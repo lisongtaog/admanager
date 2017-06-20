@@ -64,6 +64,7 @@
             <th>总点击</th>
             <th>CPA</th>
             <th>CTR</th>
+            <th>CVR</th>
         </tr>
         </thead>
         <tbody id="results_body">
@@ -122,7 +123,7 @@
                     setData(data);
                     var str = "总花费: " + data.total_spend + " 总安装: " + data.total_installed +
                             " 总展示: " + data.total_impressions + " 总点击: " + data.total_click +
-                                    " CTR: " + data.total_ctr + " CPA: " + data.total_cpa;
+                                    " CTR: " + data.total_ctr + " CPA: " + data.total_cpa + " CVR: " + data.total_cvr;
                     $('#total_result').text(str);
                 } else {
                     admanager.showCommonDlg("错误", data.message);
@@ -136,7 +137,7 @@
                 var one = data.array[i];
                 var tr = $('<tr></tr>');
                 var keyset = ["campaign_id", "account_id", "campaign_name", "create_time",
-                    "status", "budget", "bidding", "spend", "installed", "click", "cpa", "ctr"];
+                    "status", "budget", "bidding", "spend", "installed", "click", "cpa", "ctr", "cvr"];
                 for (var j = 0; j < keyset.length; j++) {
                     var td = $('<td></td>');
                     if (keyset[j] == 'budget' || keyset[j] == 'bidding') {

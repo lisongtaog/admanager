@@ -1,12 +1,12 @@
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+
 <%@ page import="com.bestgo.admanager.Utils" %>
 <%@ page import="com.bestgo.common.database.utils.JSObject" %>
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="com.bestgo.admanager.servlet.Campaign" %>
 <%@ page import="com.bestgo.admanager.servlet.Tags" %>
-<%@ page import="com.google.gson.JsonObject" %>
 <%@ page import="com.google.gson.JsonArray" %>
-
 
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 
@@ -41,7 +41,7 @@
 
         <table class="table">
             <thead>
-            <tr><th>序号</th><th>系列ID</th><th>广告组ID</th><th>广告账号ID</th><th>系列名称</th><th>创建时间</th><th>状态</th><th>预算</th><th>竞价</th><th>总花费</th><th>总安装</th><th>总点击</th><th>CPA</th><th>CTR</th><th>标签</th><th>操作</th></tr>
+            <tr><th>序号</th><th>系列ID</th><th>广告组ID</th><th>广告账号ID</th><th>系列名称</th><th>创建时间</th><th>状态</th><th>预算</th><th>竞价</th><th>总花费</th><th>总安装</th><th>总点击</th><th>CPA</th><th>CTR</th><th>CVR</th><th>标签</th><th>操作</th></tr>
             </thead>
             <tbody>
 
@@ -77,6 +77,9 @@
                     if (tagStr.length() > 0) {
                         tagStr = tagStr.substring(0, tagStr.length() - 1);
                     }
+                    double installed = Utils.convertDouble(one.get("total_installed"), 0);
+                    double click = Utils.convertDouble(one.get("total_click"), 0);
+                    double cvr = click > 0 ? installed / click : 0;
             %>
             <tr>
                 <td><%=one.get("id")%></td>
@@ -91,8 +94,9 @@
                 <td><%=one.get("total_spend")%></td>
                 <td><%=one.get("total_installed")%></td>
                 <td><%=one.get("total_click")%></td>
-                <td><%=one.get("cpa")%></td>
-                <td><%=one.get("ctr")%></td>
+                <td><fmt:formatNumber value='<%=one.get("cpa")%>' pattern="0.0000"/> </td>
+                <td><fmt:formatNumber value='<%=one.get("ctr")%>' pattern="0.0000"/> </td>
+                <td><fmt:formatNumber value="<%=cvr%>" pattern="0.0000"/> </td>
                 <td><%=tagStr%></td>
                 <td><a class="link_modify" href="#">修改</a></td>
             </tr>
@@ -253,7 +257,7 @@
             var one = data[i];
             var tr = $('<tr></tr>');
             var keyset = ["id", "campaign_id", "adset_id", "account_id", "campaign_name", "create_time",
-                "status", "budget", "bidding", "total_spend", "total_installed", "total_click", "cpa", "ctr", "tagStr"];
+                "status", "budget", "bidding", "total_spend", "total_installed", "total_click", "cpa", "ctr", "cvr", "tagStr"];
             for (var j = 0; j < keyset.length; j++) {
                 var td = $('<td></td>');
                 if (keyset[j] == 'budget' || keyset[j] == 'bidding') {
@@ -281,7 +285,7 @@
             var status = $(tds.get(6)).text();
             var budget = $(tds.get(7)).text();
             var bidding = $(tds.get(8)).text();
-            var tags = $(tds.get(14)).text().split(',');
+            var tags = $(tds.get(15)).text().split(',');
 
             $('#inputCampaignName').val(campaignName);
             if (status.toLowerCase() == 'active') {

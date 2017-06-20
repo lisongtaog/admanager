@@ -56,7 +56,9 @@ public class Campaign extends HttpServlet {
                         } else if (value instanceof Long) {
                             one.addProperty(key, (Long)value);
                         } else if (value instanceof Double) {
-                            one.addProperty(key, (Double)value);
+                            one.addProperty(key, Utils.trimDouble((Double)value));
+                        } else {
+                            one.addProperty(key, value.toString());
                         }
                     }
                     List<String> tags = Campaign.bindTags(data.get(i).get("campaign_id"));
@@ -67,6 +69,10 @@ public class Campaign extends HttpServlet {
                     if (tagStr.length() > 0) {
                         tagStr = tagStr.substring(0, tagStr.length() - 1);
                     }
+                    double installed = Utils.convertDouble(one.get("total_installed").getAsDouble(), 0);
+                    double click = Utils.convertDouble(one.get("total_click").getAsDouble(), 0);
+                    double cvr = click > 0 ? installed / click : 0;
+                    one.addProperty("cvr", Utils.trimDouble(cvr));
                     one.addProperty("tagStr", tagStr);
                     array.add(one);
                 }

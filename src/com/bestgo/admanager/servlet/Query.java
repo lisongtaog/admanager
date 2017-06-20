@@ -5,6 +5,7 @@ import com.bestgo.common.database.services.DB;
 import com.bestgo.common.database.utils.JSObject;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import org.apache.log4j.Logger;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -54,6 +55,8 @@ public class Query extends HttpServlet {
                         "and date between '" + startTime +"' and '" + endTime +"' " +
                         "and c.campaign_id in (" + campaignIds + ")" +
                         "group by ch.campaign_id;";
+                Logger logger = Logger.getRootLogger();
+                logger.debug(sql);
                 list = DB.findListBySql(sql);
                 JsonObject jsonObject = new JsonObject();
                 JsonArray array = new JsonArray();
@@ -63,6 +66,7 @@ public class Query extends HttpServlet {
                 double total_click = 0;
                 double total_ctr = 0;
                 double total_cpa = 0;
+                double total_cvr = 0;
                 for (int i = 0; i < list.size(); i++) {
                     JSObject one = list.get(i);
                     String campaign_id = one.get("campaign_id");
@@ -78,12 +82,14 @@ public class Query extends HttpServlet {
                     double click = Utils.convertDouble(one.get("click"), 0);
                     double ctr = impressions > 0 ? click / impressions : 0;
                     double cpa = installed > 0 ? spend / installed : 0;
+                    double cvr = click > 0 ? installed / click : 0;
                     total_spend += spend;
                     total_installed += installed;
                     total_impressions += impressions;
                     total_click += click;
                     total_ctr = total_impressions > 0 ? total_click / total_impressions : 0;
                     total_cpa = total_installed > 0 ? total_spend / total_installed : 0;
+                    total_cvr = total_click > 0 ? total_installed / total_click : 0;
 
                     JsonObject d = new JsonObject();
                     d.addProperty("campaign_id", campaign_id);
@@ -96,8 +102,9 @@ public class Query extends HttpServlet {
                     d.addProperty("spend", spend);
                     d.addProperty("installed", installed);
                     d.addProperty("click", click);
-                    d.addProperty("ctr", ctr);
-                    d.addProperty("cpa", cpa);
+                    d.addProperty("ctr", Utils.trimDouble(ctr));
+                    d.addProperty("cpa", Utils.trimDouble(cpa));
+                    d.addProperty("cvr", Utils.trimDouble(cvr));
                     array.add(d);
                 }
                 jsonObject.add("array", array);
@@ -105,8 +112,9 @@ public class Query extends HttpServlet {
                 jsonObject.addProperty("total_installed", total_installed);
                 jsonObject.addProperty("total_impressions", total_impressions);
                 jsonObject.addProperty("total_click", total_click);
-                jsonObject.addProperty("total_ctr", total_ctr);
-                jsonObject.addProperty("total_cpa", total_cpa);
+                jsonObject.addProperty("total_ctr", Utils.trimDouble(total_ctr));
+                jsonObject.addProperty("total_cpa", Utils.trimDouble(total_cpa));
+                jsonObject.addProperty("total_cvr", Utils.trimDouble(total_cvr));
                 json.add("data", jsonObject);
 
                 json.addProperty("ret", 1);
@@ -115,10 +123,11 @@ public class Query extends HttpServlet {
                 json.addProperty("ret", 0);
                 json.addProperty("message", "标签不存在");
             }
-        } catch (Exception e) {
+        } catch (Exception ex) {
             json.addProperty("ret", 0);
-            json.addProperty("message", e.getMessage());
-            e.printStackTrace();
+            json.addProperty("message", ex.getMessage());
+            Logger logger = Logger.getRootLogger();
+            logger.error(ex.getMessage(), ex);
         }
 
         response.getWriter().write(json.toString());

@@ -49,10 +49,14 @@ public class Utils {
             } else if (value instanceof Long) {
                 return (Long)value;
             } else if (value instanceof Integer) {
-                return (Long)value;
+                return (Integer)value;
             }
         } catch (Exception ex) {
         }
         return defaultValue;
+    }
+
+    public static double trimDouble(double value) {
+        return Double.parseDouble(String.format("%.4f", value));
     }
 }
