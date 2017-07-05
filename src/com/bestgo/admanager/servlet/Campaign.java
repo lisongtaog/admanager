@@ -13,7 +13,10 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -123,6 +126,14 @@ public class Campaign extends HttpServlet {
                         }
 
                         Process process = Runtime.getRuntime().exec(cmd);
+                        InputStream is = process.getInputStream();
+                        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+                        String lines = "";
+                        String line = reader.readLine();
+                        while (line != null) {
+                            lines += line + "\n";
+                            line = reader.readLine();
+                        }
                         process.waitFor();
                         int code = process.exitValue();
                         if (code == 0) {
@@ -133,6 +144,10 @@ public class Campaign extends HttpServlet {
                                     .put("bidding", Utils.parseDouble(bidding, 0) * 100)
                                     .where(DB.filter().whereEqualTo("id", Utils.parseInt(id, 0)))
                                     .execute();
+                        } else  {
+                            ret.result = false;
+                            ret.message = cmd + "\n" + lines;
+                            return ret;
                         }
                     }
                 }
