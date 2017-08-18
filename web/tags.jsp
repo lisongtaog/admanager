@@ -27,7 +27,11 @@
         <li role="presentation"><a href="index.jsp">首页</a></li>
         <li role="presentation"><a href="adaccounts.jsp">广告账号管理</a></li>
         <li role="presentation"><a href="campaigns.jsp">广告系列管理</a></li>
-        <li role="presentation" class="active"><a href="#">标签管理</a></li>    </ul>
+        <li role="presentation" class="active"><a href="#">标签管理</a></li>
+        <li role="presentation"><a href="rules.jsp">规则</a></li>
+        <li role="presentation"><a href="query.jsp">查询</a></li>
+        <li role="presentation"><a href="system.jsp">系统管理</a></li>
+    </ul>
 
     <div class="panel panel-default">
         <!-- Default panel contents -->

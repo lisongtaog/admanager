@@ -1,5 +1,7 @@
 package com.bestgo.admanager;
 
+import com.bestgo.common.database.services.DB;
+import com.bestgo.common.database.utils.JSObject;
 import com.google.gson.JsonObject;
 
 import javax.servlet.http.HttpServletRequest;
@@ -58,5 +60,27 @@ public class Utils {
 
     public static double trimDouble(double value) {
         return Double.parseDouble(String.format("%.4f", value));
+    }
+
+    public static String getAccessToken() {
+        try {
+            JSObject jsObject = DB.simpleScan("ad_app_config").select("access_token").execute();
+            return jsObject.get("access_token");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "";
+    }
+
+    public static String getFirstAdAccountId() {
+        try {
+            JSObject jsObject = DB.simpleScan("web_account_id").select("account_id").orderByAsc("id").execute();
+            if (jsObject.hasObjectData()) {
+                return jsObject.get("account_id");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "";
     }
 }

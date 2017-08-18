@@ -1,8 +1,8 @@
 <%@ page import="com.bestgo.admanager.Utils" %>
 <%@ page import="com.bestgo.common.database.utils.JSObject" %>
 <%@ page import="java.util.List" %>
-<%@ page import="com.bestgo.admanager.servlet.AdAccount" %>
 <%@ page import="java.util.ArrayList" %>
+<%@ page import="com.bestgo.admanager.servlet.Rules" %>
 
 
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
@@ -11,7 +11,7 @@
 
 <html>
   <head>
-    <title>广告账号管理</title>
+    <title>规则</title>
   </head>
   <body>
 
@@ -25,31 +25,34 @@
   <div class="container-fluid">
     <ul class="nav nav-pills">
       <li role="presentation"><a href="index.jsp">首页</a></li>
-      <li role="presentation" class="active"><a href="#">广告账号管理</a></li>
+      <li role="presentation"><a href="adaccounts.jsp">广告账号管理</a></li>
       <li role="presentation"><a href="campaigns.jsp">广告系列管理</a></li>
       <li role="presentation"><a href="tags.jsp">标签管理</a></li>
-      <li role="presentation"><a href="rules.jsp">规则</a></li>
+      <li role="presentation" class="active"><a href="#">规则</a></li>
       <li role="presentation"><a href="query.jsp">查询</a></li>
       <li role="presentation"><a href="system.jsp">系统管理</a></li>
+
     </ul>
 
     <div class="panel panel-default">
       <!-- Default panel contents -->
-      <div class="panel-heading">广告账号
-        <button id="btn_add_new_account" class="btn btn-default">添加</button>
-        <input id="inputSearch" class="form-control" style="display: inline; width: auto;" type="text" />
-        <button id="btnSearch" class="btn btn-default">查找</button></div>
+      <div class="panel-heading">
+        <a href="campain_monitor_log.jsp" target="_blank">关停记录</a>
+        <button id="btn_add_new_rule" class="btn btn-default">添加</button>
+        <input id="inputQueryText" type="text"/>
+        <button id="btnQuery" class="btn btn-default">查询</button>
+      </div>
 
       <table class="table">
         <thead>
-        <tr><th>序号</th><th>广告账号</th><th>缩写</th><th>操作</th></tr>
+        <tr><th>序号</th><th>规则类型</th><th>内容</th><th>操作</th></tr>
         </thead>
         <tbody>
 
         <%
           List<JSObject> data = new ArrayList<>();
           long totalPage = 0;
-          long count = AdAccount.count();
+          long count = Rules.count();
           int index = Utils.parseInt(request.getParameter("page_index"), 0);
           int size = Utils.parseInt(request.getParameter("page_size"), 20);
           totalPage = count / size + (count % size == 0 ? 0 : 1);
@@ -57,7 +60,7 @@
           int preIndex = index > 0 ? index-1 : 0;
           int nextPage = index < totalPage - 1 ? index+1 : index;
 
-          data = AdAccount.fetchData(index, size);
+          data = Rules.fetchData(index, size);
         %>
 
         <%
@@ -66,8 +69,8 @@
         %>
         <tr>
           <td><%=one.get("id")%></td>
-          <td><%=one.get("account_id")%></td>
-          <td><%=one.get("short_name")%></td>
+          <td><%=one.get("rule_type")%></td>
+          <td><%=one.get("rule_content")%></td>
           <td><a class="link_modify" href="#">修改</a><a class="link_delete" href="#">删除</a></td>
         </tr>
         <% } %>
@@ -78,12 +81,12 @@
       <nav aria-label="Page navigation">
         <ul class="pagination">
           <li>
-            <a href="adaccounts.jsp?page_index=<%=preIndex%>" aria-label="Previous">
+            <a href="rules.jsp?page_index=<%=preIndex%>" aria-label="Previous">
               <span aria-hidden="true">上一页</span>
             </a>
           </li>
           <li>
-            <a href="adaccounts.jsp?page_index=<%=nextPage%>" aria-label="Next">
+            <a href="rules.jsp?page_index=<%=nextPage%>" aria-label="Next">
               <span aria-hidden="true">下一页</span>
             </a>
           </li>
@@ -95,25 +98,28 @@
     </div>
   </div>
 
-  <div id="new_account_dlg" class="modal fade" tabindex="-1" role="dialog">
+  <div id="new_rule_dlg" class="modal fade" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-          <h4 class="modal-title" id="dlg_title">添加广告账号</h4>
+          <h4 class="modal-title" id="dlg_title">添加规则</h4>
         </div>
         <div class="modal-body">
           <form id="modify_form" class="form-horizontal" action="#" autocomplete="off">
             <div class="form-group">
-              <label for="inputAdAccount" class="col-sm-2 control-label">广告账号</label>
+              <label for="inputRuleType" class="col-sm-2 control-label">规则类型</label>
               <div class="col-sm-10">
-                <input class="form-control" id="inputAdAccount" placeholder="广告账号" autocomplete="off">
+                <select class="form-control" id="inputRuleType">
+                  <option value="1">类型1（监控广告系列）</option>
+                  <option value="2">类型2（监控应用）</option>
+                </select>
               </div>
             </div>
             <div class="form-group">
-              <label for="inputShortName" class="col-sm-2 control-label">缩写</label>
+              <label for="inputRuleContent" class="col-sm-2 control-label">缩写</label>
               <div class="col-sm-10">
-                <input type="text" class="form-control" id="inputShortName" placeholder="缩写" autocomplete="off">
+                <input type="text" class="form-control" id="inputRuleContent" placeholder="规则内容" autocomplete="off">
               </div>
             </div>
           </form>
@@ -137,72 +143,70 @@
     var modifyType = 'new';
     var id;
 
-    $("#btn_add_new_account").click(function() {
+    $("#btn_add_new_rule").click(function() {
       modifyType = 'new';
       $('#delete_message').hide();
       $('#modify_form').show();
-      $("#dlg_title").text("添加广告账号");
-      $("#new_account_dlg").modal("show");
+      $("#dlg_title").text("添加规则");
+      $("#new_rule_dlg").modal("show");
+    });
+    $('#inputRuleContent').attr('placeholder', "campaign_id=xxx,conversions>xxx,cpa>xxx");
+
+    $('#inputRuleType').change(function() {
+      var ruleContent = $('#inputRuleContent').val();
+      var ruleType = $('#inputRuleType').val();
+      if (ruleContent.indexOf('xxx') >= 0 || ruleContent == '') {
+        if (ruleType == 1) {
+          $('#inputRuleContent').val("campaign_id=xxx,conversions>xxx,cpa>xxx")
+        } else if (ruleType == 2) {
+          $('#inputRuleContent').val("app_name=xxx,cost>xxx,cpa>xxx")
+        }
+      }
     });
 
-    $("#new_account_dlg .btn-primary").click(function() {
-      var account = $("#inputAdAccount").val();
-      var shortName = $("#inputShortName").val();
+    $("#new_rule_dlg .btn-primary").click(function() {
+      var ruleType = $("#inputRuleType").val();
+      var ruleContent = $("#inputRuleContent").val();
 
       if (modifyType == 'new') {
-        $.post('adaccount/create', {
-          account: account,
-          shortName: shortName
+        $.post('rules/create', {
+          ruleType: ruleType,
+          ruleContent: ruleContent
         }, function(data) {
           if (data && data.ret == 1) {
-            $("#new_account_dlg").modal("hide");
+            $("#new_rule_dlg").modal("hide");
             location.reload();
           } else {
             admanager.showCommonDlg("错误", data.message);
           }
         }, 'json');
       } else if (modifyType == 'update') {
-        $.post('adaccount/update', {
+        $.post('rules/update', {
           id: id,
-          account: account,
-          shortName: shortName
+          ruleType: ruleType,
+          ruleContent: ruleContent
         }, function(data) {
           if (data && data.ret == 1) {
-            $("#new_account_dlg").modal("hide");
+            $("#new_rule_dlg").modal("hide");
             location.reload();
           } else {
             admanager.showCommonDlg("错误", data.message);
           }
         }, 'json');
       } else if (modifyType == 'delete') {
-        $.post('adaccount/delete', {
+        $.post('rules/delete', {
           id: id,
-          account: account,
-          shortName: shortName
+          ruleType: ruleType,
+          ruleContent: ruleContent
         }, function(data) {
           if (data && data.ret == 1) {
-            $("#new_account_dlg").modal("hide");
+            $("#new_rule_dlg").modal("hide");
             location.reload();
           } else {
             admanager.showCommonDlg("错误", data.message);
           }
         }, 'json');
       }
-    });
-
-    $('#btnSearch').click(function() {
-      var query = $("#inputSearch").val();
-      $.post('adaccount/query', {
-        word: query
-      }, function(data) {
-        if (data && data.ret == 1) {
-          $('.table tbody > tr').remove();
-          setData(data.data);
-          bindOp();
-        } else {
-          admanager.showCommonDlg("错误", data.message);
-        }
-      }, 'json');
     });
 
     function setData(data) {
@@ -213,10 +217,10 @@
         td.text(one.id);
         tr.append(td);
         td = $('<td></td>');
-        td.text(one.account_id);
+        td.text(one.rule_type);
         tr.append(td);
         td = $('<td></td>');
-        td.text(one.short_name);
+        td.text(one.rule_content);
         tr.append(td);
         td = $('<td><a class="link_modify" href="#">修改</a><a class="link_delete" href="#">删除</a></td>');
         tr.append(td);
@@ -230,16 +234,16 @@
         $('#delete_message').hide();
         $('#modify_form').show();
 
-        $("#dlg_title").text("修改广告账号");
+        $("#dlg_title").text("修改规则");
 
         var tds = $(this).parents("tr").find('td');
         id = $(tds.get(0)).text();
-        var account = $(tds.get(1)).text();
-        var shortName = $(tds.get(2)).text();
-        $("#inputAdAccount").val(account);
-        $("#inputShortName").val(shortName);
+        var ruleType = $(tds.get(1)).text();
+        var ruleContent = $(tds.get(2)).text();
+        $("#inputRuleType").val(ruleType);
+        $("#inputRuleContent").val(ruleContent);
 
-        $("#new_account_dlg").modal("show");
+        $("#new_rule_dlg").modal("show");
       });
 
       $(".link_delete").click(function() {
@@ -247,18 +251,48 @@
         $('#delete_message').show();
         $('#modify_form').hide();
 
-        $("#dlg_title").text("删除广告账号");
+        $("#dlg_title").text("删除规则");
 
         var tds = $(this).parents("tr").find('td');
         id = $(tds.get(0)).text();
-        var account = $(tds.get(1)).text();
-        var shortName = $(tds.get(2)).text();
-        $("#inputAdAccount").val(account);
-        $("#inputShortName").val(shortName);
+        var ruleType = $(tds.get(1)).text();
+        var ruleContent = $(tds.get(2)).text();
+        $("#inputRuleType").val(ruleType);
+        $("#inputRuleContent").val(ruleContent);
 
-        $("#new_account_dlg").modal("show");
+        $("#new_rule_dlg").modal("show");
       });
     }
+
+    $('#btnQuery').click(function() {
+      var query = $('#inputQueryText').val();
+      $.post('rules/query', {
+        text: query,
+      }, function(data) {
+        if (data && data.ret == 1) {
+          $('.table tbody tr').remove();
+          for (var i = 0; i < data.data.length; i++) {
+            var one = data.data[i];
+            var tr = $('<tr></tr>');
+            var td = $('<td></td>');
+            td.text(one.id);
+            tr.append(td);
+            td = $('<td></td>');
+            td.text(one.rule_type);
+            tr.append(td);
+            td = $('<td></td>');
+            td.text(one.rule_content);
+            tr.append(td);
+            td = $('<td><a class="link_modify" href="#">修改</a><a class="link_delete" href="#">删除</a></td>');
+            tr.append(td);
+            $('.table tbody').append(tr);
+          }
+          bindOp();
+        } else {
+          admanager.showCommonDlg("错误", data.message);
+        }
+      }, 'json');
+    });
 
     bindOp();
   </script>

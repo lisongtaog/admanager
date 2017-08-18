@@ -32,12 +32,22 @@ public class Campaign extends HttpServlet {
 
         if (path.startsWith("/update")) {
             String id = request.getParameter("id");
+            String campaignId = request.getParameter("campaignId");
             String campaignName = request.getParameter("campaignName");
             String status = request.getParameter("status");
             String budget = request.getParameter("budget");
             String bidding = request.getParameter("bidding");
             String tags = request.getParameter("tags");
 
+            if (id == null) {
+                try {
+                    JSObject campaign = DB.simpleScan("web_ad_campaigns").select("id", "campaign_id", "adset_id", "campaign_name", "status", "budget", "bidding").where(DB.filter().whereEqualTo("campaign_id", campaignId)).execute();
+                    if (campaign.hasObjectData()) {
+                        id = campaign.get("id").toString();
+                    }
+                } catch (Exception e) {
+                }
+            }
             OperationResult result = updateCampaign(id, campaignName, status, budget, bidding, tags);
             json.addProperty("ret", result.result ? 1 : 0);
             json.addProperty("message", result.message);
@@ -80,6 +90,37 @@ public class Campaign extends HttpServlet {
                     array.add(one);
                 }
                 json.add("data", array);
+            }
+        } else if (path.startsWith("/find_create_data")) {
+            String id = request.getParameter("campaignId");
+            try {
+                JSObject record = DB.simpleScan("ad_campaigns").select("id", "app_name", "campaign_id", "facebook_app_id", "account_id", "country_region",
+                        "language", "campaign_name", "page_id", "bugdet", "bidding", "title", "message", "tag_name", "age", "gender", "detail_target", "max_cpa")
+                        .where(DB.filter().whereEqualTo("campaign_id", id)).execute();
+                if (record.hasObjectData()) {
+                    json.addProperty("ret", 1);
+                    JsonObject one = new JsonObject();
+                    Set<String> keySet = record.getKeys();
+                    for (String key : keySet) {
+                        Object value = record.get(key);
+                        if (value instanceof String) {
+                            one.addProperty(key, (String)value);
+                        } else if (value instanceof Integer) {
+                            one.addProperty(key, (Integer)value);
+                        } else if (value instanceof Long) {
+                            one.addProperty(key, (Long)value);
+                        } else if (value instanceof Double) {
+                            one.addProperty(key, Utils.trimDouble((Double)value));
+                        } else {
+                            one.addProperty(key, value.toString());
+                        }
+                    }
+                    json.add("data", one);
+                } else {
+                    json.addProperty("ret", 0);
+                    json.addProperty("message", "没有找到创建数据");
+                }
+            } catch (Exception e) {
             }
         }
 
@@ -221,7 +262,7 @@ public class Campaign extends HttpServlet {
         try {
             return DB.scan("web_ad_campaigns").select("id", "campaign_id", "adset_id", "account_id", "campaign_name", "create_time",
                     "status", "budget", "bidding", "total_spend", "total_installed", "total_click", "cpa", "ctr")
-                    .where(DB.filter().whereLikeTo("campaign_name", "%" + word + "%")).orderByAsc("id").execute();
+                    .where(DB.filter().whereLikeTo("campaign_name", "%" + word + "%")).or(DB.filter().whereEqualTo("campaign_id", word)).orderByAsc("id").execute();
         } catch (Exception ex) {
             Logger logger = Logger.getRootLogger();
             logger.error(ex.getMessage(), ex);

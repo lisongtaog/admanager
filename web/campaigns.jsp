@@ -32,11 +32,15 @@
         <li role="presentation"><a href="index.jsp">首页</a></li>
         <li role="presentation"><a href="adaccounts.jsp">广告账号管理</a></li>
         <li role="presentation" class="active"><a href="#">广告系列管理</a></li>
-        <li role="presentation"><a href="tags.jsp">标签管理</a></li>    </ul>
+        <li role="presentation"><a href="tags.jsp">标签管理</a></li>
+        <li role="presentation"><a href="rules.jsp">规则</a></li>
+        <li role="presentation"><a href="query.jsp">查询</a></li>
+        <li role="presentation"><a href="system.jsp">系统管理</a></li>
+    </ul>
 
     <div class="panel panel-default">
         <div class="panel-heading">广告系列列表
-            <input id="inputSearch" class="form-control" style="display: inline; width: auto;" type="text" />
+            <input id="inputSearch" class="form-control" placeholder="系列名字或系列ID，系列名字可以模糊查询" style="display: inline; width: auto;" type="text" />
             <button id="btnSearch" class="btn btn-default">查找</button></div>
 
         <table class="table">
@@ -98,7 +102,7 @@
                 <td><fmt:formatNumber value='<%=one.get("ctr")%>' pattern="0.0000"/> </td>
                 <td><fmt:formatNumber value="<%=cvr%>" pattern="0.0000"/> </td>
                 <td><%=tagStr%></td>
-                <td><a class="link_modify" href="#">修改</a></td>
+                <td><a class="link_modify" href="javascript:void(0)">修改</a></td>
             </tr>
             <% } %>
 
@@ -230,7 +234,7 @@
         }, function (data) {
             if (data && data.ret == 1) {
                 $("#new_campaign_dlg").modal("hide");
-                location.reload();
+//                location.reload();
             } else {
                 admanager.showCommonDlg("错误", data.message);
             }
@@ -267,7 +271,7 @@
                 }
                 tr.append(td);
             }
-            td = $('<td><a class="link_modify" href="#">修改</a>');
+            td = $('<td><a class="link_modify" href="javascript:void(0)">修改</a>');
             tr.append(td);
             $('.table tbody').append(tr);
         }
