@@ -41,7 +41,7 @@ public class Logs extends HttpServlet {
                     one.addProperty("id", (String) data.get(i).get("category"));
                     one.addProperty("category", (String) data.get(i).get("category"));
                     one.addProperty("sub_category", (String) data.get(i).get("sub_category"));
-                    one.addProperty("log_time", (String) data.get(i).get("log_time"));
+                    one.addProperty("log_time", data.get(i).get("log_time").toString());
                     one.addProperty("content", (String)data.get(i).get("content"));
                     array.add(one);
                 }
