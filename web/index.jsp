@@ -34,7 +34,9 @@
     <ul class="nav nav-pills">
         <li role="presentation" class="active"><a href="#">首页</a></li>
         <li role="presentation"><a href="adaccounts.jsp">广告账号管理</a></li>
+        <li role="presentation"><a href="adaccounts_admob.jsp">广告账号管理(AdMob)</a></li>
         <li role="presentation"><a href="campaigns.jsp">广告系列管理</a></li>
+        <li role="presentation"><a href="campaigns_admob.jsp">广告系列管理(AdMob)</a></li>
         <li role="presentation"><a href="tags.jsp">标签管理</a></li>
         <li role="presentation"><a href="rules.jsp">规则</a></li>
         <li role="presentation"><a href="query.jsp">查询</a></li>
@@ -52,6 +54,8 @@
             <button id="btnSearch" class="btn btn-default">查找</button>
             <button id="btnSummary" class="btn btn-default">汇总数据</button>
             <input type="checkbox" id="emptyCampaignCheck"/><label for="emptyCampaignCheck">当前没数据的</label>
+            <input type="checkbox" id="admobCheck"/><label for="admobCheck">显示admob数据</label>
+            <input type="checkbox" id="countryCheck"/><label for="countryCheck">细分到国家</label>
         </div>
     </div>
     <table class="table table-hover">
@@ -170,11 +174,13 @@
         $('#inputStartTime').val(now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + now.getDate());
         $('#inputEndTime').val(now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + now.getDate());
         $('#inputStartTime').datetimepicker({
+            minView: "month",
             format: 'yyyy-mm-dd',
             autoclose: true,
             todayBtn: true
         });
         $('#inputEndTime').datetimepicker({
+            minView: "month",
             format: 'yyyy-mm-dd',
             autoclose: true,
             todayBtn: true
@@ -189,14 +195,25 @@
             var startTime = $('#inputStartTime').val();
             var endTime = $('#inputEndTime').val();
             var emptyCampaign = $('#emptyCampaignCheck').is(':checked');
+            var admobCheck = $('#admobCheck').is(':checked');
+            var countryCheck = $('#countryCheck').is(':checked');
+
             $.post('query', {
                 tag: query,
                 startTime: startTime,
                 endTime: endTime,
                 emptyCampaign: emptyCampaign,
+                admobCheck: admobCheck,
+                countryCheck: countryCheck,
             }, function (data) {
                 if (data && data.ret == 1) {
-                    $('#result_header').html("<tr><th>系列ID</th><th>广告账号ID</th><th>系列名称</th><th>创建时间<span sorterId=\"1\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>状态<span sorterId=\"2\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>预算<span sorterId=\"3\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>竞价<span sorterId=\"4\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>总花费<span sorterId=\"5\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>总安装<span sorterId=\"6\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>总点击<span sorterId=\"7\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>CPA<span sorterId=\"8\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>CTR<span sorterId=\"9\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>CVR<span sorterId=\"10\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>操作</th></tr>");
+                    if (countryCheck) {
+                        $('#result_header').html("<tr><th>系列ID</th><th>广告账号ID</th><th>系列名称</th><th>国家</th><th>创建时间<span sorterId=\"1\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>状态<span sorterId=\"2\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>预算<span sorterId=\"3\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>竞价<span sorterId=\"4\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>总花费<span sorterId=\"5\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>总安装<span sorterId=\"6\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>总点击<span sorterId=\"7\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>CPA<span sorterId=\"8\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>CTR<span sorterId=\"9\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>CVR<span sorterId=\"10\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th></tr>");
+                    } else if (admobCheck) {
+                        $('#result_header').html("<tr><th>系列ID</th><th>广告账号ID</th><th>系列名称</th><th>创建时间<span sorterId=\"1\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>状态<span sorterId=\"2\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>预算<span sorterId=\"3\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>竞价<span sorterId=\"4\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>总花费<span sorterId=\"5\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>总安装<span sorterId=\"6\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>总点击<span sorterId=\"7\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>CPA<span sorterId=\"8\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>CTR<span sorterId=\"9\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>CVR<span sorterId=\"10\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th></tr>");
+                    } else {
+                        $('#result_header').html("<tr><th>系列ID</th><th>广告账号ID</th><th>系列名称</th><th>创建时间<span sorterId=\"1\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>状态<span sorterId=\"2\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>预算<span sorterId=\"3\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>竞价<span sorterId=\"4\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>总花费<span sorterId=\"5\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>总安装<span sorterId=\"6\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>总点击<span sorterId=\"7\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>CPA<span sorterId=\"8\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>CTR<span sorterId=\"9\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>CVR<span sorterId=\"10\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>操作</th></tr>");
+                    }
                     data = data.data;
                     setData(data);
                     bindSortOp();
@@ -215,11 +232,13 @@
             var startTime = $('#inputStartTime').val();
             var endTime = $('#inputEndTime').val();
             var emptyCampaign = $('#emptyCampaignCheck').is(':checked');
+            var admobCheck = $('#admobCheck').is(':checked');
             $.post('query', {
                 summary: true,
                 startTime: startTime,
                 endTime: endTime,
                 emptyCampaign: emptyCampaign,
+                admobCheck: admobCheck,
             }, function (data) {
                 if (data && data.ret == 1) {
                     $('#result_header').html("<tr><th>应用名称</th><th>总花费</th><th>总安装</th><th>总展示</th><th>总点击</th><th>CTR</th><th>CPA</th><th>CVR</th></tr>");
@@ -251,8 +270,13 @@
         for (var i = 0; i < data.array.length; i++) {
             var one = data.array[i];
             var tr = $('<tr></tr>');
+            var countryCheck = $('#countryCheck').is(':checked');
             var keyset = ["campaign_id", "account_id", "campaign_name", "create_time",
                 "status", "budget", "bidding", "spend", "installed", "click", "cpa", "ctr", "cvr"];
+            if (countryCheck) {
+                keyset = ["campaign_id", "account_id", "campaign_name", "country_name", "create_time",
+                    "status", "budget", "bidding", "spend", "installed", "click", "cpa", "ctr", "cvr"];
+            }
             for (var j = 0; j < keyset.length; j++) {
                 var td = $('<td></td>');
                 if (keyset[j] == 'budget' || keyset[j] == 'bidding') {
@@ -262,8 +286,12 @@
                 }
                 tr.append(td);
             }
-            var td = $('<td><a class="link_modify" href="javascript:void(0)">修改</a><a class="link_copy" href="javascript:void(0)">复制</a></td>');
-            tr.append(td);
+            var admobCheck = $('#admobCheck').is(':checked');
+            var countryCheck = $('#countryCheck').is(':checked');
+            if (!admobCheck && !countryCheck) {
+                var td = $('<td><a class="link_modify" href="javascript:void(0)">修改</a><a class="link_copy" href="javascript:void(0)">复制</a></td>');
+                tr.append(td);
+            }
             $('#results_body').append(tr);
         }
         bindOp();
@@ -332,11 +360,16 @@
             var startTime = $('#inputStartTime').val();
             var endTime = $('#inputEndTime').val();
             var emptyCampaign = $('#emptyCampaignCheck').is(':checked');
+            var admobCheck = $('#admobCheck').is(':checked');
+            var countryCheck = $('#countryCheck').is(':checked');
+
             $.post('query', {
                 tag: query,
                 startTime: startTime,
                 endTime: endTime,
                 emptyCampaign: emptyCampaign,
+                admobCheck: admobCheck,
+                countryCheck: countryCheck,
                 sorterId: sorterId
             }, function (data) {
                 if (data && data.ret == 1) {

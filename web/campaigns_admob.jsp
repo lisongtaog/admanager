@@ -7,12 +7,13 @@
 <%@ page import="com.bestgo.admanager.servlet.Campaign" %>
 <%@ page import="com.bestgo.admanager.servlet.Tags" %>
 <%@ page import="com.google.gson.JsonArray" %>
+<%@ page import="com.bestgo.admanager.servlet.CampaignAdmob" %>
 
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 
 <html>
 <head>
-    <title>广告系列管理</title>
+    <title>广告系列管理(AdMob)</title>
     <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css" />
     <link rel="stylesheet" href="bootstrap/css/bootstrap-theme.min.css" />
     <link rel="stylesheet" href="css/core.css" />
@@ -32,8 +33,8 @@
         <li role="presentation"><a href="index.jsp">首页</a></li>
         <li role="presentation"><a href="adaccounts.jsp">广告账号管理</a></li>
         <li role="presentation"><a href="adaccounts_admob.jsp">广告账号管理(AdMob)</a></li>
-        <li role="presentation" class="active"><a href="#">广告系列管理</a></li>
-        <li role="presentation"><a href="campaigns_admob.jsp">广告系列管理(AdMob)</a></li>
+        <li role="presentation"><a href="campaigns.jsp">广告系列管理</a></li>
+        <li role="presentation" class="active"><a href="#">广告系列管理(AdMob)</a></li>
         <li role="presentation"><a href="tags.jsp">标签管理</a></li>
         <li role="presentation"><a href="rules.jsp">规则</a></li>
         <li role="presentation"><a href="query.jsp">查询</a></li>
@@ -47,14 +48,14 @@
 
         <table class="table">
             <thead>
-            <tr><th>序号</th><th>系列ID</th><th>广告组ID</th><th>广告账号ID</th><th>系列名称</th><th>创建时间</th><th>状态</th><th>预算</th><th>竞价</th><th>总花费</th><th>总安装</th><th>总点击</th><th>CPA</th><th>CTR</th><th>CVR</th><th>标签</th><th>操作</th></tr>
+            <tr><th>序号</th><th>系列ID</th><th>广告账号ID</th><th>系列名称</th><th>创建时间</th><th>状态</th><th>预算</th><th>竞价</th><th>总花费</th><th>总安装</th><th>总点击</th><th>CPA</th><th>CTR</th><th>CVR</th><th>标签</th><th>操作</th></tr>
             </thead>
             <tbody>
 
             <%
                 List<JSObject> data = new ArrayList<>();
                 long totalPage = 0;
-                long count = Campaign.count();
+                long count = CampaignAdmob.count();
                 int index = Utils.parseInt(request.getParameter("page_index"), 0);
                 int size = Utils.parseInt(request.getParameter("page_size"), 20);
                 totalPage = count / size + (count % size == 0 ? 0 : 1);
@@ -62,7 +63,7 @@
                 int preIndex = index > 0 ? index-1 : 0;
                 int nextPage = index < totalPage - 1 ? index+1 : index;
 
-                data = Campaign.fetchData(index, size);
+                data = CampaignAdmob.fetchData(index, size);
 
                 List<JSObject> allTags = Tags.fetchAllTags();
                 JsonArray array = new JsonArray();
@@ -75,7 +76,7 @@
             <%
                 for (int i = 0; i < data.size(); i++) {
                     JSObject one = data.get(i);
-                    List<String> tags = Campaign.bindTags((String)one.get("campaign_id"));
+                    List<String> tags = CampaignAdmob.bindTags((String)one.get("campaign_id"));
                     String tagStr = "";
                     for (int ii = 0; ii < tags.size(); ii++) {
                         tagStr += (tags.get(ii) + ",");
@@ -90,7 +91,6 @@
             <tr>
                 <td><%=one.get("id")%></td>
                 <td><%=one.get("campaign_id")%></td>
-                <td><%=one.get("adset_id")%></td>
                 <td><%=one.get("account_id")%></td>
                 <td><%=one.get("campaign_name")%></td>
                 <td><%=one.get("create_time")%></td>
@@ -140,30 +140,6 @@
             </div>
             <div class="modal-body">
                 <form id="modify_form" class="form-horizontal" action="#" autocomplete="off">
-                    <div class="form-group">
-                        <label for="inputCampaignName" class="col-sm-2 control-label">系列名称</label>
-                        <div class="col-sm-10">
-                            <input class="form-control" id="inputCampaignName" placeholder="系列名称" autocomplete="off">
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="inputStatus" class="col-sm-2 control-label">是否开启</label>
-                        <div class="col-sm-10">
-                            <input type="checkbox" id="inputStatus">
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="inputBudget" class="col-sm-2 control-label">预算</label>
-                        <div class="col-sm-10">
-                            <input type="number" class="form-control" id="inputBudget" placeholder="预算" autocomplete="off">
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="inputBidding" class="col-sm-2 control-label">竞价</label>
-                        <div class="col-sm-10">
-                            <input type="number" class="form-control" id="inputBidding" placeholder="竞价" autocomplete="off">
-                        </div>
-                    </div>
                     <div class="form-group">
                         <label for="inputTags" class="col-sm-2 control-label">标签</label>
                         <div class="col-sm-10">
@@ -219,19 +195,10 @@
     });
 
     $("#new_campaign_dlg .btn-primary").click(function() {
-        var campaignName = $('#inputCampaignName').val();
-        var status = $('#inputStatus').prop('checked') ? 'ACTIVE' : 'PAUSED';
-        var budget = $('#inputBudget').val();
-        var bidding = $('#inputBidding').val();
-
         var tags = $('#inputTags').val();
 
-        $.post('campaign/update', {
+        $.post('campaign_admob/update', {
             id: id,
-            campaignName: campaignName,
-            status: status,
-            budget: budget,
-            bidding: bidding,
             tags: tags
         }, function (data) {
             if (data && data.ret == 1) {
@@ -245,7 +212,7 @@
 
     $('#btnSearch').click(function() {
         var query = $("#inputSearch").val();
-        $.post('campaign/query', {
+        $.post('campaign_admob/query', {
             word: query
         }, function(data) {
             if (data && data.ret == 1) {
@@ -262,7 +229,7 @@
         for (var i = 0; i < data.length; i++) {
             var one = data[i];
             var tr = $('<tr></tr>');
-            var keyset = ["id", "campaign_id", "adset_id", "account_id", "campaign_name", "create_time",
+            var keyset = ["id", "campaign_id", "account_id", "campaign_name", "create_time",
                 "status", "budget", "bidding", "total_spend", "total_installed", "total_click", "cpa", "ctr", "cvr", "tagStr"];
             for (var j = 0; j < keyset.length; j++) {
                 var td = $('<td></td>');
@@ -287,20 +254,7 @@
 
             var tds = $(this).parents("tr").find('td');
             id = $(tds.get(0)).text();
-            var campaignName = $(tds.get(4)).text();
-            var status = $(tds.get(6)).text();
-            var budget = $(tds.get(7)).text();
-            var bidding = $(tds.get(8)).text();
-            var tags = $(tds.get(15)).text().split(',');
-
-            $('#inputCampaignName').val(campaignName);
-            if (status.toLowerCase() == 'active') {
-                $('#inputStatus').prop('checked', true);
-            } else {
-                $('#inputStatus').prop('checked', false);
-            }
-            $('#inputBudget').val(budget);
-            $('#inputBidding').val(bidding);
+            var tags = $(tds.get(14)).text().split(',');
 
             $('#inputTags').tagsinput('removeAll');
             for (var i = 0; i < tags.length; i++) {

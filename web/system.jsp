@@ -40,7 +40,9 @@
     <ul class="nav nav-pills">
       <li role="presentation"><a href="index.jsp">首页</a></li>
       <li role="presentation"><a href="adaccounts.jsp">广告账号管理</a></li>
+      <li role="presentation"><a href="adaccounts_admob.jsp">广告账号管理(AdMob)</a></li>
       <li role="presentation"><a href="campaigns.jsp">广告系列管理</a></li>
+      <li role="presentation"><a href="campaigns_admob.jsp">广告系列管理(AdMob)</a></li>
       <li role="presentation"><a href="tags.jsp">标签管理</a></li>
       <li role="presentation"><a href="rules.jsp">规则</a></li>
       <li role="presentation"><a href="query.jsp">查询</a></li>

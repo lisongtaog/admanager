@@ -1,8 +1,8 @@
 <%@ page import="com.bestgo.admanager.Utils" %>
 <%@ page import="com.bestgo.common.database.utils.JSObject" %>
 <%@ page import="java.util.List" %>
-<%@ page import="com.bestgo.admanager.servlet.AdAccount" %>
 <%@ page import="java.util.ArrayList" %>
+<%@ page import="com.bestgo.admanager.servlet.AdAccountAdmob" %>
 
 
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
@@ -11,7 +11,7 @@
 
 <html>
   <head>
-    <title>广告账号管理</title>
+    <title>广告账号管理(AdMob)</title>
   </head>
   <body>
 
@@ -25,9 +25,10 @@
   <div class="container-fluid">
     <ul class="nav nav-pills">
       <li role="presentation"><a href="index.jsp">首页</a></li>
-      <li role="presentation" class="active"><a href="#">广告账号管理</a></li>
-      <li role="presentation"><a href="adaccounts_admob.jsp">广告账号管理(AdMob)</a></li>
+      <li role="presentation"><a href="adaccounts.jsp">广告账号管理</a></li>
+      <li role="presentation" class="active"><a href="#">广告账号管理(AdMob)</a></li>
       <li role="presentation"><a href="campaigns.jsp">广告系列管理</a></li>
+      <li role="presentation"><a href="campaigns_admob.jsp">广告系列管理(AdMob)</a></li>
       <li role="presentation"><a href="tags.jsp">标签管理</a></li>
       <li role="presentation"><a href="rules.jsp">规则</a></li>
       <li role="presentation"><a href="query.jsp">查询</a></li>
@@ -50,7 +51,7 @@
         <%
           List<JSObject> data = new ArrayList<>();
           long totalPage = 0;
-          long count = AdAccount.count();
+          long count = AdAccountAdmob.count();
           int index = Utils.parseInt(request.getParameter("page_index"), 0);
           int size = Utils.parseInt(request.getParameter("page_size"), 20);
           totalPage = count / size + (count % size == 0 ? 0 : 1);
@@ -58,7 +59,7 @@
           int preIndex = index > 0 ? index-1 : 0;
           int nextPage = index < totalPage - 1 ? index+1 : index;
 
-          data = AdAccount.fetchData(index, size);
+          data = AdAccountAdmob.fetchData(index, size);
         %>
 
         <%
@@ -151,7 +152,7 @@
       var shortName = $("#inputShortName").val();
 
       if (modifyType == 'new') {
-        $.post('adaccount/create', {
+        $.post('adaccount_admob/create', {
           account: account,
           shortName: shortName
         }, function(data) {
@@ -163,7 +164,7 @@
           }
         }, 'json');
       } else if (modifyType == 'update') {
-        $.post('adaccount/update', {
+        $.post('adaccount_admob/update', {
           id: id,
           account: account,
           shortName: shortName
@@ -176,7 +177,7 @@
           }
         }, 'json');
       } else if (modifyType == 'delete') {
-        $.post('adaccount/delete', {
+        $.post('adaccount_admob/delete', {
           id: id,
           account: account,
           shortName: shortName
@@ -193,7 +194,7 @@
 
     $('#btnSearch').click(function() {
       var query = $("#inputSearch").val();
-      $.post('adaccount/query', {
+      $.post('adaccount_admob/query', {
         word: query
       }, function(data) {
         if (data && data.ret == 1) {

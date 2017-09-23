@@ -13,7 +13,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 @WebServlet(name = "query", urlPatterns = {"/query"}, asyncSupported = true)
@@ -35,6 +37,8 @@ public class Query extends HttpServlet {
         String emptyCampaign = request.getParameter("emptyCampaign");
         String isSummary = request.getParameter("summary");
         String sorterId = request.getParameter("sorterId");
+        String admobCheck = request.getParameter("admobCheck");
+        String countryCheck = request.getParameter("countryCheck");
         if (isSummary != null) {
             try {
                 List<JSObject> tags = DB.scan("web_tag")
@@ -43,7 +47,7 @@ public class Query extends HttpServlet {
                 for (int i = 0; i < tags.size(); i++) {
                     long id = tags.get(i).get("id");
                     String tagName = tags.get(i).get("tag_name");
-                    JsonObject jsonObject = fetchOneAppData(id, startTime, endTime, emptyCampaign, 0);
+                    JsonObject jsonObject = fetchOneAppData(id, startTime, endTime, emptyCampaign, 0, "true".equals(admobCheck), false);
                     jsonObject.addProperty("name", tagName);
                     arr.add(jsonObject);
                 }
@@ -68,7 +72,7 @@ public class Query extends HttpServlet {
                         .where(DB.filter().whereEqualTo("tag_name", tag)).execute();
                 if (tagObject.hasObjectData()) {
                     Long id = tagObject.get("id");
-                    JsonObject jsonObject = fetchOneAppData(id, startTime, endTime, emptyCampaign, sorter);
+                    JsonObject jsonObject = fetchOneAppData(id, startTime, endTime, emptyCampaign, sorter, "true".equals(admobCheck), "true".equals(countryCheck));
                     json.add("data", jsonObject);
 
                     json.addProperty("ret", 1);
@@ -88,8 +92,26 @@ public class Query extends HttpServlet {
         response.getWriter().write(json.toString());
     }
 
-    private JsonObject fetchOneAppData(long tagId, String startTime, String endTime, String emptyCampaign, int sorterId) throws Exception {
-        List<JSObject> list = DB.scan("web_ad_campaign_tag_rel").select("campaign_id")
+    private JsonObject fetchOneAppData(long tagId, String startTime, String endTime, String emptyCampaign,
+                                       int sorterId, boolean admobCheck, boolean countryCheck) throws Exception {
+        String relationTable = "web_ad_campaign_tag_rel";
+        String webAdCampaignTable = "web_ad_campaigns";
+        String webAdCampaignHistoryTable = "web_ad_campaigns_history";
+        if (countryCheck) {
+            webAdCampaignHistoryTable = "web_ad_campaigns_country_history";
+        }
+        if (admobCheck) {
+            relationTable = "web_ad_campaign_tag_admob_rel";
+            webAdCampaignTable = "web_ad_campaigns_admob";
+            webAdCampaignHistoryTable = "web_ad_campaigns_history_admob";
+            if (countryCheck) {
+                webAdCampaignHistoryTable = "web_ad_campaigns_country_history_admob";
+            }
+        }
+
+        HashMap<String ,String> countryMap = Utils.getCountryMap();
+
+        List<JSObject> list = DB.scan(relationTable).select("campaign_id")
                 .where(DB.filter().whereEqualTo("tag_id", tagId)).execute();
         String campaignIds = "";
         for (int i = 0; i < list.size(); i++) {
@@ -150,19 +172,37 @@ public class Query extends HttpServlet {
             }
         }
 
-        String sql = "select campaign_id, account_id, campaign_name, status, create_time, budget, bidding, spend, installed, impressions, click" +
-                ", (case when impressions > 0 then click/impressions else 0 end) as ctr" +
-                ", (case when installed > 0 then spend/installed else 0 end) as cpa" +
-                ", (case when click > 0 then installed/click else 0 end) as cvr" +
-                " from (" +
-                "select ch.campaign_id, account_id, campaign_name,c.status, create_time, c.budget, c.bidding, sum(ch.total_spend) as spend, " +
-                "sum(ch.total_installed) as installed, sum(ch.total_impressions) as impressions " +
-                ",sum(ch.total_click) as click from web_ad_campaigns c, web_ad_campaigns_history ch " +
-                "where c.campaign_id=ch.campaign_id\n" +
-                "and date between '" + startTime + "' and '" + endTime + "' " +
-                "and c.campaign_id in (" + campaignIds + ")" +
-                "group by ch.campaign_id) a " + orderStr;
-        list = DB.findListBySql(sql);
+        if (!campaignIds.isEmpty()) {
+            String sql = "select campaign_id, account_id, campaign_name, status, create_time, budget, bidding, spend, installed, impressions, click" +
+                    ", (case when impressions > 0 then click/impressions else 0 end) as ctr" +
+                    ", (case when installed > 0 then spend/installed else 0 end) as cpa" +
+                    ", (case when click > 0 then installed/click else 0 end) as cvr" +
+                    " from (" +
+                    "select ch.campaign_id, account_id, campaign_name,c.status, create_time, c.budget, c.bidding, sum(ch.total_spend) as spend, " +
+                    "sum(ch.total_installed) as installed, sum(ch.total_impressions) as impressions " +
+                    ",sum(ch.total_click) as click from " + webAdCampaignTable + " c, " + webAdCampaignHistoryTable + " ch " +
+                    "where c.campaign_id=ch.campaign_id\n" +
+                    "and date between '" + startTime + "' and '" + endTime + "' " +
+                    "and c.campaign_id in (" + campaignIds + ")" +
+                    "group by ch.campaign_id) a " + orderStr;
+            if (countryCheck) {
+                sql = "select campaign_id, country_code, account_id, campaign_name, status, create_time, budget, bidding, spend, installed, impressions, click" +
+                        ", (case when impressions > 0 then click/impressions else 0 end) as ctr" +
+                        ", (case when installed > 0 then spend/installed else 0 end) as cpa" +
+                        ", (case when click > 0 then installed/click else 0 end) as cvr" +
+                        " from (" +
+                        "select ch.campaign_id, country_code, account_id, campaign_name,c.status, create_time, c.budget, c.bidding, sum(ch.total_spend) as spend, " +
+                        "sum(ch.total_installed) as installed, sum(ch.total_impressions) as impressions " +
+                        ",sum(ch.total_click) as click from " + webAdCampaignTable + " c, " + webAdCampaignHistoryTable + " ch " +
+                        "where c.campaign_id=ch.campaign_id\n" +
+                        "and date between '" + startTime + "' and '" + endTime + "' " +
+                        "and c.campaign_id in (" + campaignIds + ")" +
+                        "group by ch.campaign_id, country_code) a " + orderStr;
+            }
+            list = DB.findListBySql(sql);
+        } else {
+            list.clear();
+        }
         JsonObject jsonObject = new JsonObject();
         JsonArray array = new JsonArray();
         double total_spend = 0;
@@ -179,6 +219,7 @@ public class Query extends HttpServlet {
             String campaign_name = one.get("campaign_name");
             String status = one.get("status");
             String create_time = one.get("create_time").toString();
+            String country_code = one.get("country_code");
             double budget = one.get("budget");
             double bidding = one.get("bidding");
             double spend = Utils.convertDouble(one.get("spend"), 0);
@@ -205,6 +246,8 @@ public class Query extends HttpServlet {
             d.addProperty("campaign_name", campaign_name);
             d.addProperty("status", status);
             d.addProperty("create_time", create_time);
+            d.addProperty("country_code", country_code);
+            d.addProperty("country_name", countryMap.get(country_code));
             d.addProperty("budget", budget);
             d.addProperty("bidding", bidding);
             d.addProperty("spend", spend);
