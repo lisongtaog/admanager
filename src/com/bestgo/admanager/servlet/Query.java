@@ -39,17 +39,44 @@ public class Query extends HttpServlet {
         String sorterId = request.getParameter("sorterId");
         String admobCheck = request.getParameter("admobCheck");
         String countryCheck = request.getParameter("countryCheck");
+        String plusAdmobCheck = request.getParameter("plusAdmobCheck");
+
         if (isSummary != null) {
             try {
                 List<JSObject> tags = DB.scan("web_tag")
-                        .select("id", "tag_name").execute();
+                        .select("id", "tag_name").orderByAsc("tag_name").execute();
                 JsonArray arr = new JsonArray();
-                for (int i = 0; i < tags.size(); i++) {
-                    long id = tags.get(i).get("id");
-                    String tagName = tags.get(i).get("tag_name");
-                    JsonObject jsonObject = fetchOneAppData(id, startTime, endTime, emptyCampaign, 0, "true".equals(admobCheck), false);
-                    jsonObject.addProperty("name", tagName);
-                    arr.add(jsonObject);
+                if (plusAdmobCheck != null && "true".equals(plusAdmobCheck)) {
+                    for (int i = 0; i < tags.size(); i++) {
+                        long id = tags.get(i).get("id");
+                        String tagName = tags.get(i).get("tag_name");
+                        JsonObject admob = fetchOneAppData(id, startTime, endTime, emptyCampaign, 0, true, false);
+                        JsonObject facebook = fetchOneAppData(id, startTime, endTime, emptyCampaign, 0, false, false);
+                        double total_spend = admob.get("total_spend").getAsDouble() + facebook.get("total_spend").getAsDouble();
+                        double total_installed = admob.get("total_installed").getAsDouble() + facebook.get("total_installed").getAsDouble();
+                        double total_impressions = admob.get("total_impressions").getAsDouble() + facebook.get("total_impressions").getAsDouble();
+                        double total_click = admob.get("total_click").getAsDouble() + facebook.get("total_click").getAsDouble();
+                        double total_ctr = total_impressions > 0 ? total_click / total_impressions : 0;
+                        double total_cpa = total_installed > 0 ? total_spend / total_installed : 0;
+                        double total_cvr = total_click > 0 ? total_installed / total_click : 0;
+                        admob.addProperty("total_spend", total_spend);
+                        admob.addProperty("total_installed", total_installed);
+                        admob.addProperty("total_impressions", total_impressions);
+                        admob.addProperty("total_click", total_click);
+                        admob.addProperty("total_ctr", Utils.trimDouble(total_ctr));
+                        admob.addProperty("total_cpa", Utils.trimDouble(total_cpa));
+                        admob.addProperty("total_cvr", Utils.trimDouble(total_cvr));
+                        admob.addProperty("name", tagName);
+                        arr.add(admob);
+                    }
+                } else {
+                    for (int i = 0; i < tags.size(); i++) {
+                        long id = tags.get(i).get("id");
+                        String tagName = tags.get(i).get("tag_name");
+                        JsonObject jsonObject = fetchOneAppData(id, startTime, endTime, emptyCampaign, 0, "true".equals(admobCheck), false);
+                        jsonObject.addProperty("name", tagName);
+                        arr.add(jsonObject);
+                    }
                 }
                 json.add("data", arr);
 

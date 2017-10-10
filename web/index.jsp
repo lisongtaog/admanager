@@ -53,9 +53,13 @@
             <input id="inputSearch" class="form-control" style="display: inline; width: auto;" type="text"/>
             <button id="btnSearch" class="btn btn-default">查找</button>
             <button id="btnSummary" class="btn btn-default">汇总数据</button>
-            <input type="checkbox" id="emptyCampaignCheck"/><label for="emptyCampaignCheck">当前没数据的</label>
-            <input type="checkbox" id="admobCheck"/><label for="admobCheck">显示admob数据</label>
-            <input type="checkbox" id="countryCheck"/><label for="countryCheck">细分到国家</label>
+
+            <div>
+                <input type="checkbox" id="emptyCampaignCheck"/><label for="emptyCampaignCheck">当前没数据的</label>
+                <input type="checkbox" id="admobCheck"/><label for="admobCheck">显示admob数据</label>
+                <input type="checkbox" id="countryCheck"/><label for="countryCheck">细分到国家</label>
+                <input type="checkbox" id="plusAdmobCheck"/><label for="plusAdmobCheck">计算AdMob+Facebook</label>
+            </div>
         </div>
     </div>
     <table class="table table-hover">
@@ -146,6 +150,7 @@
     var data = <%=array.toString()%>;
 
     $("#new_campaign_dlg .btn-primary").click(function() {
+        $("#new_campaign_dlg").modal("hide");
         var campaignName = $('#inputCampaignName').val();
         var status = $('#inputStatus').prop('checked') ? 'ACTIVE' : 'PAUSED';
         var budget = $('#inputBudget').val();
@@ -161,7 +166,7 @@
             bidding: bidding
         }, function (data) {
             if (data && data.ret == 1) {
-                $("#new_campaign_dlg").modal("hide");
+//                $("#new_campaign_dlg").modal("hide");
                 $('#btnSearch').click();
             } else {
                 admanager.showCommonDlg("错误", data.message);
@@ -197,6 +202,7 @@
             var emptyCampaign = $('#emptyCampaignCheck').is(':checked');
             var admobCheck = $('#admobCheck').is(':checked');
             var countryCheck = $('#countryCheck').is(':checked');
+            var plusAdmobCheck = $('#plusAdmobCheck').is(':checked');
 
             $.post('query', {
                 tag: query,
@@ -205,6 +211,7 @@
                 emptyCampaign: emptyCampaign,
                 admobCheck: admobCheck,
                 countryCheck: countryCheck,
+                plusAdmobCheck: plusAdmobCheck,
             }, function (data) {
                 if (data && data.ret == 1) {
                     if (countryCheck) {
@@ -233,12 +240,15 @@
             var endTime = $('#inputEndTime').val();
             var emptyCampaign = $('#emptyCampaignCheck').is(':checked');
             var admobCheck = $('#admobCheck').is(':checked');
+            var plusAdmobCheck = $('#plusAdmobCheck').is(':checked');
+
             $.post('query', {
                 summary: true,
                 startTime: startTime,
                 endTime: endTime,
                 emptyCampaign: emptyCampaign,
                 admobCheck: admobCheck,
+                plusAdmobCheck: plusAdmobCheck,
             }, function (data) {
                 if (data && data.ret == 1) {
                     $('#result_header').html("<tr><th>应用名称</th><th>总花费</th><th>总安装</th><th>总展示</th><th>总点击</th><th>CTR</th><th>CPA</th><th>CVR</th></tr>");

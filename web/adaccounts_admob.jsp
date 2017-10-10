@@ -80,12 +80,12 @@
       <nav aria-label="Page navigation">
         <ul class="pagination">
           <li>
-            <a href="adaccounts.jsp?page_index=<%=preIndex%>" aria-label="Previous">
+            <a href="adaccounts_admob.jsp?page_index=<%=preIndex%>" aria-label="Previous">
               <span aria-hidden="true">上一页</span>
             </a>
           </li>
           <li>
-            <a href="adaccounts.jsp?page_index=<%=nextPage%>" aria-label="Next">
+            <a href="adaccounts_admob.jsp?page_index=<%=nextPage%>" aria-label="Next">
               <span aria-hidden="true">下一页</span>
             </a>
           </li>
