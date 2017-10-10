@@ -7,6 +7,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import org.apache.log4j.Logger;
 
+import javax.rmi.CORBA.Util;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -99,7 +100,72 @@ public class Query extends HttpServlet {
                         .where(DB.filter().whereEqualTo("tag_name", tag)).execute();
                 if (tagObject.hasObjectData()) {
                     Long id = tagObject.get("id");
-                    JsonObject jsonObject = fetchOneAppData(id, startTime, endTime, emptyCampaign, sorter, "true".equals(admobCheck), "true".equals(countryCheck));
+                    JsonObject jsonObject = null;
+                    if (plusAdmobCheck != null && "true".equals(plusAdmobCheck)) {
+                        JsonObject admob = fetchOneAppData(id, startTime, endTime, emptyCampaign, sorter, true, "true".equals(countryCheck));
+                        JsonObject facebook = fetchOneAppData(id, startTime, endTime, emptyCampaign, sorter, false, "true".equals(countryCheck));
+                        double total_spend = admob.get("total_spend").getAsDouble() + facebook.get("total_spend").getAsDouble();
+                        double total_installed = admob.get("total_installed").getAsDouble() + facebook.get("total_installed").getAsDouble();
+                        double total_impressions = admob.get("total_impressions").getAsDouble() + facebook.get("total_impressions").getAsDouble();
+                        double total_click = admob.get("total_click").getAsDouble() + facebook.get("total_click").getAsDouble();
+                        double total_ctr = total_impressions > 0 ? total_click / total_impressions : 0;
+                        double total_cpa = total_installed > 0 ? total_spend / total_installed : 0;
+                        double total_cvr = total_click > 0 ? total_installed / total_click : 0;
+                        admob.addProperty("total_spend", total_spend);
+                        admob.addProperty("total_installed", total_installed);
+                        admob.addProperty("total_impressions", total_impressions);
+                        admob.addProperty("total_click", total_click);
+                        admob.addProperty("total_ctr", Utils.trimDouble(total_ctr));
+                        admob.addProperty("total_cpa", Utils.trimDouble(total_cpa));
+                        admob.addProperty("total_cvr", Utils.trimDouble(total_cvr));
+                        JsonArray array = admob.getAsJsonArray("array");
+                        JsonArray array1 = facebook.getAsJsonArray("array");
+                        for (int i = 0; i < array1.size(); i++) {
+                            array.add(array1.get(i));
+                        }
+                        jsonObject = admob;
+                    } else {
+                        jsonObject = fetchOneAppData(id, startTime, endTime, emptyCampaign, sorter, "true".equals(admobCheck), "true".equals(countryCheck));
+                    }
+                    if ("true".equals(countryCheck)) {
+                        JsonArray array = jsonObject.getAsJsonArray("array");
+                        HashMap<String, CountryRecord> dataSets = new HashMap<>();
+                        for (int i = 0; i < array.size(); i++) {
+                            JsonObject one = array.get(i).getAsJsonObject();
+                            String countryName = "";
+                            if (one.get("country_name").isJsonNull()) {
+                                countryName = one.get("country_code").getAsString();
+                            } else {
+                                countryName = one.get("country_name").getAsString();
+                            }
+                            CountryRecord record = dataSets.get(countryName);
+                            if (record == null) {
+                                record = new CountryRecord();
+                                dataSets.put(countryName, record);
+                            }
+                            record.impressions += one.get("impressions").getAsDouble();
+                            record.installed += one.get("installed").getAsDouble();
+                            record.click += one.get("click").getAsDouble();
+                            record.spend += one.get("spend").getAsDouble();
+                            record.ctr = record.impressions > 0 ? record.click / record.impressions : 0;
+                            record.cpa = record.installed > 0 ? record.spend / record.installed : 0;
+                            record.cvr = record.click > 0 ? record.installed / record.click : 0;
+                        }
+                        JsonArray newArr = new JsonArray();
+                        for (String key : dataSets.keySet()) {
+                            JsonObject one = new JsonObject();
+                            one.addProperty("country_name", key);
+                            one.addProperty("impressions", dataSets.get(key).impressions);
+                            one.addProperty("installed", dataSets.get(key).installed);
+                            one.addProperty("click", dataSets.get(key).click);
+                            one.addProperty("spend", Utils.trimDouble(dataSets.get(key).spend));
+                            one.addProperty("ctr", Utils.trimDouble(dataSets.get(key).ctr));
+                            one.addProperty("cpa", Utils.trimDouble(dataSets.get(key).cpa));
+                            one.addProperty("cvr", Utils.trimDouble(dataSets.get(key).cvr));
+                            newArr.add(one);
+                        }
+                        jsonObject.add("array", newArr);
+                    }
                     json.add("data", jsonObject);
 
                     json.addProperty("ret", 1);
@@ -117,6 +183,16 @@ public class Query extends HttpServlet {
         }
 
         response.getWriter().write(json.toString());
+    }
+
+    class CountryRecord {
+        public double impressions;
+        public double installed;
+        public double click;
+        public double spend;
+        public double ctr;
+        public double cpa;
+        public double cvr;
     }
 
     private JsonObject fetchOneAppData(long tagId, String startTime, String endTime, String emptyCampaign,
@@ -277,6 +353,7 @@ public class Query extends HttpServlet {
             d.addProperty("country_name", countryMap.get(country_code));
             d.addProperty("budget", budget);
             d.addProperty("bidding", bidding);
+            d.addProperty("impressions", impressions);
             d.addProperty("spend", spend);
             d.addProperty("installed", installed);
             d.addProperty("click", click);
