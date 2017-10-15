@@ -6,6 +6,7 @@ import com.bestgo.common.database.services.DB;
 import com.bestgo.common.database.utils.JSObject;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 
 import javax.servlet.ServletException;
@@ -13,14 +14,8 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
+import java.io.*;
+import java.util.*;
 
 @WebServlet(name = "Campaign", urlPatterns = "/campaign/*")
 public class Campaign extends HttpServlet {
@@ -30,7 +25,103 @@ public class Campaign extends HttpServlet {
         String path = request.getPathInfo();
         JsonObject json = new JsonObject();
 
-        if (path.startsWith("/update")) {
+        if (path.startsWith("/create")) {
+            String appName = request.getParameter("appName");
+            String appId = request.getParameter("appId");
+            String accountId = request.getParameter("accountId");
+            String pageId = request.getParameter("pageId");
+            String region = request.getParameter("region");
+            String language = request.getParameter("language");
+            String age = request.getParameter("age");
+            String gendar = request.getParameter("gendar");
+            String interest = request.getParameter("interest");
+            String userOs = request.getParameter("userOs");
+            String userDevice = request.getParameter("userDevice");
+            String campaignName = request.getParameter("campaignName");
+            String bugdet = request.getParameter("bugdet");
+            String bidding = request.getParameter("bidding");
+            String maxCPA = request.getParameter("maxCPA");
+            String title = request.getParameter("title");
+            String message = request.getParameter("message");
+            String imagePath = request.getParameter("imagePath");
+
+            OperationResult result = new OperationResult();
+            try {
+                JSObject record = DB.simpleScan("web_system_config").select("config_value").where(DB.filter().whereEqualTo("config_key", "fb_image_path")).execute();
+                String imageRoot = null;
+                if (record.hasObjectData()) {
+                    imageRoot = record.get("config_value");
+                }
+
+                result.result = true;
+
+                if (title.isEmpty()) {
+                    result.result = false;
+                    result.message = "标题不能为空";
+                }
+                if (message.isEmpty()) {
+                    result.result = false;
+                    result.message = "广告语不能为空";
+                }
+                if (campaignName.isEmpty()) {
+                    result.result = false;
+                    result.message = "广告系列名称不能为空";
+                }
+                if (bugdet.isEmpty()) {
+                    result.result = false;
+                    result.message = "预算不能为空";
+                }
+                if (bidding.isEmpty()) {
+                    result.result = false;
+                    result.message = "出价不能为空";
+                }
+
+                File imagesPath = new File(imageRoot + File.separatorChar + imagePath);
+                if (!imagesPath.exists()) {
+                    result.result = false;
+                    result.message = "图片路径不存在";
+                }
+
+                if (result.result) {
+                    long genId = DB.insert("ad_campaigns")
+                            .put("facebook_app_id", appId)
+                            .put("account_id", accountId)
+                            .put("country_region", region)
+                            .put("language", language)
+                            .put("campaign_name", campaignName)
+                            .put("page_id", pageId)
+                            .put("bugdet", bugdet)
+                            .put("bidding", bidding)
+                            .put("title", title)
+                            .put("message", message)
+                            .put("app_name", appName)
+                            .put("tag_name", appName)
+                            .put("age", age)
+                            .put("gender", gendar)
+                            .put("detail_target", interest)
+                            .put("max_cpa", maxCPA)
+                            .put("user_devices", userDevice)
+                            .put("user_os", userOs)
+                            .executeReturnId();
+
+                    Collection<File> uploadImages = FileUtils.listFiles(imagesPath, null, false);
+                    for (File file : uploadImages) {
+//                    new String[]{"jpg", "jpeg", "png"}
+                        String fileName = file.getAbsolutePath().toLowerCase();
+                        if (fileName.endsWith("jpg") || fileName.endsWith("jpeg") || fileName.endsWith("png")) {
+                            String sql = "insert into ad_ads set parent_id=" + genId + ", image_file_path='" + file.getAbsolutePath() + "'";
+                            DB.updateBySql(sql);
+                        }
+                    }
+                    result.result = true;
+                }
+            } catch (Exception ex) {
+                result.message = ex.getMessage();
+                result.result = false;
+            }
+            json.addProperty("ret", result.result ? 1 : 0);
+            json.addProperty("message", result.message);
+        } else if (path.startsWith("/update")) {
             String id = request.getParameter("id");
             String campaignId = request.getParameter("campaignId");
             String campaignName = request.getParameter("campaignName");

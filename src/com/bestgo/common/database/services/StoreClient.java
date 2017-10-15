@@ -964,5 +964,27 @@ public class StoreClient
             Log.d(this.sql);
             return Sql.update(this.sql, objects);
         }
+
+        @Override
+        public long executeReturnId() throws Exception {
+            this.sql = ("insert into " + this.table + " (");
+            Set<String> keys = this.object.getKeys();
+            int count = 0;
+            for (String key : keys) {
+                count++;
+                this.sql += key;
+                this.sql += (count == keys.size() ? ")" : ",");
+            }
+            count = 0;
+            this.sql += " values (";
+            Object[] objects = new Object[keys.size()];
+            for (String key : keys) {
+                objects[count] = this.object.get(key);
+                count++;
+                this.sql += (count == keys.size() ? "?)" : "?,");
+            }
+            Log.d(this.sql);
+            return Sql.insert(this.sql, objects);
+        }
     }
 }

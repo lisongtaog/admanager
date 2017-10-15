@@ -38,6 +38,8 @@ public abstract class Store {
 
         public abstract boolean execute()
                 throws Exception;
+
+        public abstract long executeReturnId() throws Exception;
     }
 
     public static abstract interface Delete {

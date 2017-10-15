@@ -24,6 +24,7 @@
   <div class="container-fluid">
     <ul class="nav nav-pills">
       <li role="presentation"><a href="index.jsp">首页</a></li>
+      <li role="presentation"><a href="campaigns_create.jsp">创建广告</a></li>
       <li role="presentation"><a href="adaccounts.jsp">广告账号管理</a></li>
       <li role="presentation"><a href="adaccounts_admob.jsp">广告账号管理(AdMob)</a></li>
       <li role="presentation"><a href="campaigns.jsp">广告系列管理</a></li>

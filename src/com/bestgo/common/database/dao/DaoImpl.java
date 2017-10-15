@@ -2,10 +2,7 @@ package com.bestgo.common.database.dao;
 
 import com.bestgo.common.database.utils.JSObject;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -91,5 +88,22 @@ public class DaoImpl
         result = this.pstmt.executeUpdate();
         flag = result > 0;
         return flag;
+    }
+
+    @Override
+    public long insertByPreparedStatement(String con, Object... params) throws Exception {
+        this.pstmt = this.connection.prepareStatement(con, Statement.RETURN_GENERATED_KEYS);
+        int index = 1;
+        if ((params != null) && (params.length > 0)) {
+            for (int i = 0; i < params.length; i++) {
+                this.pstmt.setObject(index++, params[i]);
+            }
+        }
+        int result = this.pstmt.executeUpdate();
+        ResultSet rs = this.pstmt.getGeneratedKeys();
+        if (rs.next()) {
+            return rs.getLong(1);
+        }
+        return -1;
     }
 }

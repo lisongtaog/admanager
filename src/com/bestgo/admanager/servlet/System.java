@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -34,6 +35,72 @@ public class System extends HttpServlet {
                 OperationResult result = updateConfig(key, value);
                 json.addProperty("ret", result.result ? 1 : 0);
                 json.addProperty("message", result.message);
+            } else {
+                int id = Utils.parseInt(request.getParameter("id"), 0);
+                String tagName = request.getParameter("tagName");
+                String accountId = request.getParameter("accountId");
+                String fbAppId = request.getParameter("fbAppId");
+                String pageId = request.getParameter("pageId");
+                String gpPackageId = request.getParameter("gpPackageId");
+
+                switch (path) {
+                    case "/fb_app_id_rel/create": {
+                        OperationResult result = createNewFacebookAppRelation(tagName, accountId, fbAppId, pageId, gpPackageId);
+                        json.addProperty("ret", result.result ? 1 : 0);
+                        json.addProperty("message", result.message);
+                    }
+                        break;
+                    case "/fb_app_id_rel/update": {
+                        OperationResult result = updateFacebookAppRelation(id, tagName, accountId, fbAppId, pageId, gpPackageId);
+                        json.addProperty("ret", result.result ? 1 : 0);
+                        json.addProperty("message", result.message);
+                    }
+                        break;
+                    case "/fb_app_id_rel/delete": {
+                        OperationResult result = deleteFacebookAppRelation(id);
+                        json.addProperty("ret", result.result ? 1 : 0);
+                        json.addProperty("message", result.message);
+                    }
+                        break;
+                    case "/fb_app_id_rel/query": {
+                        String word = request.getParameter("word");
+                        if (word != null) {
+                            List<JSObject> data = fetchFacebookAppRelationData(word);
+                            json.addProperty("ret", 1);
+                            JsonArray array = new JsonArray();
+                            for (int i = 0; i < data.size(); i++) {
+                                JsonObject one = new JsonObject();
+                                one.addProperty("tag_name", (String)data.get(i).get("tag_name"));
+                                one.addProperty("account_id", (String)data.get(i).get("account_id"));
+                                one.addProperty("fb_app_id", (String)data.get(i).get("fb_app_id"));
+                                one.addProperty("page_id", (String)data.get(i).get("page_id"));
+                                one.addProperty("google_package_id", (String)data.get(i).get("google_package_id"));
+                                one.addProperty("id", (long)data.get(i).get("id"));
+                                array.add(one);
+                            }
+                            json.add("data", array);
+                        } else {
+                            long count = countFacebookAppRelation();
+                            int index = Utils.parseInt(request.getParameter("page_index"), 0);
+                            int size = Utils.parseInt(request.getParameter("page_size"), 20);
+                            long totalPage = count / size + (count % size == 0 ? 0 : 1);
+                            List<JSObject> data = fetchFacebookAppRelationData(index, size);
+                            json.addProperty("ret", 1);
+                            JsonArray array = new JsonArray();
+                            for (int i = 0; i < data.size(); i++) {
+                                JsonObject one = new JsonObject();
+                                one.addProperty("tag_name", (String)data.get(i).get("tag_name"));
+                                one.addProperty("account_id", (String)data.get(i).get("account_id"));
+                                one.addProperty("fb_app_id", (String)data.get(i).get("fb_app_id"));
+                                one.addProperty("page_id", (String)data.get(i).get("page_id"));
+                                one.addProperty("id", (long)data.get(i).get("id"));
+                                array.add(one);
+                            }
+                            json.add("data", array);
+                        }
+                    }
+                        break;
+                }
             }
         } else {
 
@@ -46,6 +113,8 @@ public class System extends HttpServlet {
 
     }
 
+
+
     private OperationResult updateConfig(String key, String value) {
         OperationResult ret = new OperationResult();
 
@@ -53,6 +122,113 @@ public class System extends HttpServlet {
             DB.update("web_system_config")
                     .put("config_value", value)
                     .where(DB.filter().whereEqualTo("config_key", key)).execute();
+
+            ret.result = true;
+            ret.message = "修改成功";
+        } catch (Exception e) {
+            ret.result = false;
+            ret.message = e.getMessage();
+            Logger logger = Logger.getRootLogger();
+            logger.error(e.getMessage(), e);
+        }
+
+        return ret;
+    }
+
+    public static List<JSObject> fetchFacebookAppRelationData(String word) {
+        List<JSObject> list = new ArrayList<>();
+        try {
+            return DB.scan("web_facebook_app_ids_rel").select("id", "tag_name", "account_id", "fb_app_id", "page_id", "google_package_id")
+                    .where(DB.filter().whereLikeTo("tag_name", "%" + word + "%")).orderByAsc("id").execute();
+        } catch (Exception ex) {
+            Logger logger = Logger.getRootLogger();
+            logger.error(ex.getMessage(), ex);
+        }
+        return list;
+    }
+
+    public static List<JSObject> fetchFacebookAppRelationData(int index, int size) {
+        List<JSObject> list = new ArrayList<>();
+        try {
+            return DB.scan("web_facebook_app_ids_rel").select("id", "tag_name", "account_id", "fb_app_id", "page_id", "google_package_id")
+                    .limit(size).start(index * size).orderByAsc("id").execute();
+        } catch (Exception ex) {
+            Logger logger = Logger.getRootLogger();
+            logger.error(ex.getMessage(), ex);
+        }
+        return list;
+    }
+
+    public static long countFacebookAppRelation() {
+        try {
+            JSObject object = DB.simpleScan("web_facebook_app_ids_rel").select(DB.func(DB.COUNT, "id")).execute();
+            return object.get("count(id)");
+        } catch (Exception ex) {
+            Logger logger = Logger.getRootLogger();
+            logger.error(ex.getMessage(), ex);
+        }
+        return 0;
+    }
+
+    private OperationResult deleteFacebookAppRelation(int id) {
+        OperationResult ret = new OperationResult();
+
+        try {
+            DB.delete("web_facebook_app_ids_rel").where(DB.filter().whereEqualTo("id", id)).execute();
+
+            ret.result = true;
+            ret.message = "执行成功";
+        } catch (Exception e) {
+            ret.result = false;
+            ret.message = e.getMessage();
+            Logger logger = Logger.getRootLogger();
+            logger.error(e.getMessage(), e);
+        }
+
+        return ret;
+    }
+
+    private OperationResult createNewFacebookAppRelation(String tagName, String accountId, String fbAppId, String pageId, String gpPackageId) {
+        OperationResult ret = new OperationResult();
+
+        try {
+            JSObject one = DB.simpleScan("web_facebook_app_ids_rel").select("tag_name").where(DB.filter().whereEqualTo("tag_name", tagName)).execute();
+            if (one.get("tag_name") != null) {
+                ret.result = false;
+                ret.message = "已经存在这个账号了";
+            } else {
+                DB.insert("web_facebook_app_ids_rel")
+                        .put("tag_name", tagName)
+                        .put("account_id", accountId)
+                        .put("fb_app_id", fbAppId)
+                        .put("page_id", pageId)
+                        .put("google_package_id", gpPackageId)
+                        .execute();
+
+                ret.result = true;
+                ret.message = "修改成功";
+            }
+        } catch (Exception e) {
+            ret.result = false;
+            ret.message = e.getMessage();
+            Logger logger = Logger.getRootLogger();
+            logger.error(e.getMessage(), e);
+        }
+
+        return ret;
+    }
+
+    private OperationResult updateFacebookAppRelation(int id, String tagName, String accountId, String fbAppId, String pageId, String gpPackageId) {
+        OperationResult ret = new OperationResult();
+
+        try {
+            DB.update("web_facebook_app_ids_rel")
+                    .put("tag_name", tagName)
+                    .put("account_id", accountId)
+                    .put("fb_app_id", fbAppId)
+                    .put("page_id", pageId)
+                    .put("google_package_id", gpPackageId)
+                    .where(DB.filter().whereEqualTo("id", id)).execute();
 
             ret.result = true;
             ret.message = "修改成功";

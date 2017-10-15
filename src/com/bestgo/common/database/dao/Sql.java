@@ -19,6 +19,11 @@
    {
      return getIPeinterDaoInstance().updateByPreparedStatement(sql, params);
    }
+
+    public static long insert(String sql, Object... params) throws Exception
+    {
+     return getIPeinterDaoInstance().insertByPreparedStatement(sql, params);
+    }
    
    public static JSObject findOne(String sql, Object... params) throws Exception
    {

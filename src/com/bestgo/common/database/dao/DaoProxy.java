@@ -63,4 +63,20 @@ public class DaoProxy implements IDao {
         }
         return flag;
     }
+
+    @Override
+    public long insertByPreparedStatement(String con, Object... params) throws Exception {
+        try {
+            return this.dao.insertByPreparedStatement(con, params);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                this.dbc.releaseConn();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return -1;
+    }
 }

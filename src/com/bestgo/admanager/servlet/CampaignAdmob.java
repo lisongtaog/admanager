@@ -6,6 +6,7 @@ import com.bestgo.common.database.services.DB;
 import com.bestgo.common.database.utils.JSObject;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 
 import javax.servlet.ServletException;
@@ -13,14 +14,8 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
+import java.io.*;
+import java.util.*;
 
 @WebServlet(name = "CampaignAdMob", urlPatterns = "/campaign_admob/*")
 public class CampaignAdmob extends HttpServlet {
@@ -30,7 +25,89 @@ public class CampaignAdmob extends HttpServlet {
         String path = request.getPathInfo();
         JsonObject json = new JsonObject();
 
-        if (path.startsWith("/update")) {
+        if (path.startsWith("/create")) {
+            String appName = request.getParameter("appName");
+            String gpPackageId = request.getParameter("gpPackageId");
+            String accountId = request.getParameter("accountId");
+            String campaignName = request.getParameter("campaignName");
+            String bugdet = request.getParameter("bugdet");
+            String bidding = request.getParameter("bidding");
+            String message1 = request.getParameter("message1");
+            String message2 = request.getParameter("message2");
+            String message3 = request.getParameter("message3");
+            String message4 = request.getParameter("message4");
+            String imagePath = request.getParameter("imagePath");
+
+            OperationResult result = new OperationResult();
+            try {
+                JSObject record = DB.simpleScan("web_system_config").select("config_value").where(DB.filter().whereEqualTo("config_key", "admob_image_path")).execute();
+                String imageRoot = null;
+                if (record.hasObjectData()) {
+                    imageRoot = record.get("config_value");
+                }
+
+                result.result = true;
+
+                if (message1.isEmpty()) {
+                    result.result = false;
+                    result.message = "广告语1不能为空";
+                }
+                if (message2.isEmpty()) {
+                    result.result = false;
+                    result.message = "广告语2不能为空";
+                }
+                if (message3.isEmpty()) {
+                    result.result = false;
+                    result.message = "广告语3不能为空";
+                }
+                if (message4.isEmpty()) {
+                    result.result = false;
+                    result.message = "广告语4不能为空";
+                }
+                if (campaignName.isEmpty()) {
+                    result.result = false;
+                    result.message = "广告系列名称不能为空";
+                }
+                if (bugdet.isEmpty()) {
+                    result.result = false;
+                    result.message = "预算不能为空";
+                }
+                if (bidding.isEmpty()) {
+                    result.result = false;
+                    result.message = "出价不能为空";
+                }
+
+                File imagesPath = new File(imageRoot + File.separatorChar + imagePath);
+                if (!imagesPath.exists()) {
+                    result.result = false;
+                    result.message = "图片路径不存在";
+                }
+
+                if (result.result) {
+                    long genId = DB.insert("ad_campaigns_admob")
+                            .put("account_id", accountId)
+                            .put("campaign_name", campaignName)
+                            .put("app_id", gpPackageId)
+                            .put("bugdet", bugdet)
+                            .put("bidding", bidding)
+                            .put("message1", message1)
+                            .put("message2", message2)
+                            .put("message3", message3)
+                            .put("message4", message4)
+                            .put("app_name", appName)
+                            .put("tag_name", appName)
+                            .put("image_path", imagesPath.getAbsolutePath())
+                            .executeReturnId();
+
+                    result.result = true;
+                }
+            } catch (Exception ex) {
+                result.message = ex.getMessage();
+                result.result = false;
+            }
+            json.addProperty("ret", result.result ? 1 : 0);
+            json.addProperty("message", result.message);
+        } else if (path.startsWith("/update")) {
             String id = request.getParameter("id");
             String campaignId = request.getParameter("campaignId");
             String tags = request.getParameter("tags");

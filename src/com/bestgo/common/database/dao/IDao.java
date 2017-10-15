@@ -13,4 +13,7 @@ public abstract interface IDao {
 
     public abstract boolean updateByPreparedStatement(String paramString, Object... paramVarArgs)
             throws Exception;
+
+    public abstract long insertByPreparedStatement(String paramString, Object... paramVarArgs)
+            throws Exception;
 }
