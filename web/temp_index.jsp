@@ -32,7 +32,7 @@
 
 <div class="container-fluid">
     <ul class="nav nav-pills">
-        <li role="presentation" class="active"><a href="#">首页</a></li>
+        <li role="presentation"><a href="index.jsp">首页</a></li>
         <li role="presentation"><a href="campaigns_create.jsp">创建广告</a></li>
         <li role="presentation"><a href="adaccounts.jsp">广告账号管理</a></li>
         <li role="presentation"><a href="adaccounts_admob.jsp">广告账号管理(AdMob)</a></li>
@@ -42,7 +42,7 @@
         <li role="presentation"><a href="rules.jsp">规则</a></li>
         <li role="presentation"><a href="query.jsp">查询</a></li>
         <li role="presentation"><a href="system.jsp">系统管理</a></li>
-        <li role="presentation"><a href="temp_index.jsp">临时用的</a></li>
+        <li role="presentation" class="active"><a href="#">临时用的</a></li>
     </ul>
 
     <div class="panel panel-default" style="margin-top: 10px">
@@ -206,7 +206,7 @@
             var countryCheck = $('#countryCheck').is(':checked');
             var plusAdmobCheck = $('#plusAdmobCheck').is(':checked');
 
-            $.post('query', {
+            $.post('temp_query', {
                 tag: query,
                 startTime: startTime,
                 endTime: endTime,
@@ -244,7 +244,7 @@
             var admobCheck = $('#admobCheck').is(':checked');
             var plusAdmobCheck = $('#plusAdmobCheck').is(':checked');
 
-            $.post('query', {
+            $.post('temp_query', {
                 summary: true,
                 startTime: startTime,
                 endTime: endTime,
@@ -375,7 +375,7 @@
             var admobCheck = $('#admobCheck').is(':checked');
             var countryCheck = $('#countryCheck').is(':checked');
 
-            $.post('query', {
+            $.post('temp_query', {
                 tag: query,
                 startTime: startTime,
                 endTime: endTime,
