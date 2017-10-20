@@ -31,6 +31,7 @@ public class Campaign extends HttpServlet {
             String accountId = request.getParameter("accountId");
             String pageId = request.getParameter("pageId");
             String region = request.getParameter("region");
+            String excludedRegion = request.getParameter("excludedRegion");
             String language = request.getParameter("language");
             String age = request.getParameter("age");
             String gendar = request.getParameter("gendar");
@@ -87,6 +88,7 @@ public class Campaign extends HttpServlet {
                             .put("facebook_app_id", appId)
                             .put("account_id", accountId)
                             .put("country_region", region)
+                            .put("excluded_region", excludedRegion)
                             .put("language", language)
                             .put("campaign_name", campaignName)
                             .put("page_id", pageId)

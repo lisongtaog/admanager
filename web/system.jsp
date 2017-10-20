@@ -241,11 +241,13 @@
         var accountId = $(tds.get(2)).text();
         var fbAppId = $(tds.get(3)).text();
         var fbPageId = $(tds.get(4)).text();
+        var gpPackageId = $(tds.get(5)).text();
 
         $('#inputTagName').val(tagName);
         $('#inputAccountId').val(accountId);
         $('#inputFBAppId').val(fbAppId);
         $('#inputPageId').val(fbPageId);
+        $('#inputGPPackageId').val(gpPackageId);
 
         modifyType = 'update';
         $('#delete_rel_message').hide();

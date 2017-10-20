@@ -42,8 +42,8 @@
         <li role="presentation"><a href="rules.jsp">规则</a></li>
         <li role="presentation"><a href="query.jsp">查询</a></li>
         <li role="presentation"><a href="system.jsp">系统管理</a></li>
-        <li role="presentation" class="active"><a href="#">临时用的</a></li>
-        <li role="presentation"><a href="temp_index2.jsp">临时用的2</a></li>
+        <li role="presentation"><a href="temp_index.jsp">临时用的</a></li>
+        <li role="presentation" class="active"><a href="#">临时用的2</a></li>
     </ul>
 
     <div class="panel panel-default" style="margin-top: 10px">
@@ -179,8 +179,8 @@
 
     function init() {
         var now = new Date();
-        $('#inputStartTime').val("2017-01-01");
-        $('#inputEndTime').val("2017-10-15");
+        $('#inputStartTime').val("2017-10-10");
+        $('#inputEndTime').val("2017-10-17");
         $('#inputStartTime').datetimepicker({
             minView: "month",
             format: 'yyyy-mm-dd',
@@ -207,7 +207,7 @@
             var countryCheck = $('#countryCheck').is(':checked');
             var plusAdmobCheck = $('#plusAdmobCheck').is(':checked');
 
-            $.post('temp_query', {
+            $.post('temp_query2', {
                 tag: query,
                 startTime: startTime,
                 endTime: endTime,
@@ -245,7 +245,7 @@
             var admobCheck = $('#admobCheck').is(':checked');
             var plusAdmobCheck = $('#plusAdmobCheck').is(':checked');
 
-            $.post('temp_query', {
+            $.post('temp_query2', {
                 summary: true,
                 startTime: startTime,
                 endTime: endTime,
@@ -376,7 +376,7 @@
             var admobCheck = $('#admobCheck').is(':checked');
             var countryCheck = $('#countryCheck').is(':checked');
 
-            $.post('temp_query', {
+            $.post('temp_query2', {
                 tag: query,
                 startTime: startTime,
                 endTime: endTime,

@@ -29,6 +29,9 @@ public class CampaignAdmob extends HttpServlet {
             String appName = request.getParameter("appName");
             String gpPackageId = request.getParameter("gpPackageId");
             String accountId = request.getParameter("accountId");
+            String region = request.getParameter("region");
+            String excludedRegion = request.getParameter("excludedRegion");
+            String language = request.getParameter("language");
             String campaignName = request.getParameter("campaignName");
             String bugdet = request.getParameter("bugdet");
             String bidding = request.getParameter("bidding");
@@ -88,6 +91,9 @@ public class CampaignAdmob extends HttpServlet {
                             .put("account_id", accountId)
                             .put("campaign_name", campaignName)
                             .put("app_id", gpPackageId)
+                            .put("country_region", region)
+                            .put("language", language)
+                            .put("excluded_region", excludedRegion)
                             .put("bugdet", bugdet)
                             .put("bidding", bidding)
                             .put("message1", message1)

@@ -43,6 +43,8 @@
         <li role="presentation"><a href="query.jsp">查询</a></li>
         <li role="presentation"><a href="system.jsp">系统管理</a></li>
         <li role="presentation"><a href="temp_index.jsp">临时用的</a></li>
+        <li role="presentation"><a href="temp_index2.jsp">临时用的2</a></li>
+
     </ul>
 
     <div class="panel panel-default" style="margin-top: 10px">

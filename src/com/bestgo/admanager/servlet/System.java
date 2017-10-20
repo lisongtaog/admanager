@@ -93,6 +93,7 @@ public class System extends HttpServlet {
                                 one.addProperty("account_id", (String)data.get(i).get("account_id"));
                                 one.addProperty("fb_app_id", (String)data.get(i).get("fb_app_id"));
                                 one.addProperty("page_id", (String)data.get(i).get("page_id"));
+                                one.addProperty("google_package_id", (String)data.get(i).get("google_package_id"));
                                 one.addProperty("id", (long)data.get(i).get("id"));
                                 array.add(one);
                             }
