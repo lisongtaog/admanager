@@ -420,6 +420,7 @@
 
         $('#formFacebook input, #formFacebook select').change(function() {
 //            标签名_地理位置&性别&年龄&设备&操作系统_语言_账号_广告图路径
+            if ($(this).attr('id') == 'inputCampaignName') return;
             var appName = $('#selectApp').val();
             var accountName = $('#selectAccount option:selected').text();
             var region = $('#selectRegion').val();
@@ -434,6 +435,7 @@
 
         $('#formAdmob input, #formAdmob select').change(function() {
 //            标签名_地理位置&语言&出价_创建时间
+            if ($(this).attr('id') == 'inputCampaignNameAdmob') return;
             var now = new Date();
             var appName = $('#selectAppAdmob').val();
             var region = $('#selectRegionAdmob option:selected').text();

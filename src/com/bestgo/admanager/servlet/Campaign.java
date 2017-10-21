@@ -259,6 +259,9 @@ public class Campaign extends HttpServlet {
                                 cmd += "-bidding \"" + bidding + "\" ";
                         }
 
+                        Logger logger = Logger.getRootLogger();
+                        logger.debug("update campaign: " + cmd);
+
                         Process process = Runtime.getRuntime().exec(cmd);
                         InputStream is = process.getInputStream();
                         BufferedReader reader = new BufferedReader(new InputStreamReader(is));
