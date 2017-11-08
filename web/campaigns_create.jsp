@@ -57,6 +57,31 @@
         </div>
     </div>
 
+    <div id="moreCountryDlg" class="modal fade" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="dlg_title">输入国家，每行一个</h4>
+                </div>
+                <div class="modal-body">
+                    <form id="modify_form" class="form-horizontal" action="#" autocomplete="off">
+                        <div class="form-group">
+                            <label for="inputCampaignName" class="col-sm-2 control-label">国家</label>
+                            <div class="col-sm-10">
+                                <textarea id="textareaCountry" style="width:100%; height:400px;"></textarea>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary">确定</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <form class="form-horizontal" action="#" id="formFacebook">
         <div class="form-group">
             <label for="selectApp" class="col-sm-2 control-label">应用</label>
@@ -76,18 +101,24 @@
         </div>
         <div class="form-group">
             <label for="selectRegion" class="col-sm-2 control-label">国家地区</label>
-            <div class="col-sm-10">
+            <div class="col-sm-9">
                 <select class="form-control select2" id="selectRegion" multiple="multiple">
 
                 </select>
             </div>
+            <div class="col-sm-1">
+                <input type="button" class="btn-more btn btn-default" id="btnSelectRegionMore" value="批量输入"/>
+            </div>
         </div>
         <div class="form-group">
             <label for="selectRegionUnselected" class="col-sm-2 control-label">排除国家地区</label>
-            <div class="col-sm-10">
+            <div class="col-sm-9">
                 <select class="form-control select2" id="selectRegionUnselected" multiple="multiple">
 
                 </select>
+            </div>
+            <div class="col-sm-1">
+                <input type="button" class="btn-more btn btn-default" id="btnSelectRegionUnselectedMore" value="批量输入"/>
             </div>
         </div>
         <div class="form-group">
@@ -203,18 +234,24 @@
         </div>
         <div class="form-group">
             <label for="selectRegion" class="col-sm-2 control-label">国家地区</label>
-            <div class="col-sm-10">
+            <div class="col-sm-9">
                 <select class="form-control select2" id="selectRegionAdmob" multiple="multiple">
 
                 </select>
             </div>
+            <div class="col-sm-1">
+                <input type="button" class="btn-more btn btn-default" id="btnSelectRegionAdmobMore" value="批量输入"/>
+            </div>
         </div>
         <div class="form-group">
             <label for="selectRegionUnselected" class="col-sm-2 control-label">排除国家地区</label>
-            <div class="col-sm-10">
+            <div class="col-sm-9">
                 <select class="form-control select2" id="selectRegionUnselectedAdmob" multiple="multiple">
 
                 </select>
+            </div>
+            <div class="col-sm-1">
+                <input type="button" class="btn-more btn btn-default" id="btnSelectRegionUnselectedAdmobMore" value="批量输入"/>
             </div>
         </div>
         <div class="form-group">
@@ -297,6 +334,49 @@
 
     function init() {
         $('.select2').select2();
+
+        $('.btn-more').click(function() {
+            var id = $(this).attr('id');
+            var targetId = '';
+            if (id == 'btnSelectRegionMore') {
+                targetId = '#selectRegion';
+            } else if (id == 'btnSelectRegionUnselectedMore') {
+                targetId = '#selectRegionUnselected';
+            } else if (id == 'btnSelectRegionUnselectedAdmobMore') {
+                targetId = '#selectRegionUnselectedAdmob';
+            } else if (id == 'btnSelectRegionAdmobMore') {
+                targetId = '#selectRegionAdmob';
+            }
+            $('#moreCountryDlg').modal("show");
+            $('#moreCountryDlg .btn-primary').off('click');
+            $('#moreCountryDlg .btn-primary').click(function() {
+                console.log(id);
+                var data = $('#textareaCountry').val();
+                var countryList = data.split('\n');
+                var countryNames = [];
+                countryList.forEach(function(one) {
+                   for (var i = 0; i < regionList.length; i++) {
+                       one = one.trim();
+                       if (regionList[i].name.toLocaleLowerCase() == one.toLocaleLowerCase()) {
+                           if (targetId == '#selectRegionUnselectedAdmob' || targetId == '#selectRegionAdmob') {
+                               countryNames.push(regionList[i].country_code);
+                           } else {
+                               countryNames.push(regionList[i].name);
+                           }
+                           break;
+                       }
+                   }
+                });
+
+                if (targetId != '') {
+                    $(targetId).val(countryNames);
+                    $(targetId).trigger('change');
+                }
+                $('#moreCountryDlg').modal("hide");
+            });
+        });
+
+
 
         languageList.forEach(function (one) {
             $('#selectLanguage').append($("<option>" + one + "</option>"));
