@@ -37,11 +37,11 @@ public class System extends HttpServlet {
                 json.addProperty("message", result.message);
             } else {
                 int id = Utils.parseInt(request.getParameter("id"), 0);
-                String tagName = request.getParameter("tagName");
-                String accountId = request.getParameter("accountId");
-                String fbAppId = request.getParameter("fbAppId");
-                String pageId = request.getParameter("pageId");
-                String gpPackageId = request.getParameter("gpPackageId");
+                String tagName = request.getParameter("tagName").trim();
+                String accountId = request.getParameter("accountId").trim();
+                String fbAppId = request.getParameter("fbAppId").trim();
+                String pageId = request.getParameter("pageId").trim();
+                String gpPackageId = request.getParameter("gpPackageId").trim();
 
                 switch (path) {
                     case "/fb_app_id_rel/create": {
