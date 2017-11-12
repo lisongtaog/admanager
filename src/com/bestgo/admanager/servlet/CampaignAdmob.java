@@ -87,6 +87,9 @@ public class CampaignAdmob extends HttpServlet {
                 }
 
                 if (result.result) {
+                    Calendar calendar = Calendar.getInstance();
+                    String now  = String.format("%d-%02d-%02d %02d:%02d:%02d", calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH),
+                            calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), calendar.get(Calendar.SECOND));
                     long genId = DB.insert("ad_campaigns_admob")
                             .put("account_id", accountId)
                             .put("campaign_name", campaignName)
@@ -94,6 +97,7 @@ public class CampaignAdmob extends HttpServlet {
                             .put("country_region", region)
                             .put("language", language)
                             .put("excluded_region", excludedRegion)
+                            .put("create_time", now)
                             .put("bugdet", bugdet)
                             .put("bidding", bidding)
                             .put("message1", message1)

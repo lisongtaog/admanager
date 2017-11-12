@@ -14,10 +14,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 @WebServlet(name = "query", urlPatterns = {"/query"}, asyncSupported = true)
 public class Query extends HttpServlet {
@@ -343,6 +340,9 @@ public class Query extends HttpServlet {
             double ctr = impressions > 0 ? click / impressions : 0;
             double cpa = installed > 0 ? spend / installed : 0;
             double cvr = click > 0 ? installed / click : 0;
+            if (impressions == 0) {
+                continue;
+            }
             total_spend += spend;
             total_installed += installed;
             total_impressions += impressions;
@@ -368,6 +368,11 @@ public class Query extends HttpServlet {
             d.addProperty("ctr", Utils.trimDouble(ctr));
             d.addProperty("cpa", Utils.trimDouble(cpa));
             d.addProperty("cvr", Utils.trimDouble(cvr));
+            if (admobCheck) {
+                d.addProperty("network", "admob");
+            } else {
+                d.addProperty("network", "facebook");
+            }
             array.add(d);
         }
         jsonObject.add("array", array);

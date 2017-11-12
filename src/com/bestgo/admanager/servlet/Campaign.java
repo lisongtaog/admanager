@@ -3,9 +3,12 @@ package com.bestgo.admanager.servlet;
 import com.bestgo.admanager.OperationResult;
 import com.bestgo.admanager.Utils;
 import com.bestgo.common.database.services.DB;
+import com.bestgo.common.database.services.Store;
 import com.bestgo.common.database.utils.JSObject;
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 
@@ -15,6 +18,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
+import java.lang.*;
 import java.util.*;
 
 @WebServlet(name = "Campaign", urlPatterns = "/campaign/*")
@@ -84,11 +88,15 @@ public class Campaign extends HttpServlet {
                 }
 
                 if (result.result) {
+                    Calendar calendar = Calendar.getInstance();
+                    String now  = String.format("%d-%02d-%02d %02d:%02d:%02d", calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH),
+                            calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), calendar.get(Calendar.SECOND));
                     long genId = DB.insert("ad_campaigns")
                             .put("facebook_app_id", appId)
                             .put("account_id", accountId)
                             .put("country_region", region)
                             .put("excluded_region", excludedRegion)
+                            .put("create_time", now)
                             .put("language", language)
                             .put("campaign_name", campaignName)
                             .put("page_id", pageId)
@@ -144,6 +152,56 @@ public class Campaign extends HttpServlet {
             OperationResult result = updateCampaign(id, campaignName, status, budget, bidding, tags);
             json.addProperty("ret", result.result ? 1 : 0);
             json.addProperty("message", result.message);
+        } else if (path.startsWith("/query_status")) {
+            try {
+                Calendar calendar = Calendar.getInstance();
+                String startDate = String.format("%d-%02d-%02d 00:00:00",
+                        calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH));
+                String endDate = String.format("%d-%02d-%02d 23:59:59",
+                        calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH));
+
+                long count = 0;
+                String sql = "select count(id) as cnt from ad_campaigns where create_time between '" + startDate + "' and '" + endDate + "'";
+                JSObject record = DB.findOneBySql(sql);
+                if (record.hasObjectData()) {
+                    count = record.get("cnt");
+                }
+                sql = "select count(id) as cnt from ad_campaigns_admob where create_time between '" + startDate + "' and '" + endDate + "'";
+                record = DB.findOneBySql(sql);
+                if (record.hasObjectData()) {
+                    count += (long)record.get("cnt");
+                }
+
+                String[] fields = {"id", "campaign_name", "failed_count", "last_error_message"};
+                JsonArray array = new JsonArray();
+
+                List<JSObject> list = DB.scan("ad_campaigns").select(fields)
+                        .where(DB.filter().whereEqualTo("success", 0)).execute();
+                for (int i = 0; i < list.size(); i++) {
+                    JsonObject one = new JsonObject();
+                    for (int j = 0; j < fields.length; j++) {
+                        one.addProperty(fields[j], list.get(i).get(fields[j]).toString());
+                    }
+                    one.addProperty("network", "Facebook");
+                    array.add(one);
+                }
+
+                list = DB.scan("ad_campaigns_admob").select(fields)
+                        .where(DB.filter().whereEqualTo("success", 0)).execute();
+                for (int i = 0; i < list.size(); i++) {
+                    JsonObject one = new JsonObject();
+                    for (int j = 0; j < fields.length; j++) {
+                        one.addProperty(fields[j], list.get(i).get(fields[j]).toString());
+                    }
+                    one.addProperty("network", "AdWords");
+                    array.add(one);
+                }
+                json.addProperty("today_create_count", count);
+                json.add("data", array);
+                json.addProperty("ret", 1);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
         } else if (path.startsWith("/query")) {
             String word = request.getParameter("word");
             if (word != null) {
@@ -214,6 +272,59 @@ public class Campaign extends HttpServlet {
                     json.addProperty("message", "没有找到创建数据");
                 }
             } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else if (path.startsWith("/batch_change")) {
+            try {
+                String data = request.getParameter("data");
+                JsonParser parser = new JsonParser();
+                Gson gson = new Gson();
+                JsonArray array = parser.parse(data).getAsJsonArray();
+                String now = Utils.getNow();
+
+                for (int i = 0; i < array.size(); i++) {
+                    BatchChangeItem item = gson.fromJson(array.get(i), BatchChangeItem.class);
+                    JSObject record = DB.simpleScan("web_ad_batch_change_campaigns")
+                            .select("id").where(DB.filter().whereEqualTo("campaign_id", item.campaignId))
+                            .and(DB.filter().whereEqualTo("success", 0)).execute();
+                    int enabled = -1;
+                    if (item.enabled != null) {
+                        enabled = item.enabled ? 1 : 0;
+                    }
+                    if (record.hasObjectData()) {
+                        long id = record.get("id");
+                        DB.update("web_ad_batch_change_campaigns")
+                                .put("enabled", enabled)
+                                .put("bugdet", item.budget)
+                                .put("bidding", item.bidding)
+                                .put("network", item.network)
+                                .put("account_id", item.accountId)
+                                .put("campaign_name", item.campaignName != null ? item.campaignName : "")
+                                .put("excluded_country", item.excludedCountry != null ? item.excludedCountry : "")
+                                .put("create_time", now)
+                                .put("success", 0)
+                                .where(DB.filter().whereEqualTo("id", id))
+                                .execute();
+                    } else {
+                        DB.insert("web_ad_batch_change_campaigns")
+                                .put("enabled", enabled)
+                                .put("bugdet", item.budget)
+                                .put("bidding", item.bidding)
+                                .put("network", item.network)
+                                .put("account_id", item.accountId)
+                                .put("campaign_id", item.campaignId)
+                                .put("campaign_name", item.campaignName != null ? item.campaignName : "")
+                                .put("excluded_country", item.excludedCountry != null ? item.excludedCountry : "")
+                                .put("create_time", now)
+                                .put("success", 0)
+                                .execute();
+                    }
+                }
+                json.addProperty("ret", 1);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                json.addProperty("ret", 0);
+                json.addProperty("message", ex.getMessage());
             }
         }
 
@@ -222,6 +333,18 @@ public class Campaign extends HttpServlet {
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         doPost(request, response);
+    }
+
+    class BatchChangeItem {
+        public Boolean enabled;
+        public String network;
+        public String campaignId;
+        public String accountId;
+        public String campaignName;
+        public double budget;
+        public double bidding;
+        public String excludedCountry;
+        public int success;
     }
 
     private OperationResult updateCampaign(String id, String campaignName, String status, String budget, String bidding, String tags) {
