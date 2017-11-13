@@ -324,8 +324,8 @@ function estimateCost() {
     $('#results_body tr').each(function() {
         if (!this.changedCampainData) return;
         if (this.changedCampainData.budget > 0 && this.changedCampainData.budget != this.origCampaignData.budget) {
-            total_spend += (this.changedCampainData.budget * 100 - this.origCampaignData.budget) / 100 * (this.origCampaignData.spend / total_spend);
-            var count = (this.changedCampainData.budget * 100 - this.origCampaignData.budget) / 100 * (this.origCampaignData.spend / total_spend) / this.origCampaignData.cpa;
+            total_spend += (this.changedCampainData.budget * 100 - this.origCampaignData.budget) / this.origCampaignData.budget * this.origCampaignData.spend;
+            var count = (this.changedCampainData.budget * 100 - this.origCampaignData.budget) / this.origCampaignData.budget  * this.origCampaignData.installed;
             total_installed += parseInt(count);
         }
     });
