@@ -152,6 +152,42 @@ public class Campaign extends HttpServlet {
             OperationResult result = updateCampaign(id, campaignName, status, budget, bidding, tags);
             json.addProperty("ret", result.result ? 1 : 0);
             json.addProperty("message", result.message);
+        } else if (path.startsWith("/query_batch_change_status")) {
+            try {
+                String[] fields = {"id", "network", "campaign_id", "campaign_name", "failed_count", "last_error_message"};
+                JsonArray array = new JsonArray();
+
+                List<JSObject> list = DB.scan("web_ad_batch_change_campaigns").select(fields)
+                        .where(DB.filter().whereEqualTo("success", 0)).execute();
+                for (int i = 0; i < list.size(); i++) {
+                    JsonObject one = new JsonObject();
+                    for (int j = 0; j < fields.length; j++) {
+                        String value = list.get(i).get(fields[j]).toString();
+                        if (fields[j].equals("campaign_name")) {
+                            if (value.isEmpty()) {
+                                String campaignId = list.get(i).get("campaign_id");
+                                String tableName = "web_ad_campaigns";
+                                if (list.get(i).get("network").equals("admob")) {
+                                    tableName = "web_ad_campaigns_admob";
+                                }
+                                JSObject record = DB.simpleScan(tableName)
+                                        .select("campaign_name")
+                                        .where(DB.filter().whereEqualTo("campaign_id", campaignId))
+                                        .execute();
+                                if (record.hasObjectData()) {
+                                    value = record.get("campaign_name");
+                                }
+                            }
+                        }
+                        one.addProperty(fields[j], value);
+                    }
+                    array.add(one);
+                }
+                json.add("data", array);
+                json.addProperty("ret", 1);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
         } else if (path.startsWith("/query_status")) {
             try {
                 Calendar calendar = Calendar.getInstance();

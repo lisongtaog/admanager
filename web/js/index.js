@@ -470,7 +470,7 @@ function bindBatchModifyOperation() {
                 break;
             }
         }
-        if (countryCode == '') {
+        if (countryCode == '' && countryName != '') {
             return;
         }
 
