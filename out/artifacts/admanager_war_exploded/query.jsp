@@ -1,0 +1,139 @@
+<%@ page import="com.bestgo.admanager.Utils" %>
+<%@ page import="com.bestgo.common.database.utils.JSObject" %>
+<%@ page import="java.util.List" %>
+<%@ page import="java.util.ArrayList" %>
+
+
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<link rel="stylesheet" href="bootstrap/css/bootstrap.min.css" />
+<link rel="stylesheet" href="bootstrap/css/bootstrap-theme.min.css" />
+
+<html>
+  <head>
+    <title>查询</title>
+  </head>
+  <body>
+
+  <%
+    Object object = session.getAttribute("isAdmin");
+    if (object == null) {
+      response.sendRedirect("login.jsp");
+    }
+  %>
+
+  <div class="container-fluid">
+    <ul class="nav nav-pills">
+      <li role="presentation"><a href="index.jsp">首页</a></li>
+      <li role="presentation"><a href="campaigns_create.jsp">创建广告</a></li>
+      <li role="presentation"><a href="adaccounts.jsp">广告账号管理</a></li>
+      <li role="presentation"><a href="adaccounts_admob.jsp">广告账号管理(AdMob)</a></li>
+      <li role="presentation"><a href="campaigns.jsp">广告系列管理</a></li>
+      <li role="presentation"><a href="campaigns_admob.jsp">广告系列管理(AdMob)</a></li>
+      <li role="presentation"><a href="tags.jsp">标签管理</a></li>
+      <li role="presentation"><a href="rules.jsp">规则</a></li>
+      <li role="presentation" class="active"><a href="#">查询</a></li>
+      <li role="presentation"><a href="system.jsp">系统管理</a></li>
+    </ul>
+
+    <%
+      String accessToken = Utils.getAccessToken();
+      String accountId = Utils.getFirstAdAccountId();
+    %>
+    <span id="accessToken" style="display: none;"><%=accessToken%></span>
+    <span id="accountId" style="display: none;"><%=accountId%></span>
+
+    <div class="panel panel-default">
+      <!-- Default panel contents -->
+      <div class="panel-heading">
+        <input id="inputQueryText" type="text"/>
+        <button id="btnQuery" class="btn btn-default">查询</button>
+      </div>
+
+      <table class="table">
+        <thead>
+        <tr><th>ID</th><th>名称</th><th>路径</th><th>类型</th><th>受众范围</th></tr>
+        </thead>
+        <tbody>
+        <tr>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+
+  <jsp:include page="loading_dialog.jsp"></jsp:include>
+
+  <script src="js/jquery.js"></script>
+  <script src="bootstrap/js/bootstrap.min.js"></script>
+  <script src="js/core.js"></script>
+
+  <script type="text/javascript">
+
+    function targetSearch(q) {
+      var accountId = $('#accountId').text().trim();
+      var accessToken = $('#accessToken').text().trim();
+      var url = "https://graph.facebook.com/v2.9/act_" + accountId + "/targetingsearch?q=" + encodeURIComponent(q);
+      url += ("&access_token=" + accessToken);
+      $.get(url, function(data) {
+        $('.table tbody tr').remove();
+        for (var i = 0; i < data.data.length; i++) {
+          var one = data.data[i];
+          var tr = $('<tr></tr>');
+          var td = $('<td></td>');
+          td.text(one.id);
+          tr.append(td);
+          td = $('<td></td>');
+          td.text(one.name);
+          tr.append(td);
+          td = $('<td></td>');
+          td.text(one.path.join(' -> '));
+          tr.append(td);
+          td = $('<td></td>');
+          td.text(one.type);
+          tr.append(td);
+          td = $('<td></td>');
+          td.text(formatNumber(one.audience_size));
+          tr.append(td);
+          $('.table tbody').append(tr);
+        }
+      }, 'json');
+    }
+
+    function bindOp() {
+      $("#btnQuery").click(function() {
+        var q = $('#inputQueryText').val();
+        targetSearch(q);
+      });
+
+      $("#inputQueryText").change(function(e) {
+        var q = $('#inputQueryText').val();
+        targetSearch(q);
+      });
+    }
+
+    function formatNumber(num, precision, separator) {
+      var parts;
+      // 判断是否为数字
+      if (!isNaN(parseFloat(num)) && isFinite(num)) {
+        // 把类似 .5, 5. 之类的数据转化成0.5, 5, 为数据精度处理做准, 至于为什么
+        // 不在判断中直接写 if (!isNaN(num = parseFloat(num)) && isFinite(num))
+        // 是因为parseFloat有一个奇怪的精度问题, 比如 parseFloat(12312312.1234567119)
+        // 的值变成了 12312312.123456713
+        num = Number(num);
+        // 处理小数点位数
+        num = (typeof precision !== 'undefined' ? num.toFixed(precision) : num).toString();
+        // 分离数字的小数部分和整数部分
+        parts = num.split('.');
+        // 整数部分加[separator]分隔, 借用一个著名的正则表达式
+        parts[0] = parts[0].toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1' + (separator || ','));
+
+        return parts.join('.');
+      }
+      return NaN;
+    }
+
+    bindOp();
+  </script>
+  </body>
+</html>

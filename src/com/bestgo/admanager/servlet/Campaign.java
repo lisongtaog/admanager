@@ -362,8 +362,67 @@ public class Campaign extends HttpServlet {
                 json.addProperty("ret", 0);
                 json.addProperty("message", ex.getMessage());
             }
+            //zmj start
+        }else if (path.startsWith("/selectMessage")) {
+            String appName = request.getParameter("appName");
+            String language = request.getParameter("language");
+            String checkFacebook = request.getParameter("checkFacebook");
+            String checkAdmob = request.getParameter("checkAdmob");
+            String sql = null;
+            List<JSObject> list =null;
+            JsonArray array = new JsonArray();
+            String wherePart =  " where ";
+            try {
+                    if(appName != null){
+                        wherePart += " app_name = '" + appName + "'";
+                    }
+                    if(language != null){
+                        if(appName != null){
+                            wherePart += " and ";
+                        }
+                        wherePart += " language = '" + language + "'";
+                    }
+                    if(appName == null && language == null){
+                        wherePart = "";
+                    }
+                    if(checkFacebook != null && "true".equals(checkFacebook)) {
+                        sql = "select distinct title,message from ad_campaigns" + wherePart;
+                        list = DB.findListBySql(sql);
+                        for (int i = 0; i < list.size(); i++) {
+                            JSObject one = list.get(i);
+                            String title = one.get("title");
+                           String message = one.get("message");
+                            JsonObject d = new JsonObject();
+                            d.addProperty("title", title);
+                            d.addProperty("message", message);
+                            array.add(d);
+                        }
+                    }
+                    if(checkAdmob != null && "true".equals(checkAdmob)) {
+                        sql = "select distinct message1,message2,message3,message4 from ad_campaigns_admob" + wherePart;
+                        list = DB.findListBySql(sql);
+                        for (int i = 0; i < list.size(); i++) {
+                            JSObject two = list.get(i);
+                            String message1 = two.get("message1");
+                            String message2 = two.get("message2");
+                            String message3 = two.get("message3");
+                            String message4 = two.get("message4");
+                            JsonObject d = new JsonObject();
+                            d.addProperty("message1", message1);
+                            d.addProperty("message2", message2);
+                            d.addProperty("message3", message3);
+                            d.addProperty("message4", message4);
+                            array.add(d);
+                        }
+                    }
+                    json.add("array", array);
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
         }
 
+        //zmj end
         response.getWriter().write(json.toString());
     }
 
