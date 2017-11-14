@@ -304,9 +304,11 @@
         }, 'json');
       });
 
+      var currPageIndex = 0;
+
       $('#prevPage').click(function() {
         $.post('system/fb_app_id_rel/query', {
-          page_index: <%=preIndex%>,
+          page_index: currPageIndex > 0 ? --currPageIndex : 0,
         }, function(data) {
           if (data && data.ret == 1) {
             $('#tableFBAppRel tbody > tr').remove();
@@ -319,7 +321,7 @@
       });
       $('#nextPage').click(function () {
         $.post('system/fb_app_id_rel/query', {
-          page_index: <%=nextPage%>,
+          page_index: ++currPageIndex,
         }, function(data) {
           if (data && data.ret == 1) {
             $('#tableFBAppRel tbody > tr').remove();
