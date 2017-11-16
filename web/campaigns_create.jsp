@@ -540,7 +540,7 @@
             var now = new Date();
             var appName = $('#selectAppAdmob').val();
             var region = $('#selectRegionAdmob option:selected').text();
-            var language = $('#selectLanguageAdmob').val();
+            var language = $('#selectLanguageAdmob option:selected').text();
             var bidding = $('#inputBiddingAdmob').val();
             var countryAlisa = $('#selectRegionAdmob')[0].countryAlisa;
             if (countryAlisa) region = countryAlisa;
@@ -681,18 +681,25 @@
                 region: region.join(",")
             }, function (data) {
                 if (data && data.ret == 1) {
-                    $("#selectLanguage").val(data.language);
+                    if (data.language != null) {
+                        $("#selectLanguage").val(data.language);
+                    } else {
+                        $("#selectLanguage").val("null");
+                    }
+                    if ($("#selectLanguage option").text().indexOf(data.language) == -1) {
+                        $("#selectLanguage").val("null");
+                    }
                     $("#inputTitle").val(data.title);
                     $("#inputMessage").val(data.message);
                 } else {
-                    $("#selectLanguage").val("");
+                    $("#selectLanguage").val("null");
                     $("#inputTitle").val("");
                     $("#inputMessage").val("");
                     admanager.showCommonDlg("提示", "数据为空！");
                 }
             }, "json");
         }else{
-            $("#selectLanguage").val("");
+            $("#selectLanguage").val("null");
             $("#inputTitle").val("");
             $("#inputMessage").val("");
         }
