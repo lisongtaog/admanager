@@ -681,7 +681,14 @@
                 region: region.join(",")
             }, function (data) {
                 if (data && data.ret == 1) {
-                    $("#selectLanguage").val(data.language);
+                    if (data.language != null) {
+                        $("#selectLanguage").val(data.language);
+                    } else {
+                        $("#selectLanguage").val("null");
+                    }
+                    if ($("#selectLanguage option").text().indexOf(data.language) == -1) {
+                        $("#selectLanguage").val("null");
+                    }
                     $("#inputTitle").val(data.title);
                     $("#inputMessage").val(data.message);
                 } else {
