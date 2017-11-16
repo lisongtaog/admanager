@@ -98,14 +98,26 @@
                 </select>
             </div>
         </div>
+
         <div class="form-group">
-            <label for="selectApp" class="col-sm-2 control-label">账号</label>
-            <div class="col-sm-10">
-                <select class="form-control" id="selectAccount">
+            <label for="selectAccount" class="col-sm-2 control-label">账号</label>
+            <div class="col-sm-9">
+                <select class="form-control select2" id="selectAccount" multiple="multiple">
 
                 </select>
             </div>
+            <div class="col-sm-1">
+                <input type="button" class="btn-more btn btn-default" id="btnSelectAccountMore" value="批量输入"/>
+            </div>
         </div>
+
+        <div class="form-group">
+            <label for="inputCreateCount" class="col-sm-2 control-label">创建数量</label>
+            <div class="col-sm-10">
+                <input class="form-control" id="inputCreateCount" />
+            </div>
+        </div>
+
         <div class="form-group">
             <label for="selectRegion" class="col-sm-2 control-label">国家地区</label>
             <div class="col-sm-9">
@@ -225,12 +237,22 @@
                 </select>
             </div>
         </div>
+
         <div class="form-group">
-            <label for="selectApp" class="col-sm-2 control-label">广告账号</label>
-            <div class="col-sm-10">
-                <select class="form-control" id="selectAccountAdmob">
+            <label for="selectAccountAdmob" class="col-sm-2 control-label">广告账号</label>
+            <div class="col-sm-9">
+                <select class="form-control select2" id="selectAccountAdmob" multiple="multiple">
 
                 </select>
+            </div>
+            <div class="col-sm-1">
+                <input type="button" class="btn-more btn btn-default" id="btnselectAccountAdmobMore" value="批量输入"/>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="inputCreateCountAdmob" class="col-sm-2 control-label">创建数量</label>
+            <div class="col-sm-10">
+                <input class="form-control" id="inputCreateCountAdmob" />
             </div>
         </div>
         <div class="form-group">
@@ -550,6 +572,7 @@
         $('#btnCreate').click(function () {
             var appName = $('#selectApp').val();
             var accountId = $('#selectAccount').val();
+            var createCount = $("#inputCreateCount").val();
             var region = $('#selectRegion').val();
             var excludedRegion = $('#selectRegionUnselected').val();
             var language = $('#selectLanguage').val();
@@ -708,7 +731,7 @@
         });
         if(regionAdmob != null && regionAdmob.length > 0){
             var appNameAdmob = $('#selectAppAdmob').val();
-            $.post("campaign/selectLanguageAdmobByRegion", {
+            $.post("campaign_admob/selectLanguageAdmobByRegion", {
                 appNameAdmob: appNameAdmob,
                 regionAdmob: regionAdmob.join(",")
             }, function (data) {

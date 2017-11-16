@@ -477,40 +477,6 @@ public class Campaign extends HttpServlet {
                 json.addProperty("language", language);
                 json.addProperty("ret", 1);
             }
-        }else if (path.startsWith("/selectLanguageAdmobByRegion")) {
-            String region = request.getParameter("regionAdmob");
-            String appName = request.getParameter("appNameAdmob");
-
-            if (region != null) {
-                Map<String, String> regionLanguageAdmobRelMap = Config.getRegionLanguageRelMap();
-                String[] regionAdmobArray = region.split(",");
-                Set<String> languageAdmobSet = new HashSet<>();
-                for (int i=0,len = regionAdmobArray.length;i<len;i++){
-                    languageAdmobSet.add(regionLanguageAdmobRelMap.get(regionAdmobArray[i]));
-                }
-                int size = languageAdmobSet.size();
-                String languageAdmob = "";
-                if(size == 1){
-                    languageAdmob = regionLanguageAdmobRelMap.get(regionAdmobArray[0]);
-                }else{
-                    languageAdmob = "English";
-                }
-                String sql = "select message1,message2,message3,message4 from web_ad_descript_dict_admob where app_name = '" + appName + "' and language = '" + languageAdmob +"' limit 1";
-                JSObject messages = new JSObject();
-                try {
-                    messages = DB.findOneBySql(sql);
-                    System.out.println(messages);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
-                json.addProperty("message1",(String)(messages.get("message1")));
-                json.addProperty("message2",(String)(messages.get("message2")));
-                json.addProperty("message3",(String)(messages.get("message3")));
-                json.addProperty("message4",(String)(messages.get("message4")));
-                json.addProperty("languageAdmob", languageAdmob);
-                json.addProperty("ret", 1);
-            }
         }
 
         response.getWriter().write(json.toString());

@@ -1,5 +1,6 @@
 package com.bestgo.admanager.servlet;
 
+import com.bestgo.admanager.Config;
 import com.bestgo.admanager.OperationResult;
 import com.bestgo.admanager.Utils;
 import com.bestgo.common.database.services.DB;
@@ -137,7 +138,40 @@ public class CampaignAdmob extends HttpServlet {
             OperationResult result = updateCampaign(id, tags);
             json.addProperty("ret", result.result ? 1 : 0);
             json.addProperty("message", result.message);
-        } else if (path.startsWith("/query")) {
+        } else if (path.startsWith("/selectLanguageAdmobByRegion")) {
+            String region = request.getParameter("regionAdmob");
+            String appName = request.getParameter("appNameAdmob");
+
+            if (region != null) {
+                Map<String, String> regionLanguageAdmobRelMap = Config.getRegionLanguageRelMap();
+                String[] regionAdmobArray = region.split(",");
+                Set<String> languageAdmobSet = new HashSet<>();
+                for (int i=0,len = regionAdmobArray.length;i<len;i++){
+                    languageAdmobSet.add(regionLanguageAdmobRelMap.get(regionAdmobArray[i]));
+                }
+                int size = languageAdmobSet.size();
+                String languageAdmob = "";
+                if(size == 1){
+                    languageAdmob = regionLanguageAdmobRelMap.get(regionAdmobArray[0]);
+                }else{
+                    languageAdmob = "English";
+                }
+                String sql = "select message1,message2,message3,message4 from web_ad_descript_dict_admob where app_name = '" + appName + "' and language = '" + languageAdmob +"' limit 1";
+                JSObject messages = new JSObject();
+                try {
+                    messages = DB.findOneBySql(sql);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                json.addProperty("message1",(String)(messages.get("message1")));
+                json.addProperty("message2",(String)(messages.get("message2")));
+                json.addProperty("message3",(String)(messages.get("message3")));
+                json.addProperty("message4",(String)(messages.get("message4")));
+                json.addProperty("languageAdmob", languageAdmob);
+                json.addProperty("ret", 1);
+            }
+        }else if (path.startsWith("/query")) {
             String word = request.getParameter("word");
             if (word != null) {
                 List<JSObject> data = fetchData(word);
