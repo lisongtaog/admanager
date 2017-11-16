@@ -499,7 +499,7 @@
                 campaignName: campaignName,
                 region: region.join(','),
                 excludedRegion: excludedRegion.join(','),
-                language: language.join(','),
+                language: language,
                 bugdet: bugdet,
                 bidding: bidding,
                 gpPackageId: app.google_package_id,
