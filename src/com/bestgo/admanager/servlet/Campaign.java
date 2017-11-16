@@ -1,5 +1,6 @@
 package com.bestgo.admanager.servlet;
 
+import com.bestgo.admanager.Config;
 import com.bestgo.admanager.OperationResult;
 import com.bestgo.admanager.Utils;
 import com.bestgo.common.database.services.DB;
@@ -19,6 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.lang.*;
+import java.lang.System;
 import java.util.*;
 
 @WebServlet(name = "Campaign", urlPatterns = "/campaign/*")
@@ -362,67 +364,115 @@ public class Campaign extends HttpServlet {
                 json.addProperty("ret", 0);
                 json.addProperty("message", ex.getMessage());
             }
-            //zmj start
-        }else if (path.startsWith("/selectMessage")) {
+        }else if (path.startsWith("/selectFacebookMessage")) {
             String appName = request.getParameter("appName");
             String language = request.getParameter("language");
-            String checkFacebook = request.getParameter("checkFacebook");
-            String checkAdmob = request.getParameter("checkAdmob");
-            String sql = null;
-            List<JSObject> list =null;
-            JsonArray array = new JsonArray();
-            String wherePart =  " where ";
             try {
-                    if(appName != null){
-                        wherePart += " app_name = '" + appName + "'";
-                    }
-                    if(language != null){
-                        if(appName != null){
-                            wherePart += " and ";
-                        }
-                        wherePart += " language = '" + language + "'";
-                    }
-                    if(appName == null && language == null){
-                        wherePart = "";
-                    }
-                    if(checkFacebook != null && "true".equals(checkFacebook)) {
-                        sql = "select distinct title,message from ad_campaigns" + wherePart;
-                        list = DB.findListBySql(sql);
-                        for (int i = 0; i < list.size(); i++) {
-                            JSObject one = list.get(i);
-                            String title = one.get("title");
-                           String message = one.get("message");
-                            JsonObject d = new JsonObject();
-                            d.addProperty("title", title);
-                            d.addProperty("message", message);
-                            array.add(d);
-                        }
-                    }
-                    if(checkAdmob != null && "true".equals(checkAdmob)) {
-                        sql = "select distinct message1,message2,message3,message4 from ad_campaigns_admob" + wherePart;
-                        list = DB.findListBySql(sql);
-                        for (int i = 0; i < list.size(); i++) {
-                            JSObject two = list.get(i);
-                            String message1 = two.get("message1");
-                            String message2 = two.get("message2");
-                            String message3 = two.get("message3");
-                            String message4 = two.get("message4");
-                            JsonObject d = new JsonObject();
-                            d.addProperty("message1", message1);
-                            d.addProperty("message2", message2);
-                            d.addProperty("message3", message3);
-                            d.addProperty("message4", message4);
-                            array.add(d);
-                        }
-                    }
-                    json.add("array", array);
+                String sql = "select title,message from web_ad_descript_dict where app_name = '" + appName + "' and language = '" + language +"' limit 1";
+                JSObject titleMessage = new JSObject();
+                try {
+                    titleMessage = DB.findOneBySql(sql);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                json.addProperty("title",(String)(titleMessage.get("title")));
+                json.addProperty("message",(String)(titleMessage.get("message")));
+                json.addProperty("language", language);
+                json.addProperty("ret", 1);
 
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
+        }else if (path.startsWith("/selectAdmobMessage")) {
+            String appNameAdmob = request.getParameter("appNameAdmob");
+            String languageAdmob = request.getParameter("languageAdmob");
+            try {
+                String sql = "select message1,message2,message3,message4 from web_ad_descript_dict_admob where app_name = '" + appNameAdmob + "' and language = '" + languageAdmob +"' limit 1";
+                JSObject messages = new JSObject();
+                try {
+                    messages = DB.findOneBySql(sql);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                json.addProperty("message1",(String)(messages.get("message1")));
+                json.addProperty("message2",(String)(messages.get("message2")));
+                json.addProperty("message3",(String)(messages.get("message3")));
+                json.addProperty("message4",(String)(messages.get("message4")));
+                json.addProperty("languageAdmob", languageAdmob);
+                json.addProperty("ret", 1);
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }else if (path.startsWith("/selectLanguageByRegion")) {
+            String region = request.getParameter("region");
+            String appName = request.getParameter("appName");
+
+            if (region != null) {
+                Map<String, String> regionLanguageRelMap = Config.getRegionLanguageRelMap();
+                String[] regionArray = region.split(",");
+                Set<String> languageSet = new HashSet<>();
+                for (int i=0,len = regionArray.length;i<len;i++){
+                    languageSet.add(regionLanguageRelMap.get(regionArray[i]));
+                }
+                int size = languageSet.size();
+                String language = "";
+                if(size == 1){
+                    language = regionLanguageRelMap.get(regionArray[0]);
+                }else{
+                    language = "English";
+                }
+                String sql = "select title,message from web_ad_descript_dict where app_name = '" + appName + "' and language = '" + language +"' limit 1";
+                JSObject titleMessage = new JSObject();
+                try {
+                    titleMessage = DB.findOneBySql(sql);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                json.addProperty("title",(String)(titleMessage.get("title")));
+                json.addProperty("message",(String)(titleMessage.get("message")));
+                json.addProperty("language", language);
+                json.addProperty("ret", 1);
+            }
+        }else if (path.startsWith("/selectLanguageAdmobByRegion")) {
+            String region = request.getParameter("regionAdmob");
+            String appName = request.getParameter("appNameAdmob");
+
+            if (region != null) {
+                Map<String, String> regionLanguageAdmobRelMap = Config.getRegionLanguageRelMap();
+                String[] regionAdmobArray = region.split(",");
+                Set<String> languageAdmobSet = new HashSet<>();
+                for (int i=0,len = regionAdmobArray.length;i<len;i++){
+                    languageAdmobSet.add(regionLanguageAdmobRelMap.get(regionAdmobArray[i]));
+                }
+                int size = languageAdmobSet.size();
+                String languageAdmob = "";
+                if(size == 1){
+                    languageAdmob = regionLanguageAdmobRelMap.get(regionAdmobArray[0]);
+                }else{
+                    languageAdmob = "English";
+                }
+                String sql = "select message1,message2,message3,message4 from web_ad_descript_dict_admob where app_name = '" + appName + "' and language = '" + languageAdmob +"' limit 1";
+                JSObject messages = new JSObject();
+                try {
+                    messages = DB.findOneBySql(sql);
+                    System.out.println(messages);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                json.addProperty("message1",(String)(messages.get("message1")));
+                json.addProperty("message2",(String)(messages.get("message2")));
+                json.addProperty("message3",(String)(messages.get("message3")));
+                json.addProperty("message4",(String)(messages.get("message4")));
+                json.addProperty("languageAdmob", languageAdmob);
+                json.addProperty("ret", 1);
+            }
         }
 
-        //zmj end
         response.getWriter().write(json.toString());
     }
 
@@ -545,7 +595,8 @@ public class Campaign extends HttpServlet {
                     }
                     for (String tagName : delList) {
                         long tagId = tagIds.get(tagName);
-                        DB.delete("web_ad_campaign_tag_rel").where(DB.filter().whereEqualTo("tag_id", tagId))
+                        DB.delete("web_ad_campaign_tag_rel")
+                                .where(DB.filter().whereEqualTo("tag_id", tagId))
                                 .and(DB.filter().whereEqualTo("campaign_id", campaignId)).execute();
                     }
                     for (String tagName : newList) {
@@ -632,4 +683,6 @@ public class Campaign extends HttpServlet {
         }
         return retList;
     }
+
+
 }

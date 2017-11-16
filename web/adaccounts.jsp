@@ -33,6 +33,7 @@
       <li role="presentation"><a href="rules.jsp">规则</a></li>
       <li role="presentation"><a href="query.jsp">查询</a></li>
       <li role="presentation"><a href="system.jsp">系统管理</a></li>
+      <li role="presentation"><a href="advert_insert.jsp">广告存储</a></li>
     </ul>
 
     <div class="panel panel-default">

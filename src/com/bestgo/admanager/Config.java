@@ -1,5 +1,7 @@
 package com.bestgo.admanager;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -46,5 +48,41 @@ public class Config {
     prop.setProperty("http.proxyPort", "7790");
     prop.setProperty("https.proxyHost", "218.93.127.86");
     prop.setProperty("https.proxyPort", "7790");
+  }
+
+
+  public static Map<String, String> getRegionLanguageRelMap() {
+    Map<String, String> regionLanguageRelMap = new HashMap<>();
+    //第一句为了测试用
+    regionLanguageRelMap.put("United Arab Emirates", "French");
+    regionLanguageRelMap.put("Sint Maarten", "French");
+
+    regionLanguageRelMap.put("Burundi", "French");
+    regionLanguageRelMap.put("Central African Republic", "French");
+    regionLanguageRelMap.put("Malawi", "English");
+    regionLanguageRelMap.put("The Gambia", "Arabic");
+    regionLanguageRelMap.put("Madagascar", "French");
+    regionLanguageRelMap.put("Niger", "French");
+    regionLanguageRelMap.put("Liberia", "English");
+    regionLanguageRelMap.put("Guinea", "French");
+    regionLanguageRelMap.put("Somalia", "Somali");
+    regionLanguageRelMap.put("Togo", "French");
+    regionLanguageRelMap.put("Afghanistan", "Pashto");
+    regionLanguageRelMap.put("Uganda", "English");
+    regionLanguageRelMap.put("Mozambique", "Portuguese");
+    regionLanguageRelMap.put("Eritrea", "English");
+    regionLanguageRelMap.put("Burkina Faso", "French");
+    regionLanguageRelMap.put("Mali", "French");
+    regionLanguageRelMap.put("Sierra Leone", "English");
+    regionLanguageRelMap.put("Ethiopia", "Amharic");
+    regionLanguageRelMap.put("Benin", "French");
+    regionLanguageRelMap.put("South Sudan", "English");
+    regionLanguageRelMap.put("Comoros", "Arabic");
+    regionLanguageRelMap.put("Rwanda", "French");
+    regionLanguageRelMap.put("Nepal", "Nepali");
+    regionLanguageRelMap.put("Haiti", "French");
+    regionLanguageRelMap.put("Tajikistan", "Tajik");
+    regionLanguageRelMap.put("Palestine", "Arabic");
+    return regionLanguageRelMap;
   }
 }
