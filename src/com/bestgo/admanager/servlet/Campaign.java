@@ -198,6 +198,12 @@ public class Campaign extends HttpServlet {
                 String endDate = String.format("%d-%02d-%02d 23:59:59",
                         calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH));
 
+                calendar.add(Calendar.DAY_OF_MONTH, -1);
+                String yesterdayStart = String.format("%d-%02d-%02d 00:00:00",
+                        calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH));
+                String yesterdayEnd = String.format("%d-%02d-%02d 23:59:59",
+                        calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH));
+
                 long count = 0;
                 String sql = "select count(id) as cnt from ad_campaigns where create_time between '" + startDate + "' and '" + endDate + "'";
                 JSObject record = DB.findOneBySql(sql);
@@ -209,6 +215,39 @@ public class Campaign extends HttpServlet {
                 if (record.hasObjectData()) {
                     count += (long)record.get("cnt");
                 }
+
+                JsonObject yesterdayData = new JsonObject();
+                long yesterdayCount = 0;
+                double totalSpend = 0;
+                double totalInstalled = 0;
+                sql = "select count(id) as cnt from ad_campaigns where create_time between '" + yesterdayStart + "' and '" + yesterdayEnd + "' and success=1";
+                record = DB.findOneBySql(sql);
+                if (record.hasObjectData()) {
+                    yesterdayCount += (long)record.get("cnt");
+                }
+
+                sql = "select sum(total_spend) as total_spend, sum(total_installed) as total_intalled from web_ad_campaigns_history " +
+                        "where date between '" + yesterdayStart + "' and '" + yesterdayEnd + "' and campaign_id in (select campaign_id from " +
+                        "ad_campaigns where create_time between '" + yesterdayStart + "' and '" + yesterdayEnd + "' and success=1)";
+                record = DB.findOneBySql(sql);
+                totalSpend += Utils.convertDouble(record.get("total_spend"), 0);
+                totalInstalled += Utils.convertDouble(record.get("total_intalled"), 0);
+
+                sql = "select count(id) as cnt from ad_campaigns_admob where create_time between '" + yesterdayEnd + "' and '" + yesterdayEnd + "' and success=1";
+                record = DB.findOneBySql(sql);
+                if (record.hasObjectData()) {
+                    yesterdayCount += (long)record.get("cnt");
+                }
+                sql = "select sum(total_spend) as total_spend, sum(total_installed) as total_intalled from web_ad_campaigns_history_admob " +
+                        "where date between '" + yesterdayStart + "' and '" + yesterdayEnd + "' and campaign_id in (select campaign_id from " +
+                        "ad_campaigns_admob where create_time between '" + yesterdayStart + "' and '" + yesterdayEnd + "' and success=1)";
+                record = DB.findOneBySql(sql);
+                totalSpend += Utils.convertDouble(record.get("total_spend"), 0);
+                totalInstalled += Utils.convertDouble(record.get("total_intalled"), 0);
+
+                yesterdayData.addProperty("count", yesterdayCount);
+                yesterdayData.addProperty("total_spend", totalSpend);
+                yesterdayData.addProperty("total_installed", totalInstalled);
 
                 String[] fields = {"id", "campaign_name", "failed_count", "last_error_message"};
                 JsonArray array = new JsonArray();
@@ -236,6 +275,7 @@ public class Campaign extends HttpServlet {
                 }
                 json.addProperty("today_create_count", count);
                 json.add("data", array);
+                json.add("yesterdayData", yesterdayData);
                 json.addProperty("ret", 1);
             } catch (Exception ex) {
                 ex.printStackTrace();
