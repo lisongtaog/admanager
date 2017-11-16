@@ -36,7 +36,7 @@ public class Advert extends HttpServlet {
             String message4 = request.getParameter("message4");
 
             List<JSObject> list = new ArrayList<>();
-            String sql = "select id,message1,message2,message3,message4 from web_ad_descript_dict_admob where app_name='" + appName + "' and language = '" + language + "'";
+            String sql = "select message1,message2,message3,message4 from web_ad_descript_dict_admob where app_name='" + appName + "' and language = '" + language + "'";
             list = fetchData(sql);
             OperationResult result = new OperationResult();
             try {
@@ -97,7 +97,7 @@ public class Advert extends HttpServlet {
             String message = request.getParameter("message");
             String existData = request.getParameter("existData");
             List<JSObject> list = new ArrayList<>();
-            String sql = "select id,title,message from web_ad_descript_dict where app_name='" + appName + "' and language = '" + language + "'";
+            String sql = "select title,message from web_ad_descript_dict where app_name='" + appName + "' and language = '" + language + "'";
             list = fetchData(sql);
             OperationResult result = new OperationResult();
             try {
@@ -144,7 +144,7 @@ public class Advert extends HttpServlet {
             List<JSObject> list =null;
             try {
                 if(appName != null && language != null){
-                    String sql = "select distinct title,message from web_ad_descript_dict where app_name = '" + appName + "' and language = '" + language + "' limit 1";
+                    String sql = "select title,message from web_ad_descript_dict where app_name = '" + appName + "' and language = '" + language + "' limit 1";
                     JSObject one  = DB.findOneBySql(sql);
                     String title = one.get("title");
                     String message = one.get("message");
@@ -163,7 +163,7 @@ public class Advert extends HttpServlet {
             List<JSObject> list =null;
             try {
                 if(appNameAdmob != null && languageAdmob != null){
-                    String sql = "select distinct message1,message2,message3,message4 from web_ad_descript_dict_admob where app_name = '" + appNameAdmob + "' and language = '" + languageAdmob + "' limit 1";
+                    String sql = "select message1,message2,message3,message4 from web_ad_descript_dict_admob where app_name = '" + appNameAdmob + "' and language = '" + languageAdmob + "' limit 1";
                     JSObject two  = DB.findOneBySql(sql);
                     String message1 = two.get("message1");
                     String message2 = two.get("message2");
