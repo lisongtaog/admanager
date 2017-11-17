@@ -185,8 +185,6 @@
     $('#btnBatchChangeStatus').click(function() {
         popupCenter("batch_change_status.jsp", "修改状态监控", 600, 480);
     });
-
-
 </script>
 </body>
 </html>

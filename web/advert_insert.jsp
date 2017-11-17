@@ -55,7 +55,6 @@
                 <input type="radio" name="optionsRadios" id="checkAdmob">
                 AdWords 广告
             </label>
-            <input type="button" class="btn btn-default" id="btnCampaignStatus" value="创建状态监控"/>
         </div>
     </div>
 

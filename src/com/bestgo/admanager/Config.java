@@ -75,7 +75,7 @@ public class Config {
         regionLanguageRelMap.put("South Sudan","English");
         regionLanguageRelMap.put("Comoros","Arabic");
         regionLanguageRelMap.put("Rwanda","French");
-        regionLanguageRelMap.put("Nepal","Nepali language");
+        regionLanguageRelMap.put("Nepal","Nepali");
         regionLanguageRelMap.put("Haiti","French");
         regionLanguageRelMap.put("Tajikistan","Tajik");
         regionLanguageRelMap.put("Palestine","Arabic");
@@ -159,12 +159,12 @@ public class Config {
         regionLanguageRelMap.put("Dominica","Spanish");
         regionLanguageRelMap.put("Azerbaijan","Azerbaijani");
         regionLanguageRelMap.put("Saint Vincent and the Grenadines","English");
-        regionLanguageRelMap.put("Turkmenistan","Turkmen");
+        regionLanguageRelMap.put("Turkmenistan","English");
         regionLanguageRelMap.put("China","Chinese");
         regionLanguageRelMap.put("St. Lucia","English");
         regionLanguageRelMap.put("Russia","Russian");
         regionLanguageRelMap.put("Gabon","French");
-        regionLanguageRelMap.put("Maldives","Dhivehi");
+        regionLanguageRelMap.put("Maldives","English");
         regionLanguageRelMap.put("Brazil","Portuguese");
         regionLanguageRelMap.put("Grenada","English");
         regionLanguageRelMap.put("Romania","Romanian");
@@ -199,7 +199,7 @@ public class Config {
         regionLanguageRelMap.put("Slovenia","Slovenian");
         regionLanguageRelMap.put("Cyprus","Greek");
         regionLanguageRelMap.put("Malta","English");
-        regionLanguageRelMap.put("Taiwan, China","Chinese");
+        regionLanguageRelMap.put("Taiwan, China","Traditional");
         regionLanguageRelMap.put("Bahrain","Arabic");
         regionLanguageRelMap.put("The Bahamas","English");
         regionLanguageRelMap.put("Spain","Spanish");
@@ -215,7 +215,7 @@ public class Config {
         regionLanguageRelMap.put("Andorra","Catalan");
         regionLanguageRelMap.put("Belgium","Dutch");
         regionLanguageRelMap.put("Germany","German");
-        regionLanguageRelMap.put("Hong Kong","traditional Chinese");
+        regionLanguageRelMap.put("Hong Kong","Traditional");
         regionLanguageRelMap.put("Finland","Finnish");
         regionLanguageRelMap.put("Austria","German");
         regionLanguageRelMap.put("Canada","English");
@@ -247,7 +247,7 @@ public class Config {
         regionLanguageRelMap.put("Gibraltar","English");
         regionLanguageRelMap.put("Greenland","Danish");
         regionLanguageRelMap.put("Guam","English");
-        regionLanguageRelMap.put("Guinea-Bissau","Creole language");
+        regionLanguageRelMap.put("Guinea-Bissau","English");
         regionLanguageRelMap.put("Isle Of Man","English");
         regionLanguageRelMap.put("Jersey","English");
         regionLanguageRelMap.put("Saint Kitts and Nevis","English");

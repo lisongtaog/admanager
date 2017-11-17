@@ -101,13 +101,10 @@
 
         <div class="form-group">
             <label for="selectAccount" class="col-sm-2 control-label">账号</label>
-            <div class="col-sm-9">
+            <div class="col-sm-10">
                 <select class="form-control select2" id="selectAccount" multiple="multiple">
 
                 </select>
-            </div>
-            <div class="col-sm-1">
-                <input type="button" class="btn-more btn btn-default" id="btnSelectAccountMore" value="批量输入"/>
             </div>
         </div>
 
@@ -217,7 +214,7 @@
         <div class="form-group">
             <label for="inputImagePath" class="col-sm-2 control-label">图片路径</label>
             <div class="col-sm-10">
-                <input class="form-control" id="inputImagePath" />
+                <input class="form-control" id="inputImagePath"/>
             </div>
         </div>
         <div class="form-group">
@@ -240,13 +237,10 @@
 
         <div class="form-group">
             <label for="selectAccountAdmob" class="col-sm-2 control-label">广告账号</label>
-            <div class="col-sm-9">
+            <div class="col-sm-10">
                 <select class="form-control select2" id="selectAccountAdmob" multiple="multiple">
 
                 </select>
-            </div>
-            <div class="col-sm-1">
-                <input type="button" class="btn-more btn btn-default" id="btnselectAccountAdmobMore" value="批量输入"/>
             </div>
         </div>
         <div class="form-group">
@@ -367,9 +361,9 @@
     function init() {
         $('.select2').select2();
 
-        $('#btnCampaignStatus').click(function() {
+        /*$('#btnCampaignStatus').click(function() {
             popupCenter("campaign_status.jsp", "创建状态监控", 600, 480);
-        });
+        });*/
 
         $('.btn-more').click(function() {
             var id = $(this).attr('id');
@@ -450,7 +444,9 @@
                 appList.forEach(function(one) {
                     $('#selectApp').append($("<option>" + one.tag_name + "</option>"));
                     $('#selectAppAdmob').append($("<option>" + one.tag_name + "</option>"));
-                })
+                });
+                $("#inputImagePath").val(appList[0].tag_name+"/");
+                $("#inputImagePathAdmob").val(appList[0].tag_name+"/");
             } else {
                 admanager.showCommonDlg("错误", data.message);
             }
@@ -461,7 +457,8 @@
                 var accountList = data.data;
                 accountList.forEach(function(one) {
                     $('#selectAccountAdmob').append($("<option value='" + one.account_id + "'>" + one.short_name + "</option>"));
-                })
+                });
+
             } else {
                 admanager.showCommonDlg("错误", data.message);
             }
@@ -653,11 +650,12 @@
 
     init();
 
-   $('#selectApp,#selectLanguage').change(function () {
+   $('#selectApp').change(function () {
+       var appName = $('#selectApp').val();
+       $('#inputImagePath').val(appName+"/");
        var language = $('#selectLanguage').val();
-       if(language != null && language.length > 0){
-           var appName = $('#selectApp').val();
 
+       if(language != null && language.length > 0){
 
            $.post("campaign/selectFacebookMessage", {
                appName: appName,
@@ -678,12 +676,73 @@
        return false;
     });
 
-   $('#selectAppAdmob,#selectLanguageAdmob').change(function () {
+   $('#selectLanguage').change(function () {
+       var language = $('#selectLanguage').val();
+       if(language != null && language.length > 0){
+           var appName = $('#selectApp').val();
+
+           $.post("campaign/selectFacebookMessage", {
+               appName: appName,
+               language: language
+           }, function (data) {
+               if(data && data.ret == 1){
+                   $('#inputTitle').val(data.title);
+                   $('#inputMessage').val(data.message);
+               }else{
+                   $('#inputTitle').val("");
+                   $('#inputMessage').val("");
+               }
+           }, "json");
+       }else{
+           $('#inputTitle').val("");
+           $('#inputMessage').val("");
+       }
+       return false;
+    });
+
+   $('#selectAppAdmob').change(function () {
+       var appNameAdmob = $('#selectAppAdmob').val();
+       $('#inputImagePathAdmob').val(appNameAdmob+"/");
        var selectOptions = $('#selectLanguageAdmob option:selected');
        var languageAdmob = [];
        selectOptions.each(function () {
            languageAdmob.push($(this).text())
        });
+        if(languageAdmob != null && languageAdmob.length > 0){
+
+            $.post("campaign/selectAdmobMessage", {
+                appNameAdmob: appNameAdmob,
+                languageAdmob: languageAdmob.join(",")
+            }, function (data) {
+                if(data && data.ret == 1){
+                    $("#inputMessage1").val(data.message1);
+                    $("#inputMessage2").val(data.message2);
+                    $("#inputMessage3").val(data.message3);
+                    $("#inputMessage4").val(data.message4);
+                }else{
+                    $("#inputMessage1").val("");
+                    $("#inputMessage2").val("");
+                    $("#inputMessage3").val("");
+                    $("#inputMessage4").val("");
+                    admanager.showCommonDlg("提示", "数据为空！");
+                }
+            }, "json");
+        }else{
+            $("#inputMessage1").val("");
+            $("#inputMessage2").val("");
+            $("#inputMessage3").val("");
+            $("#inputMessage4").val("");
+        }
+
+        return false;
+    });
+
+    $('#selectLanguageAdmob').change(function () {
+        var selectOptions = $('#selectLanguageAdmob option:selected');
+        var languageAdmob = [];
+        selectOptions.each(function () {
+            languageAdmob.push($(this).text())
+        });
         if(languageAdmob != null && languageAdmob.length > 0){
             var appNameAdmob = $('#selectAppAdmob').val();
             $.post("campaign/selectAdmobMessage", {
@@ -712,7 +771,6 @@
 
         return false;
     });
-
 
     $('#selectRegion').change(function () {
         var region = $('#selectRegion').val();
@@ -762,18 +820,17 @@
                 regionAdmob: regionAdmob.join(",")
             }, function (data) {
                 if (data && data.ret == 1) {
-                    $.each(admobLanguageCodes, function (n, value) {
+                    /*$.each(admobLanguageCodes, function (n, value) {
                         if(value.name == data.languageAdmob){
                             $("#selectLanguageAdmob").val(value.code);
                             return false;
                         }
-                    });
+                    });*/
                     $("#inputMessage1").val(data.message1);
                     $("#inputMessage2").val(data.message2);
                     $("#inputMessage3").val(data.message3);
                     $("#inputMessage4").val(data.message4);
                 } else {
-                    $("#selectLanguageAdmob").val("");
                     $("#inputMessage1").val("");
                     $("#inputMessage2").val("");
                     $("#inputMessage3").val("");
@@ -782,7 +839,6 @@
                 }
             }, "json");
         }else{
-            $("#selectLanguageAdmob").val("");
             $("#inputMessage1").val("");
             $("#inputMessage2").val("");
             $("#inputMessage3").val("");

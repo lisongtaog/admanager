@@ -100,12 +100,13 @@ public class CampaignAdmob extends HttpServlet {
                     String[] accountNameArr = accountName.split(",");
                     String[] accountIdArr = accountId.split(",");
                     int createCountInt = Integer.parseInt(createCount);
+                    Random random = new Random(1);
                     for(int j=0,len = accountNameArr.length;j<len;j++){
                         for(int i=0;i<createCountInt;i++){
                             String now  = String.format("%d-%02d-%02d %02d:%02d:%02d", calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH),
                                     calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), calendar.get(Calendar.SECOND));
                             String s = String.valueOf(System.currentTimeMillis());
-                            campaignName = campaignNameOld + accountNameArr[j] + "_"+ s.substring(s.length()-5);
+                            campaignName = campaignNameOld + accountNameArr[j] + "_"+ s.substring(s.length()-4)+String.valueOf(random.nextInt()).substring(1, 4);
                             long genId = DB.insert("ad_campaigns_admob")
                                     .put("account_id", accountIdArr[j])
                                     .put("campaign_name", campaignName)
