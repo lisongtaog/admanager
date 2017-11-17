@@ -361,9 +361,9 @@
     function init() {
         $('.select2').select2();
 
-        /*$('#btnCampaignStatus').click(function() {
+        $('#btnCampaignStatus').click(function() {
             popupCenter("campaign_status.jsp", "创建状态监控", 600, 480);
-        });*/
+        });
 
         $('.btn-more').click(function() {
             var id = $(this).attr('id');
