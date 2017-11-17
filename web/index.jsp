@@ -84,6 +84,7 @@
                 <input type="checkbox" name="adnetwork" id="facebookCheck"/><label for="facebookCheck">只显示Facebook</label>
                 <input type="checkbox" name="adnetwork" id="adwordsCheck"/><label for="adwordsCheck">只显示AdWords</label>
                 <input type="checkbox" id="countryCheck"/><label for="countryCheck">细分到国家</label>
+                <input type="button" class="btn btn-default" id="btnBatchChangeStatus" value="修改状态监控"/>
             </div>
         </div>
     </div>
@@ -180,7 +181,9 @@
     $("#inputSearch").autocomplete({
         source: data
     });
-
+    $('#btnBatchChangeStatus').click(function() {
+        popupCenter("batch_change_status.jsp", "修改状态监控", 600, 480);
+    });
 </script>
 </body>
 </html>
