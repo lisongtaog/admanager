@@ -35,6 +35,9 @@ public class Campaign extends HttpServlet {
             String appName = request.getParameter("appName");
             String appId = request.getParameter("appId");
             String accountId = request.getParameter("accountId");
+            String accoutName = request.getParameter("accoutName");
+
+            String createCount = request.getParameter("createCount");
             String pageId = request.getParameter("pageId");
             String region = request.getParameter("region");
             String excludedRegion = request.getParameter("excludedRegion");
@@ -52,6 +55,7 @@ public class Campaign extends HttpServlet {
             String message = request.getParameter("message");
             String imagePath = request.getParameter("imagePath");
 
+
             OperationResult result = new OperationResult();
             try {
                 JSObject record = DB.simpleScan("web_system_config").select("config_value").where(DB.filter().whereEqualTo("config_key", "fb_image_path")).execute();
@@ -61,6 +65,11 @@ public class Campaign extends HttpServlet {
                 }
 
                 result.result = true;
+
+                if (createCount.isEmpty()) {
+                    result.result = false;
+                    result.message = "创建数量不能为空";
+                }
 
                 if (title.isEmpty()) {
                     result.result = false;
@@ -91,40 +100,52 @@ public class Campaign extends HttpServlet {
 
                 if (result.result) {
                     Calendar calendar = Calendar.getInstance();
-                    String now  = String.format("%d-%02d-%02d %02d:%02d:%02d", calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH),
-                            calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), calendar.get(Calendar.SECOND));
-                    long genId = DB.insert("ad_campaigns")
-                            .put("facebook_app_id", appId)
-                            .put("account_id", accountId)
-                            .put("country_region", region)
-                            .put("excluded_region", excludedRegion)
-                            .put("create_time", now)
-                            .put("language", language)
-                            .put("campaign_name", campaignName)
-                            .put("page_id", pageId)
-                            .put("bugdet", bugdet)
-                            .put("bidding", bidding)
-                            .put("title", title)
-                            .put("message", message)
-                            .put("app_name", appName)
-                            .put("tag_name", appName)
-                            .put("age", age)
-                            .put("gender", gendar)
-                            .put("detail_target", interest)
-                            .put("max_cpa", maxCPA)
-                            .put("user_devices", userDevice)
-                            .put("user_os", userOs)
-                            .executeReturnId();
-
+                    String campaignNameOld = campaignName + "_";
+                    String[] accountNameArr = accoutName.split(",");
+                    String accountNameArrStr = accoutName.replace(",", "");
+                    String[] accountIdArr = accountId.split(",");
+                    int createCountInt = Integer.parseInt(createCount);
                     Collection<File> uploadImages = FileUtils.listFiles(imagesPath, null, false);
-                    for (File file : uploadImages) {
-//                    new String[]{"jpg", "jpeg", "png"}
-                        String fileName = file.getAbsolutePath().toLowerCase();
-                        if (fileName.endsWith("jpg") || fileName.endsWith("jpeg") || fileName.endsWith("png")) {
-                            String sql = "insert into ad_ads set parent_id=" + genId + ", image_file_path='" + file.getAbsolutePath() + "'";
-                            DB.updateBySql(sql);
+                    for(int j=0,len = accountNameArr.length;j<len;j++){
+                        for(int i=0;i<createCountInt;i++){
+                            String now  = String.format("%d-%02d-%02d %02d:%02d:%02d", calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH),
+                                    calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), calendar.get(Calendar.SECOND));
+                            String s = String.valueOf(System.currentTimeMillis());
+                            campaignName = campaignNameOld.replace(accountNameArrStr,accountNameArr[j]) + s.substring(s.length()-5);
+
+                            long genId = DB.insert("ad_campaigns")
+                                    .put("facebook_app_id", appId)
+                                    .put("account_id", accountIdArr[j])
+                                    .put("country_region", region)
+                                    .put("excluded_region", excludedRegion)
+                                    .put("create_time", now)
+                                    .put("language", language)
+                                    .put("campaign_name", campaignName)
+                                    .put("page_id", pageId)
+                                    .put("bugdet", bugdet)
+                                    .put("bidding", bidding)
+                                    .put("title", title)
+                                    .put("message", message)
+                                    .put("app_name", appName)
+                                    .put("tag_name", appName)
+                                    .put("age", age)
+                                    .put("gender", gendar)
+                                    .put("detail_target", interest)
+                                    .put("max_cpa", maxCPA)
+                                    .put("user_devices", userDevice)
+                                    .put("user_os", userOs)
+                                    .executeReturnId();
+
+                            for (File file : uploadImages) {
+                                String fileName = file.getAbsolutePath().toLowerCase();
+                                if (fileName.endsWith("jpg") || fileName.endsWith("jpeg") || fileName.endsWith("png")) {
+                                    String sql = "insert into ad_ads set parent_id=" + genId + ", image_file_path='" + file.getAbsolutePath() + "'";
+                                    DB.updateBySql(sql);
+                                }
+                            }
                         }
                     }
+
                     result.result = true;
                 }
             } catch (Exception ex) {
@@ -690,5 +711,23 @@ public class Campaign extends HttpServlet {
         return retList;
     }
 
-
+    /**
+     * 以某个间隔符的倒数第num个截取，如12_345_6789_倒数第一个_将成为6789_
+     * @param str
+     * @param num
+     * @param spaceSign
+     * @return
+     */
+    private static String getSubStr(String str, int num,String spaceSign) {
+        String result = "";
+        int i = num;
+        while(i > 0) {
+            int lastFirst = str.lastIndexOf(spaceSign);
+            result = str.substring(lastFirst) + result;
+            str = str.substring(0, lastFirst);
+            i--;
+        }
+        return result.substring(1);
+    }
 }
+
