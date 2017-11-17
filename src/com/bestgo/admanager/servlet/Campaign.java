@@ -390,7 +390,7 @@ public class Campaign extends HttpServlet {
                     if (item.enabled != null) {
                         enabled = item.enabled ? 1 : 0;
                     }
-                    if (record.hasObjectData()) {
+                    if (record.hasObjectData() && (item.excludedCountry == null || item.excludedCountry.isEmpty())) {
                         long id = record.get("id");
                         DB.update("web_ad_batch_change_campaigns")
                                 .put("enabled", enabled)
