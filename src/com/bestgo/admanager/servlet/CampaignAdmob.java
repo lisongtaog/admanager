@@ -1,12 +1,13 @@
 package com.bestgo.admanager.servlet;
 
+import com.bestgo.admanager.Config;
 import com.bestgo.admanager.OperationResult;
 import com.bestgo.admanager.Utils;
 import com.bestgo.common.database.services.DB;
 import com.bestgo.common.database.utils.JSObject;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import org.apache.commons.io.FileUtils;
+import java.lang.System;
 import org.apache.log4j.Logger;
 
 import javax.servlet.ServletException;
@@ -29,6 +30,8 @@ public class CampaignAdmob extends HttpServlet {
             String appName = request.getParameter("appName");
             String gpPackageId = request.getParameter("gpPackageId");
             String accountId = request.getParameter("accountId");
+            String accountName = request.getParameter("accountName");
+            String createCount = request.getParameter("createCount");
             String region = request.getParameter("region");
             String excludedRegion = request.getParameter("excludedRegion");
             String language = request.getParameter("language");
@@ -51,6 +54,10 @@ public class CampaignAdmob extends HttpServlet {
 
                 result.result = true;
 
+                if (createCount.isEmpty()) {
+                    result.result = false;
+                    result.message = "创建数量不能为空";
+                }
                 if (message1.isEmpty()) {
                     result.result = false;
                     result.message = "广告语1不能为空";
@@ -86,28 +93,39 @@ public class CampaignAdmob extends HttpServlet {
                     result.message = "图片路径不存在";
                 }
 
+
                 if (result.result) {
                     Calendar calendar = Calendar.getInstance();
-                    String now  = String.format("%d-%02d-%02d %02d:%02d:%02d", calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH),
-                            calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), calendar.get(Calendar.SECOND));
-                    long genId = DB.insert("ad_campaigns_admob")
-                            .put("account_id", accountId)
-                            .put("campaign_name", campaignName)
-                            .put("app_id", gpPackageId)
-                            .put("country_region", region)
-                            .put("language", language)
-                            .put("excluded_region", excludedRegion)
-                            .put("create_time", now)
-                            .put("bugdet", bugdet)
-                            .put("bidding", bidding)
-                            .put("message1", message1)
-                            .put("message2", message2)
-                            .put("message3", message3)
-                            .put("message4", message4)
-                            .put("app_name", appName)
-                            .put("tag_name", appName)
-                            .put("image_path", imagesPath.getAbsolutePath())
-                            .executeReturnId();
+                    String campaignNameOld = campaignName + "_";
+                    String[] accountNameArr = accountName.split(",");
+                    String[] accountIdArr = accountId.split(",");
+                    int createCountInt = Integer.parseInt(createCount);
+                    for(int j=0,len = accountNameArr.length;j<len;j++){
+                        for(int i=0;i<createCountInt;i++){
+                            String now  = String.format("%d-%02d-%02d %02d:%02d:%02d", calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH),
+                                    calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), calendar.get(Calendar.SECOND));
+                            String s = String.valueOf(System.currentTimeMillis());
+                            campaignName = campaignNameOld + accountNameArr[j] + "_"+ s.substring(s.length()-5);
+                            long genId = DB.insert("ad_campaigns_admob")
+                                    .put("account_id", accountIdArr[j])
+                                    .put("campaign_name", campaignName)
+                                    .put("app_id", gpPackageId)
+                                    .put("country_region", region)
+                                    .put("language", language)
+                                    .put("excluded_region", excludedRegion)
+                                    .put("create_time", now)
+                                    .put("bugdet", bugdet)
+                                    .put("bidding", bidding)
+                                    .put("message1", message1)
+                                    .put("message2", message2)
+                                    .put("message3", message3)
+                                    .put("message4", message4)
+                                    .put("app_name", appName)
+                                    .put("tag_name", appName)
+                                    .put("image_path", imagesPath.getAbsolutePath())
+                                    .executeReturnId();
+                        }
+                    }
 
                     result.result = true;
                 }
@@ -137,7 +155,40 @@ public class CampaignAdmob extends HttpServlet {
             OperationResult result = updateCampaign(id, tags);
             json.addProperty("ret", result.result ? 1 : 0);
             json.addProperty("message", result.message);
-        } else if (path.startsWith("/query")) {
+        } else if (path.startsWith("/selectLanguageAdmobByRegion")) {
+            String region = request.getParameter("regionAdmob");
+            String appName = request.getParameter("appNameAdmob");
+
+            if (region != null) {
+                Map<String, String> regionLanguageAdmobRelMap = Config.getRegionLanguageRelMap();
+                String[] regionAdmobArray = region.split(",");
+                Set<String> languageAdmobSet = new HashSet<>();
+                for (int i=0,len = regionAdmobArray.length;i<len;i++){
+                    languageAdmobSet.add(regionLanguageAdmobRelMap.get(regionAdmobArray[i]));
+                }
+                int size = languageAdmobSet.size();
+                String languageAdmob = "";
+                if(size == 1){
+                    languageAdmob = regionLanguageAdmobRelMap.get(regionAdmobArray[0]);
+                }else{
+                    languageAdmob = "English";
+                }
+                String sql = "select message1,message2,message3,message4 from web_ad_descript_dict_admob where app_name = '" + appName + "' and language = '" + languageAdmob +"' limit 1";
+                JSObject messages = new JSObject();
+                try {
+                    messages = DB.findOneBySql(sql);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                json.addProperty("message1",(String)(messages.get("message1")));
+                json.addProperty("message2",(String)(messages.get("message2")));
+                json.addProperty("message3",(String)(messages.get("message3")));
+                json.addProperty("message4",(String)(messages.get("message4")));
+                json.addProperty("languageAdmob", languageAdmob);
+                json.addProperty("ret", 1);
+            }
+        }else if (path.startsWith("/query")) {
             String word = request.getParameter("word");
             if (word != null) {
                 List<JSObject> data = fetchData(word);
