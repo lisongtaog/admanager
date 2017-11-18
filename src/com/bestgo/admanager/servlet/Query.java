@@ -293,7 +293,7 @@ public class Query extends HttpServlet {
                     "sum(ch.total_installed) as installed, sum(ch.total_impressions) as impressions " +
                     ",sum(ch.total_click) as click from " + webAdCampaignTable + " c, " + webAdCampaignHistoryTable + " ch " +
                     "where c.campaign_id=ch.campaign_id\n" +
-                    ((likeCampaignName != null) ? " and campaign_name like '" + likeCampaignName +"' " : "")  +
+                    ((likeCampaignName != null) ? " and campaign_name like '%" + likeCampaignName +"%' " : "")  +
                     "and date between '" + startTime + "' and '" + endTime + "' " +
                     "and c.campaign_id in (" + campaignIds + ")" +
                     ((countryCode != null && !countryCode.isEmpty()) ? " and country_code='" + countryCode + "'" : "") +
@@ -308,7 +308,7 @@ public class Query extends HttpServlet {
                         "sum(ch.total_installed) as installed, sum(ch.total_impressions) as impressions " +
                         ",sum(ch.total_click) as click from " + webAdCampaignTable + " c, " + webAdCampaignHistoryTable + " ch " +
                         "where c.campaign_id=ch.campaign_id\n" +
-                        ((likeCampaignName != null) ? " and campaign_name like '" + likeCampaignName +"' " : "")  +
+                        ((likeCampaignName != null) ? " and campaign_name like '%" + likeCampaignName +"%' " : "")  +
                         "and date between '" + startTime + "' and '" + endTime + "' " +
                         "and c.campaign_id in (" + campaignIds + ")" +
                         "group by ch.campaign_id, country_code) a " + orderStr;
