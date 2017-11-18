@@ -76,15 +76,18 @@
             <input id="inputSearch" class="form-control" style="display: inline; width: auto;" type="text"/>
             <span>国家</span>
             <input id="inputCountry" class="form-control" style="display: inline; width: auto;" type="text"/>
-            <button id="btnSearch" class="btn btn-default">查找</button>
+            <button id="btnSearch" class="btn btn-default">条件查找</button>
             <button id="btnSummary" class="btn btn-default">汇总数据</button>
             <button id="btnModifyBatch" class="btn btn-default">批量修改</button>
+
 
             <div>
                 <input type="checkbox" name="adnetwork" id="facebookCheck"/><label for="facebookCheck">只显示Facebook</label>
                 <input type="checkbox" name="adnetwork" id="adwordsCheck"/><label for="adwordsCheck">只显示AdWords</label>
                 <input type="checkbox" id="countryCheck"/><label for="countryCheck">细分到国家</label>
                 <input type="button" class="btn btn-default" id="btnBatchChangeStatus" value="修改状态监控"/>
+                <input id="inputQueryByCampaignNameText" type="text"/>
+                <button id="btnQueryByCampaignName" class="btn btn-default">系列名称查询</button>
             </div>
         </div>
     </div>
@@ -184,6 +187,73 @@
     $('#btnBatchChangeStatus').click(function() {
         popupCenter("batch_change_status.jsp", "修改状态监控", 600, 480);
     });
+
+
+    $('#btnQueryByCampaignName').click(function () {
+        var  likeCampaignName = $("#inputQueryByCampaignNameText").val();
+        var query = $("#inputSearch").val();
+        var startTime = $('#inputStartTime').val();
+        var endTime = $('#inputEndTime').val();
+        var countryName = $('#inputCountry').val();
+        var countryCode = '';
+        var adwordsCheck = $('#adwordsCheck').is(':checked');
+        var countryCheck = $('#countryCheck').is(':checked');
+        var facebookCheck = $('#facebookCheck').is(':checked');
+        for (var i = 0; i < regionList.length; i++) {
+            if (countryName == regionList[i].name) {
+                countryCode = regionList[i].country_code;
+                break;
+            }
+        }
+
+        $.post('query', {
+            tag: query,
+            startTime: startTime,
+            endTime: endTime,
+            adwordsCheck: adwordsCheck,
+            countryCheck: countryCheck,
+            facebookCheck: facebookCheck,
+            likeCampaignName: likeCampaignName
+        }, function (data) {
+            if (data && data.ret == 1) {
+                appQueryData = data.data.array;
+                $.post('query', {
+                    tag: query,
+                    startTime: startTime,
+                    endTime: endTime,
+                    adwordsCheck: adwordsCheck,
+                    countryCheck: countryCheck,
+                    facebookCheck: facebookCheck,
+                    countryCode: countryCode,
+                    likeCampaignName: likeCampaignName
+                }, function (data) {
+                    if (data && data.ret == 1) {
+                        if (countryCheck) {
+                            $('#result_header').html("<tr><th>国家</th><th>总展示</th><th>总花费</th><th>总安装</th><th>总点击</th><th>CPA</th><th>CTR</th><th>CVR</th></tr>");
+                        } else if (adwordsCheck) {
+                            $('#result_header').html("<tr><th>系列ID</th><th>广告账号ID</th><th>系列名称</th><th>创建时间<span sorterId=\"1\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>状态<span sorterId=\"2\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>预算<span sorterId=\"3\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>竞价<span sorterId=\"4\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>总花费<span sorterId=\"5\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>总安装<span sorterId=\"6\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>总点击<span sorterId=\"7\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>CPA<span sorterId=\"8\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>CTR<span sorterId=\"9\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>CVR<span sorterId=\"10\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th></tr>");
+                        } else {
+                            $('#result_header').html("<tr><th>系列ID</th><th>广告账号ID</th><th>系列名称</th><th>创建时间<span sorterId=\"1\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>状态<span sorterId=\"2\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>预算<span sorterId=\"3\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>竞价<span sorterId=\"4\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>总花费<span sorterId=\"5\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>总安装<span sorterId=\"6\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>总点击<span sorterId=\"7\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>CPA<span sorterId=\"8\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>CTR<span sorterId=\"9\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>CVR<span sorterId=\"10\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th></tr>");
+                        }
+                        data = data.data;
+                        setData(data);
+                        bindSortOp();
+                        var str = "总花费: " + data.total_spend + " 总安装: " + data.total_installed +
+                            " 总展示: " + data.total_impressions + " 总点击: " + data.total_click +
+                            " CTR: " + data.total_ctr + " CPA: " + data.total_cpa + " CVR: " + data.total_cvr;
+                        str += "<br/><span class='estimateResult'></span>"
+                        $('#total_result').html(str);
+                        $('#total_result').removeClass("editable");
+                    } else {
+                        admanager.showCommonDlg("错误", data.message);
+                    }
+                }, 'json');
+            } else {
+                admanager.showCommonDlg("错误", data.message);
+            }
+        }, 'json');
+    });
+
 </script>
 </body>
 </html>
