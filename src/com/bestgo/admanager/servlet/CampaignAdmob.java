@@ -156,25 +156,36 @@ public class CampaignAdmob extends HttpServlet {
             OperationResult result = updateCampaign(id, tags);
             json.addProperty("ret", result.result ? 1 : 0);
             json.addProperty("message", result.message);
-        } else if (path.startsWith("/selectLanguageAdmobByRegion")) {
+        } else if (path.startsWith("/selectMessagesByRegionAdmob")) {
             String region = request.getParameter("regionAdmob");
             String appName = request.getParameter("appNameAdmob");
 
             if (region != null) {
                 Map<String, String> regionLanguageAdmobRelMap = Config.getRegionLanguageRelMap();
-                String[] regionAdmobArray = region.split(",");
-                Set<String> languageAdmobSet = new HashSet<>();
-                for (int i=0,len = regionAdmobArray.length;i<len;i++){
-                    languageAdmobSet.add(regionLanguageAdmobRelMap.get(regionAdmobArray[i]));
-                }
-                int size = languageAdmobSet.size();
+                String sql = "";
                 String languageAdmob = "";
-                if(size == 1){
-                    languageAdmob = regionLanguageAdmobRelMap.get(regionAdmobArray[0]);
+                String[] regionAdmobArray = region.split(",");
+                int length = regionAdmobArray.length;
+                if(length == 1){
+                    sql = "select message1,message2,message3,message4 from ad_campaigns_admob where app_name = '" + appName + "' and country_region = '" + region +"' limit 1";
                 }else{
-                    languageAdmob = "English";
+                    Set<String> languageAdmobSet = new HashSet<>();
+                    for (int i=0,len = regionAdmobArray.length;i<len;i++){
+                        languageAdmobSet.add(regionLanguageAdmobRelMap.get(regionAdmobArray[i]));
+                    }
+                    int size = languageAdmobSet.size();
+
+                    if(size == 1){
+                        languageAdmob = regionLanguageAdmobRelMap.get(regionAdmobArray[0]);
+                    }else{
+                        languageAdmob = "English";
+                    }
+                    String regionArrStr = "";
+                    for(int i=0;i<length;i++){
+                        regionArrStr += "'"+regionAdmobArray[i] + "',";
+                    }
+                    sql = "select message1,message2,message3,message4 from web_ad_descript_dict_admob where app_name = '" + appName + "' and language = '" + languageAdmob +"' and country_region in (" + regionArrStr.substring(0,regionArrStr.length()-1) +") limit 1";
                 }
-                String sql = "select message1,message2,message3,message4 from web_ad_descript_dict_admob where app_name = '" + appName + "' and language = '" + languageAdmob +"' limit 1";
                 JSObject messages = new JSObject();
                 try {
                     messages = DB.findOneBySql(sql);

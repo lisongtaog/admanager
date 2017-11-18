@@ -38,6 +38,7 @@ public class Query extends HttpServlet {
         String countryCheck = request.getParameter("countryCheck");
         String facebookCheck = request.getParameter("facebookCheck");
         String countryCode = request.getParameter("countryCode");
+        String likeCampaignName = request.getParameter("likeCampaignName");
 
         if (isSummary != null) {
             try {
@@ -48,8 +49,8 @@ public class Query extends HttpServlet {
                     for (int i = 0; i < tags.size(); i++) {
                         long id = tags.get(i).get("id");
                         String tagName = tags.get(i).get("tag_name");
-                        JsonObject admob = fetchOneAppData(id, startTime, endTime, 0, true, false, countryCode);
-                        JsonObject facebook = fetchOneAppData(id, startTime, endTime, 0, false, false, countryCode);
+                        JsonObject admob = fetchOneAppData(id, startTime, endTime, 0, true, false, countryCode,likeCampaignName);
+                        JsonObject facebook = fetchOneAppData(id, startTime, endTime, 0, false, false, countryCode,likeCampaignName);
                         double total_spend = admob.get("total_spend").getAsDouble() + facebook.get("total_spend").getAsDouble();
                         double total_installed = admob.get("total_installed").getAsDouble() + facebook.get("total_installed").getAsDouble();
                         double total_impressions = admob.get("total_impressions").getAsDouble() + facebook.get("total_impressions").getAsDouble();
@@ -74,7 +75,7 @@ public class Query extends HttpServlet {
                     for (int i = 0; i < tags.size(); i++) {
                         long id = tags.get(i).get("id");
                         String tagName = tags.get(i).get("tag_name");
-                        JsonObject jsonObject = fetchOneAppData(id, startTime, endTime, 0, "true".equals(adwordsCheck), false, countryCode);
+                        JsonObject jsonObject = fetchOneAppData(id, startTime, endTime, 0, "true".equals(adwordsCheck), false, countryCode,likeCampaignName);
                         double total_impression = jsonObject.get("total_impressions").getAsDouble();
                         if (total_impression == 0) {
                             continue;
@@ -109,8 +110,8 @@ public class Query extends HttpServlet {
                         countryCheck = "false";
                     }
                     if (adwordsCheck != null && adwordsCheck.equals("false") && facebookCheck != null && facebookCheck.equals("false")) {
-                        JsonObject admob = fetchOneAppData(id, startTime, endTime, sorter, true, "true".equals(countryCheck), countryCode);
-                        JsonObject facebook = fetchOneAppData(id, startTime, endTime, sorter, false, "true".equals(countryCheck), countryCode);
+                        JsonObject admob = fetchOneAppData(id, startTime, endTime, sorter, true, "true".equals(countryCheck), countryCode,likeCampaignName);
+                        JsonObject facebook = fetchOneAppData(id, startTime, endTime, sorter, false, "true".equals(countryCheck), countryCode,likeCampaignName);
                         double total_spend = admob.get("total_spend").getAsDouble() + facebook.get("total_spend").getAsDouble();
                         double total_installed = admob.get("total_installed").getAsDouble() + facebook.get("total_installed").getAsDouble();
                         double total_impressions = admob.get("total_impressions").getAsDouble() + facebook.get("total_impressions").getAsDouble();
@@ -132,7 +133,7 @@ public class Query extends HttpServlet {
                         }
                         jsonObject = admob;
                     } else {
-                        jsonObject = fetchOneAppData(id, startTime, endTime, sorter, "true".equals(adwordsCheck), "true".equals(countryCheck), countryCode);
+                        jsonObject = fetchOneAppData(id, startTime, endTime, sorter, "true".equals(adwordsCheck), "true".equals(countryCheck), countryCode,likeCampaignName);
                     }
                     if ("true".equals(countryCheck)) {
                         JsonArray array = jsonObject.getAsJsonArray("array");
@@ -203,7 +204,7 @@ public class Query extends HttpServlet {
     }
 
     private JsonObject fetchOneAppData(long tagId, String startTime, String endTime,
-                                       int sorterId, boolean admobCheck, boolean countryCheck, String countryCode) throws Exception {
+                                       int sorterId, boolean admobCheck, boolean countryCheck, String countryCode,String likeCampaignName) throws Exception {
         String relationTable = "web_ad_campaign_tag_rel";
         String webAdCampaignTable = "web_ad_campaigns";
         String webAdCampaignHistoryTable = "web_ad_campaigns_history";
@@ -292,6 +293,7 @@ public class Query extends HttpServlet {
                     "sum(ch.total_installed) as installed, sum(ch.total_impressions) as impressions " +
                     ",sum(ch.total_click) as click from " + webAdCampaignTable + " c, " + webAdCampaignHistoryTable + " ch " +
                     "where c.campaign_id=ch.campaign_id\n" +
+                    ((likeCampaignName != null) ? " and campaign_name like '" + likeCampaignName +"' " : "")  +
                     "and date between '" + startTime + "' and '" + endTime + "' " +
                     "and c.campaign_id in (" + campaignIds + ")" +
                     ((countryCode != null && !countryCode.isEmpty()) ? " and country_code='" + countryCode + "'" : "") +
@@ -306,6 +308,7 @@ public class Query extends HttpServlet {
                         "sum(ch.total_installed) as installed, sum(ch.total_impressions) as impressions " +
                         ",sum(ch.total_click) as click from " + webAdCampaignTable + " c, " + webAdCampaignHistoryTable + " ch " +
                         "where c.campaign_id=ch.campaign_id\n" +
+                        ((likeCampaignName != null) ? " and campaign_name like '" + likeCampaignName +"' " : "")  +
                         "and date between '" + startTime + "' and '" + endTime + "' " +
                         "and c.campaign_id in (" + campaignIds + ")" +
                         "group by ch.campaign_id, country_code) a " + orderStr;
@@ -330,6 +333,7 @@ public class Query extends HttpServlet {
             String campaign_name = one.get("campaign_name");
             String status = one.get("status");
             String create_time = one.get("create_time").toString();
+            create_time = create_time.substring(0,create_time.length()-5);
             String country_code = one.get("country_code");
             double budget = one.get("budget");
             double bidding = one.get("bidding");
