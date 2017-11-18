@@ -470,32 +470,22 @@ public class Campaign extends HttpServlet {
         }else if (path.startsWith("/selectTitleMessageByRegion")) {
             String region = request.getParameter("region");
             String appName = request.getParameter("appName");
-            String sql = "";
             String language = "";
             if (region != null) {
                 Map<String, String> regionLanguageRelMap = Config.getRegionLanguageRelMap();
                 String[] regionArray = region.split(",");
-                int length = regionArray.length;
-                if(length == 1){
-                    sql = "select title,message from ad_campaigns where app_name = '" + appName + "' and country_region = '" + region +"' limit 1";
-                }else{
-                    Set<String> languageSet = new HashSet<>();
-                    for (int i=0,len = regionArray.length;i<len;i++){
-                        languageSet.add(regionLanguageRelMap.get(regionArray[i]));
-                    }
-                    int size = languageSet.size();
+                Set<String> languageSet = new HashSet<>();
 
-                    if(size == 1){
-                        language = regionLanguageRelMap.get(regionArray[0]);
-                    }else{
-                        language = "English";
-                    }
-                    String regionArrStr = "";
-                    for(int i=0;i<length;i++){
-                        regionArrStr += "'"+regionArray[i] + "',";
-                    }
-                    sql = "select title,message from ad_campaigns where app_name = '" + appName + "' and language = '" + language +"' and country_region in (" + regionArrStr.substring(0,regionArrStr.length()-1) +") limit 1";
+                for (int i=0,len = regionArray.length;i<len;i++){
+                    languageSet.add(regionLanguageRelMap.get(regionArray[i]));
                 }
+
+                if(languageSet.size() == 1){
+                    language = regionLanguageRelMap.get(regionArray[0]);
+                }else{
+                    language = "English";
+                }
+                String sql = "select title,message from web_ad_descript_dict where app_name = '" + appName + "' and language = '" + language +"' limit 1";
 
                 JSObject titleMessage = new JSObject();
                 try {

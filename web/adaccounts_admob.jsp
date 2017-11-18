@@ -72,7 +72,7 @@
           <td><%=one.get("id")%></td>
           <td><%=one.get("account_id")%></td>
           <td><%=one.get("short_name")%></td>
-          <td><a class="link_modify" href="#">修改</a><a class="link_delete" href="#">删除</a></td>
+          <td><a class="link_modify" href="#">修改</a>&nbsp;&nbsp;<a class="link_delete" href="#">删除</a></td>
         </tr>
         <% } %>
 
@@ -265,6 +265,11 @@
     }
 
     bindOp();
+    $(function(){
+        $("tr th").css("background","#85e2ff");
+        $("tr:even td").css("background","#c7e5ff");
+        $("tr:odd td").css("background","#eaf5ff");
+    });
   </script>
   </body>
 </html>
