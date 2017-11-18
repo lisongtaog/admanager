@@ -676,7 +676,7 @@
        return false;
     });
 
-   $('#selectLanguage').change(function () {
+   /*$('#selectLanguage').change(function () {
        var language = $('#selectLanguage').val();
        if(language != null && language.length > 0){
            var appName = $('#selectApp').val();
@@ -698,7 +698,7 @@
            $('#inputMessage').val("");
        }
        return false;
-    });
+    });*/
 
    $('#selectAppAdmob').change(function () {
        var appNameAdmob = $('#selectAppAdmob').val();
@@ -737,7 +737,7 @@
         return false;
     });
 
-    $('#selectLanguageAdmob').change(function () {
+    /*$('#selectLanguageAdmob').change(function () {
         var selectOptions = $('#selectLanguageAdmob option:selected');
         var languageAdmob = [];
         selectOptions.each(function () {
@@ -770,7 +770,7 @@
         }
 
         return false;
-    });
+    });*/
 
     $('#selectRegion').change(function () {
         var region = $('#selectRegion').val();
