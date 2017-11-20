@@ -14,28 +14,20 @@
     <title>Login</title>
     <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css" />
     <link rel="stylesheet" href="bootstrap/css/bootstrap-theme.min.css" />
+    <link href="bootstrap/css/signin.css" rel="stylesheet">
 </head>
 <body>
 
-<div class="container" style="margin-top: 10%">
-    <form class="form-horizontal" action="#">
-        <div class="form-group">
-            <label for="inputUserName" class="col-sm-2 control-label">用户名</label>
-            <div class="col-sm-10">
-                <input class="form-control" id="inputUserName" placeholder="用户名">
-            </div>
-        </div>
-        <div class="form-group">
-            <label for="inputPassword" class="col-sm-2 control-label">密码</label>
-            <div class="col-sm-10">
-                <input type="password" class="form-control" id="inputPassword" placeholder="密码">
-            </div>
-        </div>
-        <div class="form-group">
-            <div class="col-sm-offset-2 col-sm-10">
-                <button type="submit" class="btn btn-primary" id="btnLogin">登录</button>
-            </div>
-        </div>
+<div class="container">
+
+    <form class="form-signin">
+        <h2 class="form-signin-heading">投放项目后台管理中心</h2>
+        <label for="inputUserName" class="sr-only">用户名</label>
+        <input type="text" id="inputUserName" class="form-control" placeholder="用户名" required autofocus>
+        <label for="inputPassword" class="sr-only">密码</label>
+        <input type="password" id="inputPassword" class="form-control" placeholder="密码" required>
+
+        <button class="btn btn-lg btn-primary btn-block" type="submit" id="btnLogin">登录</button>
     </form>
 
     <jsp:include page="loading_dialog.jsp" ></jsp:include>

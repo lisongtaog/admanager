@@ -75,7 +75,7 @@
           <td><%=one.get("id")%></td>
           <td><%=one.get("rule_type")%></td>
           <td><%=one.get("rule_content")%></td>
-          <td><a class="link_modify" href="#">修改</a><a class="link_delete" href="#">删除</a></td>
+          <td><a class="link_modify" href="#">修改</a>&nbsp;&nbsp;<a class="link_delete" href="#">删除</a></td>
         </tr>
         <% } %>
 

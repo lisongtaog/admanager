@@ -254,7 +254,6 @@
             }
         }, 'json');
     });
-
 </script>
 </body>
 </html>

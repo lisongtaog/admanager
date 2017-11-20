@@ -356,7 +356,7 @@
           td = $('<td></td>');
           td.text(one.google_package_id);
           tr.append(td);
-          td = $('<td><a class="link_modify" href="#">修改</a><a class="link_delete" href="#">删除</a></td>');
+          td = $('<td><a class="link_modify" href="#">修改</a>&nbsp;&nbsp;<a class="link_delete" href="#">删除</a></td>');
           tr.append(td);
           $('#tableFBAppRel tbody').append(tr);
         }
