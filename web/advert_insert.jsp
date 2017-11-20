@@ -321,7 +321,7 @@
         var message2 = $('#inputMessage2').val();
         var message3 = $('#inputMessage3').val();
         var message4 = $('#inputMessage4').val();
-              $.post("advert/saveAdvertAdmob", {
+              $.post("advert_admob/saveAdvertAdmob", {
             appName: appName,
             language: language,
             message1: message1,
@@ -397,7 +397,7 @@
         var appNameAdmob = $("#selectAppAdmob").val();
         var languageAdmob = $("#selectLanguageAdmob").val();
         if(languageAdmob != null &&  languageAdmob.length > 0){
-            $.post("advert/queryBeforeAdmobInsertion", {
+            $.post("advert_admob/queryBeforeAdmobInsertion", {
                 appNameAdmob: appNameAdmob,
                 languageAdmob: languageAdmob
             }, function (data) {

@@ -44,7 +44,9 @@
     </ul>
 
     <div class="panel panel-default">
-        <div class="panel-heading">广告系列列表
+        <div class="panel-heading">
+            <input type="checkbox" name="notExistTagAdmob" id="notExistTagAdmobCheck"/><label for="notExistTagAdmobCheck">只显示没有加上标签的广告系列</label>
+            &nbsp;&nbsp;
             <input id="inputSearch" class="form-control" placeholder="系列名字或系列ID，系列名字可以模糊查询" style="display: inline; width: auto;" type="text" />
             <button id="btnSearch" class="btn btn-default">查找</button></div>
 
@@ -214,8 +216,10 @@
 
     $('#btnSearch').click(function() {
         var query = $("#inputSearch").val();
+        var notExistTagAdmobCheck = $('#notExistTagAdmobCheck').is(':checked');
         $.post('campaign_admob/query', {
-            word: query
+            word: query,
+            notExistTagAdmobCheck: notExistTagAdmobCheck
         }, function(data) {
             if (data && data.ret == 1) {
                 $('.table tbody > tr').remove();

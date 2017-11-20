@@ -253,7 +253,6 @@
             }
         }, 'json');
     });
-
 </script>
 </body>
 </html>
