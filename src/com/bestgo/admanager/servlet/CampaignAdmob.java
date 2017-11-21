@@ -278,7 +278,7 @@ public class CampaignAdmob extends HttpServlet {
                         double click = Utils.convertDouble(one.get("total_click").getAsDouble(), 0);
                         double cvr = click > 0 ? installed / click : 0;
                         one.addProperty("cvr", Utils.trimDouble(cvr));
-                        one.addProperty("tagStr", "_");
+                        //one.addProperty("tagStr", "");
                         array.add(one);
 
                     }
