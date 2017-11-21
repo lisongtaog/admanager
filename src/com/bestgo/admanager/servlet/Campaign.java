@@ -10,6 +10,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.sun.org.apache.xpath.internal.SourceTree;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 
@@ -111,7 +112,7 @@ public class Campaign extends HttpServlet {
                             String now  = String.format("%d-%02d-%02d %02d:%02d:%02d", calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH),
                                     calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), calendar.get(Calendar.SECOND));
                             String s = String.valueOf(System.currentTimeMillis());
-                            campaignName = campaignNameOld.replace(accountNameArrStr,accountNameArr[j]) + s.substring(s.length()-5);
+                            campaignName = campaignNameOld.replace(accountNameArrStr,accountNameArr[j]) + s.substring(s.length()-5) + i;
 
                             long genId = DB.insert("ad_campaigns")
                                     .put("facebook_app_id", appId)
@@ -303,49 +304,73 @@ public class Campaign extends HttpServlet {
             }
         } else if (path.startsWith("/query")) {
             String word = request.getParameter("word");
-            String notExistTagCheck = request.getParameter("notExistTagCheck");
             if (word != null) {
                 JsonArray array = new JsonArray();
-                List<JSObject> data = new ArrayList<>();
-                if(notExistTagCheck != null && notExistTagCheck.equals("true")){
-                    String sql = "select id,campaign_id,adset_id,account_id,campaign_name,create_time,status,budget,bidding,total_spend,\n" +
-                            "total_click,total_installed,cpa,ctr,effective_status from web_ad_campaigns where campaign_id not in(select campaign_id\n" +
-                            " from web_ad_campaign_tag_rel)";
-                    try {
-                        data = DB.findListBySql(sql);
-                        for (int i = 0; i < data.size(); i++) {
-                            JsonObject one = new JsonObject();
-                            Set<String> keySet = data.get(i).getKeys();
-                            for (String key : keySet) {
-                                Object value = data.get(i).get(key);
-                                if (value instanceof String) {
-                                    one.addProperty(key, (String)value);
-                                } else if (value instanceof Integer) {
-                                    one.addProperty(key, (Integer)value);
-                                } else if (value instanceof Long) {
-                                    one.addProperty(key, (Long)value);
-                                } else if (value instanceof Double) {
-                                    one.addProperty(key, Utils.trimDouble((Double)value));
-                                } else {
-                                    one.addProperty(key, value.toString());
-                                }
-                            }
-
-                            double installed = Utils.convertDouble(one.get("total_installed").getAsDouble(), 0);
-                            double click = Utils.convertDouble(one.get("total_click").getAsDouble(), 0);
-                            double cvr = click > 0 ? installed / click : 0;
-                            one.addProperty("cvr", Utils.trimDouble(cvr));
-                            one.addProperty("tagStr", "_");
-                            array.add(one);
+                List<JSObject> data = fetchData(word);
+                json.addProperty("ret", 1);
+                for (int i = 0; i < data.size(); i++) {
+                    JsonObject one = new JsonObject();
+                    Set<String> keySet = data.get(i).getKeys();
+                    for (String key : keySet) {
+                        Object value = data.get(i).get(key);
+                        if (value instanceof String) {
+                            one.addProperty(key, (String)value);
+                        } else if (value instanceof Integer) {
+                            one.addProperty(key, (Integer)value);
+                        } else if (value instanceof Long) {
+                            one.addProperty(key, (Long)value);
+                        } else if (value instanceof Double) {
+                            one.addProperty(key, Utils.trimDouble((Double)value));
+                        } else {
+                            one.addProperty(key, value.toString());
                         }
-                    } catch (Exception e) {
-                        e.printStackTrace();
                     }
-                }else{
-                    data = fetchData(word);
+                    List<String> tags = Campaign.bindTags(data.get(i).get("campaign_id"));
+                    String tagStr = "";
+                    for (int ii = 0; ii < tags.size(); ii++) {
+                        tagStr += (tags.get(ii) + ",");
+                    }
+                    if (tagStr.length() > 0) {
+                        tagStr = tagStr.substring(0, tagStr.length() - 1);
+                    }
+                    double installed = Utils.convertDouble(one.get("total_installed").getAsDouble(), 0);
+                    double click = Utils.convertDouble(one.get("total_click").getAsDouble(), 0);
+                    double cvr = click > 0 ? installed / click : 0;
+                    one.addProperty("cvr", Utils.trimDouble(cvr));
+                    one.addProperty("tagStr", tagStr);
+                    array.add(one);
 
-
-                    for (int i = 0; i < data.size(); i++) {
+                }
+                json.add("data", array);
+            }
+        } else if (path.startsWith("/selectCampaingnWhereNotExistTag")) {
+            JsonArray array = new JsonArray();
+            String sqlCampaignIds = "select campaign_id from web_ad_campaign_tag_rel";
+            
+            String sqlAll = "select campaign_id from web_ad_campaigns";
+            List<JSObject> data = new ArrayList<>();
+            try {
+                List<JSObject> campaignIdsList = DB.findListBySql(sqlCampaignIds);
+                Set<String>  campaignIdsSet = new HashSet<>();
+                for(JSObject j : campaignIdsList){
+                    campaignIdsSet.add(j.get("campaign_id"));
+                }
+                List<JSObject> allList = DB.findListBySql(sqlAll);
+                Set<String>  allSet = new HashSet<>();
+                for(JSObject k : allList){
+                    allSet.add(k.get("campaign_id"));
+                }
+                List<String> diffList = Utils.getDiffrentStrList(allSet, campaignIdsSet);
+                String allStr = "";
+                for(String j : diffList){
+                    allStr += j + ",";
+                }
+                allStr = allStr.substring(0,allStr.length()-1);
+                String sqlFilterAll = "select id,campaign_id,adset_id,account_id,campaign_name,create_time,status,budget,bidding," +
+                        "total_spend,total_click,total_installed,cpa,ctr,effective_status from web_ad_campaigns where campaign_id in (" + allStr + ")";
+                data = DB.findListBySql(sqlFilterAll);
+                if(data != null){
+                    for (int i = 0,len = data.size(); i < len; i++) {
                         JsonObject one = new JsonObject();
                         Set<String> keySet = data.get(i).getKeys();
                         for (String key : keySet) {
@@ -362,27 +387,23 @@ public class Campaign extends HttpServlet {
                                 one.addProperty(key, value.toString());
                             }
                         }
-                        List<String> tags = Campaign.bindTags(data.get(i).get("campaign_id"));
-                        String tagStr = "";
-                        for (int ii = 0; ii < tags.size(); ii++) {
-                            tagStr += (tags.get(ii) + ",");
-                        }
-                        if (tagStr.length() > 0) {
-                            tagStr = tagStr.substring(0, tagStr.length() - 1);
-                        }
                         double installed = Utils.convertDouble(one.get("total_installed").getAsDouble(), 0);
                         double click = Utils.convertDouble(one.get("total_click").getAsDouble(), 0);
                         double cvr = click > 0 ? installed / click : 0;
                         one.addProperty("cvr", Utils.trimDouble(cvr));
-                        one.addProperty("tagStr", tagStr);
+                        one.addProperty("tagStr", "_");
                         array.add(one);
-                    }
 
+                    }
                 }
-                json.addProperty("ret", 1);
-                json.add("data", array);
+
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-        } else if (path.startsWith("/find_create_data")) {
+
+            json.addProperty("ret", 1);
+            json.add("data", array);
+        }else if (path.startsWith("/find_create_data")) {
             String id = request.getParameter("campaignId");
             try {
                 JSObject record = DB.simpleScan("ad_campaigns").select("id", "app_name", "campaign_id", "facebook_app_id", "account_id", "country_region",
@@ -752,23 +773,6 @@ public class Campaign extends HttpServlet {
         return retList;
     }
 
-    /**
-     * 以某个间隔符的倒数第num个截取，如12_345_6789_倒数第一个_将成为6789_
-     * @param str
-     * @param num
-     * @param spaceSign
-     * @return
-     */
-    private static String getSubStr(String str, int num,String spaceSign) {
-        String result = "";
-        int i = num;
-        while(i > 0) {
-            int lastFirst = str.lastIndexOf(spaceSign);
-            result = str.substring(lastFirst) + result;
-            str = str.substring(0, lastFirst);
-            i--;
-        }
-        return result.substring(1);
-    }
+
 }
 

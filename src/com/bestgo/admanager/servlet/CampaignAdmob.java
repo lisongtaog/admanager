@@ -106,7 +106,7 @@ public class CampaignAdmob extends HttpServlet {
                             String now  = String.format("%d-%02d-%02d %02d:%02d:%02d", calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH),
                                     calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), calendar.get(Calendar.SECOND));
                             String s = String.valueOf(System.currentTimeMillis());
-                            campaignName = campaignNameOld + accountNameArr[j] + "_"+ s.substring(s.length()-4)+String.valueOf(random.nextInt()).substring(1, 4);
+                            campaignName = campaignNameOld + accountNameArr[j] + "_"+ i + s.substring(s.length()-4)+String.valueOf(random.nextInt()).substring(1, 4);
                             long genId = DB.insert("ad_campaigns_admob")
                                     .put("account_id", accountIdArr[j])
                                     .put("campaign_name", campaignName)
@@ -191,48 +191,73 @@ public class CampaignAdmob extends HttpServlet {
             }
         }else if (path.startsWith("/query")) {
             String word = request.getParameter("word");
-            String notExistTagAdmobCheck = request.getParameter("notExistTagAdmobCheck");
             if (word != null) {
                 JsonArray array = new JsonArray();
-                List<JSObject> data = new ArrayList<>();
-                if(notExistTagAdmobCheck != null && notExistTagAdmobCheck.equals("true")){
-                    String sql = "select id,campaign_id,campaign_name,account_id,create_time,status,budget,bidding,total_spend,total_click,\n" +
-                            "total_installed,total_impressions,cpa,ctr from web_ad_campaigns_admob where campaign_id not in (select campaign_id\n" +
-                            "from web_ad_campaign_tag_admob_rel)";
-                    try {
-                        data = DB.findListBySql(sql);
-                        for (int i = 0; i < data.size(); i++) {
-                            JsonObject one = new JsonObject();
-                            Set<String> keySet = data.get(i).getKeys();
-                            for (String key : keySet) {
-                                Object value = data.get(i).get(key);
-                                if (value instanceof String) {
-                                    one.addProperty(key, (String)value);
-                                } else if (value instanceof Integer) {
-                                    one.addProperty(key, (Integer)value);
-                                } else if (value instanceof Long) {
-                                    one.addProperty(key, (Long)value);
-                                } else if (value instanceof Double) {
-                                    one.addProperty(key, Utils.trimDouble((Double)value));
-                                } else {
-                                    one.addProperty(key, value.toString());
-                                }
-                            }
-
-                            double installed = Utils.convertDouble(one.get("total_installed").getAsDouble(), 0);
-                            double click = Utils.convertDouble(one.get("total_click").getAsDouble(), 0);
-                            double cvr = click > 0 ? installed / click : 0;
-                            one.addProperty("cvr", Utils.trimDouble(cvr));
-                            one.addProperty("tagStr", "_");
-                            array.add(one);
+                List<JSObject> data = fetchData(word);
+                json.addProperty("ret", 1);
+                for (int i = 0; i < data.size(); i++) {
+                    JsonObject one = new JsonObject();
+                    Set<String> keySet = data.get(i).getKeys();
+                    for (String key : keySet) {
+                        Object value = data.get(i).get(key);
+                        if (value instanceof String) {
+                            one.addProperty(key, (String)value);
+                        } else if (value instanceof Integer) {
+                            one.addProperty(key, (Integer)value);
+                        } else if (value instanceof Long) {
+                            one.addProperty(key, (Long)value);
+                        } else if (value instanceof Double) {
+                            one.addProperty(key, Utils.trimDouble((Double)value));
+                        } else {
+                            one.addProperty(key, value.toString());
                         }
-                    } catch (Exception e) {
-                        e.printStackTrace();
                     }
-                }else{
-                    data = fetchData(word);
+                    List<String> tags = CampaignAdmob.bindTags(data.get(i).get("campaign_id"));
+                    String tagStr = "";
+                    for (int ii = 0; ii < tags.size(); ii++) {
+                        tagStr += (tags.get(ii) + ",");
+                    }
+                    if (tagStr.length() > 0) {
+                        tagStr = tagStr.substring(0, tagStr.length() - 1);
+                    }
+                    double installed = Utils.convertDouble(one.get("total_installed").getAsDouble(), 0);
+                    double click = Utils.convertDouble(one.get("total_click").getAsDouble(), 0);
+                    double cvr = click > 0 ? installed / click : 0;
+                    one.addProperty("cvr", Utils.trimDouble(cvr));
+                    one.addProperty("tagStr", tagStr);
+                    array.add(one);
+                }
+                json.add("data", array);
+            }
+        }else if (path.startsWith("/selectCampaingnWhereNotExistTagAdmob")) {
+            JsonArray array = new JsonArray();
+            String sqlCampaignIds = "select campaign_id from web_ad_campaign_tag_admob_rel";
 
-                    for (int i = 0; i < data.size(); i++) {
+            String sqlAll = "select campaign_id from web_ad_campaigns_admob";
+            List<JSObject> data = new ArrayList<>();
+            try {
+                List<JSObject> campaignIdsList = DB.findListBySql(sqlCampaignIds);
+                Set<String>  campaignIdsSet = new HashSet<>();
+                for(JSObject j : campaignIdsList){
+                    campaignIdsSet.add(j.get("campaign_id"));
+                }
+                List<JSObject> allList = DB.findListBySql(sqlAll);
+                Set<String>  allSet = new HashSet<>();
+                for(JSObject k : allList){
+                    allSet.add(k.get("campaign_id"));
+                }
+                List<String> diffList = Utils.getDiffrentStrList(allSet, campaignIdsSet);
+                String allStr = "";
+                for(String j : diffList){
+                    allStr += j + ",";
+                }
+                allStr = allStr.substring(0,allStr.length()-1);
+                String sqlFilterAll = "select id,campaign_id,campaign_name,account_id,create_time,status,budget,bidding," +
+                        "total_spend,total_click,total_installed,total_impressions,cpa,ctr from web_ad_campaigns_admob " +
+                        "where campaign_id in (" + allStr + ")";
+                data = DB.findListBySql(sqlFilterAll);
+                if(data != null){
+                    for (int i = 0,len = data.size(); i < len; i++) {
                         JsonObject one = new JsonObject();
                         Set<String> keySet = data.get(i).getKeys();
                         for (String key : keySet) {
@@ -249,25 +274,22 @@ public class CampaignAdmob extends HttpServlet {
                                 one.addProperty(key, value.toString());
                             }
                         }
-                        List<String> tags = CampaignAdmob.bindTags(data.get(i).get("campaign_id"));
-                        String tagStr = "";
-                        for (int ii = 0; ii < tags.size(); ii++) {
-                            tagStr += (tags.get(ii) + ",");
-                        }
-                        if (tagStr.length() > 0) {
-                            tagStr = tagStr.substring(0, tagStr.length() - 1);
-                        }
                         double installed = Utils.convertDouble(one.get("total_installed").getAsDouble(), 0);
                         double click = Utils.convertDouble(one.get("total_click").getAsDouble(), 0);
                         double cvr = click > 0 ? installed / click : 0;
                         one.addProperty("cvr", Utils.trimDouble(cvr));
-                        one.addProperty("tagStr", tagStr);
+                        one.addProperty("tagStr", "_");
                         array.add(one);
+
                     }
                 }
-                json.addProperty("ret", 1);
-                json.add("data", array);
+
+            } catch (Exception e) {
+                e.printStackTrace();
             }
+
+            json.addProperty("ret", 1);
+            json.add("data", array);
         }
 
         response.getWriter().write(json.toString());

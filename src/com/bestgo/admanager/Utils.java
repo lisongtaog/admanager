@@ -9,9 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 public class Utils {
     public static HashMap<String, String> countryCodeMap;
@@ -113,5 +111,29 @@ public class Utils {
         String now  = String.format("%d-%02d-%02d %02d:%02d:%02d", calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH),
                 calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), calendar.get(Calendar.SECOND));
         return now;
+    }
+
+    public static List<String> getDiffrentStrList(Set<String> maxSet, Set<String> minSet) {
+        List<String> diff = new ArrayList<>();
+        Map<String,Integer> map = new HashMap<>(maxSet.size());
+        for (String str : maxSet) {
+            map.put(str, 1);
+        }
+        for (String str : minSet) {
+            if(map.get(str)!=null)
+            {
+                map.put(str, 2);
+                continue;
+            }
+            diff.add(str);
+        }
+        for(Map.Entry<String, Integer> entry:map.entrySet())
+        {
+            if(entry.getValue()==1)
+            {
+                diff.add(entry.getKey());
+            }
+        }
+        return diff;
     }
 }
