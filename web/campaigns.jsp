@@ -44,7 +44,7 @@
 
     <div class="panel panel-default">
         <div class="panel-heading">
-            <input type="checkbox" name="notExistTag" id="notExistTagCheck"/><label for="notExistTagCheck">只显示没有加上标签的广告系列</label>
+            <button id="btnNotExistTagSearch" class="btn btn-default" name="false">只显示没有加上标签的广告系列</button>
             &nbsp;&nbsp;
             <input id="inputSearch" class="form-control" placeholder="系列名字或系列ID，系列名字可以模糊查询" style="display: inline; width: auto;" type="text" />
             <button id="btnSearch" class="btn btn-default">查找</button>
@@ -251,10 +251,8 @@
 
     $('#btnSearch').click(function() {
         var query = $("#inputSearch").val();
-        var notExistTagCheck = $('#notExistTagCheck').is(':checked');
         $.post('campaign/query', {
-            word: query,
-            notExistTagCheck: notExistTagCheck
+            word: query
         }, function(data) {
             if (data && data.ret == 1) {
                 $('.table tbody > tr').remove();
@@ -264,6 +262,26 @@
                 admanager.showCommonDlg("错误", data.message);
             }
         }, 'json');
+    });
+
+    $('#btnNotExistTagSearch').click(function() {
+        if(this.name == "false"){
+            $('#btnNotExistTagSearch').css("background-color","red");
+            this.name = "true";
+            $.post('campaign/selectCampaingnWhereNotExistTag',{
+            },function(data) {
+                if (data && data.ret == 1) {
+                    $('.table tbody > tr').remove();
+                    setData(data.data);
+                    bindOp();
+                } else {
+                    admanager.showCommonDlg("错误", data.message);
+                }
+            }, 'json');
+        }else{
+            this.name = "false";
+            window.location.reload();
+        }
     });
 
     function setData(data) {

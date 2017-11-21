@@ -676,29 +676,6 @@
        return false;
     });
 
-   /*$('#selectLanguage').change(function () {
-       var language = $('#selectLanguage').val();
-       if(language != null && language.length > 0){
-           var appName = $('#selectApp').val();
-
-           $.post("campaign/selectFacebookMessage", {
-               appName: appName,
-               language: language
-           }, function (data) {
-               if(data && data.ret == 1){
-                   $('#inputTitle').val(data.title);
-                   $('#inputMessage').val(data.message);
-               }else{
-                   $('#inputTitle').val("");
-                   $('#inputMessage').val("");
-               }
-           }, "json");
-       }else{
-           $('#inputTitle').val("");
-           $('#inputMessage').val("");
-       }
-       return false;
-    });*/
 
    $('#selectAppAdmob').change(function () {
        var appNameAdmob = $('#selectAppAdmob').val();
