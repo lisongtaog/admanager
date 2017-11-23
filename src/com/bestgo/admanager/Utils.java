@@ -113,6 +113,12 @@ public class Utils {
         return now;
     }
 
+    /**
+     * 从较大的Set集合中，找到与较小的Set集合不同的字符串对象，并放到list中返回
+     * @param maxSet
+     * @param minSet
+     * @return 字符串集合
+     */
     public static List<String> getDiffrentStrList(Set<String> maxSet, Set<String> minSet) {
         List<String> diff = new ArrayList<>();
         Map<String,Integer> map = new HashMap<>(maxSet.size());
