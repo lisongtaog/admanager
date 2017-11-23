@@ -7,7 +7,14 @@ var admanager = {};
 admanager.showCommonDlg = function(title, message, callback) {
     $('#common_message_dialog').modal('show');
     $("#common_dlg_title").text(title);
-    $("#common_dlg_message").text(message);
+    //换行的格式化输出
+    if( message.indexOf("\n") > -1 ){
+        $("#common_dlg_message").html("").append(
+            $("<pre>").html(message)
+        );
+    }else{
+        $("#common_dlg_message").text(message);
+    }
 
     $("#common_message_dialog").on("hide.bs.modal", function(e) {
         if (callback) callback();
