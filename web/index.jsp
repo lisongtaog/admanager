@@ -61,6 +61,7 @@
         <li role="presentation"><a href="query.jsp">查询</a></li>
         <li role="presentation"><a href="system.jsp">系统管理</a></li>
         <li role="presentation"><a href="advert_insert.jsp">广告存储</a></li>
+        <li role="presentation"><a href="country_revenue_spend.jsp">国家收支</a></li>
         <li role="presentation"><a href="temp_index.jsp">临时用的</a></li>
         <li role="presentation"><a href="temp_index2.jsp">临时用的2</a></li>
 
