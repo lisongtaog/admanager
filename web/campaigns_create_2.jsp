@@ -270,14 +270,17 @@
             </div>
         </div>
         <div class="form-group">
-            <label for="selectRegion" class="col-sm-2 control-label">国家地区</label>
-            <div class="col-sm-9">
+            <label for="selectRegionAdmob" class="col-sm-2 control-label">国家地区</label>
+            <div class="col-sm-7">
                 <select class="form-control select2" id="selectRegionAdmob" multiple="multiple">
 
                 </select>
             </div>
             <div class="col-sm-1">
                 <input type="button" class="btn-more btn btn-default" id="btnSelectRegionAdmobMore" value="批量输入"/>
+            </div>
+            <div class="col-sm-2">
+                <label title="选中后每个选项创建一个或多个广告系列"><input type="checkbox" class="form-check-input" id="selectRegionAdmobExplode">分离到系列</label>
             </div>
         </div>
         <div class="form-group">
@@ -308,9 +311,12 @@
             </div>
         </div>
         <div class="form-group">
-            <label for="inputBidding" class="col-sm-2 control-label">出价</label>
-            <div class="col-sm-10">
+            <label for="inputBiddingAdmob" class="col-sm-2 control-label">出价</label>
+            <div class="col-sm-8">
                 <input class="form-control" id="inputBiddingAdmob" />
+            </div>
+            <div class="col-sm-2">
+                <label title="选中后每个选项创建一个或多个广告系列"><input type="checkbox" class="form-check-input" id="inputBiddingAdmobExplode">分离到系列</label>
             </div>
         </div>
         <div class="form-group">
@@ -372,7 +378,8 @@
     var appList = [];
     var userOsList = ["2.3", "3.0", "3.1", "3.2", "4.0", "4.1", "4.2", "4.3", "4.4", "4.5", "5.0", "5.1", "6.0", "6.1", "7.0", "7.1", "8.0"];
     var admobRegionCodes = {"All":"","Sint Maarten":"SX","Cuba":"CU","Curacao":"CW","Iran":"IR","Afghanistan":"AF","Albania":"AL","Antarctica":"AQ","Algeria":"DZ","American Samoa":"AS","Andorra":"AD","Angola":"AO","Antigua and Barbuda":"AG","Azerbaijan":"AZ","Argentina":"AR","Australia":"AU","Austria":"AT","The Bahamas":"BS","Bahrain":"BH","Bangladesh":"BD","Armenia":"AM","Barbados":"BB","Belgium":"BE","Bermuda":"BM","Bhutan":"BT","Bolivia":"BO","Bosnia and Herzegovina":"BA","Botswana":"BW","Bouvet Island":"BV","Brazil":"BR","Belize":"BZ","British Indian Ocean Territory":"IO","Solomon Islands":"SB","British Virgin Islands":"VG","Brunei":"BN","Bulgaria":"BG","Myanmar (Burma)":"MM","Burundi":"BI","Belarus":"BY","Cambodia":"KH","Cameroon":"CM","Canada":"CA","Cape Verde":"CV","Cayman Islands":"KY","Central African Republic":"CF","Sri Lanka":"LK","Chad":"TD","Chile":"CL","China":"CN","Taiwan":"TW","Christmas Island":"CX","Cocos (Keeling) Islands":"CC","Colombia":"CO","Comoros":"KM","Mayotte":"YT","Republic of the Congo":"CG","Democratic Republic of the Congo":"CD","Cook Islands":"CK","Costa Rica":"CR","Croatia":"HR","Cyprus":"CY","Czechia":"CZ","Benin":"BJ","Denmark":"DK","Dominica":"DM","Dominican Republic":"DO","Ecuador":"EC","El Salvador":"SV","Equatorial Guinea":"GQ","Ethiopia":"ET","Eritrea":"ER","Estonia":"EE","Faroe Islands":"FO","Falkland Islands (Islas Malvinas)":"FK","South Georgia and the South Sandwich Islands":"GS","Fiji":"FJ","Finland":"FI","France":"FR","French Guiana":"GF","French Polynesia":"PF","French Southern and Antarctic Lands":"TF","Djibouti":"DJ","Gabon":"GA","Georgia":"GE","The Gambia":"GM","Palestine":"PS","Germany":"DE","Ghana":"GH","Gibraltar":"GI","Kiribati":"KI","Greece":"GR","Greenland":"GL","Grenada":"GD","Guadeloupe":"GP","Guam":"GU","Guatemala":"GT","Guinea":"GN","Guyana":"GY","Haiti":"HT","Heard Island and McDonald Islands":"HM","Vatican City":"VA","Honduras":"HN","Hong Kong":"HK","Hungary":"HU","Iceland":"IS","India":"IN","Indonesia":"ID","Iraq":"IQ","Ireland":"IE","Israel":"IL","Italy":"IT","Cote d'Ivoire":"CI","Jamaica":"JM","Japan":"JP","Kazakhstan":"KZ","Jordan":"JO","Kenya":"KE","South Korea":"KR","Kuwait":"KW","Kyrgyzstan":"KG","Laos":"LA","Lebanon":"LB","Lesotho":"LS","Latvia":"LV","Liberia":"LR","Libya":"LY","Liechtenstein":"LI","Lithuania":"LT","Luxembourg":"LU","Macau":"MO","Madagascar":"MG","Malawi":"MW","Malaysia":"MY","Maldives":"MV","Mali":"ML","Malta":"MT","Martinique":"MQ","Mauritania":"MR","Mauritius":"MU","Mexico":"MX","Monaco":"MC","Mongolia":"MN","Moldova":"MD","Montenegro":"ME","Montserrat":"MS","Morocco":"MA","Mozambique":"MZ","Oman":"OM","Namibia":"NA","Nauru":"NR","Nepal":"NP","Netherlands":"NL","Netherlands Antilles":"BQ","Aruba":"AW","New Caledonia":"NC","Vanuatu":"VU","New Zealand":"NZ","Nicaragua":"NI","Niger":"NE","Nigeria":"NG","Niue":"NU","Norfolk Island":"NF","Norway":"NO","Northern Mariana Islands":"MP","United States Minor Outlying Islands":"UM","Federated States of Micronesia":"FM","Marshall Islands":"MH","Palau":"PW","Pakistan":"PK","Panama":"PA","Papua New Guinea":"PG","Paraguay":"PY","Peru":"PE","Philippines":"PH","Pitcairn Islands":"PN","Poland":"PL","Portugal":"PT","Guinea-Bissau":"GW","Timor-Leste":"TL","Puerto Rico":"PR","Qatar":"QA","Reunion":"RE","Romania":"RO","Russia":"RU","Rwanda":"RW","Saint Helena, Ascension and Tristan da Cunha":"SH","Saint Kitts and Nevis":"KN","Anguilla":"AI","Saint Lucia":"LC","Saint Pierre and Miquelon":"PM","Saint Vincent and the Grenadines":"VC","San Marino":"SM","Sao Tome and Principe":"ST","Saudi Arabia":"SA","Senegal":"SN","Serbia":"RS","Seychelles":"SC","Sierra Leone":"SL","Singapore":"SG","Slovakia":"SK","Vietnam":"VN","Slovenia":"SI","Somalia":"SO","South Africa":"ZA","Zimbabwe":"ZW","Spain":"ES","Western Sahara":"EH","Suriname":"SR","Svalbard and Jan Mayen":"SJ","Swaziland":"SZ","Sweden":"SE","Switzerland":"CH","Tajikistan":"TJ","Thailand":"TH","Togo":"TG","Tokelau":"TK","Tonga":"TO","Trinidad and Tobago":"TT","United Arab Emirates":"AE","Tunisia":"TN","Turkey":"TR","Turkmenistan":"TM","Turks and Caicos Islands":"TC","Tuvalu":"TV","Uganda":"UG","Ukraine":"UA","Macedonia (FYROM)":"MK","Egypt":"EG","United Kingdom":"GB","Guernsey":"GG","Jersey":"JE","Tanzania":"TZ","United States":"US","U.S. Virgin Islands":"VI","Burkina Faso":"BF","Uruguay":"UY","Uzbekistan":"UZ","Venezuela":"VE","Wallis and Futuna":"WF","Samoa":"WS","Yemen":"YE","Zambia":"ZM","Kosovo":"XK"};
-
+</script>
+<script>
     /**
      * 把一个参数数组，根据 explodeParam 交叉合并得到新的参数数组
      * @param params [{x:1,y:2},{x:1,y:3}]
@@ -445,6 +452,37 @@
         if( params.bidding ){
             dims.push(params.bidding);
         }
+
+        return dims.join("_");
+    }
+
+    function generateAdmobCampaignName(params){
+        if( !params ){
+            params = {};
+        }
+        var dims = [];
+        var now = new Date();
+        dims.push($('#selectAppAdmob').val());
+
+        var region = $('#selectRegionAdmob option:selected').text();
+        var countryAlisa = $('#selectRegionAdmob')[0].countryAlisa;
+        if( params.region ){
+            dims.push(params.region);
+        }else if( countryAlisa ){
+            dims.push(params.countryAlisa);
+        }else{
+            dims.push(region);
+        }
+
+        dims.push( $('#selectLanguageAdmob option:selected').text() );
+
+        if( params.bidding ){
+            dims.push( params.bidding );
+        }else{
+            dims.push( $('#inputBiddingAdmob').val() );
+        }
+
+        dims.push(now.getFullYear() +"" + (now.getMonth() + 1) + "" + now.getDate());
 
         return dims.join("_");
     }
@@ -665,30 +703,98 @@
                 }
             }
 
-            $.post("campaign_admob/create", {
+            //处理分离到国家的字段
+            var explodeList = [];//{key:x, values:[]}
+            if( $("#selectRegionAdmobExplode").prop("checked") ){
+                explodeList.push({
+                    key: 'region',
+                    values: region.map(function(x){
+                        return x.trim();
+                    })
+                })
+            }else{
+                explodeList.push({
+                    key: 'region',
+                    values: [region.join(",")]
+                })
+            }
+            if( !$("#inputBiddingAdmobExplode").prop("checked")  && bidding.indexOf(",") !== -1 ){
+                admanager.showCommonDlg("错误", "不分离的情况下不允许出价多选");
+                return false;
+            }
+            explodeList.push({
+                key: 'bidding',
+                values: bidding.split(",").map(function(x){
+                    return x.trim();
+                })
+            })
+
+
+            var explodeParams = explodeList.length>0?explodeList.reduce(function(params, explodeParam){
+                return getExplodeParams(params, explodeParam);
+            }, []):[];
+
+            var baseParam = {
                 appName: appName,
                 accountId: accountIdAdmob.join(","),
                 accountName: accountNameAdmob.join(","),
                 createCount: createCountAdmob,
                 campaignName: campaignName,
-                region: region.join(','),
+                //region: region.join(','),
                 excludedRegion: excludedRegion.join(','),
                 language: language,
                 bugdet: bugdet,
-                bidding: bidding,
+                //bidding: bidding,
                 gpPackageId: app.google_package_id,
                 message1: message1,
                 message2: message2,
                 message3: message3,
                 message4: message4,
                 imagePath: imagePath
+            }
+
+            var requestPool = [];
+            explodeParams.forEach(function(p){
+                var cloned = $.extend({}, baseParam);
+                $.extend(cloned, p);
+                cloned.campaignName = generateAdmobCampaignName({
+                    bidding: p.bidding,
+                    region: p.region
+                });
+                requestPool.push( cloned );
+            });
+//弹一个进度条出来
+            batchRequest(requestPool, function(param, onSuccess, onFail){
+                //fake
+                console.log("start.. ", param);
+                /*setTimeout(function(){
+                    if( Math.random()< 0.5){
+                        onSuccess();
+                    }else{
+                        onFail("随机错误");
+                    }
+                },100);*/
+
+                $.post("campaign_admob/create", param, function (data) {
+                    if (data && data.ret == 1) {
+                        onSuccess()
+                    } else {
+                        onFail(data.message)
+                    }
+                }, "json");
+
+            }, function(){
+                //队列全部处理完成
+
+            })
+            /*$.post("campaign_admob/create", {
             }, function (data) {
                 if (data && data.ret == 1) {
                     admanager.showCommonDlg("提示", "添加记录成功");
                 } else {
                     admanager.showCommonDlg("提示", data.message);
                 }
-            }, "json");
+            }, "json");*/
             return false;
         });
 
@@ -701,14 +807,8 @@
         $('#formAdmob input, #formAdmob select').change(function() {
 //            标签名_地理位置&语言&出价_创建时间
             if ($(this).attr('id') == 'inputCampaignNameAdmob') return;
-            var now = new Date();
-            var appName = $('#selectAppAdmob').val();
-            var region = $('#selectRegionAdmob option:selected').text();
-            var language = $('#selectLanguageAdmob option:selected').text();
-            var bidding = $('#inputBiddingAdmob').val();
-            var countryAlisa = $('#selectRegionAdmob')[0].countryAlisa;
-            if (countryAlisa) region = countryAlisa;
-            $('#inputCampaignNameAdmob').val(appName + "_" + region + language + bidding + "_" + now.getFullYear() +"" + (now.getMonth() + 1) + "" + now.getDate());
+
+            $('#inputCampaignNameAdmob').val(generateAdmobCampaignName());
         });
 
         $('#btnCreate').click(function () {

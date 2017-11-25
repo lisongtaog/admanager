@@ -8,7 +8,7 @@ admanager.showCommonDlg = function(title, message, callback) {
     $('#common_message_dialog').modal('show');
     $("#common_dlg_title").text(title);
     //换行的格式化输出
-    if( message.indexOf("\n") > -1 ){
+    if( typeof message === 'string' && message.indexOf("\n") > -1 ){
         $("#common_dlg_message").html("").append(
             $("<pre>").html(message)
         );
