@@ -32,8 +32,9 @@ $("#new_campaign_dlg .btn-primary").click(function() {
 });
 
 var appQueryData = [];
-
+var strFullPath = "";
 function init() {
+
     var now = new Date(new Date().getTime() - 86400 * 1000);
     $('#inputStartTime').val(now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + now.getDate());
     $('#inputEndTime').val(now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + now.getDate());
@@ -126,6 +127,19 @@ function init() {
             }
         }, 'json');
     });
+
+    strFullPath = window.document.location.href;
+    if(strFullPath.indexOf("?") != -1){
+        strFullPath = strFullPath.substr(strFullPath.indexOf("?")+1,strFullPath.length);
+        var thisArr = strFullPath.split("&");
+
+        //顺序：tag_name startTime endTime country_name
+        $("#inputSearch").val(thisArr[0].split("=")[1]);
+        $('#inputStartTime').val(thisArr[1].split("=")[1]);
+        $('#inputEndTime').val(thisArr[2].split("=")[1]);
+        $('#inputCountry').val(thisArr[3].split("=")[1]);
+        $('#btnSearch').click();
+    }
 
     $('#btnSummary').click(function () {
         var query = $("#inputSearch").val();
@@ -558,5 +572,6 @@ function bindBatchModifyOperation() {
 
 init();
 bindBatchModifyOperation();
-
-$('#btnSummary').click();
+if(strFullPath.indexOf("?") != -1){
+    $('#btnSummary').click();
+}
