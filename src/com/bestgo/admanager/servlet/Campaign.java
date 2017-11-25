@@ -248,9 +248,19 @@ public class Campaign extends HttpServlet {
                     yesterdayCount += (long)record.get("cnt");
                 }
 
+                sql = "select campaign_id from ad_campaigns where create_time between '" + yesterdayStart + "' and '" + yesterdayEnd + "' and success=1";
+                List<JSObject> campaignIds = DB.findListBySql(sql);
+                String str = "";
+                for (int i = 0; i < campaignIds.size(); i++) {
+                    if (i == campaignIds.size() - 1) {
+                        str += campaignIds.get(i).get("campaign_id").toString();
+                    } else {
+                        str += campaignIds.get(i).get("campaign_id").toString() + ",";
+                    }
+                }
+
                 sql = "select sum(total_spend) as total_spend, sum(total_installed) as total_intalled from web_ad_campaigns_history " +
-                        "where date between '" + yesterdayStart + "' and '" + yesterdayEnd + "' and campaign_id in (select campaign_id from " +
-                        "ad_campaigns where create_time between '" + yesterdayStart + "' and '" + yesterdayEnd + "' and success=1)";
+                        "where date between '" + yesterdayStart + "' and '" + yesterdayEnd + "' and campaign_id in (" + str + ")";
                 record = DB.findOneBySql(sql);
                 totalSpend += Utils.convertDouble(record.get("total_spend"), 0);
                 totalInstalled += Utils.convertDouble(record.get("total_intalled"), 0);
@@ -260,9 +270,18 @@ public class Campaign extends HttpServlet {
                 if (record.hasObjectData()) {
                     yesterdayCount += (long)record.get("cnt");
                 }
+                sql = "select campaign_id from ad_campaigns_admob where create_time between '" + yesterdayStart + "' and '" + yesterdayEnd + "' and success=1";
+                campaignIds = DB.findListBySql(sql);
+                str = "";
+                for (int i = 0; i < campaignIds.size(); i++) {
+                    if (i == campaignIds.size() - 1) {
+                        str += campaignIds.get(i).get("campaign_id").toString();
+                    } else {
+                        str += campaignIds.get(i).get("campaign_id").toString() + ",";
+                    }
+                }
                 sql = "select sum(total_spend) as total_spend, sum(total_installed) as total_intalled from web_ad_campaigns_history_admob " +
-                        "where date between '" + yesterdayStart + "' and '" + yesterdayEnd + "' and campaign_id in (select campaign_id from " +
-                        "ad_campaigns_admob where create_time between '" + yesterdayStart + "' and '" + yesterdayEnd + "' and success=1)";
+                        "where date between '" + yesterdayStart + "' and '" + yesterdayEnd + "' and campaign_id in (" + str + ")";
                 record = DB.findOneBySql(sql);
                 totalSpend += Utils.convertDouble(record.get("total_spend"), 0);
                 totalInstalled += Utils.convertDouble(record.get("total_intalled"), 0);
