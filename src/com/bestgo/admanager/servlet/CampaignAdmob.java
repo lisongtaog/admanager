@@ -105,8 +105,8 @@ public class CampaignAdmob extends HttpServlet {
                         for(int i=0;i<createCountInt;i++){
                             String now  = String.format("%d-%02d-%02d %02d:%02d:%02d", calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH),
                                     calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), calendar.get(Calendar.SECOND));
-                            String s = String.valueOf(System.currentTimeMillis());
-                            campaignName = campaignNameOld + accountNameArr[j] + "_"+ i + s.substring(s.length()-4)+String.valueOf(random.nextInt()).substring(1, 4);
+                            String r = String.valueOf(random.nextInt()).substring(1, 5);
+                            campaignName = campaignNameOld + accountNameArr[j] + "_"+ r +String.valueOf(System.currentTimeMillis()).substring(1, 4) + i;
                             long genId = DB.insert("ad_campaigns_admob")
                                     .put("account_id", accountIdArr[j])
                                     .put("campaign_name", campaignName)
@@ -159,7 +159,6 @@ public class CampaignAdmob extends HttpServlet {
         } else if (path.startsWith("/selectMessagesByRegionAdmob")) {
             String region = request.getParameter("regionAdmob");
             String appName = request.getParameter("appNameAdmob");
-
             if (region != null) {
                 Map<String, String> regionLanguageAdmobRelMap = Config.getRegionLanguageRelMap();
                 String languageAdmob = "";
