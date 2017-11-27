@@ -32,7 +32,7 @@ public class CountryRevenueSpend extends HttpServlet {
         String startTime = request.getParameter("startTime");
         String endTime = request.getParameter("endTime");
         try {
-            String sqlWT = "select id from web_tag where tag_name = '" + tag_name + "' limit 1";
+            String sqlWT = "select id from web_tag where tag_name = '" + tag_name + "'";
             JSObject idJS = DB.findOneBySql(sqlWT);
             long tag_id = idJS.get("id");
 
@@ -117,7 +117,7 @@ public class CountryRevenueSpend extends HttpServlet {
                 countryMap.put(j.get("country_code"),j.get("country_name"));
             }
 
-            String sqlFAIR = "select google_package_id from web_facebook_app_ids_rel where tag_name = '" + tag_name + "' limit 1";
+            String sqlFAIR = "select google_package_id from web_facebook_app_ids_rel where tag_name = '" + tag_name + "'";
             JSObject goolePackageIdJSObject = DB.findOneBySql(sqlFAIR);
             String google_package_id = goolePackageIdJSObject.get("google_package_id");
 
@@ -126,30 +126,36 @@ public class CountryRevenueSpend extends HttpServlet {
                     " where  app_id = '" + google_package_id + "' and create_time between '" + startTime +
                     "' and '" + endTime + "' group by country_code";
             List<JSObject> listR = DB.findListBySql(sqlR);
-            Map<String, CountryRecord> newMap = new HashMap<>();
+            ArrayList<CountryRecord>  countryRecordList = new ArrayList<>();
             for (JSObject r : listR) {
                 String country_code3 = r.get("country_code");
                 if (map.containsKey(country_code3)) {
                     CountryRecord record3 = map.get(country_code3);
                     record3.revenue = Utils.convertDouble(r.get("total_revenue"),0.0);
-                    record3.country_name = countryMap.get(country_code3);
-                    //如果赔钱，存入新的集合中
-                    if(record3.spend > record3.revenue){
-                        newMap.put(country_code3, record3);
-                    }
-
+                    //收益减去花费
+                    record3.incoming = record3.revenue - record3.spend;
+                    countryRecordList.add(record3);
                 }
             }
-            Collection<CountryRecord> newCountryRecords = newMap.values();
-
+            Collections.sort(countryRecordList, new Comparator<CountryRecord>() {
+                @Override
+                public int compare(CountryRecord a, CountryRecord b) {
+                    if(a.incoming >= b.incoming){
+                        return 1;
+                    }else{
+                        return -1;
+                    }
+                }
+            });
             JsonArray jsonArray = new JsonArray();
-            if(newCountryRecords != null){
-                for(CountryRecord ncr : newCountryRecords){
+            if(countryRecordList != null){
+                for(CountryRecord ncr : countryRecordList){
                     JsonObject j = new JsonObject();
                     j.addProperty("country_code",ncr.country_code);
-                    j.addProperty("country_name",ncr.country_name);
                     j.addProperty("revenue",ncr.revenue);
                     j.addProperty("spend",ncr.spend);
+                    j.addProperty("incoming",ncr.incoming);
+
                     j.addProperty("installed",ncr.installed);
                     j.addProperty("cpa",ncr.cpa);
                     jsonArray.add(j);
@@ -172,11 +178,11 @@ public class CountryRevenueSpend extends HttpServlet {
 
     class CountryRecord {
         public String country_code;
-        public String country_name;
         public double installed;
         public double spend;
         public double cpa;
         public double revenue;
+        public double incoming;//收益减去花费
     }
 
 }
