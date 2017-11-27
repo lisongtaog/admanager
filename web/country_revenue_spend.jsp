@@ -16,6 +16,11 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.4/css/select2.min.css" rel="stylesheet" />
 
     <style>
+        .green {
+            color: #ffffff !important;
+            background:#62ff63 !important;
+            text-decoration:none;
+        }
         td.editable {
 
         }
@@ -179,6 +184,9 @@
 
                         $('#results_body').append(tr);
                     }
+                    $(".ui-button").click(function(){
+                        $(this).addClass("green");
+                    });
                 }else {
                     admanager.showCommonDlg("错误", data.message);
                 }
@@ -457,6 +465,8 @@
     $("#inputSearch").autocomplete({
         source: data
     });
+
+
 </script>
 </body>
 </html>
