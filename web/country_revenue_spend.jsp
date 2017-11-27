@@ -149,9 +149,9 @@
                 tag_name: tag_name,
                 startTime: startTime,
                 endTime: endTime
-            }, function (result) {
-                if (result && result.ret == 1) {
-                    var arr = result.arr;
+            }, function (data) {
+                if (data && data.ret == 1) {
+                    var arr = data.arr;
                     $('#results_body > tr').remove();
                     $('#result_header').html("<tr><th>国家名称</th><th>总收入</th><th>总花费</th><th>总盈利</th><th>总安装</th><th>CPA</th><th>国家对应的系列</th></tr>");
 
