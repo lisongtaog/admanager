@@ -31,7 +31,9 @@ public class Query extends HttpServlet {
 
         String tag = request.getParameter("tag");
         String startTime = request.getParameter("startTime");
+        startTime = "2017-10-20";
         String endTime = request.getParameter("endTime");
+        endTime = "2017-10-20";
         String isSummary = request.getParameter("summary");
         String sorterId = request.getParameter("sorterId");
         String adwordsCheck = request.getParameter("adwordsCheck");
