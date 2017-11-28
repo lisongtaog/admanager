@@ -465,8 +465,6 @@
     $("#inputSearch").autocomplete({
         source: data
     });
-
-
 </script>
 </body>
 </html>
