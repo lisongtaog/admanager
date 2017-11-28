@@ -588,7 +588,73 @@ function bindBatchModifyOperation() {
     });
 }
 
+function bindQueryZero() {
+    $('#btnCloseZero').click(function() {
+        var yes = confirm("小心啊，确认关闭吗？");
+        if (yes) {
+            var startTime = $('#inputStartTime').val();
+            var endTime = $('#inputEndTime').val();
+
+            var costOp = $('#selectCostOp').val();
+            var conversionOp = $('#selectConversionOp').val();
+            var cost = $('#inputCostRate').val();
+            var conversion = $('#inputConversion').val();
+
+            $.post("query_zero/close", {
+                startTime: startTime,
+                endTime: endTime,
+                costOp: costOp,
+                conversionOp: conversionOp,
+                cost: cost,
+                conversion: conversion,
+            }, function(data) {
+                if (data && data.ret == 1) {
+                    admanager.showCommonDlg("提示", "提交任务成功");
+                }
+            }, 'json');
+        }
+    });
+    $('#btnQueryZero').click(function() {
+        var startTime = $('#inputStartTime').val();
+        var endTime = $('#inputEndTime').val();
+
+        var costOp = $('#selectCostOp').val();
+        var conversionOp = $('#selectConversionOp').val();
+        var cost = $('#inputCostRate').val();
+        var conversion = $('#inputConversion').val();
+
+        $.post("query_zero/query", {
+            startTime: startTime,
+            endTime: endTime,
+            costOp: costOp,
+            conversionOp: conversionOp,
+            cost: cost,
+            conversion: conversion,
+        }, function(data) {
+            if (data && data.ret == 1) {
+                $('#result_header').html("<tr><th>系列ID</th><th>广告账号ID</th><th>系列名称</th><th>创建时间<span sorterId=\"1\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>状态<span sorterId=\"2\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>预算<span sorterId=\"3\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>竞价<span sorterId=\"4\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>总花费<span sorterId=\"5\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>总安装<span sorterId=\"6\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>总点击<span sorterId=\"7\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>CPA<span sorterId=\"8\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>CTR<span sorterId=\"9\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>CVR<span sorterId=\"10\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th></tr>");
+                data = data.data;
+                setData(data);
+                bindSortOp();
+
+                var now = new Date();
+                var six = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 16, 0, 0);
+                var estimatedCost = ((six - now) / 1000) * (data.total_spend / (86400 - (six - now) / 1000)) + data.total_spend;
+                var str = "<span style='color:red;'>只算还在开启状态的系列</span>" + " 总预算: " + data.total_bugdet + " 总花费: " + data.total_spend + " <span style='color:red'>预计花费: " + estimatedCost + "</span> 总安装: " + data.total_installed +
+                    " 总展示: " + data.total_impressions + " 总点击: " + data.total_click +
+                    " CTR: " + data.total_ctr + " CPA: " + data.total_cpa + " CVR: " + data.total_cvr;
+                str += "<br/><span class='estimateResult'></span>"
+                $('#total_result').html(str);
+                $('#total_result').removeClass("editable");
+            } else {
+                admanager.showCommonDlg("错误", data.message);
+            }
+        }, "json");
+    });
+}
+
 init();
+bindQueryZero();
 bindBatchModifyOperation();
 
 if(countryRevenueSpendReturn == "false"){
