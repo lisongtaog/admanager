@@ -610,6 +610,8 @@ function bindQueryZero() {
             }, function(data) {
                 if (data && data.ret == 1) {
                     admanager.showCommonDlg("提示", "提交任务成功");
+                } else {
+                    admanager.showCommonDlg("错误", data.message);
                 }
             }, 'json');
         }

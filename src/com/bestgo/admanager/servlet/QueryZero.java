@@ -15,9 +15,12 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @WebServlet(name = "QueryZero", urlPatterns = {"/query_zero/*"}, asyncSupported = true)
 public class QueryZero extends HttpServlet {
+    private static ExecutorService executors = Executors.newFixedThreadPool(1);
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         doPost(request, response);
@@ -52,7 +55,16 @@ public class QueryZero extends HttpServlet {
             }
         } else if (path.startsWith("/close")) {
             try {
-                closeCampaigns(startTime, endTime, costOp, cost, conversionOp, conversion);
+                executors.submit(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            closeCampaigns(startTime, endTime, costOp, cost, conversionOp, conversion);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
                 json.addProperty("ret", 1);
                 json.addProperty("message", "执行成功");
             } catch (Exception ex) {
@@ -123,7 +135,7 @@ public class QueryZero extends HttpServlet {
                             .put("enabled", enabled)
                             .put("bugdet", 0)
                             .put("bidding", 0)
-                            .put("network", adNetwork)
+                            .put("network", network)
                             .put("account_id", account_id)
                             .put("campaign_id", campaign_id)
                             .put("campaign_name", "")

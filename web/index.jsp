@@ -187,7 +187,7 @@
 <script src="js/bootstrap-datetimepicker.js"></script>
 <script src="jqueryui/jquery-ui.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.4/js/select2.min.js"></script>
-<script src="js/index.js"></script>
+<script src="js/index.js?t=20171128"></script>
 
 <script>
     var data = <%=array.toString()%>;
