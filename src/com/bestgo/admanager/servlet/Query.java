@@ -28,10 +28,10 @@ public class Query extends HttpServlet {
         if (!Utils.isAdmin(request, response)) return;
 
         JsonObject json = new JsonObject();
-
         String tag = request.getParameter("tag");
         String startTime = request.getParameter("startTime");
         String endTime = request.getParameter("endTime");
+        String campaignCreateTime = request.getParameter("campaignCreateTime");
         String isSummary = request.getParameter("summary");
         String sorterId = request.getParameter("sorterId");
         String adwordsCheck = request.getParameter("adwordsCheck");
@@ -39,7 +39,6 @@ public class Query extends HttpServlet {
         String facebookCheck = request.getParameter("facebookCheck");
         String countryCode = request.getParameter("countryCode");
         String likeCampaignName = request.getParameter("likeCampaignName");
-        String campaignCreateTime = request.getParameter("campaignCreateTime");
 
         if (isSummary != null) {
             try {
