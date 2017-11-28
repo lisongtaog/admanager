@@ -87,9 +87,6 @@ function init() {
         var startTime = $('#inputStartTime').val();
         var endTime = $('#inputEndTime').val();
         var campaignCreateTime = $('#inputCampaignCreateTime').val();
-        if(campaignCreateTime == '2017-01-01'){
-            campaignCreateTime = '';
-        }
         var countryCode = '';
         var adwordsCheck = $('#adwordsCheck').is(':checked');
         var countryCheck = $('#countryCheck').is(':checked');
@@ -133,15 +130,15 @@ function init() {
                 admanager.showCommonDlg("错误", data.message);
             }
         },'json');
+        countryRevenueSpendReturn = "true";
     });
 
 
     strFullPath = window.document.location.href;
     if(strFullPath.indexOf("?") != -1){
-        countryRevenueSpendReturn = "true";
         strFullPath = strFullPath.substr(strFullPath.indexOf("?")+1,strFullPath.length);
         var thisArr = strFullPath.split("&");
-
+        countryRevenueSpendReturn = "true";
         //顺序：tag_name startTime endTime country_code
         $("#inputSearch").val(thisArr[0].split("=")[1]);
         $('#inputStartTime').val(thisArr[1].split("=")[1]);

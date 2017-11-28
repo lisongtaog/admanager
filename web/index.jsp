@@ -78,7 +78,7 @@
             <span>国家</span>
             <input id="inputCountry" class="form-control" style="display: inline; width: auto;" type="text"/>
             <span>系列创建时间</span>
-            <input type="text" value="2017-01-01" id="inputCampaignCreateTime" readonly>
+            <input type="text" id="inputCampaignCreateTime">
             <button id="btnSearch" class="btn btn-default">条件查找</button>
             <button id="btnSummary" class="btn btn-default">汇总数据</button>
             <button id="btnModifyBatch" class="btn btn-default">批量修改</button>
@@ -190,7 +190,6 @@
 <script src="jqueryui/jquery-ui.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.4/js/select2.min.js"></script>
 <script src="js/country-name-code-dict.js"></script>
-<script src="js/index.js"></script>
 <script src="js/index.js?t=20171128"></script>
 
 <script>
