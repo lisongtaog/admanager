@@ -106,6 +106,7 @@ function init() {
             adwordsCheck: adwordsCheck,
             countryCheck: countryCheck,
             facebookCheck: facebookCheck,
+            countryCode: countryCode,
             campaignCreateTime: campaignCreateTime
         },function(data){
             if(data && data.ret == 1){
