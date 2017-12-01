@@ -49,8 +49,8 @@ public class Query extends HttpServlet {
                     for (int i = 0; i < tags.size(); i++) {
                         long id = tags.get(i).get("id");
                         String tagName = tags.get(i).get("tag_name");
-                        JsonObject admob = fetchOneAppData(id, tagName,startTime, endTime, 0, true, false, countryCode,likeCampaignName,campaignCreateTime);
-                        JsonObject facebook = fetchOneAppData(id, tagName,startTime, endTime, 0, false, false, countryCode,likeCampaignName,campaignCreateTime);
+                        JsonObject admob = fetchOneAppData(id, tagName,startTime, endTime, 0, true, false, countryCode,likeCampaignName,campaignCreateTime,false);
+                        JsonObject facebook = fetchOneAppData(id, tagName,startTime, endTime, 0, false, false, countryCode,likeCampaignName,campaignCreateTime,false);
                         double total_spend = admob.get("total_spend").getAsDouble() + facebook.get("total_spend").getAsDouble();
                         double total_installed = admob.get("total_installed").getAsDouble() + facebook.get("total_installed").getAsDouble();
                         double total_impressions = admob.get("total_impressions").getAsDouble() + facebook.get("total_impressions").getAsDouble();
@@ -75,7 +75,7 @@ public class Query extends HttpServlet {
                     for (int i = 0; i < tags.size(); i++) {
                         long id = tags.get(i).get("id");
                         String tagName = tags.get(i).get("tag_name");
-                        JsonObject jsonObject = fetchOneAppData(id, tagName,startTime, endTime, 0, "true".equals(adwordsCheck), false, countryCode,likeCampaignName,campaignCreateTime);
+                        JsonObject jsonObject = fetchOneAppData(id, tagName,startTime, endTime, 0, "true".equals(adwordsCheck), false, countryCode,likeCampaignName,campaignCreateTime,false);
                         double total_impression = jsonObject.get("total_impressions").getAsDouble();
                         if (total_impression == 0) {
                             continue;
@@ -110,8 +110,8 @@ public class Query extends HttpServlet {
                         countryCheck = "false";
                     }
                     if (adwordsCheck != null && adwordsCheck.equals("false") && facebookCheck != null && facebookCheck.equals("false")) {
-                        JsonObject admob = fetchOneAppData(id, tag,startTime, endTime, sorter, true, "true".equals(countryCheck), countryCode,likeCampaignName,campaignCreateTime);
-                        JsonObject facebook = fetchOneAppData(id, tag,startTime, endTime, sorter, false, "true".equals(countryCheck), countryCode,likeCampaignName,campaignCreateTime);
+                        JsonObject admob = fetchOneAppData(id, tag,startTime, endTime, sorter, true, "true".equals(countryCheck), countryCode,likeCampaignName,campaignCreateTime,true);
+                        JsonObject facebook = fetchOneAppData(id, tag,startTime, endTime, sorter, false, "true".equals(countryCheck), countryCode,likeCampaignName,campaignCreateTime,true);
                         double total_spend = admob.get("total_spend").getAsDouble() + facebook.get("total_spend").getAsDouble();
                         double total_installed = admob.get("total_installed").getAsDouble() + facebook.get("total_installed").getAsDouble();
                         double total_impressions = admob.get("total_impressions").getAsDouble() + facebook.get("total_impressions").getAsDouble();
@@ -133,7 +133,7 @@ public class Query extends HttpServlet {
                         }
                         jsonObject = admob;
                     } else {
-                        jsonObject = fetchOneAppData(id, tag,startTime, endTime, sorter, "true".equals(adwordsCheck), "true".equals(countryCheck), countryCode,likeCampaignName,campaignCreateTime);
+                        jsonObject = fetchOneAppData(id, tag,startTime, endTime, sorter, "true".equals(adwordsCheck), "true".equals(countryCheck), countryCode,likeCampaignName,campaignCreateTime,true);
                     }
                     if ("true".equals(countryCheck)) {
                         JsonArray array = jsonObject.getAsJsonArray("array");
@@ -204,7 +204,7 @@ public class Query extends HttpServlet {
     }
 
     private JsonObject fetchOneAppData(long tagId, String tagName, String startTime, String endTime,
-                                       int sorterId, boolean admobCheck, boolean countryCheck, String countryCode,String likeCampaignName,String campaignCreateTime) throws Exception {
+                                       int sorterId, boolean admobCheck, boolean countryCheck, String countryCode,String likeCampaignName,String campaignCreateTime,boolean hasROI) throws Exception {
         String relationTable = "web_ad_campaign_tag_rel";
         String webAdCampaignTable = "web_ad_campaigns";
         String webAdCampaignHistoryTable = "web_ad_campaigns_history";
@@ -268,8 +268,9 @@ public class Query extends HttpServlet {
 
 
         String orderStr = "";
-        if (sorterId > 0) {
+        if (sorterId >= 0) {
             switch (sorterId) {
+                case 0:
                 case 1:
                 case 1001:
                     orderStr = "order by create_time ";
@@ -310,11 +311,11 @@ public class Query extends HttpServlet {
                 case 1010:
                     orderStr = "order by cvr ";
                     break;
+                default:
+                    orderStr = "order by create_time ";
             }
             if (sorterId > 1000) {
                 orderStr += " desc";
-            } else {
-                orderStr += " asc";
             }
         }
 
@@ -361,9 +362,58 @@ public class Query extends HttpServlet {
         double total_ctr = 0;
         double total_cpa = 0;
         double total_cvr = 0;
+
+
         for (int i = 0; i < list.size(); i++) {
             JSObject one = list.get(i);
             String campaign_id = one.get("campaign_id");
+            double roi = 0;
+            if(hasROI){
+                double priceI = 0;
+                double cpaI = 0;
+                double installedI = 0;
+                if(countryCode != null && countryCode.length()>0){
+                    String sql = "select price from web_ad_tag_country_price_dict where tag_name = '" + tagName + "' and country_code = '" + countryCode + "'";
+                    JSObject oneI = DB.findOneBySql(sql);
+                    if(one.hasObjectData()){
+                        priceI = Utils.convertDouble(oneI.get("price"),0);
+                        String sqlT = "";
+                        if(admobCheck){
+                            sqlT = "select sum(total_installed) installed, sum(cpa) cpa from web_ad_campaigns_country_history_admob where campaign_id = '" + campaign_id + "' \n" +
+                                    "and country_code = '"+countryCode+"' and date between '"+startTime+"' and '"+endTime+"'";
+                        }else{
+                            sqlT = "select sum(total_installed) installed, sum(cpa) cpa from web_ad_campaigns_country_history where campaign_id = '" + campaign_id + "' \n" +
+                                    "and country_code = '"+countryCode+"' and date between '"+startTime+"' and '"+endTime+"'";
+                        }
+                        JSObject twoI = DB.findOneBySql(sqlT);
+                        cpaI = Utils.convertDouble(twoI.get("cpa"),0);
+                        installedI = Utils.convertDouble(twoI.get("installed"),0);
+                        roi = ( priceI - cpaI ) * installedI;
+                    }
+                }else{
+                    String sql = "";
+                    if(admobCheck){
+                        sql = "select cch.country_code, sum(cpa) cpa, sum(total_installed) installed, price \n" +
+                                "from web_ad_campaigns_country_history_admob cch,web_ad_tag_country_price_dict cpd \n" +
+                                "where cch.country_code = cpd.country_code and campaign_id = '"+campaign_id+"' and tag_name = '"+tagName+"'\n" +
+                                "and date between '"+startTime+"' and '"+endTime+"' group by cch.country_code";
+                    }else{
+                        sql = "select cch.country_code, sum(cpa) cpa, sum(total_installed) installed, price \n" +
+                                "from web_ad_campaigns_country_history cch,web_ad_tag_country_price_dict cpd \n" +
+                                "where cch.country_code = cpd.country_code and campaign_id = '"+campaign_id+"' and tag_name = '"+tagName+"'\n" +
+                                "and date between '"+startTime+"' and '"+endTime+"' group by cch.country_code";
+                    }
+
+                    List<JSObject> listM = DB.findListBySql(sql);
+                    for(JSObject j : listM){
+                        cpaI = Utils.convertDouble(j.get("cpa"),0);
+                        installedI = Utils.convertDouble(j.get("installed"),0);
+                        priceI = Utils.convertDouble(j.get("price"),0);
+                        roi += (priceI - cpaI)*installedI;
+                    }
+                }
+            }
+
             String account_id = one.get("account_id");
             String campaign_name = one.get("campaign_name");
             String status = one.get("status");
@@ -390,6 +440,7 @@ public class Query extends HttpServlet {
             total_cpa = total_installed > 0 ? total_spend / total_installed : 0;
             total_cvr = total_click > 0 ? total_installed / total_click : 0;
 
+
             JsonObject d = new JsonObject();
             d.addProperty("campaign_id", campaign_id);
             d.addProperty("account_id", account_id);
@@ -407,6 +458,7 @@ public class Query extends HttpServlet {
             d.addProperty("ctr", Utils.trimDouble(ctr));
             d.addProperty("cpa", Utils.trimDouble(cpa));
             d.addProperty("cvr", Utils.trimDouble(cvr));
+            d.addProperty("roi", Utils.trimDouble(roi));
             if (admobCheck) {
                 d.addProperty("network", "admob");
             } else {

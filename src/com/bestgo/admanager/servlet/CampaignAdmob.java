@@ -110,7 +110,7 @@ public class CampaignAdmob extends HttpServlet {
                             String s = String.valueOf(System.currentTimeMillis());
                             s = s.substring(s.length()-5);
                             campaignName = campaignNameOld + accountNameArr[j] + "_"+ r  + "_"+ s + "_" + i;
-                             long genId = DB.insert("ad_campaigns_admob")
+                            long genId = DB.insert("ad_campaigns_admob")
                                     .put("account_id", accountIdArr[j])
                                     .put("campaign_name", campaignName)
                                     .put("app_id", gpPackageId)

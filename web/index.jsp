@@ -31,6 +31,15 @@
         .estimateResult {
             color: red;
         }
+        .red {
+            color: red;
+        }
+        .blue {
+            color: #0f0;
+        }
+        .yellow{
+            color: #ff5a41;
+        }
     </style>
 </head>
 <body>
