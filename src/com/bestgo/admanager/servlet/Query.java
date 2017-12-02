@@ -5,6 +5,7 @@ import com.bestgo.common.database.services.DB;
 import com.bestgo.common.database.utils.JSObject;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.sun.xml.internal.bind.v2.runtime.unmarshaller.TagName;
 import org.apache.log4j.Logger;
 
 import javax.rmi.CORBA.Util;
@@ -161,15 +162,22 @@ public class Query extends HttpServlet {
                         }
                         JsonArray newArr = new JsonArray();
                         for (String key : dataSets.keySet()) {
+                            String sql = "select price from web_ad_tag_country_price_dict cpd, app_country_code_dict ccd\n" +
+                                    "where cpd.country_code = ccd.country_code and ccd.country_name = '" + key + "' and tag_name = '" + tag + "'";
+                            JSObject oneR = DB.findOneBySql(sql);
+                            double price = Utils.convertDouble(oneR.get("price"),0);
                             JsonObject one = new JsonObject();
+                            CountryRecord record = dataSets.get(key);
+                            record.roi = (price - record.cpa) * record.installed;
                             one.addProperty("country_name", key);
-                            one.addProperty("impressions", dataSets.get(key).impressions);
-                            one.addProperty("installed", dataSets.get(key).installed);
-                            one.addProperty("click", dataSets.get(key).click);
-                            one.addProperty("spend", Utils.trimDouble(dataSets.get(key).spend));
-                            one.addProperty("ctr", Utils.trimDouble(dataSets.get(key).ctr));
-                            one.addProperty("cpa", Utils.trimDouble(dataSets.get(key).cpa));
-                            one.addProperty("cvr", Utils.trimDouble(dataSets.get(key).cvr));
+                            one.addProperty("impressions", record.impressions);
+                            one.addProperty("installed", record.installed);
+                            one.addProperty("click", record.click);
+                            one.addProperty("spend", Utils.trimDouble(record.spend));
+                            one.addProperty("ctr", Utils.trimDouble(record.ctr));
+                            one.addProperty("cpa", Utils.trimDouble(record.cpa));
+                            one.addProperty("cvr", Utils.trimDouble(record.cvr));
+                            one.addProperty("roi", Utils.trimDouble(record.roi));
                             newArr.add(one);
                         }
                         jsonObject.add("array", newArr);
@@ -201,6 +209,7 @@ public class Query extends HttpServlet {
         public double ctr;
         public double cpa;
         public double cvr;
+        public double roi;
     }
 
     private JsonObject fetchOneAppData(long tagId, String tagName, String startTime, String endTime,

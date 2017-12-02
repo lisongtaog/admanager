@@ -38,7 +38,7 @@
             color: #0f0;
         }
         .yellow{
-            color: #ff5a41;
+            color: #ffa17a;
         }
     </style>
 </head>
