@@ -1,5 +1,6 @@
 package com.bestgo.admanager.servlet;
 
+import com.bestgo.admanager.DateUtil;
 import com.bestgo.admanager.OperationResult;
 import com.bestgo.admanager.Utils;
 import com.bestgo.common.database.services.DB;
@@ -27,23 +28,27 @@ public class Tags extends HttpServlet {
 
         String path = request.getPathInfo();
         JsonObject json = new JsonObject();
+        OperationResult result = new OperationResult();
+        String tag = request.getParameter("tag");
+        String startTime = request.getParameter("startTime");
+        String endTime = request.getParameter("endTime");
 
         if (path != null) {
             if (path.startsWith("/create")) {
                 String tagName = request.getParameter("name");
 
-                OperationResult result = createNewTag(tagName);
+                result = createNewTag(tagName);
                 json.addProperty("ret", result.result ? 1 : 0);
                 json.addProperty("message", result.message);
             } else if (path.startsWith("/delete")) {
                 String tagName = request.getParameter("name");
-                OperationResult result = deleteTag(tagName);
+                result = deleteTag(tagName);
                 json.addProperty("ret", result.result ? 1 : 0);
                 json.addProperty("message", result.message);
             } else if (path.startsWith("/update")) {
                 String tagName = request.getParameter("name");
                 int id = Utils.parseInt(request.getParameter("id"), 0);
-                OperationResult result = updateTag(id, tagName);
+                result = updateTag(id, tagName);
                 json.addProperty("ret", result.result ? 1 : 0);
                 json.addProperty("message", result.message);
             } else if (path.startsWith("/query")) {
@@ -75,9 +80,54 @@ public class Tags extends HttpServlet {
                     }
                     json.add("data", array);
                 }
-            }
-        } else {
+            }else if (path.startsWith("/selectByTagName")) {
+                result.result = true;
+                if (tag.isEmpty()) {
+                    result.result = false;
+                    result.message = "标签不能为空";
+                }
+                if(result.result){
+                    String sqlFacebook = "select app_name,campaign_id,account_id,campaign_name,create_time,bugdet,bidding,country_region from ad_campaigns where tag_name = '"+tag+"' and create_time between '"+startTime+"' and '"+endTime+"'";
+                    String sqlAdmob = "select app_name,campaign_id,account_id,campaign_name,create_time,bugdet,bidding,country_region from ad_campaigns_admob where tag_name = '"+tag+"' and create_time between '"+startTime+"' and '"+endTime+"'";
+                    try {
+                        List<JSObject> listF = DB.findListBySql(sqlFacebook);
+                        List<JSObject> listA = DB.findListBySql(sqlAdmob);
+                        listF.addAll(listA);
+                        JsonArray array = new JsonArray();
+                        double total_budget = 0;
+                        for (JSObject j : listF) {
+                            JsonObject one = new JsonObject();
+                            String app_name = j.get("app_name");
+                            String campaign_id = j.get("campaign_id");
+                            String account_id = j.get("account_id");
+                            String campaign_name = j.get("campaign_name");
+                            String create_time = DateUtil.timeStamp2Date(j.get("create_time"),"yyyy-MM-dd HH:mm:ss");
 
+                            double budget = Utils.parseDouble(j.get("bugdet"),0);
+                            total_budget += budget;
+                            double bidding = Utils.parseDouble(j.get("bidding"),0);
+                            String country_region = j.get("country_region");
+                            one.addProperty("app_name", app_name);
+                            one.addProperty("campaign_id", campaign_id);
+                            one.addProperty("account_id", account_id);
+                            one.addProperty("campaign_name", campaign_name);
+                            one.addProperty("create_time", create_time);
+                            one.addProperty("budget", budget);
+                            one.addProperty("bidding", bidding);
+                            one.addProperty("country_region", country_region);
+                            array.add(one);
+                        }
+                        json.add("arr", array);
+                        json.addProperty("total_budget",total_budget);
+                        json.addProperty("total_count",listF.size());
+                    } catch (Exception ex) {
+                        result.message = ex.getMessage();
+                        result.result = false;
+                    }
+                }
+                json.addProperty("ret", result.result ? 1 : 0);
+                json.addProperty("message", result.message);
+            }
         }
 
         response.getWriter().write(json.toString());
