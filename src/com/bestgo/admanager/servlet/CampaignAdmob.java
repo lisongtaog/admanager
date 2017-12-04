@@ -88,10 +88,10 @@ public class CampaignAdmob extends HttpServlet {
                 }
 
                 File imagesPath = new File(imageRoot + File.separatorChar + imagePath);
-                if (!imagesPath.exists()) {
+                /*if (!imagesPath.exists()) {
                     result.result = false;
                     result.message = "图片路径不存在";
-                }
+                }*/
 
 
                 if (result.result) {

@@ -1,8 +1,10 @@
 package com.bestgo.admanager;
 
 import java.sql.Timestamp;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 
 public class DateUtil {
 
@@ -42,6 +44,48 @@ public class DateUtil {
         String now  = String.format("%d-%02d-%02d %02d:%02d:%02d", calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH),
                 calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), calendar.get(Calendar.SECOND));
         return now;
+    }
+
+
+    /**
+     * 字符串转Date
+     * @param str
+     * @param formatStr
+     * @return
+     */
+    public static Date getStrToDate(String str,String formatStr) {
+        SimpleDateFormat format = new SimpleDateFormat(formatStr);
+
+        Date date = null;
+
+        try {
+
+        date = format.parse(str);
+
+        }  catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return date;
+    }
+
+    /**
+     * 日期字符串增加 n 天
+     * @param s
+     * @param n
+     * @param format
+     * @return 日期字符串
+     */
+    public static String addDay(String s, int n,String format) {
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat(format);
+            Calendar cd = Calendar.getInstance();
+            cd.setTime(sdf.parse(s));
+            cd.add(Calendar.DATE, n);//增加一天
+            //cd.add(Calendar.MONTH, n);//增加一个月
+            return sdf.format(cd.getTime());
+        } catch (Exception e) {
+            return null;
+        }
     }
 
 }

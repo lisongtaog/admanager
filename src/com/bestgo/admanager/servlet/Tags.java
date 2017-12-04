@@ -87,14 +87,39 @@ public class Tags extends HttpServlet {
                     result.message = "标签不能为空";
                 }
                 if(result.result){
-                    String sqlFacebook = "select app_name,campaign_id,account_id,campaign_name,create_time,bugdet,bidding,country_region from ad_campaigns where tag_name = '"+tag+"' and create_time between '"+startTime+"' and '"+endTime+"'";
-                    String sqlAdmob = "select app_name,campaign_id,account_id,campaign_name,create_time,bugdet,bidding,country_region from ad_campaigns_admob where tag_name = '"+tag+"' and create_time between '"+startTime+"' and '"+endTime+"'";
+                    endTime = DateUtil.addDay(endTime,1,"yyyy-MM-dd");//加一天
+                    String sqlFacebook = "select app_name,campaign_id,account_id,campaign_name,create_time,bugdet,bidding,country_region" +
+                            " from ad_campaigns where tag_name = '"+tag+"' and create_time >= '"+startTime+"' and create_time < '"+endTime+"'";
+                    String sqlAdmob = "select app_name,campaign_id,account_id,campaign_name,create_time,bugdet,bidding,ccd.country_name" +
+                            " from ad_campaigns_admob ca,app_country_code_dict ccd " +
+                            "where ca.country_region = ccd.country_code and " +
+                            "tag_name = '"+tag+"' and create_time >= '"+startTime+"' and create_time < '"+endTime+"'";
                     try {
                         List<JSObject> listF = DB.findListBySql(sqlFacebook);
                         List<JSObject> listA = DB.findListBySql(sqlAdmob);
-                        listF.addAll(listA);
                         JsonArray array = new JsonArray();
                         double total_budget = 0;
+                        for (JSObject j : listA) {
+                            JsonObject one = new JsonObject();
+                            String app_name = j.get("app_name");
+                            String campaign_id = j.get("campaign_id");
+                            String account_id = j.get("account_id");
+                            String campaign_name = j.get("campaign_name");
+                            String create_time = DateUtil.timeStamp2Date(j.get("create_time"),"yyyy-MM-dd HH:mm:ss");
+                            double budget = Utils.parseDouble(j.get("bugdet"),0);
+                            total_budget += budget;
+                            double bidding = Utils.parseDouble(j.get("bidding"),0);
+                            String country_region = j.get("country_name");
+                            one.addProperty("app_name", app_name);
+                            one.addProperty("campaign_id", campaign_id);
+                            one.addProperty("account_id", account_id);
+                            one.addProperty("campaign_name", campaign_name);
+                            one.addProperty("create_time", create_time);
+                            one.addProperty("budget", budget);
+                            one.addProperty("bidding", bidding);
+                            one.addProperty("country_region", country_region);
+                            array.add(one);
+                        }
                         for (JSObject j : listF) {
                             JsonObject one = new JsonObject();
                             String app_name = j.get("app_name");
@@ -119,7 +144,7 @@ public class Tags extends HttpServlet {
                         }
                         json.add("arr", array);
                         json.addProperty("total_budget",total_budget);
-                        json.addProperty("total_count",listF.size());
+                        json.addProperty("total_count",array.size());
                     } catch (Exception ex) {
                         result.message = ex.getMessage();
                         result.result = false;
