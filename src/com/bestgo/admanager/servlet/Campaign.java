@@ -93,6 +93,11 @@ public class Campaign extends HttpServlet {
                     result.result = false;
                     result.message = "出价不能为空";
                 }
+                double dBidding = Utils.parseDouble(bidding, 0);
+                if (dBidding >= 1) {
+                    result.result = false;
+                    result.message = "bidding超过了1,   " + bidding;
+                }
 
                 File imagesPath = new File(imageRoot + File.separatorChar + imagePath);
                 if (!imagesPath.exists()) {
