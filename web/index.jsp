@@ -31,6 +31,15 @@
         .estimateResult {
             color: red;
         }
+        .red {
+            color: red;
+        }
+        .blue {
+            color: #0f0;
+        }
+        .yellow{
+            color: #ffa17a;
+        }
     </style>
 </head>
 <body>
@@ -52,6 +61,7 @@
     <ul class="nav nav-pills">
         <li role="presentation" class="active"><a href="#">首页</a></li>
         <li role="presentation"><a href="campaigns_create.jsp">创建广告</a></li>
+        <li role="presentation"><a href="campaigns_update_daily_log.jsp">日更记录</a></li>
         <li role="presentation"><a href="adaccounts.jsp">广告账号管理</a></li>
         <li role="presentation"><a href="adaccounts_admob.jsp">广告账号管理(AdMob)</a></li>
         <li role="presentation"><a href="campaigns.jsp">广告系列管理</a></li>

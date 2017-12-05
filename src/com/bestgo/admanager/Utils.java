@@ -122,12 +122,6 @@ public class Utils {
         return countryCodeMap;
     }
 
-    public static String getNow() {
-        Calendar calendar = Calendar.getInstance();
-        String now  = String.format("%d-%02d-%02d %02d:%02d:%02d", calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH),
-                calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), calendar.get(Calendar.SECOND));
-        return now;
-    }
 
     /**
      * 从较大的Set集合中，找到与较小的Set集合不同的字符串对象，并放到list中返回

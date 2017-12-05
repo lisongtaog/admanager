@@ -88,10 +88,10 @@ public class CampaignAdmob extends HttpServlet {
                 }
 
                 File imagesPath = new File(imageRoot + File.separatorChar + imagePath);
-                if (!imagesPath.exists()) {
+                /*if (!imagesPath.exists()) {
                     result.result = false;
                     result.message = "图片路径不存在";
-                }
+                }*/
 
 
                 if (result.result) {
@@ -100,13 +100,16 @@ public class CampaignAdmob extends HttpServlet {
                     String[] accountNameArr = accountName.split(",");
                     String[] accountIdArr = accountId.split(",");
                     int createCountInt = Integer.parseInt(createCount);
-                    Random random = new Random(1);
+                    Random random = new Random();
                     for(int j=0,len = accountNameArr.length;j<len;j++){
                         for(int i=0;i<createCountInt;i++){
                             String now  = String.format("%d-%02d-%02d %02d:%02d:%02d", calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH),
                                     calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), calendar.get(Calendar.SECOND));
-                            String r = String.valueOf(random.nextInt()).substring(1, 5);
-                            campaignName = campaignNameOld + accountNameArr[j] + "_"+ r +String.valueOf(System.currentTimeMillis()).substring(1, 4) + i;
+                            String r = String.valueOf(random.nextInt());
+                            r = r.substring(r.length()-5);
+                            String s = String.valueOf(System.currentTimeMillis());
+                            s = s.substring(s.length()-5);
+                            campaignName = campaignNameOld + accountNameArr[j] + "_"+ r  + "_"+ s + "_" + i;
                             long genId = DB.insert("ad_campaigns_admob")
                                     .put("account_id", accountIdArr[j])
                                     .put("campaign_name", campaignName)

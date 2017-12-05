@@ -1,5 +1,6 @@
 package com.bestgo.admanager.servlet;
 
+import com.bestgo.admanager.DateUtil;
 import com.bestgo.admanager.Utils;
 import com.bestgo.common.database.services.DB;
 import com.bestgo.common.database.utils.JSObject;
@@ -130,7 +131,7 @@ public class QueryZero extends HttpServlet {
                             .where(DB.filter().whereEqualTo("id", id))
                             .execute();
                 } else {
-                    String now = Utils.getNow();
+                    String now = DateUtil.getNow();
                     DB.insert("web_ad_batch_change_campaigns")
                             .put("enabled", enabled)
                             .put("bugdet", 0)

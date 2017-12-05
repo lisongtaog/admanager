@@ -1,6 +1,7 @@
 package com.bestgo.admanager.servlet;
 
 import com.bestgo.admanager.Config;
+import com.bestgo.admanager.DateUtil;
 import com.bestgo.admanager.OperationResult;
 import com.bestgo.admanager.Utils;
 import com.bestgo.common.database.services.DB;
@@ -460,7 +461,7 @@ public class Campaign extends HttpServlet {
                 JsonParser parser = new JsonParser();
                 Gson gson = new Gson();
                 JsonArray array = parser.parse(data).getAsJsonArray();
-                String now = Utils.getNow();
+                String now = DateUtil.getNow();
 
                 for (int i = 0; i < array.size(); i++) {
                     BatchChangeItem item = gson.fromJson(array.get(i), BatchChangeItem.class);
