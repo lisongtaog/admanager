@@ -3,6 +3,7 @@
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="com.bestgo.admanager.servlet.Logs" %>
+<%@ page import="com.bestgo.admanager.DailyCpaEcpmReport" %>
 
 
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
@@ -11,7 +12,7 @@
 
 <html>
   <head>
-    <title>广告系列状态</title>
+    <title>每日CPA/ECPM报告</title>
   </head>
   <body>
 
@@ -20,15 +21,17 @@
     if (object == null) {
       response.sendRedirect("login.jsp");
     }
+
+    String date = request.getParameter("date");
+    if (date != null) {
+      DailyCpaEcpmReport.report(date);
+    }
   %>
 
   <div class="container-fluid">
     <div class="panel panel-default" style="margin-top: 10px">
       <div class="panel-heading">
         <span id="todayResult"></span>
-      </div>
-      <div class="panel-heading">
-        <ul id="reduceResult"></ul>
       </div>
     </div>
 
@@ -48,15 +51,9 @@
 
   <script>
     function fetchData() {
-      $.post('campaign/query_status', {
+      $.post('campaign/query_batch_change_status', {
       }, function(data) {
         if (data && data.ret == 1) {
-          $('#todayResult').text("今日创建系列数量: " + data.today_create_count + ", 昨天创建数量: " + data.yesterdayData.count
-                  + ", 安装数: " + data.yesterdayData.total_installed + ", 花费: " + data.yesterdayData.total_spend);
-          for (var i = 0; i < data.reduceArr.length; i++) {
-            var one = data.reduceArr[i];
-            $('#reduceResult').append($("<li>" + one.appName + " : " + one.cost  + "</li>"));
-          }
 
           $('.table tbody tr').remove();
           for (var i = 0; i < data.data.length; i++) {

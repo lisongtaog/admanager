@@ -46,6 +46,22 @@ public class Utils {
         }
     }
 
+    public static long convertLong(Object value, long defaultValue) {
+        try {
+            if (value instanceof BigDecimal) {
+                return ((BigDecimal)value).longValue();
+            } else if (value instanceof Double) {
+                return (long)value;
+            } else if (value instanceof Long) {
+                return (Long)value;
+            } else if (value instanceof Integer) {
+                return (Integer)value;
+            }
+        } catch (Exception ex) {
+        }
+        return defaultValue;
+    }
+
     public static double convertDouble(Object value, double defaultValue) {
         try {
             if (value instanceof BigDecimal) {
