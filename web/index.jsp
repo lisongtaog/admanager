@@ -95,9 +95,7 @@
 
 
             <div>
-                <input type="checkbox" name="dataCheck" id="hasDataCheck"/><label for="facebookCheck">只显示有数据的系列</label>
-                <input type="checkbox" name="dataCheck" id="notHasDataCheck"/><label for="adwordsCheck">只显示无数据的系列</label>
-
+                <button id="btnQueryNoData" class="btn btn-default">显示无数据的系列</button>
                 <input type="checkbox" name="adnetwork" id="facebookCheck"/><label for="facebookCheck">只显示Facebook</label>
                 <input type="checkbox" name="adnetwork" id="adwordsCheck"/><label for="adwordsCheck">只显示AdWords</label>
                 <input type="checkbox" id="countryCheck"/><label for="countryCheck">细分到国家</label>
