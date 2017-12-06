@@ -83,6 +83,8 @@ function init() {
     });
 
     $('#btnSearch').click(function () {
+        var hasDataCheck = $("#hasDataCheck").is(':checked');
+        var notHasDataCheck = $("#notHasDataCheck").is(':checked');
         var query = $("#inputSearch").val();
         var startTime = $('#inputStartTime').val();
         var endTime = $('#inputEndTime').val();
@@ -100,6 +102,8 @@ function init() {
             }
         }
         $.post('query', {
+            hasDataCheck: hasDataCheck,
+            notHasDataCheck: notHasDataCheck,
             tag: query,
             startTime: startTime,
             endTime: endTime,

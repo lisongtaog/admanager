@@ -165,4 +165,28 @@ public class Utils {
         }
         return null;
     }
+
+
+    /**
+     * 获取两个List不同的部分
+     * @param mainList
+     * @param compareList 被比较的List参照物
+     * @param commonFiled 对象之间比较的属性
+     * @return
+     */
+    public static List<JSObject> getDiffJSObjectList(List<JSObject> mainList, List<JSObject> compareList,String commonFiled) {
+        List<JSObject> diff = new ArrayList<>();
+        Map<String,JSObject> map = new HashMap<>(mainList.size());
+        for (JSObject x : compareList) {
+            map.put(x.get(commonFiled), x);
+        }
+        for (JSObject i : mainList) {
+            String cf = i.get(commonFiled);
+            if(map.get(cf) == null) {
+                diff.add(i);
+            }
+
+        }
+        return diff;
+    }
 }
