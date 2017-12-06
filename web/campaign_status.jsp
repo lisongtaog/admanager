@@ -27,6 +27,9 @@
       <div class="panel-heading">
         <span id="todayResult"></span>
       </div>
+      <div class="panel-heading">
+        <ul id="reduceResult"></ul>
+      </div>
     </div>
 
     <div class="panel panel-default">
@@ -50,6 +53,10 @@
         if (data && data.ret == 1) {
           $('#todayResult').text("今日创建系列数量: " + data.today_create_count + ", 昨天创建数量: " + data.yesterdayData.count
                   + ", 安装数: " + data.yesterdayData.total_installed + ", 花费: " + data.yesterdayData.total_spend);
+          for (var i = 0; i < data.reduceArr.length; i++) {
+            var one = data.reduceArr[i];
+            $('#reduceResult').append($("<li>" + one.appName + " : " + one.cost  + "</li>"));
+          }
 
           $('.table tbody tr').remove();
           for (var i = 0; i < data.data.length; i++) {

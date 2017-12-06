@@ -244,6 +244,112 @@ public class Campaign extends HttpServlet {
                     count += (long)record.get("cnt");
                 }
 
+                Map<String, ReduceCostItem> reduceCostItemHashMap = new HashMap<>();
+
+                sql = "select campaign_id, network, enabled, excluded_country from web_ad_batch_change_campaigns where create_time between '" + startDate + "' and '" + endDate + "' and success=1";
+                List<JSObject> changeList = DB.findListBySql(sql);
+                for (int i = 0; i < changeList.size(); i++) {
+                    JSObject one = changeList.get(i);
+                    int enabled = one.get("enabled");
+                    String excludeCountry = one.get("excluded_country");
+                    String network = one.get("network");
+                    String campaignId = one.get("campaign_id");
+                    if (enabled != 0 && excludeCountry.isEmpty()) {
+                        continue;
+                    }
+                    ReduceCostItem item = reduceCostItemHashMap.get(campaignId);
+                    if (item == null) {
+                        item = new ReduceCostItem();
+                        item.campaignId = campaignId;
+                        if (network.equals("admob")) {
+                            sql = "select tag_name from web_ad_campaign_tag_admob_rel, web_tag where campaign_id=? and tag_id=web_tag.id";
+                            JSObject tagNameRecord = DB.findOneBySql(sql, campaignId);
+                            item.appName = tagNameRecord.get("tag_name");
+                        } else {
+                            sql = "select tag_name from web_ad_campaign_tag_rel, web_tag where campaign_id=? and tag_id=web_tag.id";
+                            JSObject tagNameRecord = DB.findOneBySql(sql, campaignId);
+                            item.appName = tagNameRecord.get("tag_name");
+                        }
+                        reduceCostItemHashMap.put(campaignId, item);
+                    }
+                    if (enabled == 0) {
+                        item.enabled = 0;
+                    } else if (item.enabled != 0) {
+                        item.enabled = enabled;
+                    }
+                    if (!excludeCountry.isEmpty()) {
+                        item.countryExcluded.add(excludeCountry);
+                    }
+                }
+
+                sql = "select campaign_id, country_code, total_spend from web_ad_campaigns_country_history where date between ? and ?";
+                List<JSObject> facebookHistory = DB.findListBySql(sql, yesterdayStart, yesterdayEnd);
+                for (int i = 0; i < facebookHistory.size(); i++) {
+                    JSObject one = facebookHistory.get(i);
+                    String campaignId = one.get("campaign_id");
+                    String countryCode = one.get("country_code");
+                    double cost = Utils.convertDouble(one.get("total_spend"), 0);
+                    ReduceCostItem item = reduceCostItemHashMap.get(campaignId);
+                    if (item == null) {
+                        continue;
+                    } else {
+                        if (item.enabled == 0) {
+                            if (!item.countryRemoved.contains(countryCode)) {
+                                item.reduceCost += cost;
+                                item.countryRemoved.add(countryCode);
+                            }
+                        } else if (item.countryExcluded.contains(countryCode)) {
+                            if (!item.countryRemoved.contains(countryCode)) {
+                                item.reduceCost += cost;
+                                item.countryRemoved.add(countryCode);
+                            }
+                        }
+                    }
+                }
+
+                sql = "select campaign_id, country_code, total_spend from web_ad_campaigns_country_history_admob where date between ? and ?";
+                List<JSObject> adwordsHistory = DB.findListBySql(sql, yesterdayStart, yesterdayEnd);
+                for (int i = 0; i < adwordsHistory.size(); i++) {
+                    JSObject one = adwordsHistory.get(i);
+                    String campaignId = one.get("campaign_id");
+                    String countryCode = one.get("country_code");
+                    double cost = Utils.convertDouble(one.get("total_spend"), 0);
+                    ReduceCostItem item = reduceCostItemHashMap.get(campaignId);
+                    if (item == null) {
+                        continue;
+                    } else {
+                        if (item.enabled == 0) {
+                            if (!item.countryRemoved.contains(countryCode)) {
+                                item.reduceCost += cost;
+                                item.countryRemoved.add(countryCode);
+                            }
+                        } else if (item.countryExcluded.contains(countryCode)) {
+                            if (!item.countryRemoved.contains(countryCode)) {
+                                item.reduceCost += cost;
+                                item.countryRemoved.add(countryCode);
+                            }
+                        }
+                    }
+                }
+
+                Map<String, Double> reduceCost = new HashMap<>();
+                for (ReduceCostItem item : reduceCostItemHashMap.values()) {
+                    Double cost = reduceCost.get(item.appName);
+                    if (cost == null) {
+                        cost = 0.0;
+                    }
+                    cost += item.reduceCost;
+                    reduceCost.put(item.appName, cost);
+                }
+
+                JsonArray reduceArr = new JsonArray();
+                for (String key : reduceCost.keySet()) {
+                    JsonObject one = new JsonObject();
+                    one.addProperty("appName", key);
+                    one.addProperty("cost", Utils.trimDouble(reduceCost.get(key)));
+                    reduceArr.add(one);
+                }
+
                 JsonObject yesterdayData = new JsonObject();
                 long yesterdayCount = 0;
                 double totalSpend = 0;
@@ -323,6 +429,7 @@ public class Campaign extends HttpServlet {
                 json.addProperty("today_create_count", count);
                 json.add("data", array);
                 json.add("yesterdayData", yesterdayData);
+                json.add("reduceArr", reduceArr);
                 json.addProperty("ret", 1);
             } catch (Exception ex) {
                 ex.printStackTrace();
@@ -606,6 +713,16 @@ public class Campaign extends HttpServlet {
         public int success;
     }
 
+    class ReduceCostItem {
+        public String campaignId;
+        public String appName;
+        public int enabled = -1;
+        public double reduceCost;
+
+        public Set<String> countryRemoved = new HashSet<>();
+        public Set<String> countryExcluded = new HashSet<>();
+    }
+
     private OperationResult updateCampaign(String id, String campaignName, String status, String budget, String bidding, String tags) {
         OperationResult ret = new OperationResult();
 
@@ -797,6 +914,8 @@ public class Campaign extends HttpServlet {
         }
         return retList;
     }
+
+
 
 
 }
