@@ -492,7 +492,6 @@ public class Query extends HttpServlet {
             array.add(d);
         }
         jsonObject.add("array", array);
-        java.lang.System.out.println("facebook:                                " + array.size());
         jsonObject.addProperty("total_spend", total_spend);
         jsonObject.addProperty("total_installed", total_installed);
         jsonObject.addProperty("total_impressions", total_impressions);
@@ -662,7 +661,6 @@ public class Query extends HttpServlet {
                         "campaign_id in (" + campaignIds + ")" +
                         ((likeCampaignName != null) ? " and campaign_name like '%" + likeCampaignName +"%' " : "");
                 listAll = DB.findListBySql(sql);
-                java.lang.System.out.println("listAll:                  "+listAll.size());
                 sql = "select campaign_id, impressions from ( " +
                         "select ch.campaign_id, " +
                         " sum(ch.total_impressions) as impressions " +
@@ -674,7 +672,6 @@ public class Query extends HttpServlet {
                         ((countryCode != null && !countryCode.isEmpty()) ? " and country_code='" + countryCode + "'" : "") +
                         "group by ch.campaign_id having impressions > 0 ) a ";
                 listHasData = DB.findListBySql(sql);
-                java.lang.System.out.println("listHasData:                  "+listHasData.size());
                 list = Utils.getDiffJSObjectList(listAll,listHasData,"campaign_id");
             }else{
                 list.clear();
@@ -799,7 +796,6 @@ public class Query extends HttpServlet {
             array.add(d);
         }
         jsonObject.add("array", array);
-        java.lang.System.out.println("adwords:                                " + array.size());
         jsonObject.addProperty("total_spend", total_spend);
         jsonObject.addProperty("total_installed", total_installed);
         jsonObject.addProperty("total_impressions", total_impressions);
