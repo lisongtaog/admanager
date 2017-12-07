@@ -359,6 +359,11 @@ public class Campaign extends HttpServlet {
                 if (record.hasObjectData()) {
                     yesterdayCount += (long)record.get("cnt");
                 }
+                sql = "select count(id) as cnt from ad_campaigns_admob where create_time between '" + yesterdayStart + "' and '" + yesterdayEnd + "' and success=1";
+                record = DB.findOneBySql(sql);
+                if (record.hasObjectData()) {
+                    yesterdayCount += (long)record.get("cnt");
+                }
 
                 sql = "select campaign_id from ad_campaigns where create_time between '" + yesterdayStart + "' and '" + yesterdayEnd + "' and success=1";
                 List<JSObject> campaignIds = DB.findListBySql(sql);
