@@ -217,9 +217,9 @@ public class QueryOne extends HttpServlet {
                         "select ch.campaign_id, account_id, campaign_name,c.status, create_time, c.budget, c.bidding, sum(ch.total_spend) as spend, " +
                         "sum(ch.total_installed) as installed, sum(ch.total_impressions) as impressions " +
                         ",sum(ch.total_click) as click from " + webAdCampaignTable + " c, " + webAdCampaignHistoryTable + " ch " +
-                        "where c.campaign_id=ch.campaign_id\n" +
+                        "where c.campaign_id=ch.campaign_id " +
                         "and date between '" + startTime + "' and '" + endTime + "' " +
-                        "and c.status = 'active' and c.campaign_id in (" + campaignIds + ")" +
+                        "and c.campaign_id in (" + campaignIds + ")" +
                         "group by ch.campaign_id ) a where impressions = 0 " + orderStr;
                 list = DB.findListBySql(sql);
             }
