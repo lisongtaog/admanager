@@ -123,12 +123,15 @@ function init() {
         var countryCheck = $('#countryCheck').is(':checked');
         var facebookCheck = $('#facebookCheck').is(':checked');
         var countryName = $('#inputCountry').val();
-        for (var i = 0; i < regionList.length; i++) {
-            if (countryName == regionList[i].name) {
-                countryCode = regionList[i].country_code;
-                break;
+        if(countryName != ""){
+            for (var i = 0; i < regionList.length; i++) {
+                if (countryName == regionList[i].name) {
+                    countryCode = regionList[i].country_code;
+                    break;
+                }
             }
         }
+
         $.post('query', {
                 tag: query,
                 startTime: startTime,
@@ -258,7 +261,12 @@ function setData(data) {
             var totalSpend = 0;
             for (var jj = 0; jj < appQueryData.length; jj++) {
                 if (appQueryData[jj]['campaign_id'] == campaignId) {
-                    totalSpend = appQueryData[jj]['spend'];
+                    var countryName = $('#inputCountry').val();
+                    if(countryName != ""){
+                        totalSpend = appQueryData[jj]['campaign_spends'];
+                    }else{
+                        totalSpend = appQueryData[jj]['spend'];
+                    }
                     break;
                 }
             }
