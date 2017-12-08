@@ -55,7 +55,7 @@ public class QueryOne extends HttpServlet {
                     JsonObject jsonObject = null;
                     if (adwordsCheck != null && adwordsCheck.equals("false") && facebookCheck != null && facebookCheck.equals("false")) {
                         JsonObject admob = fetchOneAppData(tagId, startTime, endTime,
-                         sorter,  true);
+                                sorter,  true);
                         JsonObject facebook = fetchOneAppData(tagId, startTime, endTime,
                                 sorter,  false);
                         double total_spend = admob.get("total_spend").getAsDouble() + facebook.get("total_spend").getAsDouble();
@@ -217,10 +217,10 @@ public class QueryOne extends HttpServlet {
                         "select ch.campaign_id, account_id, campaign_name,c.status, create_time, c.budget, c.bidding, sum(ch.total_spend) as spend, " +
                         "sum(ch.total_installed) as installed, sum(ch.total_impressions) as impressions " +
                         ",sum(ch.total_click) as click from " + webAdCampaignTable + " c, " + webAdCampaignHistoryTable + " ch " +
-                        "where c.campaign_id=ch.campaign_id " +
+                        "where c.campaign_id=ch.campaign_id and status != 'paused' " +
                         "and date between '" + startTime + "' and '" + endTime + "' " +
                         "and c.campaign_id in (" + campaignIds + ")" +
-                        "group by ch.campaign_id ) a where impressions = 0 " + orderStr;
+                        "group by ch.campaign_id having impressions = 0 ) a ";
                 list = DB.findListBySql(sql);
             }
         } else {

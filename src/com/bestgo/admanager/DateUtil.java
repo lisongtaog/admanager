@@ -49,23 +49,19 @@ public class DateUtil {
 
     /**
      * 字符串转Date
-     * @param str
+     * @param dateStr
      * @param formatStr
      * @return
      */
-    public static Date getStrToDate(String str,String formatStr) {
-        SimpleDateFormat format = new SimpleDateFormat(formatStr);
-
-        Date date = null;
-
+    public static Date convertStr2Date(String dateStr,String formatStr){
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(formatStr);
+        Date dd = null;
         try {
-
-        date = format.parse(str);
-
-        }  catch (ParseException e) {
+            dd = simpleDateFormat.parse(dateStr);
+        } catch (ParseException e) {
             e.printStackTrace();
         }
-        return date;
+        return dd;
     }
 
     /**

@@ -117,7 +117,7 @@
 
         <div class="form-group">
             <label for="selectRegion" class="col-sm-2 control-label">国家地区</label>
-            <div class="col-sm-9">
+            <div class="col-sm-7">
                 <select class="form-control select2" id="selectRegion" multiple="multiple">
 
                 </select>
@@ -125,10 +125,13 @@
             <div class="col-sm-1">
                 <input type="button" class="btn-more btn btn-default" id="btnSelectRegionMore" value="批量输入"/>
             </div>
+            <div class="col-sm-2">
+                <label title="选中后每个选项创建一个或多个广告系列"><input type="checkbox" class="form-check-input" id="selectRegionExplode">分离到系列</label>
+            </div>
         </div>
         <div class="form-group">
             <label for="selectRegionUnselected" class="col-sm-2 control-label">排除国家地区</label>
-            <div class="col-sm-9">
+            <div class="col-sm-8">
                 <select class="form-control select2" id="selectRegionUnselected" multiple="multiple">
 
                 </select>
@@ -146,15 +149,22 @@
         </div>
         <div class="form-group">
             <label for="inputAge" class="col-sm-2 control-label">年龄</label>
-            <div class="col-sm-10">
-                <input class="form-control" id="inputAge" />
+            <div class="col-sm-8">
+                <input class="form-control" id="inputAge" type="text"/>
+            </div>
+            <div class="col-sm-2">
+                <label title="选中后每个选项创建一个或多个广告系列"><input type="checkbox" class="form-check-input" id="inputAgeExplode">分离到系列</label>
             </div>
         </div>
         <div class="form-group">
             <label for="selectGendar" class="col-sm-2 control-label">性别</label>
-            <div class="col-sm-10">
-                <select class="form-control" id="selectGendar">
+            <div class="col-sm-8">
+                <select class="form-control select2" id="selectGendar" multiple="multiple">
                 </select>
+            </div>
+
+            <div class="col-sm-2">
+                <label title="选中后每个选项创建一个或多个广告系列"><input type="checkbox" class="form-check-input" id="selectGendarExplode">分离到系列</label>
             </div>
         </div>
         <div class="form-group">
@@ -189,8 +199,12 @@
         </div>
         <div class="form-group">
             <label for="inputBidding" class="col-sm-2 control-label">出价</label>
-            <div class="col-sm-10">
-                <input class="form-control" id="inputBidding" />
+            <div class="col-sm-8">
+                <input class="form-control" id="inputBidding" type="text"/>
+            </div>
+
+            <div class="col-sm-2">
+                <label title="选中后每个选项创建一个或多个广告系列"><input type="checkbox" class="form-check-input" id="inputBiddingExplode">分离到系列</label>
             </div>
         </div>
         <div class="form-group">
@@ -256,14 +270,17 @@
             </div>
         </div>
         <div class="form-group">
-            <label for="selectRegion" class="col-sm-2 control-label">国家地区</label>
-            <div class="col-sm-9">
+            <label for="selectRegionAdmob" class="col-sm-2 control-label">国家地区</label>
+            <div class="col-sm-7">
                 <select class="form-control select2" id="selectRegionAdmob" multiple="multiple">
 
                 </select>
             </div>
             <div class="col-sm-1">
                 <input type="button" class="btn-more btn btn-default" id="btnSelectRegionAdmobMore" value="批量输入"/>
+            </div>
+            <div class="col-sm-2">
+                <label title="选中后每个选项创建一个或多个广告系列"><input type="checkbox" class="form-check-input" id="selectRegionAdmobExplode">分离到系列</label>
             </div>
         </div>
         <div class="form-group">
@@ -294,9 +311,18 @@
             </div>
         </div>
         <div class="form-group">
-            <label for="inputBidding" class="col-sm-2 control-label">出价</label>
-            <div class="col-sm-10">
+            <label for="inputBiddingAdmob" class="col-sm-2 control-label">出价</label>
+            <div class="col-sm-8">
                 <input class="form-control" id="inputBiddingAdmob" />
+            </div>
+            <div class="col-sm-2">
+                <label title="选中后每个选项创建一个或多个广告系列"><input type="checkbox" class="form-check-input" id="inputBiddingAdmobExplode">分离到系列</label>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="inputMaxCpa" class="col-sm-2 control-label">关闭价格</label>
+            <div class="col-sm-10">
+                <input class="form-control" id="inputMaxCpaAdmob" />
             </div>
         </div>
         <div class="form-group">
@@ -340,6 +366,7 @@
 
 </div>
 
+
 <jsp:include page="loading_dialog.jsp"></jsp:include>
 
 
@@ -357,7 +384,169 @@
     var appList = [];
     var userOsList = ["2.3", "3.0", "3.1", "3.2", "4.0", "4.1", "4.2", "4.3", "4.4", "4.5", "5.0", "5.1", "6.0", "6.1", "7.0", "7.1", "8.0"];
     var admobRegionCodes = {"All":"","Sint Maarten":"SX","Cuba":"CU","Curacao":"CW","Iran":"IR","Afghanistan":"AF","Albania":"AL","Antarctica":"AQ","Algeria":"DZ","American Samoa":"AS","Andorra":"AD","Angola":"AO","Antigua and Barbuda":"AG","Azerbaijan":"AZ","Argentina":"AR","Australia":"AU","Austria":"AT","The Bahamas":"BS","Bahrain":"BH","Bangladesh":"BD","Armenia":"AM","Barbados":"BB","Belgium":"BE","Bermuda":"BM","Bhutan":"BT","Bolivia":"BO","Bosnia and Herzegovina":"BA","Botswana":"BW","Bouvet Island":"BV","Brazil":"BR","Belize":"BZ","British Indian Ocean Territory":"IO","Solomon Islands":"SB","British Virgin Islands":"VG","Brunei":"BN","Bulgaria":"BG","Myanmar (Burma)":"MM","Burundi":"BI","Belarus":"BY","Cambodia":"KH","Cameroon":"CM","Canada":"CA","Cape Verde":"CV","Cayman Islands":"KY","Central African Republic":"CF","Sri Lanka":"LK","Chad":"TD","Chile":"CL","China":"CN","Taiwan":"TW","Christmas Island":"CX","Cocos (Keeling) Islands":"CC","Colombia":"CO","Comoros":"KM","Mayotte":"YT","Republic of the Congo":"CG","Democratic Republic of the Congo":"CD","Cook Islands":"CK","Costa Rica":"CR","Croatia":"HR","Cyprus":"CY","Czechia":"CZ","Benin":"BJ","Denmark":"DK","Dominica":"DM","Dominican Republic":"DO","Ecuador":"EC","El Salvador":"SV","Equatorial Guinea":"GQ","Ethiopia":"ET","Eritrea":"ER","Estonia":"EE","Faroe Islands":"FO","Falkland Islands (Islas Malvinas)":"FK","South Georgia and the South Sandwich Islands":"GS","Fiji":"FJ","Finland":"FI","France":"FR","French Guiana":"GF","French Polynesia":"PF","French Southern and Antarctic Lands":"TF","Djibouti":"DJ","Gabon":"GA","Georgia":"GE","The Gambia":"GM","Palestine":"PS","Germany":"DE","Ghana":"GH","Gibraltar":"GI","Kiribati":"KI","Greece":"GR","Greenland":"GL","Grenada":"GD","Guadeloupe":"GP","Guam":"GU","Guatemala":"GT","Guinea":"GN","Guyana":"GY","Haiti":"HT","Heard Island and McDonald Islands":"HM","Vatican City":"VA","Honduras":"HN","Hong Kong":"HK","Hungary":"HU","Iceland":"IS","India":"IN","Indonesia":"ID","Iraq":"IQ","Ireland":"IE","Israel":"IL","Italy":"IT","Cote d'Ivoire":"CI","Jamaica":"JM","Japan":"JP","Kazakhstan":"KZ","Jordan":"JO","Kenya":"KE","South Korea":"KR","Kuwait":"KW","Kyrgyzstan":"KG","Laos":"LA","Lebanon":"LB","Lesotho":"LS","Latvia":"LV","Liberia":"LR","Libya":"LY","Liechtenstein":"LI","Lithuania":"LT","Luxembourg":"LU","Macau":"MO","Madagascar":"MG","Malawi":"MW","Malaysia":"MY","Maldives":"MV","Mali":"ML","Malta":"MT","Martinique":"MQ","Mauritania":"MR","Mauritius":"MU","Mexico":"MX","Monaco":"MC","Mongolia":"MN","Moldova":"MD","Montenegro":"ME","Montserrat":"MS","Morocco":"MA","Mozambique":"MZ","Oman":"OM","Namibia":"NA","Nauru":"NR","Nepal":"NP","Netherlands":"NL","Netherlands Antilles":"BQ","Aruba":"AW","New Caledonia":"NC","Vanuatu":"VU","New Zealand":"NZ","Nicaragua":"NI","Niger":"NE","Nigeria":"NG","Niue":"NU","Norfolk Island":"NF","Norway":"NO","Northern Mariana Islands":"MP","United States Minor Outlying Islands":"UM","Federated States of Micronesia":"FM","Marshall Islands":"MH","Palau":"PW","Pakistan":"PK","Panama":"PA","Papua New Guinea":"PG","Paraguay":"PY","Peru":"PE","Philippines":"PH","Pitcairn Islands":"PN","Poland":"PL","Portugal":"PT","Guinea-Bissau":"GW","Timor-Leste":"TL","Puerto Rico":"PR","Qatar":"QA","Reunion":"RE","Romania":"RO","Russia":"RU","Rwanda":"RW","Saint Helena, Ascension and Tristan da Cunha":"SH","Saint Kitts and Nevis":"KN","Anguilla":"AI","Saint Lucia":"LC","Saint Pierre and Miquelon":"PM","Saint Vincent and the Grenadines":"VC","San Marino":"SM","Sao Tome and Principe":"ST","Saudi Arabia":"SA","Senegal":"SN","Serbia":"RS","Seychelles":"SC","Sierra Leone":"SL","Singapore":"SG","Slovakia":"SK","Vietnam":"VN","Slovenia":"SI","Somalia":"SO","South Africa":"ZA","Zimbabwe":"ZW","Spain":"ES","Western Sahara":"EH","Suriname":"SR","Svalbard and Jan Mayen":"SJ","Swaziland":"SZ","Sweden":"SE","Switzerland":"CH","Tajikistan":"TJ","Thailand":"TH","Togo":"TG","Tokelau":"TK","Tonga":"TO","Trinidad and Tobago":"TT","United Arab Emirates":"AE","Tunisia":"TN","Turkey":"TR","Turkmenistan":"TM","Turks and Caicos Islands":"TC","Tuvalu":"TV","Uganda":"UG","Ukraine":"UA","Macedonia (FYROM)":"MK","Egypt":"EG","United Kingdom":"GB","Guernsey":"GG","Jersey":"JE","Tanzania":"TZ","United States":"US","U.S. Virgin Islands":"VI","Burkina Faso":"BF","Uruguay":"UY","Uzbekistan":"UZ","Venezuela":"VE","Wallis and Futuna":"WF","Samoa":"WS","Yemen":"YE","Zambia":"ZM","Kosovo":"XK"};
+</script>
+<script>
+    /**
+     * 把一个参数数组，根据 explodeParam 交叉合并得到新的参数数组
+     * @param params [{x:1,y:2},{x:1,y:3}]
+     * @param explodeParam {key:z, values:[4,5,6]}
+     * @return Array [{x:1,y:2,z:4}, {x:1,y:2,z:5}, {x:1,y:2,z:6},{x:1,y:3,z:4},{x:1,y:3,z:5},{x:1,y:3,z:6}]
+     **/
+    function getExplodeParams(params, explodeParam){
+        if( params.length === 0 && explodeParam.values.length > 0 ){
+            params.push({})
+        }
+        var createdParams = [];
+        params.forEach(function(p){
+            explodeParam.values.forEach(function(p2){
+                var np = $.extend({}, p); //clone
+                np[explodeParam.key] = p2;
+                createdParams.push(np);
+            })
+        });
+        return createdParams;
+    }
+    /**
+     * @param {{region: string, gendar: string, age: string, bidding: string}}
+     *
+     **/
+    function generateFacebookCampaignName(params){
+        if( !params ){
+            params = {};
+        }
+        var dims = [];
+        var appName = $('#selectApp').val();
+        dims.push(appName);
 
+        var region = $('#selectRegion').val();
+        var countryAlisa = $('#selectRegion')[0].countryAlisa;
+        if( countryAlisa ){
+            dims.push(countryAlisa);
+        }else{
+            if( params.region ){
+                dims.push(params.region);
+            }else{
+                dims.push(region.join(","));
+            }
+        }
+        var gendar = $('#selectGendar').val();
+        if( typeof params.gendar !== 'undefined'){
+            dims.push(params.gendar);
+        }else{
+            dims.push($('#selectGendar').val());
+        }
+        if( params.age ){
+            dims.push(params.age);
+        }else{
+            dims.push($('#inputAge').val());
+        }
+
+        var userDevice = $('#inputUserDevices').val();
+        dims.push(userDevice);
+
+        var userOs = $('#inputUserOs').val();
+        dims.push(userOs);
+        var language = $('#selectLanguage').val();
+        dims.push(language);
+
+        var accountName = $('#selectAccount option:selected').text();
+        dims.push(accountName);
+
+        var imagePath = $('#inputImagePath').val();
+        dims.push(imagePath);
+
+        if( params.bidding ){
+            dims.push(params.bidding);
+        }
+
+        return dims.join("_");
+    }
+
+    function generateAdmobCampaignName(params){
+        if( !params ){
+            params = {};
+        }
+        var dims = [];
+        var now = new Date();
+        dims.push($('#selectAppAdmob').val());
+
+        var region = $('#selectRegionAdmob option:selected').text();
+        var countryAlisa = $('#selectRegionAdmob')[0].countryAlisa;
+        if( params.region ){
+            dims.push(params.region);
+        }else if( countryAlisa ){
+            dims.push(params.countryAlisa);
+        }else{
+            dims.push(region);
+        }
+
+        dims.push( $('#selectLanguageAdmob option:selected').text() );
+
+        if( params.bidding ){
+            dims.push( params.bidding );
+        }else{
+            dims.push( $('#inputBiddingAdmob').val() );
+        }
+
+        dims.push(now.getFullYear() +"" + (now.getMonth() + 1) + "" + now.getDate());
+
+        return dims.join("_");
+    }
+
+    /**
+     * @param Array params 一个数组，存放所有的等待请求的参数
+     * @param Function send 处理每一个参数的请求
+     * @param onFinish 队列全部处理完成后，调用一下
+     **/
+    function batchRequest(params, send, onFinish){
+        var idx = -1;
+        var errLog = [];//[{param:object, errMsg:string}]
+        var stop = false;
+        function getProgress(){
+            return idx + " / " + params.length;
+        }
+        function getFullLog(){
+            var logs = ["统计 " + getProgress()];
+            errLog.forEach(function(log){
+                logs.push(log.errMsg + " : " + JSON.stringify(log.param));
+            });
+            return logs.join("\n");
+        }
+        function next(){
+            if( stop ){
+                admanager.showCommonDlg("终止", getProgress(), function(){
+                    onFinish(errLog);
+                });
+                return;
+            }
+            setTimeout(function(){
+                idx ++;
+                if( idx === params.length ){
+                    admanager.showCommonDlg("完成", getFullLog(), function(){
+                        onFinish(errLog);
+                    });
+                    return;
+                }
+
+                admanager.showCommonDlg("进度", getProgress() + " 。有 " + errLog.length + " 个错误，看console", function(){
+                    stop = true;
+                });
+                request();
+            },10);
+        }
+        function request(){
+            send( params[idx], function(){
+                //请求一个成功
+                next();
+            }, function(errMsg){
+                //请求一个失败，要不要重试？
+                errLog.push( {param: params[idx], errMsg: errMsg} );
+                console.log(errLog[ errLog.length - 1]);
+                next();
+            })
+        }
+        next();
+    }
     function init() {
         $('.select2').select2();
 
@@ -386,17 +575,17 @@
                 var countryList = data.split('\n');
                 var countryNames = [];
                 countryList.forEach(function(one) {
-                   for (var i = 0; i < regionList.length; i++) {
-                       one = one.trim();
-                       if (regionList[i].name.toLocaleLowerCase() == one.toLocaleLowerCase()) {
-                           if (targetId == '#selectRegionUnselectedAdmob' || targetId == '#selectRegionAdmob') {
-                               countryNames.push(regionList[i].country_code);
-                           } else {
-                               countryNames.push(regionList[i].name);
-                           }
-                           break;
-                       }
-                   }
+                    for (var i = 0; i < regionList.length; i++) {
+                        one = one.trim();
+                        if (regionList[i].name.toLocaleLowerCase() == one.toLocaleLowerCase()) {
+                            if (targetId == '#selectRegionUnselectedAdmob' || targetId == '#selectRegionAdmob') {
+                                countryNames.push(regionList[i].country_code);
+                            } else {
+                                countryNames.push(regionList[i].name);
+                            }
+                            break;
+                        }
+                    }
                 });
 
                 if (targetId != '') {
@@ -438,7 +627,7 @@
 
         $.post('system/fb_app_id_rel/query', {
             word: '',
-            }, function(data) {
+        }, function(data) {
             if (data && data.ret == 1) {
                 appList = data.data;
                 appList.forEach(function(one) {
@@ -506,6 +695,7 @@
             var campaignName = $('#inputCampaignNameAdmob').val();
             var bugdet = $('#inputBudgetAdmob').val();
             var bidding = $('#inputBiddingAdmob').val();
+            var maxCPA = $('#inputMaxCpaAdmob').val();
             var message1 = $('#inputMessage1').val();
             var message2 = $('#inputMessage2').val();
             var message3 = $('#inputMessage3').val();
@@ -520,60 +710,113 @@
                 }
             }
 
-            $.post("campaign_admob/create", {
+            //处理分离到国家的字段
+            var explodeList = [];//{key:x, values:[]}
+            if( $("#selectRegionAdmobExplode").prop("checked") ){
+                explodeList.push({
+                    key: 'region',
+                    values: region.map(function(x){
+                        return x.trim();
+                    })
+                })
+            }else{
+                explodeList.push({
+                    key: 'region',
+                    values: [region.join(",")]
+                })
+            }
+            if( !$("#inputBiddingAdmobExplode").prop("checked")  && bidding.indexOf(",") !== -1 ){
+                admanager.showCommonDlg("错误", "不分离的情况下不允许出价多选");
+                return false;
+            }
+            explodeList.push({
+                key: 'bidding',
+                values: bidding.split(",").map(function(x){
+                    return x.trim();
+                })
+            })
+
+
+            var explodeParams = explodeList.length>0?explodeList.reduce(function(params, explodeParam){
+                return getExplodeParams(params, explodeParam);
+            }, []):[];
+
+            var baseParam = {
                 appName: appName,
                 accountId: accountIdAdmob.join(","),
                 accountName: accountNameAdmob.join(","),
                 createCount: createCountAdmob,
                 campaignName: campaignName,
-                region: region.join(','),
+                //region: region.join(','),
                 excludedRegion: excludedRegion.join(','),
                 language: language,
                 bugdet: bugdet,
-                bidding: bidding,
+                //bidding: bidding,
                 gpPackageId: app.google_package_id,
+                maxCPA: maxCPA,
                 message1: message1,
                 message2: message2,
                 message3: message3,
                 message4: message4,
                 imagePath: imagePath
+            }
+
+            var requestPool = [];
+            explodeParams.forEach(function(p){
+                var cloned = $.extend({}, baseParam);
+                $.extend(cloned, p);
+                cloned.campaignName = generateAdmobCampaignName({
+                    bidding: p.bidding,
+                    region: p.region
+                });
+                requestPool.push( cloned );
+            });
+//弹一个进度条出来
+            batchRequest(requestPool, function(param, onSuccess, onFail){
+                //fake
+                console.log("start.. ", param);
+                /*setTimeout(function(){
+                    if( Math.random()< 0.5){
+                        onSuccess();
+                    }else{
+                        onFail("随机错误");
+                    }
+                },100);*/
+
+                $.post("campaign_admob/create", param, function (data) {
+                    if (data && data.ret == 1) {
+                        onSuccess()
+                    } else {
+                        onFail(data.message)
+                    }
+                }, "json");
+
+            }, function(){
+                //队列全部处理完成
+
+            })
+            /*$.post("campaign_admob/create", {
             }, function (data) {
                 if (data && data.ret == 1) {
                     admanager.showCommonDlg("提示", "添加记录成功");
                 } else {
                     admanager.showCommonDlg("提示", data.message);
                 }
-            }, "json");
+            }, "json");*/
             return false;
         });
 
         $('#formFacebook input, #formFacebook select').change(function() {
 //            标签名_地理位置&性别&年龄&设备&操作系统_语言_账号_广告图路径
             if ($(this).attr('id') == 'inputCampaignName') return;
-            var appName = $('#selectApp').val();
-            var accountName = $('#selectAccount option:selected').text();
-            var region = $('#selectRegion').val();
-            var language = $('#selectLanguage').val();
-            var age = $('#inputAge').val();
-            var gendar = $('#selectGendar').val();
-            var userOs = $('#inputUserOs').val();
-            var userDevice = $('#inputUserDevices').val();
-            var imagePath = $('#inputImagePath').val();
-            var countryAlisa = $('#selectRegion')[0].countryAlisa;
-            $('#inputCampaignName').val(appName + "_" + (countryAlisa ? countryAlisa : region.join(",")) + gendar + age + userDevice + userOs + "_" + language + "_" + accountName + "_" + imagePath);
+            $('#inputCampaignName').val(generateFacebookCampaignName());
         });
 
         $('#formAdmob input, #formAdmob select').change(function() {
 //            标签名_地理位置&语言&出价_创建时间
             if ($(this).attr('id') == 'inputCampaignNameAdmob') return;
-            var now = new Date();
-            var appName = $('#selectAppAdmob').val();
-            var region = $('#selectRegionAdmob option:selected').text();
-            var language = $('#selectLanguageAdmob option:selected').text();
-            var bidding = $('#inputBiddingAdmob').val();
-            var countryAlisa = $('#selectRegionAdmob')[0].countryAlisa;
-            if (countryAlisa) region = countryAlisa;
-            $('#inputCampaignNameAdmob').val(appName + "_" + region + language + bidding + "_" + now.getFullYear() +"" + (now.getMonth() + 1) + "" + now.getDate());
+
+            $('#inputCampaignNameAdmob').val(generateAdmobCampaignName());
         });
 
         $('#btnCreate').click(function () {
@@ -595,7 +838,7 @@
             var interest = $('#inputInterest').val();
             var userOs = $('#inputUserOs').val();
             var userDevice = $('#inputUserDevices').val();
-            var campaignName = $('#inputCampaignName').val();
+            //var campaignName = $('#inputCampaignName').val();
             var bugdet = $('#inputBudget').val();
             var bidding = $('#inputBidding').val();
             var maxCPA = $('#inputMaxCpa').val();
@@ -611,7 +854,122 @@
                 }
             }
 
-            $.post("campaign/create", {
+            //处理分离到国家的字段
+            var explodeList = [];//{key:x, values:[]}
+            if( $("#selectRegionExplode").prop("checked") ){
+                explodeList.push({
+                    key: 'region',
+                    values: region.map(function(x){
+                        return x.trim();
+                    })
+                })
+            }else{
+                explodeList.push({
+                    key: 'region',
+                    values: [region.join(",")]
+                })
+            }
+
+            if( !$("#selectGendarExplode").prop("checked") && gendar.length > 1 ){
+                admanager.showCommonDlg("错误", "不分离的情况下不允许性别多选");
+                return false;
+            }
+            explodeList.push({
+                key: 'gendar',
+                values: gendar.map(function(x){
+                    return x.trim();
+                })
+            })
+            if( !$("#inputAgeExplode").prop("checked")  && age.indexOf(",") !== -1 ){
+                admanager.showCommonDlg("错误", "不分离的情况下不允许年龄多选");
+                return false;
+            }
+            explodeList.push({
+                key: 'age',
+                values: age.split(",").map(function(x){
+                    return x.trim();
+                })
+            })
+            if( !$("#inputBiddingExplode").prop("checked")  && bidding.indexOf(",") !== -1 ){
+                admanager.showCommonDlg("错误", "不分离的情况下不允许出价多选");
+                return false;
+            }
+            explodeList.push({
+                key: 'bidding',
+                values: bidding.split(",").map(function(x){
+                    return x.trim();
+                })
+            })
+
+            var explodeParams = explodeList.length>0?explodeList.reduce(function(params, explodeParam){
+                return getExplodeParams(params, explodeParam);
+            }, []):[];
+
+            //用 explodeParams 构造新的请求
+            var baseParam = {
+                appName: appName,
+                appId: app.fb_app_id,
+                accoutName:accountName.join(","),
+                accountId: accountId.join(","),
+                createCount: createCount,
+                pageId: app.page_id,
+                //region: region.join(","),
+                excludedRegion: excludedRegion.join(","),
+                language: language,
+                //age: age,
+                //gendar: gendar,
+                interest: interest,
+                userOs: userOs,
+                userDevice: userDevice,
+                campaignName: "",
+                bugdet: bugdet,
+                //bidding: bidding,
+                maxCPA: maxCPA,
+                title: title,
+                message: message,
+                imagePath: imagePath,
+            };
+
+            var requestPool = [];
+
+            explodeParams.forEach(function(p){
+                var cloned = $.extend({}, baseParam);
+                $.extend(cloned, p);
+                cloned.campaignName = generateFacebookCampaignName({
+                    age: p.age,
+                    gendar: p.gendar,
+                    bidding: p.bidding,
+                    region: p.region
+                });
+                requestPool.push( cloned );
+            });
+
+            //弹一个进度条出来
+            batchRequest(requestPool, function(param, onSuccess, onFail){
+                //fake
+                console.log("start.. ", param);
+                /*setTimeout(function(){
+                    if( Math.random()< 0.5){
+                        onSuccess();
+                    }else{
+                        onFail("随机错误");
+                    }
+                },100);*/
+
+                $.post("campaign/create", param, function (data) {
+                    if (data && data.ret == 1) {
+                        onSuccess()
+                    } else {
+                        onFail(data.message)
+                    }
+                }, "json");
+
+            }, function(){
+                //队列全部处理完成
+
+            })
+
+            /*$.post("campaign/create", {
                 appName: appName,
                 appId: app.fb_app_id,
                 accoutName:accountName.join(","),
@@ -639,7 +997,7 @@
                 } else {
                     admanager.showCommonDlg("提示", data.message);
                 }
-            }, "json");
+            }, "json");*/
 
             return false;
         });
@@ -650,41 +1008,41 @@
 
     init();
 
-   $('#selectApp').change(function () {
-       var appName = $('#selectApp').val();
-       $('#inputImagePath').val(appName+"/");
-       var language = $('#selectLanguage').val();
+    $('#selectApp').change(function () {
+        var appName = $('#selectApp').val();
+        $('#inputImagePath').val(appName+"/");
+        var language = $('#selectLanguage').val();
 
-       if(language != null && language.length > 0){
+        if(language != null && language.length > 0){
 
-           $.post("campaign/selectFacebookMessage", {
-               appName: appName,
-               language: language
-           }, function (data) {
-               if(data && data.ret == 1){
-                   $('#inputTitle').val(data.title);
-                   $('#inputMessage').val(data.message);
-               }else{
-                   $('#inputTitle').val("");
-                   $('#inputMessage').val("");
-               }
-           }, "json");
-       }else{
-           $('#inputTitle').val("");
-           $('#inputMessage').val("");
-       }
-       return false;
+            $.post("campaign/selectFacebookMessage", {
+                appName: appName,
+                language: language
+            }, function (data) {
+                if(data && data.ret == 1){
+                    $('#inputTitle').val(data.title);
+                    $('#inputMessage').val(data.message);
+                }else{
+                    $('#inputTitle').val("");
+                    $('#inputMessage').val("");
+                }
+            }, "json");
+        }else{
+            $('#inputTitle').val("");
+            $('#inputMessage').val("");
+        }
+        return false;
     });
 
 
-   $('#selectAppAdmob').change(function () {
-       var appNameAdmob = $('#selectAppAdmob').val();
-       $('#inputImagePathAdmob').val(appNameAdmob+"/");
-       var selectOptions = $('#selectLanguageAdmob option:selected');
-       var languageAdmob = [];
-       selectOptions.each(function () {
-           languageAdmob.push($(this).text())
-       });
+    $('#selectAppAdmob').change(function () {
+        var appNameAdmob = $('#selectAppAdmob').val();
+        $('#inputImagePathAdmob').val(appNameAdmob+"/");
+        var selectOptions = $('#selectLanguageAdmob option:selected');
+        var languageAdmob = [];
+        selectOptions.each(function () {
+            languageAdmob.push($(this).text())
+        });
         if(languageAdmob != null && languageAdmob.length > 0){
 
             $.post("campaign/selectAdmobMessage", {

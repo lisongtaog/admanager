@@ -3,8 +3,11 @@ package com.bestgo.admanager.servlet;
 import com.bestgo.admanager.Utils;
 import com.bestgo.common.database.services.DB;
 import com.bestgo.common.database.utils.JSObject;
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.reflect.TypeToken;
 import com.sun.xml.internal.bind.v2.runtime.unmarshaller.TagName;
 import org.apache.log4j.Logger;
 
@@ -129,9 +132,21 @@ public class Query extends HttpServlet {
                         admob.addProperty("total_cvr", Utils.trimDouble(total_cvr));
                         JsonArray array = admob.getAsJsonArray("array");
                         JsonArray array1 = facebook.getAsJsonArray("array");
-                        for (int i = 0; i < array1.size(); i++) {
-                            array.add(array1.get(i));
-                        }
+                        array.addAll(array1);
+                       /* List<JsonObject> jsonObjectList = new ArrayList<>();
+                        Gson gson = new Gson();
+                        List<Campaigns> campaignsList = gson.fromJson(array, new TypeToken<List<Campaigns>>() {}.getType());
+
+                        Collections.sort(jsonObjectList, new Comparator<Campaigns>() {
+                            @Override
+                            public int compare(Campaigns a, Campaigns b) {
+                                if(a.click >= b.incoming){
+                                    return 1;
+                                }else{
+                                    return -1;
+                                }
+                            }
+                        });*/
                         jsonObject = admob;
                     } else {
                         jsonObject = fetchOneAppData(id, tag,startTime, endTime, sorter, "true".equals(adwordsCheck), "true".equals(countryCheck), countryCode,likeCampaignName,campaignCreateTime,true);
@@ -210,6 +225,26 @@ public class Query extends HttpServlet {
         public double cpa;
         public double cvr;
         public double roi;
+    }
+    class Campaigns{
+        String account_id;
+        String campaign_name;
+        String status;
+        String create_time;
+        String country_code;
+        String country_name;
+        double budget;
+        double bidding;
+        double spend;
+        double campaign_spends;
+        double installed;
+        double impressions;
+        double click;
+        double ctr;
+        double cpa;
+        double cvr;
+        double roi;
+        String network;
     }
 
     private JsonObject fetchOneAppData(long tagId, String tagName, String startTime, String endTime,
