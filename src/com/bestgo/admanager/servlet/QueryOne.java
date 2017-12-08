@@ -191,23 +191,21 @@ public class QueryOne extends HttpServlet {
             if(admobCheck){
                 List<JSObject> listAll = new ArrayList<>();
                 List<JSObject> listHasData = new ArrayList<>();
-                if( !campaignIds.isEmpty()) {
-                    sql = "select campaign_id, account_id, campaign_name, create_time, status, budget, bidding, total_spend, total_installed, total_click, total_impressions, cpa,ctr, " +
-                            "(case when total_click > 0 then total_installed/total_click else 0 end) as cvr " +
-                            " from " + webAdCampaignTable + " where status != 'paused' and " +
-                            "campaign_id in (" + campaignIds + ")";
-                    listAll = DB.findListBySql(sql);
-                    sql = "select campaign_id, impressions from ( " +
-                            "select ch.campaign_id, " +
-                            " sum(ch.total_impressions) as impressions " +
-                            " from " + webAdCampaignTable + " c, " + webAdCampaignHistoryTable + " ch " +
-                            "where c.campaign_id=ch.campaign_id " +
-                            "and date between '" + startTime + "' and '" + endTime + "' " +
-                            "and c.campaign_id in (" + campaignIds + ") " +
-                            "group by ch.campaign_id having impressions > 0 ) a ";
-                    listHasData = DB.findListBySql(sql);
-                    list = Utils.getDiffJSObjectList(listAll, listHasData, "campaign_id");
-                }
+                sql = "select campaign_id, account_id, campaign_name, create_time, status, budget, bidding, total_spend, total_installed, total_click, total_impressions, cpa,ctr, " +
+                        "(case when total_click > 0 then total_installed/total_click else 0 end) as cvr " +
+                        " from " + webAdCampaignTable + " where status != 'paused' and " +
+                        "campaign_id in (" + campaignIds + ")";
+                listAll = DB.findListBySql(sql);
+                sql = "select campaign_id, impressions from ( " +
+                        "select ch.campaign_id, " +
+                        " sum(ch.total_impressions) as impressions " +
+                        " from " + webAdCampaignTable + " c, " + webAdCampaignHistoryTable + " ch " +
+                        "where c.campaign_id=ch.campaign_id " +
+                        "and date between '" + startTime + "' and '" + endTime + "' " +
+                        "and c.campaign_id in (" + campaignIds + ") " +
+                        "group by ch.campaign_id having impressions > 0 ) a ";
+                listHasData = DB.findListBySql(sql);
+                list = Utils.getDiffJSObjectList(listAll, listHasData, "campaign_id");
             }else{//Facebook
                 sql = "select campaign_id, account_id, campaign_name, status, create_time, budget, bidding, spend, installed, impressions, click" +
                         ", (case when impressions > 0 then click/impressions else 0 end) as ctr" +
@@ -217,10 +215,10 @@ public class QueryOne extends HttpServlet {
                         "select ch.campaign_id, account_id, campaign_name,c.status, create_time, c.budget, c.bidding, sum(ch.total_spend) as spend, " +
                         "sum(ch.total_installed) as installed, sum(ch.total_impressions) as impressions " +
                         ",sum(ch.total_click) as click from " + webAdCampaignTable + " c, " + webAdCampaignHistoryTable + " ch " +
-                        "where c.campaign_id=ch.campaign_id " +
+                        "where c.campaign_id=ch.campaign_id and status != 'paused' " +
                         "and date between '" + startTime + "' and '" + endTime + "' " +
                         "and c.campaign_id in (" + campaignIds + ")" +
-                        "group by ch.campaign_id ) a where impressions = 0 " + orderStr;
+                        "group by ch.campaign_id having impressions = 0 ) a ";
                 list = DB.findListBySql(sql);
             }
         } else {
