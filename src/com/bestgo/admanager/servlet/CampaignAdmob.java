@@ -45,6 +45,8 @@ public class CampaignAdmob extends HttpServlet {
             String message4 = request.getParameter("message4");
             String imagePath = request.getParameter("imagePath");
 
+            if (maxCPA == null) maxCPA = "";
+
             OperationResult result = new OperationResult();
             try {
                 JSObject record = DB.simpleScan("web_system_config").select("config_value").where(DB.filter().whereEqualTo("config_key", "admob_image_path")).execute();
