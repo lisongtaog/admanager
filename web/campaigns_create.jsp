@@ -326,6 +326,12 @@
             </div>
         </div>
         <div class="form-group">
+            <label for="inputMaxCpa" class="col-sm-2 control-label">关闭价格</label>
+            <div class="col-sm-10">
+                <input class="form-control" id="inputMaxCpaAdmob" />
+            </div>
+        </div>
+        <div class="form-group">
             <label for="inputMessage" class="col-sm-2 control-label">广告语1</label>
             <div class="col-sm-10">
                 <input class="form-control" id="inputMessage1" />
@@ -990,7 +996,7 @@
                 maxCPA: maxCPA,
                 title: title,
                 message: message,
-                imagePath: imagePath,
+                imagePath: imagePath
             }, function (data) {
                 if (data && data.ret == 1) {
                     admanager.showCommonDlg("提示", "添加记录成功");

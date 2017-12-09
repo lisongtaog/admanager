@@ -133,20 +133,6 @@ public class Query extends HttpServlet {
                         JsonArray array = admob.getAsJsonArray("array");
                         JsonArray array1 = facebook.getAsJsonArray("array");
                         array.addAll(array1);
-                       /* List<JsonObject> jsonObjectList = new ArrayList<>();
-                        Gson gson = new Gson();
-                        List<Campaigns> campaignsList = gson.fromJson(array, new TypeToken<List<Campaigns>>() {}.getType());
-
-                        Collections.sort(jsonObjectList, new Comparator<Campaigns>() {
-                            @Override
-                            public int compare(Campaigns a, Campaigns b) {
-                                if(a.click >= b.incoming){
-                                    return 1;
-                                }else{
-                                    return -1;
-                                }
-                            }
-                        });*/
                         jsonObject = admob;
                     } else {
                         jsonObject = fetchOneAppData(id, tag,startTime, endTime, sorter, "true".equals(adwordsCheck), "true".equals(countryCheck), countryCode,likeCampaignName,campaignCreateTime,true);
