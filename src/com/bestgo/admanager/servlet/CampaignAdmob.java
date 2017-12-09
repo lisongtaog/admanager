@@ -114,9 +114,7 @@ public class CampaignAdmob extends HttpServlet {
                             String now  = String.format("%d-%02d-%02d %02d:%02d:%02d", calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH),
                                     calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), calendar.get(Calendar.SECOND));
                             String r = String.valueOf(random.nextInt());
-                            r = r.substring(r.length()-5);
                             String s = String.valueOf(System.currentTimeMillis());
-                            s = s.substring(s.length()-5);
                             campaignName = campaignNameOld + accountNameArr[j] + "_"+ r  + "_"+ s + "_" + i;
                             long genId = DB.insert("ad_campaigns_admob")
                                     .put("account_id", accountIdArr[j])

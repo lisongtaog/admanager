@@ -118,7 +118,7 @@ public class Campaign extends HttpServlet {
                             String now  = String.format("%d-%02d-%02d %02d:%02d:%02d", calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH),
                                     calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), calendar.get(Calendar.SECOND));
                             String s = String.valueOf(System.currentTimeMillis());
-                            campaignName = campaignNameOld.replace(accountNameArrStr,accountNameArr[j]) + s.substring(s.length()-5) + i;
+                            campaignName = campaignNameOld.replace(accountNameArrStr,accountNameArr[j]) + s + "_" + i;
 
                             long genId = DB.insert("ad_campaigns")
                                     .put("facebook_app_id", appId)

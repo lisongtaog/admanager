@@ -575,17 +575,17 @@
                 var countryList = data.split('\n');
                 var countryNames = [];
                 countryList.forEach(function(one) {
-                    for (var i = 0; i < regionList.length; i++) {
-                        one = one.trim();
-                        if (regionList[i].name.toLocaleLowerCase() == one.toLocaleLowerCase()) {
-                            if (targetId == '#selectRegionUnselectedAdmob' || targetId == '#selectRegionAdmob') {
-                                countryNames.push(regionList[i].country_code);
-                            } else {
-                                countryNames.push(regionList[i].name);
-                            }
-                            break;
-                        }
-                    }
+                   for (var i = 0; i < regionList.length; i++) {
+                       one = one.trim();
+                       if (regionList[i].name.toLocaleLowerCase() == one.toLocaleLowerCase()) {
+                           if (targetId == '#selectRegionUnselectedAdmob' || targetId == '#selectRegionAdmob') {
+                               countryNames.push(regionList[i].country_code);
+                           } else {
+                               countryNames.push(regionList[i].name);
+                           }
+                           break;
+                       }
+                   }
                 });
 
                 if (targetId != '') {
@@ -627,7 +627,7 @@
 
         $.post('system/fb_app_id_rel/query', {
             word: '',
-        }, function(data) {
+            }, function(data) {
             if (data && data.ret == 1) {
                 appList = data.data;
                 appList.forEach(function(one) {
@@ -1008,41 +1008,41 @@
 
     init();
 
-    $('#selectApp').change(function () {
-        var appName = $('#selectApp').val();
-        $('#inputImagePath').val(appName+"/");
-        var language = $('#selectLanguage').val();
+   $('#selectApp').change(function () {
+       var appName = $('#selectApp').val();
+       $('#inputImagePath').val(appName+"/");
+       var language = $('#selectLanguage').val();
 
-        if(language != null && language.length > 0){
+       if(language != null && language.length > 0){
 
-            $.post("campaign/selectFacebookMessage", {
-                appName: appName,
-                language: language
-            }, function (data) {
-                if(data && data.ret == 1){
-                    $('#inputTitle').val(data.title);
-                    $('#inputMessage').val(data.message);
-                }else{
-                    $('#inputTitle').val("");
-                    $('#inputMessage').val("");
-                }
-            }, "json");
-        }else{
-            $('#inputTitle').val("");
-            $('#inputMessage').val("");
-        }
-        return false;
+           $.post("campaign/selectFacebookMessage", {
+               appName: appName,
+               language: language
+           }, function (data) {
+               if(data && data.ret == 1){
+                   $('#inputTitle').val(data.title);
+                   $('#inputMessage').val(data.message);
+               }else{
+                   $('#inputTitle').val("");
+                   $('#inputMessage').val("");
+               }
+           }, "json");
+       }else{
+           $('#inputTitle').val("");
+           $('#inputMessage').val("");
+       }
+       return false;
     });
 
 
-    $('#selectAppAdmob').change(function () {
-        var appNameAdmob = $('#selectAppAdmob').val();
-        $('#inputImagePathAdmob').val(appNameAdmob+"/");
-        var selectOptions = $('#selectLanguageAdmob option:selected');
-        var languageAdmob = [];
-        selectOptions.each(function () {
-            languageAdmob.push($(this).text())
-        });
+   $('#selectAppAdmob').change(function () {
+       var appNameAdmob = $('#selectAppAdmob').val();
+       $('#inputImagePathAdmob').val(appNameAdmob+"/");
+       var selectOptions = $('#selectLanguageAdmob option:selected');
+       var languageAdmob = [];
+       selectOptions.each(function () {
+           languageAdmob.push($(this).text())
+       });
         if(languageAdmob != null && languageAdmob.length > 0){
 
             $.post("campaign/selectAdmobMessage", {
