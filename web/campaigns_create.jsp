@@ -300,6 +300,12 @@
             </div>
         </div>
         <div class="form-group">
+            <label for="inputMaxCpa" class="col-sm-2 control-label">关闭价格</label>
+            <div class="col-sm-10">
+                <input class="form-control" id="inputMaxCpaAdmob" />
+            </div>
+        </div>
+        <div class="form-group">
             <label for="inputMessage" class="col-sm-2 control-label">广告语1</label>
             <div class="col-sm-10">
                 <input class="form-control" id="inputMessage1" />
@@ -506,6 +512,7 @@
             var campaignName = $('#inputCampaignNameAdmob').val();
             var bugdet = $('#inputBudgetAdmob').val();
             var bidding = $('#inputBiddingAdmob').val();
+            var maxCPA = $('#inputMaxCpaAdmob').val();
             var message1 = $('#inputMessage1').val();
             var message2 = $('#inputMessage2').val();
             var message3 = $('#inputMessage3').val();
@@ -532,6 +539,7 @@
                 bugdet: bugdet,
                 bidding: bidding,
                 gpPackageId: app.google_package_id,
+                maxCPA: maxCPA,
                 message1: message1,
                 message2: message2,
                 message3: message3,
@@ -632,7 +640,7 @@
                 maxCPA: maxCPA,
                 title: title,
                 message: message,
-                imagePath: imagePath,
+                imagePath: imagePath
             }, function (data) {
                 if (data && data.ret == 1) {
                     admanager.showCommonDlg("提示", "添加记录成功");

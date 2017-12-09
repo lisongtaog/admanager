@@ -38,6 +38,7 @@ public class CampaignAdmob extends HttpServlet {
             String campaignName = request.getParameter("campaignName");
             String bugdet = request.getParameter("bugdet");
             String bidding = request.getParameter("bidding");
+            String maxCPA = request.getParameter("maxCPA");
             String message1 = request.getParameter("message1");
             String message2 = request.getParameter("message2");
             String message3 = request.getParameter("message3");
@@ -93,10 +94,10 @@ public class CampaignAdmob extends HttpServlet {
                 }
 
                 File imagesPath = new File(imageRoot + File.separatorChar + imagePath);
-                /*if (!imagesPath.exists()) {
+                if (!imagesPath.exists()) {
                     result.result = false;
                     result.message = "图片路径不存在";
-                }*/
+                }
 
 
                 if (result.result) {
@@ -125,6 +126,7 @@ public class CampaignAdmob extends HttpServlet {
                                     .put("create_time", now)
                                     .put("bugdet", bugdet)
                                     .put("bidding", bidding)
+                                    .put("max_cpa", maxCPA)
                                     .put("message1", message1)
                                     .put("message2", message2)
                                     .put("message3", message3)

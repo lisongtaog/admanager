@@ -53,7 +53,7 @@ public class DateUtil {
      * @param formatStr
      * @return
      */
-    public static Date getStrToDate(String str,String formatStr) {
+    public static Date convertDateStrToDate(String str,String formatStr) {
         SimpleDateFormat format = new SimpleDateFormat(formatStr);
 
         Date date = null;

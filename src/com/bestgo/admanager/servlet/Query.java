@@ -129,9 +129,7 @@ public class Query extends HttpServlet {
                         admob.addProperty("total_cvr", Utils.trimDouble(total_cvr));
                         JsonArray array = admob.getAsJsonArray("array");
                         JsonArray array1 = facebook.getAsJsonArray("array");
-                        for (int i = 0; i < array1.size(); i++) {
-                            array.add(array1.get(i));
-                        }
+                        array.addAll(array1);
                         jsonObject = admob;
                     } else {
                         jsonObject = fetchOneAppData(id, tag,startTime, endTime, sorter, "true".equals(adwordsCheck), "true".equals(countryCheck), countryCode,likeCampaignName,campaignCreateTime,true);

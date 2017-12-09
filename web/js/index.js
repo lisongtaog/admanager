@@ -390,33 +390,21 @@ function bindSortOp() {
             adwordsCheck: adwordsCheck,
             countryCheck: countryCheck,
             facebookCheck: facebookCheck,
+            countryCode: countryCode,
+            sorterId: sorterId
         }, function (data) {
             if (data && data.ret == 1) {
-                appQueryData = data.data.array;
-                $.post('query', {
-                    tag: query,
-                    startTime: startTime,
-                    endTime: endTime,
-                    adwordsCheck: adwordsCheck,
-                    countryCheck: countryCheck,
-                    facebookCheck: facebookCheck,
-                    countryCode: countryCode,
-                    sorterId: sorterId
-                }, function (data) {
-                    if (data && data.ret == 1) {
-                        data = data.data;
-                        setData(data);
-                        var str = "总花费: " + data.total_spend + " 总安装: " + data.total_installed +
+                data = data.data;
+                setData(data);
+                var str = "总花费: " + data.total_spend + " 总安装: " + data.total_installed +
                             " 总展示: " + data.total_impressions + " 总点击: " + data.total_click +
                             " CTR: " + data.total_ctr + " CPA: " + data.total_cpa + " CVR: " + data.total_cvr;
 
-                        str += "<br/><span class='estimateResult'></span>"
-                        $('#total_result').removeClass("editable");
-                        $('#total_result').html(str);
-                    } else {
-                        admanager.showCommonDlg("错误", data.message);
-                    }
-                }, 'json');
+                str += "<br/><span class='estimateResult'></span>"
+                $('#total_result').removeClass("editable");
+                $('#total_result').html(str);
+            } else {
+                admanager.showCommonDlg("错误", data.message);
             }
         }, 'json');
     });
