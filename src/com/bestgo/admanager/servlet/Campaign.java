@@ -37,7 +37,7 @@ public class Campaign extends HttpServlet {
             String appName = request.getParameter("appName");
             String appId = request.getParameter("appId");
             String accountId = request.getParameter("accountId");
-            String accoutName = request.getParameter("accoutName");
+            String accountName = request.getParameter("accountName");
 
             String createCount = request.getParameter("createCount");
             String pageId = request.getParameter("pageId");
@@ -45,7 +45,7 @@ public class Campaign extends HttpServlet {
             String excludedRegion = request.getParameter("excludedRegion");
             String language = request.getParameter("language");
             String age = request.getParameter("age");
-            String gendar = request.getParameter("gendar");
+            String gender = request.getParameter("gender");
             String interest = request.getParameter("interest");
             String userOs = request.getParameter("userOs");
             String userDevice = request.getParameter("userDevice");
@@ -108,8 +108,8 @@ public class Campaign extends HttpServlet {
                 if (result.result) {
                     Calendar calendar = Calendar.getInstance();
                     String campaignNameOld = campaignName + "_";
-                    String[] accountNameArr = accoutName.split(",");
-                    String accountNameArrStr = accoutName.replace(",", "");
+                    String[] accountNameArr = accountName.split(",");
+                    String accountNameArrStr = accountName.replace(",", "");
                     String[] accountIdArr = accountId.split(",");
                     int createCountInt = Integer.parseInt(createCount);
                     Collection<File> uploadImages = FileUtils.listFiles(imagesPath, null, false);
@@ -136,7 +136,7 @@ public class Campaign extends HttpServlet {
                                     .put("app_name", appName)
                                     .put("tag_name", appName)
                                     .put("age", age)
-                                    .put("gender", gendar)
+                                    .put("gender", gender)
                                     .put("detail_target", interest)
                                     .put("max_cpa", maxCPA)
                                     .put("user_devices", userDevice)
