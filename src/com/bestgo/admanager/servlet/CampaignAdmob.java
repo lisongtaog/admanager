@@ -104,7 +104,29 @@ public class CampaignAdmob extends HttpServlet {
 
                 if (result.result) {
                     Calendar calendar = Calendar.getInstance();
-                    String campaignNameOld = campaignName + "_";
+                    String campaignNameOld = "";
+
+                    String[] countrys = region.split(",");
+                    String countrysStr = "";
+                    for(int i=0,len=countrys.length;i<len;i++){
+                        countrysStr += "'" + countrys[i] + "',";
+                    }
+                    String countryListStr = "";
+                    if(countrysStr.length() >0){
+                        countrysStr = countrysStr.substring(0,countrysStr.length()-1);
+                        String sqlCountry = "select country_name from app_country_code_dict where country_code in ("+countrysStr+")";
+                        List<JSObject> countryList = DB.findListBySql(sqlCountry);
+
+                        for(JSObject j : countryList){
+                            countryListStr += j.get("country_name") + ",";
+                        }
+                    }
+                    if(countryListStr != null && countryListStr.length()>0){
+                        campaignNameOld = campaignName.replace(region,countryListStr)+"_";
+                    }else{
+                        campaignNameOld = campaignName + "_";
+                    }
+
                     String[] accountNameArr = accountName.split(",");
                     String[] accountIdArr = accountId.split(",");
                     int createCountInt = Integer.parseInt(createCount);

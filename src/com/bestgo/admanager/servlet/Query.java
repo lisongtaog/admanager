@@ -143,10 +143,12 @@ public class Query extends HttpServlet {
                                     Collections.sort(campaignsList, new Comparator<Campaigns>() {
                                         @Override
                                         public int compare(Campaigns a, Campaigns b) {
-                                            if(a.create_time.compareTo(b.create_time) >= 0){
+                                            if(a.create_time.compareTo(b.create_time) > 0){
                                                 return 1;
-                                            }else{
+                                            }else if(a.create_time.compareTo(b.create_time) < 0){
                                                 return -1;
+                                            }else{
+                                                return 0;
                                             }
                                         }
                                     });
@@ -155,10 +157,12 @@ public class Query extends HttpServlet {
                                     Collections.sort(campaignsList, new Comparator<Campaigns>() {
                                         @Override
                                         public int compare(Campaigns a, Campaigns b) {
-                                            if(a.create_time.compareTo(b.create_time) >= 0){
+                                            if(a.create_time.compareTo(b.create_time) > 0){
                                                 return -1;
-                                            }else{
+                                            }else if(a.create_time.compareTo(b.create_time) < 0){
                                                 return 1;
+                                            }else{
+                                                return 0;
                                             }
                                         }
                                     });
@@ -167,10 +171,12 @@ public class Query extends HttpServlet {
                                     Collections.sort(campaignsList, new Comparator<Campaigns>() {
                                         @Override
                                         public int compare(Campaigns a, Campaigns b) {
-                                            if(a.status.compareTo(b.status) >= 0){
+                                            if(a.status.compareTo(b.status) > 0){
                                                 return 1;
-                                            }else{
+                                            }else if(a.status.compareTo(b.status) < 0){
                                                 return -1;
+                                            }else{
+                                                return 0;
                                             }
                                         }
                                     });
@@ -179,10 +185,12 @@ public class Query extends HttpServlet {
                                     Collections.sort(campaignsList, new Comparator<Campaigns>() {
                                         @Override
                                         public int compare(Campaigns a, Campaigns b) {
-                                            if(a.status.compareTo(b.status) >= 0){
+                                            if(a.status.compareTo(b.status) > 0){
                                                 return -1;
-                                            }else{
+                                            }else if(a.status.compareTo(b.status) < 0){
                                                 return 1;
+                                            }else{
+                                                return 0;
                                             }
                                         }
                                     });
@@ -219,10 +227,12 @@ public class Query extends HttpServlet {
                                     Collections.sort(campaignsList, new Comparator<Campaigns>() {
                                         @Override
                                         public int compare(Campaigns a, Campaigns b) {
-                                            if(a.bidding >= b.bidding){
+                                            if(a.bidding > b.bidding){
                                                 return 1;
-                                            }else{
+                                            }else  if(a.bidding < b.bidding){
                                                 return -1;
+                                            }else{
+                                                return 0;
                                             }
                                         }
                                     });
@@ -231,10 +241,12 @@ public class Query extends HttpServlet {
                                     Collections.sort(campaignsList, new Comparator<Campaigns>() {
                                         @Override
                                         public int compare(Campaigns a, Campaigns b) {
-                                            if(a.bidding >= b.bidding){
+                                            if(a.bidding > b.bidding){
                                                 return -1;
-                                            }else{
+                                            }else  if(a.bidding < b.bidding){
                                                 return 1;
+                                            }else{
+                                                return 0;
                                             }
                                         }
                                     });
@@ -243,10 +255,12 @@ public class Query extends HttpServlet {
                                     Collections.sort(campaignsList, new Comparator<Campaigns>() {
                                         @Override
                                         public int compare(Campaigns a, Campaigns b) {
-                                            if(a.spend >= b.spend){
+                                            if(a.spend > b.spend){
                                                 return 1;
-                                            }else{
+                                            }else if(a.spend < b.spend){
                                                 return -1;
+                                            }else{
+                                                return 0;
                                             }
                                         }
                                     });
@@ -255,10 +269,12 @@ public class Query extends HttpServlet {
                                     Collections.sort(campaignsList, new Comparator<Campaigns>() {
                                         @Override
                                         public int compare(Campaigns a, Campaigns b) {
-                                            if(a.spend >= b.spend){
+                                            if(a.spend > b.spend){
                                                 return -1;
-                                            }else{
+                                            }else if(a.spend < b.spend){
                                                 return 1;
+                                            }else{
+                                                return 0;
                                             }
                                         }
                                     });
@@ -267,10 +283,12 @@ public class Query extends HttpServlet {
                                     Collections.sort(campaignsList, new Comparator<Campaigns>() {
                                         @Override
                                         public int compare(Campaigns a, Campaigns b) {
-                                            if(a.installed >= b.installed){
+                                            if(a.installed > b.installed){
                                                 return 1;
-                                            }else{
+                                            }else if(a.installed < b.installed){
                                                 return -1;
+                                            }else{
+                                                return 0;
                                             }
                                         }
                                     });
@@ -279,10 +297,12 @@ public class Query extends HttpServlet {
                                     Collections.sort(campaignsList, new Comparator<Campaigns>() {
                                         @Override
                                         public int compare(Campaigns a, Campaigns b) {
-                                            if(a.installed >= b.installed){
+                                            if(a.installed > b.installed){
                                                 return -1;
-                                            }else{
+                                            }else  if(a.installed < b.installed){
                                                 return 1;
+                                            }else{
+                                                return 0;
                                             }
                                         }
                                     });
@@ -291,10 +311,12 @@ public class Query extends HttpServlet {
                                     Collections.sort(campaignsList, new Comparator<Campaigns>() {
                                         @Override
                                         public int compare(Campaigns a, Campaigns b) {
-                                            if(a.click >= b.click){
+                                            if(a.click > b.click){
                                                 return 1;
-                                            }else{
+                                            }else if(a.click < b.click){
                                                 return -1;
+                                            }else{
+                                                return 0;
                                             }
                                         }
                                     });
@@ -303,10 +325,12 @@ public class Query extends HttpServlet {
                                     Collections.sort(campaignsList, new Comparator<Campaigns>() {
                                         @Override
                                         public int compare(Campaigns a, Campaigns b) {
-                                            if(a.click >= b.click){
+                                            if(a.click > b.click){
                                                 return -1;
-                                            }else{
+                                            }else if(a.click < b.click){
                                                 return 1;
+                                            }else{
+                                                return 0;
                                             }
                                         }
                                     });
@@ -315,10 +339,12 @@ public class Query extends HttpServlet {
                                     Collections.sort(campaignsList, new Comparator<Campaigns>() {
                                         @Override
                                         public int compare(Campaigns a, Campaigns b) {
-                                            if(a.cpa >= b.cpa){
+                                            if(a.cpa > b.cpa){
                                                 return 1;
-                                            }else{
+                                            }else if(a.cpa < b.cpa){
                                                 return -1;
+                                            }else{
+                                                return 0;
                                             }
                                         }
                                     });
@@ -327,10 +353,12 @@ public class Query extends HttpServlet {
                                     Collections.sort(campaignsList, new Comparator<Campaigns>() {
                                         @Override
                                         public int compare(Campaigns a, Campaigns b) {
-                                            if(a.cpa >= b.cpa){
+                                            if(a.cpa > b.cpa){
                                                 return -1;
-                                            }else{
+                                            }else if(a.cpa < b.cpa){
                                                 return 1;
+                                            }else{
+                                                return 0;
                                             }
                                         }
                                     });
@@ -339,10 +367,12 @@ public class Query extends HttpServlet {
                                     Collections.sort(campaignsList, new Comparator<Campaigns>() {
                                         @Override
                                         public int compare(Campaigns a, Campaigns b) {
-                                            if(a.ctr >= b.ctr){
+                                            if(a.ctr > b.ctr){
                                                 return 1;
-                                            }else{
+                                            }else if(a.ctr < b.ctr){
                                                 return -1;
+                                            }else{
+                                                return 0;
                                             }
                                         }
                                     });
@@ -351,10 +381,12 @@ public class Query extends HttpServlet {
                                     Collections.sort(campaignsList, new Comparator<Campaigns>() {
                                         @Override
                                         public int compare(Campaigns a, Campaigns b) {
-                                            if(a.ctr >= b.ctr){
+                                            if(a.ctr > b.ctr){
                                                 return -1;
-                                            }else{
+                                            }else if(a.ctr < b.ctr){
                                                 return 1;
+                                            }else{
+                                                return 0;
                                             }
                                         }
                                     });
@@ -363,10 +395,12 @@ public class Query extends HttpServlet {
                                     Collections.sort(campaignsList, new Comparator<Campaigns>() {
                                         @Override
                                         public int compare(Campaigns a, Campaigns b) {
-                                            if(a.cvr >= b.cvr){
+                                            if(a.cvr > b.cvr){
                                                 return 1;
-                                            }else{
+                                            }else if(a.cvr < b.cvr){
                                                 return -1;
+                                            }else{
+                                                return 0;
                                             }
                                         }
                                     });
@@ -375,10 +409,12 @@ public class Query extends HttpServlet {
                                     Collections.sort(campaignsList, new Comparator<Campaigns>() {
                                         @Override
                                         public int compare(Campaigns a, Campaigns b) {
-                                            if(a.cvr >= b.cvr){
+                                            if(a.cvr > b.cvr){
                                                 return -1;
-                                            }else{
+                                            }else if(a.cvr < b.cvr){
                                                 return 1;
+                                            }else{
+                                                return 0;
                                             }
                                         }
                                     });
@@ -387,10 +423,12 @@ public class Query extends HttpServlet {
                                     Collections.sort(campaignsList, new Comparator<Campaigns>() {
                                         @Override
                                         public int compare(Campaigns a, Campaigns b) {
-                                            if(a.roi >= b.roi){
+                                            if(a.roi > b.roi){
                                                 return 1;
-                                            }else{
+                                            }else  if(a.roi < b.roi){
                                                 return -1;
+                                            }else{
+                                                return 0;
                                             }
                                         }
                                     });
@@ -399,10 +437,12 @@ public class Query extends HttpServlet {
                                     Collections.sort(campaignsList, new Comparator<Campaigns>() {
                                         @Override
                                         public int compare(Campaigns a, Campaigns b) {
-                                            if(a.roi >= b.roi){
+                                            if(a.roi > b.roi){
                                                 return -1;
-                                            }else{
+                                            }else if(a.roi < b.roi){
                                                 return 1;
+                                            }else{
+                                                return 0;
                                             }
                                         }
                                     });
@@ -484,10 +524,12 @@ public class Query extends HttpServlet {
                                     Collections.sort(countryRecordList, new Comparator<CountryRecord>() {
                                         @Override
                                         public int compare(CountryRecord a, CountryRecord b) {
-                                            if(a.impressions >= b.impressions){
+                                            if(a.impressions > b.impressions){
                                                 return 1;
-                                            }else{
+                                            }else if(a.impressions < b.impressions){
                                                 return -1;
+                                            }else{
+                                                return 0;
                                             }
                                         }
                                     });
@@ -496,10 +538,12 @@ public class Query extends HttpServlet {
                                     Collections.sort(countryRecordList, new Comparator<CountryRecord>() {
                                         @Override
                                         public int compare(CountryRecord a, CountryRecord b) {
-                                            if(a.impressions >= b.impressions){
+                                            if(a.impressions > b.impressions){
                                                 return -1;
-                                            }else{
+                                            }else if(a.impressions < b.impressions){
                                                 return 1;
+                                            }else{
+                                                return 0;
                                             }
                                         }
                                     });
@@ -508,10 +552,12 @@ public class Query extends HttpServlet {
                                     Collections.sort(countryRecordList, new Comparator<CountryRecord>() {
                                         @Override
                                         public int compare(CountryRecord a, CountryRecord b) {
-                                            if(a.spend >= b.spend){
+                                            if(a.spend > b.spend){
                                                 return 1;
-                                            }else{
+                                            }else if(a.spend < b.spend){
                                                 return -1;
+                                            }else{
+                                                return 0;
                                             }
                                         }
                                     });
@@ -520,10 +566,12 @@ public class Query extends HttpServlet {
                                     Collections.sort(countryRecordList, new Comparator<CountryRecord>() {
                                         @Override
                                         public int compare(CountryRecord a, CountryRecord b) {
-                                            if(a.spend >= b.spend){
+                                            if(a.spend > b.spend){
                                                 return -1;
-                                            }else{
+                                            }else if(a.spend < b.spend){
                                                 return 1;
+                                            }else{
+                                                return 0;
                                             }
                                         }
                                     });
@@ -532,10 +580,12 @@ public class Query extends HttpServlet {
                                     Collections.sort(countryRecordList, new Comparator<CountryRecord>() {
                                         @Override
                                         public int compare(CountryRecord a, CountryRecord b) {
-                                            if(a.installed >= b.installed){
+                                            if(a.installed > b.installed){
                                                 return 1;
-                                            }else{
+                                            }else  if(a.installed < b.installed){
                                                 return -1;
+                                            }else{
+                                                return 0;
                                             }
                                         }
                                     });
@@ -544,10 +594,12 @@ public class Query extends HttpServlet {
                                     Collections.sort(countryRecordList, new Comparator<CountryRecord>() {
                                         @Override
                                         public int compare(CountryRecord a, CountryRecord b) {
-                                            if(a.installed>= b.installed){
+                                            if(a.installed > b.installed){
                                                 return -1;
-                                            }else{
+                                            }else if(a.installed < b.installed){
                                                 return 1;
+                                            }else{
+                                                return 0;
                                             }
                                         }
                                     });
@@ -556,10 +608,12 @@ public class Query extends HttpServlet {
                                     Collections.sort(countryRecordList, new Comparator<CountryRecord>() {
                                         @Override
                                         public int compare(CountryRecord a, CountryRecord b) {
-                                            if(a.click >= b.click){
+                                            if(a.click > b.click){
                                                 return 1;
-                                            }else{
+                                            }else if(a.click < b.click){
                                                 return -1;
+                                            }else{
+                                                return 0;
                                             }
                                         }
                                     });
@@ -568,10 +622,12 @@ public class Query extends HttpServlet {
                                     Collections.sort(countryRecordList, new Comparator<CountryRecord>() {
                                         @Override
                                         public int compare(CountryRecord a, CountryRecord b) {
-                                            if(a.click >= b.click){
+                                            if(a.click > b.click){
                                                 return -1;
-                                            }else{
+                                            }else if(a.click < b.click){
                                                 return 1;
+                                            }else{
+                                                return 0;
                                             }
                                         }
                                     });
@@ -580,10 +636,12 @@ public class Query extends HttpServlet {
                                     Collections.sort(countryRecordList, new Comparator<CountryRecord>() {
                                         @Override
                                         public int compare(CountryRecord a, CountryRecord b) {
-                                            if(a.cpa >= b.cpa){
+                                            if(a.cpa > b.cpa){
                                                 return 1;
-                                            }else{
+                                            }else if(a.cpa < b.cpa){
                                                 return -1;
+                                            }else{
+                                                return 0;
                                             }
                                         }
                                     });
@@ -592,10 +650,12 @@ public class Query extends HttpServlet {
                                     Collections.sort(countryRecordList, new Comparator<CountryRecord>() {
                                         @Override
                                         public int compare(CountryRecord a, CountryRecord b) {
-                                            if(a.cpa >= b.cpa){
+                                            if(a.cpa > b.cpa){
                                                 return -1;
-                                            }else{
+                                            }else  if(a.cpa < b.cpa){
                                                 return 1;
+                                            }else{
+                                                return 0;
                                             }
                                         }
                                     });
@@ -604,10 +664,12 @@ public class Query extends HttpServlet {
                                     Collections.sort(countryRecordList, new Comparator<CountryRecord>() {
                                         @Override
                                         public int compare(CountryRecord a, CountryRecord b) {
-                                            if(a.ctr >= b.ctr){
+                                            if(a.ctr > b.ctr){
                                                 return 1;
-                                            }else{
+                                            }else if(a.ctr < b.ctr){
                                                 return -1;
+                                            }else{
+                                                return 0;
                                             }
                                         }
                                     });
@@ -616,10 +678,12 @@ public class Query extends HttpServlet {
                                     Collections.sort(countryRecordList, new Comparator<CountryRecord>() {
                                         @Override
                                         public int compare(CountryRecord a, CountryRecord b) {
-                                            if(a.ctr >= b.ctr){
+                                            if(a.ctr > b.ctr){
                                                 return -1;
-                                            }else{
+                                            }else if(a.ctr < b.ctr){
                                                 return 1;
+                                            }else{
+                                                return 0;
                                             }
                                         }
                                     });
@@ -628,10 +692,12 @@ public class Query extends HttpServlet {
                                     Collections.sort(countryRecordList, new Comparator<CountryRecord>() {
                                         @Override
                                         public int compare(CountryRecord a, CountryRecord b) {
-                                            if(a.cvr >= b.cvr){
+                                            if(a.cvr > b.cvr){
                                                 return 1;
-                                            }else{
+                                            }else  if(a.cvr < b.cvr){
                                                 return -1;
+                                            }else{
+                                                return 0;
                                             }
                                         }
                                     });
@@ -640,10 +706,12 @@ public class Query extends HttpServlet {
                                     Collections.sort(countryRecordList, new Comparator<CountryRecord>() {
                                         @Override
                                         public int compare(CountryRecord a, CountryRecord b) {
-                                            if(a.cvr >= b.cvr){
+                                            if(a.cvr > b.cvr){
                                                 return -1;
-                                            }else{
+                                            }else if(a.cvr < b.cvr){
                                                 return 1;
+                                            }else{
+                                                return 0;
                                             }
                                         }
                                     });
@@ -652,10 +720,12 @@ public class Query extends HttpServlet {
                                     Collections.sort(countryRecordList, new Comparator<CountryRecord>() {
                                         @Override
                                         public int compare(CountryRecord a, CountryRecord b) {
-                                            if(a.roi >= b.roi){
+                                            if(a.roi > b.roi){
                                                 return 1;
-                                            }else{
+                                            }else if(a.roi < b.roi){
                                                 return -1;
+                                            }else{
+                                                return 0;
                                             }
                                         }
                                     });
@@ -664,10 +734,12 @@ public class Query extends HttpServlet {
                                     Collections.sort(countryRecordList, new Comparator<CountryRecord>() {
                                         @Override
                                         public int compare(CountryRecord a, CountryRecord b) {
-                                            if(a.roi >= b.roi){
+                                            if(a.roi > b.roi){
                                                 return -1;
-                                            }else{
+                                            }else if(a.roi < b.roi){
                                                 return 1;
+                                            }else{
+                                                return 0;
                                             }
                                         }
                                     });
