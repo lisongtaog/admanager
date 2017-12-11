@@ -1,8 +1,10 @@
 package com.bestgo.admanager.servlet;
 
+import com.bestgo.admanager.DateUtil;
 import com.bestgo.admanager.Utils;
 import com.bestgo.common.database.services.DB;
 import com.bestgo.common.database.utils.JSObject;
+import com.facebook.ads.sdk.User;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -53,8 +55,8 @@ public class Query extends HttpServlet {
                     for (int i = 0; i < tags.size(); i++) {
                         long id = tags.get(i).get("id");
                         String tagName = tags.get(i).get("tag_name");
-                        JsonObject admob = fetchOneAppData(id, tagName,startTime, endTime, 0, true, false, countryCode,likeCampaignName,campaignCreateTime,false);
-                        JsonObject facebook = fetchOneAppData(id, tagName,startTime, endTime, 0, false, false, countryCode,likeCampaignName,campaignCreateTime,false);
+                        JsonObject admob = fetchOneAppData(id, tagName,startTime, endTime, true, false, countryCode,likeCampaignName,campaignCreateTime,false);
+                        JsonObject facebook = fetchOneAppData(id, tagName,startTime, endTime, false, false, countryCode,likeCampaignName,campaignCreateTime,false);
                         double total_spend = admob.get("total_spend").getAsDouble() + facebook.get("total_spend").getAsDouble();
                         double total_installed = admob.get("total_installed").getAsDouble() + facebook.get("total_installed").getAsDouble();
                         double total_impressions = admob.get("total_impressions").getAsDouble() + facebook.get("total_impressions").getAsDouble();
@@ -79,7 +81,7 @@ public class Query extends HttpServlet {
                     for (int i = 0; i < tags.size(); i++) {
                         long id = tags.get(i).get("id");
                         String tagName = tags.get(i).get("tag_name");
-                        JsonObject jsonObject = fetchOneAppData(id, tagName,startTime, endTime, 0, "true".equals(adwordsCheck), false, countryCode,likeCampaignName,campaignCreateTime,false);
+                        JsonObject jsonObject = fetchOneAppData(id, tagName,startTime, endTime,  "true".equals(adwordsCheck), false, countryCode,likeCampaignName,campaignCreateTime,false);
                         double total_impression = jsonObject.get("total_impressions").getAsDouble();
                         if (total_impression == 0) {
                             continue;
@@ -109,13 +111,13 @@ public class Query extends HttpServlet {
                         .where(DB.filter().whereEqualTo("tag_name", tag)).execute();
                 if (tagObject.hasObjectData()) {
                     Long id = tagObject.get("id");
-                    JsonObject jsonObject = null;
+                    JsonObject jsonObject = new JsonObject();
                     if (countryCode != null && !countryCode.isEmpty()) {
                         countryCheck = "false";
                     }
                     if (adwordsCheck != null && adwordsCheck.equals("false") && facebookCheck != null && facebookCheck.equals("false")) {
-                        JsonObject admob = fetchOneAppData(id, tag,startTime, endTime, sorter, true, "true".equals(countryCheck), countryCode,likeCampaignName,campaignCreateTime,true);
-                        JsonObject facebook = fetchOneAppData(id, tag,startTime, endTime, sorter, false, "true".equals(countryCheck), countryCode,likeCampaignName,campaignCreateTime,true);
+                        JsonObject admob = fetchOneAppData(id, tag,startTime, endTime, true, "true".equals(countryCheck), countryCode,likeCampaignName,campaignCreateTime,true);
+                        JsonObject facebook = fetchOneAppData(id, tag,startTime, endTime,false, "true".equals(countryCheck), countryCode,likeCampaignName,campaignCreateTime,true);
                         double total_spend = admob.get("total_spend").getAsDouble() + facebook.get("total_spend").getAsDouble();
                         double total_installed = admob.get("total_installed").getAsDouble() + facebook.get("total_installed").getAsDouble();
                         double total_impressions = admob.get("total_impressions").getAsDouble() + facebook.get("total_impressions").getAsDouble();
@@ -133,9 +135,312 @@ public class Query extends HttpServlet {
                         JsonArray array = admob.getAsJsonArray("array");
                         JsonArray array1 = facebook.getAsJsonArray("array");
                         array.addAll(array1);
-                        jsonObject = admob;
+                        Gson gson = new Gson();
+                        if(sorter > 0 && "false".equals(countryCheck)){
+                            List<Campaigns> campaignsList = gson.fromJson(array, new TypeToken<List<Campaigns>>() {}.getType());
+                            switch (sorter){
+                                case 1:
+                                    Collections.sort(campaignsList, new Comparator<Campaigns>() {
+                                        @Override
+                                        public int compare(Campaigns a, Campaigns b) {
+                                            if(a.create_time.compareTo(b.create_time) >= 0){
+                                                return 1;
+                                            }else{
+                                                return -1;
+                                            }
+                                        }
+                                    });
+                                    break;
+                                case 1001:
+                                    Collections.sort(campaignsList, new Comparator<Campaigns>() {
+                                        @Override
+                                        public int compare(Campaigns a, Campaigns b) {
+                                            if(a.create_time.compareTo(b.create_time) >= 0){
+                                                return -1;
+                                            }else{
+                                                return 1;
+                                            }
+                                        }
+                                    });
+                                    break;
+                                case 2:
+                                    Collections.sort(campaignsList, new Comparator<Campaigns>() {
+                                        @Override
+                                        public int compare(Campaigns a, Campaigns b) {
+                                            if(a.status.compareTo(b.status) >= 0){
+                                                return 1;
+                                            }else{
+                                                return -1;
+                                            }
+                                        }
+                                    });
+                                    break;
+                                case 1002:
+                                    Collections.sort(campaignsList, new Comparator<Campaigns>() {
+                                        @Override
+                                        public int compare(Campaigns a, Campaigns b) {
+                                            if(a.status.compareTo(b.status) >= 0){
+                                                return -1;
+                                            }else{
+                                                return 1;
+                                            }
+                                        }
+                                    });
+                                    break;
+                                case 3:
+                                    Collections.sort(campaignsList, new Comparator<Campaigns>() {
+                                        @Override
+                                        public int compare(Campaigns a, Campaigns b) {
+                                            if(a.budget > b.budget){
+                                                return 1;
+                                            }else if(a.budget < b.budget){
+                                                return -1;
+                                            }else{
+                                                return 0;
+                                            }
+                                        }
+                                    });
+                                    break;
+                                case 1003:
+                                    Collections.sort(campaignsList, new Comparator<Campaigns>() {
+                                        @Override
+                                        public int compare(Campaigns a, Campaigns b) {
+                                            if(a.budget > b.budget){
+                                                return -1;
+                                            }else if(a.budget < b.budget){
+                                                return 1;
+                                            }else {
+                                                return 0;
+                                            }
+                                        }
+                                    });
+                                    break;
+                                case 4:
+                                    Collections.sort(campaignsList, new Comparator<Campaigns>() {
+                                        @Override
+                                        public int compare(Campaigns a, Campaigns b) {
+                                            if(a.bidding >= b.bidding){
+                                                return 1;
+                                            }else{
+                                                return -1;
+                                            }
+                                        }
+                                    });
+                                    break;
+                                case 1004:
+                                    Collections.sort(campaignsList, new Comparator<Campaigns>() {
+                                        @Override
+                                        public int compare(Campaigns a, Campaigns b) {
+                                            if(a.bidding >= b.bidding){
+                                                return -1;
+                                            }else{
+                                                return 1;
+                                            }
+                                        }
+                                    });
+                                    break;
+                                case 5:
+                                    Collections.sort(campaignsList, new Comparator<Campaigns>() {
+                                        @Override
+                                        public int compare(Campaigns a, Campaigns b) {
+                                            if(a.spend >= b.spend){
+                                                return 1;
+                                            }else{
+                                                return -1;
+                                            }
+                                        }
+                                    });
+                                    break;
+                                case 1005:
+                                    Collections.sort(campaignsList, new Comparator<Campaigns>() {
+                                        @Override
+                                        public int compare(Campaigns a, Campaigns b) {
+                                            if(a.spend >= b.spend){
+                                                return -1;
+                                            }else{
+                                                return 1;
+                                            }
+                                        }
+                                    });
+                                    break;
+                                case 6:
+                                    Collections.sort(campaignsList, new Comparator<Campaigns>() {
+                                        @Override
+                                        public int compare(Campaigns a, Campaigns b) {
+                                            if(a.installed >= b.installed){
+                                                return 1;
+                                            }else{
+                                                return -1;
+                                            }
+                                        }
+                                    });
+                                    break;
+                                case 1006:
+                                    Collections.sort(campaignsList, new Comparator<Campaigns>() {
+                                        @Override
+                                        public int compare(Campaigns a, Campaigns b) {
+                                            if(a.installed >= b.installed){
+                                                return -1;
+                                            }else{
+                                                return 1;
+                                            }
+                                        }
+                                    });
+                                    break;
+                                case 7:
+                                    Collections.sort(campaignsList, new Comparator<Campaigns>() {
+                                        @Override
+                                        public int compare(Campaigns a, Campaigns b) {
+                                            if(a.click >= b.click){
+                                                return 1;
+                                            }else{
+                                                return -1;
+                                            }
+                                        }
+                                    });
+                                    break;
+                                case 1007:
+                                    Collections.sort(campaignsList, new Comparator<Campaigns>() {
+                                        @Override
+                                        public int compare(Campaigns a, Campaigns b) {
+                                            if(a.click >= b.click){
+                                                return -1;
+                                            }else{
+                                                return 1;
+                                            }
+                                        }
+                                    });
+                                    break;
+                                case 8:
+                                    Collections.sort(campaignsList, new Comparator<Campaigns>() {
+                                        @Override
+                                        public int compare(Campaigns a, Campaigns b) {
+                                            if(a.cpa >= b.cpa){
+                                                return 1;
+                                            }else{
+                                                return -1;
+                                            }
+                                        }
+                                    });
+                                    break;
+                                case 1008:
+                                    Collections.sort(campaignsList, new Comparator<Campaigns>() {
+                                        @Override
+                                        public int compare(Campaigns a, Campaigns b) {
+                                            if(a.cpa >= b.cpa){
+                                                return -1;
+                                            }else{
+                                                return 1;
+                                            }
+                                        }
+                                    });
+                                    break;
+                                case 9:
+                                    Collections.sort(campaignsList, new Comparator<Campaigns>() {
+                                        @Override
+                                        public int compare(Campaigns a, Campaigns b) {
+                                            if(a.ctr >= b.ctr){
+                                                return 1;
+                                            }else{
+                                                return -1;
+                                            }
+                                        }
+                                    });
+                                    break;
+                                case 1009:
+                                    Collections.sort(campaignsList, new Comparator<Campaigns>() {
+                                        @Override
+                                        public int compare(Campaigns a, Campaigns b) {
+                                            if(a.ctr >= b.ctr){
+                                                return -1;
+                                            }else{
+                                                return 1;
+                                            }
+                                        }
+                                    });
+                                    break;
+                                case 10:
+                                    Collections.sort(campaignsList, new Comparator<Campaigns>() {
+                                        @Override
+                                        public int compare(Campaigns a, Campaigns b) {
+                                            if(a.cvr >= b.cvr){
+                                                return 1;
+                                            }else{
+                                                return -1;
+                                            }
+                                        }
+                                    });
+                                    break;
+                                case 1010:
+                                    Collections.sort(campaignsList, new Comparator<Campaigns>() {
+                                        @Override
+                                        public int compare(Campaigns a, Campaigns b) {
+                                            if(a.cvr >= b.cvr){
+                                                return -1;
+                                            }else{
+                                                return 1;
+                                            }
+                                        }
+                                    });
+                                    break;
+                                case 11:
+                                    Collections.sort(campaignsList, new Comparator<Campaigns>() {
+                                        @Override
+                                        public int compare(Campaigns a, Campaigns b) {
+                                            if(a.roi >= b.roi){
+                                                return 1;
+                                            }else{
+                                                return -1;
+                                            }
+                                        }
+                                    });
+                                    break;
+                                case 1011:
+                                    Collections.sort(campaignsList, new Comparator<Campaigns>() {
+                                        @Override
+                                        public int compare(Campaigns a, Campaigns b) {
+                                            if(a.roi >= b.roi){
+                                                return -1;
+                                            }else{
+                                                return 1;
+                                            }
+                                        }
+                                    });
+                                    break;
+                            }
+                            JsonArray jsonArray = new JsonArray();
+
+                            for(Campaigns c : campaignsList){
+                                JsonObject j = new JsonObject();
+                                j.addProperty("campaign_id",c.campaign_id);
+                                j.addProperty("account_id",c.account_id);
+                                j.addProperty("campaign_name",c.campaign_name);
+                                j.addProperty("status",c.status);
+                                j.addProperty("create_time",c.create_time);
+                                j.addProperty("country_code",c.country_code);
+                                j.addProperty("budget",c.budget);
+                                j.addProperty("bidding",c.bidding);
+                                j.addProperty("impressions",c.impressions);
+                                j.addProperty("installed",c.installed);
+                                j.addProperty("click",c.click);
+                                j.addProperty("spend",c.spend);
+                                j.addProperty("ctr",c.ctr);
+                                j.addProperty("cpa",c.cpa);
+                                j.addProperty("cvr",c.cvr);
+                                j.addProperty("roi",c.roi);
+                                j.addProperty("campaign_spends",c.campaign_spends);
+                                j.addProperty("network",c.network);
+                                jsonArray.add(j);
+                            }
+
+                            jsonObject.add("array",jsonArray);
+                        }else{
+                            jsonObject = admob;
+                        }
+
+
                     } else {
-                        jsonObject = fetchOneAppData(id, tag,startTime, endTime, sorter, "true".equals(adwordsCheck), "true".equals(countryCheck), countryCode,likeCampaignName,campaignCreateTime,true);
+                        jsonObject = fetchOneAppData(id, tag,startTime, endTime, "true".equals(adwordsCheck), "true".equals(countryCheck), countryCode,likeCampaignName,campaignCreateTime,true);
                     }
                     if ("true".equals(countryCheck)) {
                         JsonArray array = jsonObject.getAsJsonArray("array");
@@ -157,30 +462,255 @@ public class Query extends HttpServlet {
                             record.installed += one.get("installed").getAsDouble();
                             record.click += one.get("click").getAsDouble();
                             record.spend += one.get("spend").getAsDouble();
-                            record.ctr = record.impressions > 0 ? record.click / record.impressions : 0;
-                            record.cpa = record.installed > 0 ? record.spend / record.installed : 0;
-                            record.cvr = record.click > 0 ? record.installed / record.click : 0;
                         }
                         JsonArray newArr = new JsonArray();
-                        for (String key : dataSets.keySet()) {
-                            String sql = "select price from web_ad_tag_country_price_dict cpd, app_country_code_dict ccd\n" +
-                                    "where cpd.country_code = ccd.country_code and ccd.country_name = '" + key + "' and tag_name = '" + tag + "'";
-                            JSObject oneR = DB.findOneBySql(sql);
-                            double price = Utils.convertDouble(oneR.get("price"),0);
-                            JsonObject one = new JsonObject();
-                            CountryRecord record = dataSets.get(key);
-                            record.roi = (price - record.cpa) * record.installed;
-                            one.addProperty("country_name", key);
-                            one.addProperty("impressions", record.impressions);
-                            one.addProperty("installed", record.installed);
-                            one.addProperty("click", record.click);
-                            one.addProperty("spend", Utils.trimDouble(record.spend));
-                            one.addProperty("ctr", Utils.trimDouble(record.ctr));
-                            one.addProperty("cpa", Utils.trimDouble(record.cpa));
-                            one.addProperty("cvr", Utils.trimDouble(record.cvr));
-                            one.addProperty("roi", Utils.trimDouble(record.roi));
-                            newArr.add(one);
+                        if(sorter > 0){
+                            List<CountryRecord> countryRecordList = new ArrayList<>();
+                            for (String key : dataSets.keySet()) {
+                                String sql = "select price from web_ad_tag_country_price_dict cpd, app_country_code_dict ccd\n" +
+                                        "where cpd.country_code = ccd.country_code and ccd.country_name = '" + key + "' and tag_name = '" + tag + "'";
+                                JSObject oneR = DB.findOneBySql(sql);
+                                double price = Utils.convertDouble(oneR.get("price"),0);
+                                CountryRecord record = dataSets.get(key);
+                                record.country_name = key;
+                                record.ctr = record.impressions > 0 ? record.click / record.impressions : 0;
+                                record.cpa = record.installed > 0 ? record.spend / record.installed : 0;
+                                record.cvr = record.click > 0 ? record.installed / record.click : 0;
+                                record.roi = (price - record.cpa) * record.installed;
+                                countryRecordList.add(record);
+                            }
+                            switch (sorter){
+                                case 21:
+                                    Collections.sort(countryRecordList, new Comparator<CountryRecord>() {
+                                        @Override
+                                        public int compare(CountryRecord a, CountryRecord b) {
+                                            if(a.impressions >= b.impressions){
+                                                return 1;
+                                            }else{
+                                                return -1;
+                                            }
+                                        }
+                                    });
+                                    break;
+                                case 1021:
+                                    Collections.sort(countryRecordList, new Comparator<CountryRecord>() {
+                                        @Override
+                                        public int compare(CountryRecord a, CountryRecord b) {
+                                            if(a.impressions >= b.impressions){
+                                                return -1;
+                                            }else{
+                                                return 1;
+                                            }
+                                        }
+                                    });
+                                    break;
+                                case 22:
+                                    Collections.sort(countryRecordList, new Comparator<CountryRecord>() {
+                                        @Override
+                                        public int compare(CountryRecord a, CountryRecord b) {
+                                            if(a.spend >= b.spend){
+                                                return 1;
+                                            }else{
+                                                return -1;
+                                            }
+                                        }
+                                    });
+                                    break;
+                                case 1022:
+                                    Collections.sort(countryRecordList, new Comparator<CountryRecord>() {
+                                        @Override
+                                        public int compare(CountryRecord a, CountryRecord b) {
+                                            if(a.spend >= b.spend){
+                                                return -1;
+                                            }else{
+                                                return 1;
+                                            }
+                                        }
+                                    });
+                                    break;
+                                case 23:
+                                    Collections.sort(countryRecordList, new Comparator<CountryRecord>() {
+                                        @Override
+                                        public int compare(CountryRecord a, CountryRecord b) {
+                                            if(a.installed >= b.installed){
+                                                return 1;
+                                            }else{
+                                                return -1;
+                                            }
+                                        }
+                                    });
+                                    break;
+                                case 1023:
+                                    Collections.sort(countryRecordList, new Comparator<CountryRecord>() {
+                                        @Override
+                                        public int compare(CountryRecord a, CountryRecord b) {
+                                            if(a.installed>= b.installed){
+                                                return -1;
+                                            }else{
+                                                return 1;
+                                            }
+                                        }
+                                    });
+                                    break;
+                                case 24:
+                                    Collections.sort(countryRecordList, new Comparator<CountryRecord>() {
+                                        @Override
+                                        public int compare(CountryRecord a, CountryRecord b) {
+                                            if(a.click >= b.click){
+                                                return 1;
+                                            }else{
+                                                return -1;
+                                            }
+                                        }
+                                    });
+                                    break;
+                                case 1024:
+                                    Collections.sort(countryRecordList, new Comparator<CountryRecord>() {
+                                        @Override
+                                        public int compare(CountryRecord a, CountryRecord b) {
+                                            if(a.click >= b.click){
+                                                return -1;
+                                            }else{
+                                                return 1;
+                                            }
+                                        }
+                                    });
+                                    break;
+                                case 25:
+                                    Collections.sort(countryRecordList, new Comparator<CountryRecord>() {
+                                        @Override
+                                        public int compare(CountryRecord a, CountryRecord b) {
+                                            if(a.cpa >= b.cpa){
+                                                return 1;
+                                            }else{
+                                                return -1;
+                                            }
+                                        }
+                                    });
+                                    break;
+                                case 1025:
+                                    Collections.sort(countryRecordList, new Comparator<CountryRecord>() {
+                                        @Override
+                                        public int compare(CountryRecord a, CountryRecord b) {
+                                            if(a.cpa >= b.cpa){
+                                                return -1;
+                                            }else{
+                                                return 1;
+                                            }
+                                        }
+                                    });
+                                    break;
+                                case 26:
+                                    Collections.sort(countryRecordList, new Comparator<CountryRecord>() {
+                                        @Override
+                                        public int compare(CountryRecord a, CountryRecord b) {
+                                            if(a.ctr >= b.ctr){
+                                                return 1;
+                                            }else{
+                                                return -1;
+                                            }
+                                        }
+                                    });
+                                    break;
+                                case 1026:
+                                    Collections.sort(countryRecordList, new Comparator<CountryRecord>() {
+                                        @Override
+                                        public int compare(CountryRecord a, CountryRecord b) {
+                                            if(a.ctr >= b.ctr){
+                                                return -1;
+                                            }else{
+                                                return 1;
+                                            }
+                                        }
+                                    });
+                                    break;
+                                case 27:
+                                    Collections.sort(countryRecordList, new Comparator<CountryRecord>() {
+                                        @Override
+                                        public int compare(CountryRecord a, CountryRecord b) {
+                                            if(a.cvr >= b.cvr){
+                                                return 1;
+                                            }else{
+                                                return -1;
+                                            }
+                                        }
+                                    });
+                                    break;
+                                case 1027:
+                                    Collections.sort(countryRecordList, new Comparator<CountryRecord>() {
+                                        @Override
+                                        public int compare(CountryRecord a, CountryRecord b) {
+                                            if(a.cvr >= b.cvr){
+                                                return -1;
+                                            }else{
+                                                return 1;
+                                            }
+                                        }
+                                    });
+                                    break;
+                                case 28:
+                                    Collections.sort(countryRecordList, new Comparator<CountryRecord>() {
+                                        @Override
+                                        public int compare(CountryRecord a, CountryRecord b) {
+                                            if(a.roi >= b.roi){
+                                                return 1;
+                                            }else{
+                                                return -1;
+                                            }
+                                        }
+                                    });
+                                    break;
+                                case 1028:
+                                    Collections.sort(countryRecordList, new Comparator<CountryRecord>() {
+                                        @Override
+                                        public int compare(CountryRecord a, CountryRecord b) {
+                                            if(a.roi >= b.roi){
+                                                return -1;
+                                            }else{
+                                                return 1;
+                                            }
+                                        }
+                                    });
+                                    break;
+                            }
+                            for(CountryRecord record : countryRecordList){
+                                JsonObject one = new JsonObject();
+                                one.addProperty("country_name", record.country_name);
+                                one.addProperty("impressions", record.impressions);
+                                one.addProperty("installed", record.installed);
+                                one.addProperty("click", record.click);
+                                one.addProperty("spend", Utils.trimDouble(record.spend));
+                                one.addProperty("ctr", Utils.trimDouble(record.ctr));
+                                one.addProperty("cpa", Utils.trimDouble(record.cpa));
+                                one.addProperty("cvr", Utils.trimDouble(record.cvr));
+                                one.addProperty("roi", Utils.trimDouble(record.roi));
+                                newArr.add(one);
+                            }
+                        }else{
+                            for (String key : dataSets.keySet()) {
+                                String sql = "select price from web_ad_tag_country_price_dict cpd, app_country_code_dict ccd\n" +
+                                        "where cpd.country_code = ccd.country_code and ccd.country_name = '" + key + "' and tag_name = '" + tag + "'";
+                                JSObject oneR = DB.findOneBySql(sql);
+                                double price = Utils.convertDouble(oneR.get("price"),0);
+                                JsonObject one = new JsonObject();
+                                CountryRecord record = dataSets.get(key);
+                                record.ctr = record.impressions > 0 ? record.click / record.impressions : 0;
+                                record.cpa = record.installed > 0 ? record.spend / record.installed : 0;
+                                record.cvr = record.click > 0 ? record.installed / record.click : 0;
+                                record.roi = (price - record.cpa) * record.installed;
+                                one.addProperty("country_name", key);
+                                one.addProperty("impressions", record.impressions);
+                                one.addProperty("installed", record.installed);
+                                one.addProperty("click", record.click);
+                                one.addProperty("spend", Utils.trimDouble(record.spend));
+                                one.addProperty("ctr", Utils.trimDouble(record.ctr));
+                                one.addProperty("cpa", Utils.trimDouble(record.cpa));
+                                one.addProperty("cvr", Utils.trimDouble(record.cvr));
+                                one.addProperty("roi", Utils.trimDouble(record.roi));
+                                newArr.add(one);
+                            }
                         }
+
                         jsonObject.add("array", newArr);
                     }
                     json.add("data", jsonObject);
@@ -203,6 +733,7 @@ public class Query extends HttpServlet {
     }
 
     class CountryRecord {
+        public String country_name;
         public double impressions;
         public double installed;
         public double click;
@@ -212,29 +743,28 @@ public class Query extends HttpServlet {
         public double cvr;
         public double roi;
     }
-    class Campaigns{
-        String account_id;
-        String campaign_name;
-        String status;
-        String create_time;
-        String country_code;
-        String country_name;
-        double budget;
-        double bidding;
-        double spend;
-        double campaign_spends;
-        double installed;
-        double impressions;
-        double click;
-        double ctr;
-        double cpa;
-        double cvr;
-        double roi;
-        String network;
+    class Campaigns {
+        public String campaign_id;
+        public String account_id;
+        public String campaign_name;
+        public String status;
+        public String create_time;
+        public String country_code;
+        public double budget;
+        public double bidding;
+        public double impressions;
+        public double installed;
+        public double click;
+        public double spend;
+        public double ctr;
+        public double cpa;
+        public double cvr;
+        public double roi;
+        public double campaign_spends;
+        public String network;
     }
 
-    private JsonObject fetchOneAppData(long tagId, String tagName, String startTime, String endTime,
-                                       int sorterId, boolean admobCheck, boolean countryCheck, String countryCode,String likeCampaignName,String campaignCreateTime,boolean hasROI) throws Exception {
+    private JsonObject fetchOneAppData(long tagId, String tagName, String startTime, String endTime, boolean admobCheck, boolean countryCheck, String countryCode,String likeCampaignName,String campaignCreateTime,boolean hasROI) throws Exception {
         String relationTable = "web_ad_campaign_tag_rel";
         String webAdCampaignTable = "web_ad_campaigns";
         String webAdCampaignHistoryTable = "web_ad_campaigns_history";
@@ -294,58 +824,6 @@ public class Query extends HttpServlet {
             campaignIds = campaignIds.substring(0,campaignIds.length()-1);
         }
 
-
-        String orderStr = "";
-        if (sorterId >= 0) {
-            switch (sorterId) {
-                case 0:
-                case 1:
-                case 1001:
-                    orderStr = "order by create_time ";
-                    break;
-                case 2:
-                case 1002:
-                    orderStr = "order by status ";
-                    break;
-                case 3:
-                case 1003:
-                    orderStr = "order by budget ";
-                    break;
-                case 4:
-                case 1004:
-                    orderStr = "order by bidding ";
-                    break;
-                case 5:
-                case 1005:
-                    orderStr = "order by spend ";
-                    break;
-                case 6:
-                case 1006:
-                    orderStr = "order by installed ";
-                    break;
-                case 7:
-                case 1007:
-                    orderStr = "order by click ";
-                    break;
-                case 8:
-                case 1008:
-                    orderStr = "order by cpa ";
-                    break;
-                case 9:
-                case 1009:
-                    orderStr = "order by ctr ";
-                    break;
-                case 10:
-                case 1010:
-                    orderStr = "order by cvr ";
-                    break;
-                default:
-                    orderStr = "order by create_time ";
-            }
-            if (sorterId > 1000) {
-                orderStr += " desc";
-            }
-        }
         List<JSObject> listCampaignSpend4CountryCode = new ArrayList<>();
         Map<String,JSObject> countryCampaignspendMap = new HashMap<>();
         if (!campaignIds.isEmpty()) {
@@ -373,17 +851,17 @@ public class Query extends HttpServlet {
                         "select ch.campaign_id, account_id, campaign_name,c.status, create_time, c.budget, c.bidding, sum(ch.total_spend) as spend, " +
                         "sum(ch.total_installed) as installed, sum(ch.total_impressions) as impressions " +
                         ",sum(ch.total_click) as click from " + webAdCampaignTable + " c, ";
-                        if(admobCheck){
-                            sql += " web_ad_campaigns_country_history_admob ch ";
-                        }else{
-                            sql += " web_ad_campaigns_country_history ch ";
-                        }
+                if(admobCheck){
+                    sql += " web_ad_campaigns_country_history_admob ch ";
+                }else{
+                    sql += " web_ad_campaigns_country_history ch ";
+                }
 
-                        sql += "where c.campaign_id=ch.campaign_id and country_code= '" + countryCode + "' " +
+                sql += "where c.campaign_id=ch.campaign_id and country_code= '" + countryCode + "' " +
                         ((likeCampaignName != null) ? " and campaign_name like '%" + likeCampaignName +"%' " : "")  +
                         "and date between '" + startTime + "' and '" + endTime + "' " +
-                                "and c.campaign_id in (" + campaignIds + ")" +
-                        "group by ch.campaign_id) a " + orderStr;
+                        "and c.campaign_id in (" + campaignIds + ")" +
+                        "group by ch.campaign_id) a ";
                 list = DB.findListBySql(sql);
             }else if (countryCheck) {
                 sql = "select campaign_id, country_code, account_id, campaign_name, status, create_time, budget, bidding, spend, installed, impressions, click" +
@@ -398,7 +876,7 @@ public class Query extends HttpServlet {
                         ((likeCampaignName != null) ? " and campaign_name like '%" + likeCampaignName +"%' " : "")  +
                         "and date between '" + startTime + "' and '" + endTime + "' " +
                         "and c.campaign_id in (" + campaignIds + ")" +
-                        "group by ch.campaign_id, country_code) a " + orderStr;
+                        "group by ch.campaign_id, country_code) a ";
                 list = DB.findListBySql(sql);
             }else{
                 sql = "select campaign_id, account_id, campaign_name, status, create_time, budget, bidding, spend, installed, impressions, click" +
@@ -413,7 +891,7 @@ public class Query extends HttpServlet {
                         ((likeCampaignName != null) ? " and campaign_name like '%" + likeCampaignName +"%' " : "")  +
                         "and date between '" + startTime + "' and '" + endTime + "' " +
                         "and c.campaign_id in (" + campaignIds + ")" +
-                        "group by ch.campaign_id) a " + orderStr;
+                        "group by ch.campaign_id) a ";
                 list = DB.findListBySql(sql);
             }
 
