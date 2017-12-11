@@ -376,6 +376,7 @@ function bindSortOp() {
         var adwordsCheck = $('#adwordsCheck').is(':checked');
         var countryCheck = $('#countryCheck').is(':checked');
         var facebookCheck = $('#facebookCheck').is(':checked');
+        var  likeCampaignName = $("#inputQueryByCampaignNameText").val();
         for (var i = 0; i < regionList.length; i++) {
             if (countryName == regionList[i].name) {
                 countryCode = regionList[i].country_code;
@@ -391,7 +392,8 @@ function bindSortOp() {
             countryCheck: countryCheck,
             facebookCheck: facebookCheck,
             countryCode: countryCode,
-            sorterId: sorterId
+            sorterId: sorterId,
+            likeCampaignName: likeCampaignName
         }, function (data) {
             if (data && data.ret == 1) {
                 data = data.data;
