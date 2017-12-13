@@ -122,6 +122,9 @@ public class Campaign extends HttpServlet {
                             String s = String.valueOf(System.currentTimeMillis());
                             s = s.substring(9,s.length());
                             campaignName = campaignNameOld.replace(accountNameArrStr,accountNameArr[j]) + s + "_" + i;
+                            if (campaignName.length() > 100) {
+                                campaignName = campaignName.substring(0, 100);
+                            }
 
                             long genId = DB.insert("ad_campaigns")
                                     .put("facebook_app_id", appId)
