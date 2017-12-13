@@ -52,9 +52,16 @@ public class Config {
 
     public static Map<String, String> getRegionLanguageRelMap() {
         Map<String, String> regionLanguageRelMap = new HashMap<>();
+        regionLanguageRelMap.put("Afghanistan","Pashto");
 
+        regionLanguageRelMap.put("Burkina Faso","French");
+        regionLanguageRelMap.put("Bosnia and Herzegovina","Bosnian");
         regionLanguageRelMap.put("Burundi","French");
+
         regionLanguageRelMap.put("Central African Republic","French");
+
+        regionLanguageRelMap.put("Ivory Coast","French");
+
         regionLanguageRelMap.put("Malawi","English");
         regionLanguageRelMap.put("The Gambia","Arabic");
         regionLanguageRelMap.put("Madagascar","French");
@@ -63,11 +70,11 @@ public class Config {
         regionLanguageRelMap.put("Guinea","French");
         regionLanguageRelMap.put("Somalia","Somali");
         regionLanguageRelMap.put("Togo","French");
-        regionLanguageRelMap.put("Afghanistan","Pashto");
+
         regionLanguageRelMap.put("Uganda","English");
         regionLanguageRelMap.put("Mozambique","Portuguese");
         regionLanguageRelMap.put("Eritrea","English");
-        regionLanguageRelMap.put("Burkina Faso","French");
+
         regionLanguageRelMap.put("Mali","French");
         regionLanguageRelMap.put("Sierra Leone","English");
         regionLanguageRelMap.put("Ethiopia","Amharic");
@@ -130,7 +137,7 @@ public class Config {
         regionLanguageRelMap.put("Tunisia","Arabic");
         regionLanguageRelMap.put("Guyana","English");
         regionLanguageRelMap.put("El Salvador","Spanish");
-        regionLanguageRelMap.put("Bosnia and Herzegovina","Bosnian");
+
         regionLanguageRelMap.put("Angola","Portuguese");
         regionLanguageRelMap.put("Paraguay","Spanish");
         regionLanguageRelMap.put("Mongolia","Mongolian");
@@ -210,7 +217,7 @@ public class Config {
         regionLanguageRelMap.put("Japan","Japanese");
         regionLanguageRelMap.put("United Arab Emirates","Arabic");
         regionLanguageRelMap.put("Israel","Hebrew");
-        regionLanguageRelMap.put("new Zealand","English");
+        regionLanguageRelMap.put("New Zealand","English");
         regionLanguageRelMap.put("France","French");
         regionLanguageRelMap.put("Andorra","Catalan");
         regionLanguageRelMap.put("Belgium","Dutch");
