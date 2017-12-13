@@ -169,7 +169,7 @@ public class CampaignAdmob extends HttpServlet {
                                     String[] split = region.split(",");
                                     for(String country_code : split){
                                         DB.insert("web_ad_campaign_operation_log")
-                                                .put("operation_date", DateUtil.convertDateStrToDate(now,"yyyy-MM-dd"))
+                                                .put("operation_date", now)
                                                 .put("app_name",appName)
                                                 .put("country_code", country_code)
                                                 .put("campaign_name",campaignName)

@@ -171,7 +171,7 @@ public class Campaign extends HttpServlet {
                                     for(JSObject m: countryCodeJSObjectList){
                                         String countryCodeStr = m.get("country_code");
                                         DB.insert("web_ad_campaign_operation_log")
-                                                .put("operation_date", DateUtil.convertDateStrToDate(now,"yyyy-MM-dd"))
+                                                .put("operation_date", now)
                                                 .put("app_name",appName)
                                                 .put("country_code", countryCodeStr)
                                                 .put("campaign_name",campaignName)
@@ -692,7 +692,7 @@ public class Campaign extends HttpServlet {
                         }
                         for(JSObject js : countryJSObjectList){
                             DB.insert("web_ad_campaign_operation_log")
-                                    .put("operation_date", DateUtil.convertDateStrToDate(now,"yyyy-MM-dd"))
+                                    .put("operation_date", now)
                                     .put("app_name",appName)
                                     .put("country_code",js.get("country_code"))
                                     .put("campaign_id",item.campaignId)
