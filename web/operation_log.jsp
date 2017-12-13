@@ -53,17 +53,16 @@
             <input id="inputSearch" class="form-control" style="display: inline; width: auto;" type="text"/>
             <span>国家</span>
             <input id="inputCountry" class="form-control" style="display: inline; width: auto;" type="text"/>
-            <button id="btnSearch" class="btn btn-default">查找</button>
+            <button id="btnSearch" class="btn btn-default">查询</button>
         </div>
     </div>
     <table class="table table-hover">
         <thead id="result_header">
         <tr>
-            <th>操作日期</th>
-            <th>创建情况</th>
-            <th>暂停情况</th>
-            <th>预算升降</th>
-            <th>竞价升降</th>
+            <th>操作时间</th>
+            <th>系列ID</th>
+            <th>系列名称</th>
+            <th>操作日志</th>
         </tr>
         </thead>
         <tbody id="results_body">
@@ -71,49 +70,6 @@
     </table>
     <div class="panel panel-default">
         <div class="panel-body" id="total_result">
-        </div>
-    </div>
-</div>
-
-<div id="new_campaign_dlg" class="modal fade" tabindex="-1" role="dialog">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title" id="dlg_title">修改系列</h4>
-            </div>
-            <div class="modal-body">
-                <form id="modify_form" class="form-horizontal" action="#" autocomplete="off">
-                    <div class="form-group">
-                        <label for="inputCampaignName" class="col-sm-2 control-label">系列名称</label>
-                        <div class="col-sm-10">
-                            <input class="form-control" id="inputCampaignName" placeholder="系列名称" autocomplete="off">
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="inputStatus" class="col-sm-2 control-label">是否开启</label>
-                        <div class="col-sm-10">
-                            <input type="checkbox" id="inputStatus">
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="inputBudget" class="col-sm-2 control-label">预算</label>
-                        <div class="col-sm-10">
-                            <input type="number" class="form-control" id="inputBudget" placeholder="预算" autocomplete="off">
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="inputBidding" class="col-sm-2 control-label">竞价</label>
-                        <div class="col-sm-10">
-                            <input type="number" class="form-control" id="inputBidding" placeholder="竞价" autocomplete="off">
-                        </div>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
-                <button type="button" class="btn btn-primary">确定</button>
-            </div>
         </div>
     </div>
 </div>
@@ -128,7 +84,7 @@
 <script src="js/core.js"></script>
 <script src="js/bootstrap-datetimepicker.js"></script>
 <script src="jqueryui/jquery-ui.min.js"></script>
-
+<script src="js/country-name-code-dict.js"></script>
 <script>
     var campaignId;
 
@@ -158,22 +114,14 @@
             }
         }, 'json');
     });
+    var countryNames = [];
+    for (var i = 0; i < regionList.length; i++) {
+        countryNames.push(regionList[i].name);
+    }
 
     function init() {
-        var now = new Date();
-        $('#inputStartTime').val("2017-01-01");
-        $('#inputEndTime').val("2017-10-15");
-        $('#inputStartTime').datetimepicker({
-            minView: "month",
-            format: 'yyyy-mm-dd',
-            autoclose: true,
-            todayBtn: true
-        });
-        $('#inputEndTime').datetimepicker({
-            minView: "month",
-            format: 'yyyy-mm-dd',
-            autoclose: true,
-            todayBtn: true
+        $("#inputCountry").autocomplete({
+            source: countryNames
         });
 
         $("#inputSearch").autocomplete({
@@ -182,69 +130,18 @@
 
         $('#btnSearch').click(function () {
             var query = $("#inputSearch").val();
-            var startTime = $('#inputStartTime').val();
-            var endTime = $('#inputEndTime').val();
-            var emptyCampaign = $('#emptyCampaignCheck').is(':checked');
-            var admobCheck = $('#admobCheck').is(':checked');
-            var countryCheck = $('#countryCheck').is(':checked');
-            var plusAdmobCheck = $('#plusAdmobCheck').is(':checked');
-
-            $.post('temp_query', {
-                tag: query,
-                startTime: startTime,
-                endTime: endTime,
-                emptyCampaign: emptyCampaign,
-                admobCheck: admobCheck,
-                countryCheck: countryCheck,
-                plusAdmobCheck: plusAdmobCheck,
+            var countryName = $('#inputCountry').val();
+            $.post('query_two/query_operation_log', {
+                tagName: query,
+                countryName: countryName
             }, function (data) {
                 if (data && data.ret == 1) {
-                    if (countryCheck) {
-                        $('#result_header').html("<tr><th>国家</th><th>总展示</th><th>总花费</th><th>总安装</th><th>总点击</th><th>CPA</th><th>CTR</th><th>CVR</th></tr>");
-                    } else if (admobCheck) {
-                        $('#result_header').html("<tr><th>系列ID</th><th>广告账号ID</th><th>系列名称</th><th>创建时间<span sorterId=\"1\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>状态<span sorterId=\"2\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>预算<span sorterId=\"3\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>竞价<span sorterId=\"4\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>总花费<span sorterId=\"5\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>总安装<span sorterId=\"6\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>总点击<span sorterId=\"7\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>CPA<span sorterId=\"8\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>CTR<span sorterId=\"9\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>CVR<span sorterId=\"10\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th></tr>");
-                    } else {
-                        $('#result_header').html("<tr><th>系列ID</th><th>广告账号ID</th><th>系列名称</th><th>创建时间<span sorterId=\"1\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>状态<span sorterId=\"2\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>预算<span sorterId=\"3\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>竞价<span sorterId=\"4\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>总花费<span sorterId=\"5\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>总安装<span sorterId=\"6\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>总点击<span sorterId=\"7\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>CPA<span sorterId=\"8\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>CTR<span sorterId=\"9\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>CVR<span sorterId=\"10\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>操作</th></tr>");
-                    }
-                    data = data.data;
-                    setData(data);
-                    bindSortOp();
-                    var str = "总花费: " + data.total_spend + " 总安装: " + data.total_installed +
-                            " 总展示: " + data.total_impressions + " 总点击: " + data.total_click +
-                                    " CTR: " + data.total_ctr + " CPA: " + data.total_cpa + " CVR: " + data.total_cvr;
-                    $('#total_result').text(str);
-                } else {
-                    admanager.showCommonDlg("错误", data.message);
-                }
-            }, 'json');
-        });
-
-        $('#btnSummary').click(function () {
-            var query = $("#inputSearch").val();
-            var startTime = $('#inputStartTime').val();
-            var endTime = $('#inputEndTime').val();
-            var emptyCampaign = $('#emptyCampaignCheck').is(':checked');
-            var admobCheck = $('#admobCheck').is(':checked');
-            var plusAdmobCheck = $('#plusAdmobCheck').is(':checked');
-
-            $.post('temp_query', {
-                summary: true,
-                startTime: startTime,
-                endTime: endTime,
-                emptyCampaign: emptyCampaign,
-                admobCheck: admobCheck,
-                plusAdmobCheck: plusAdmobCheck,
-            }, function (data) {
-                if (data && data.ret == 1) {
-                    $('#result_header').html("<tr><th>应用名称</th><th>总花费</th><th>总安装</th><th>总展示</th><th>总点击</th><th>CTR</th><th>CPA</th><th>CVR</th></tr>");
-                    data = data.data;
-
+                    $('#result_header').html("<tr><th>操作时间</th><th>系列ID</th><th>操作日志</th></tr>");
                     $('#results_body > tr').remove();
-                    for (var i = 0; i < data.length; i++) {
-                        var one = data[i];
+                    for (var i = 0; i < data.array.length; i++) {
+                        var one = data.array[i];
                         var tr = $('<tr></tr>');
-                        var keyset = ["name", "total_spend", "total_installed", "total_impressions", "total_click",
-                            "total_ctr", "total_cpa", "total_cvr"];
+                        var keyset = ["operation_date", "campaign_id", "details_text"];
                         for (var j = 0; j < keyset.length; j++) {
                             var td = $('<td></td>');
                             td.text(one[keyset[j]]);
@@ -252,138 +149,15 @@
                         }
                         $('#results_body').append(tr);
                     }
-                    $('#total_result').text("");
                 } else {
                     admanager.showCommonDlg("错误", data.message);
                 }
             }, 'json');
         });
-    }
 
-    function setData(data) {
-        $('#results_body > tr').remove();
-        for (var i = 0; i < data.array.length; i++) {
-            var one = data.array[i];
-            var tr = $('<tr></tr>');
-            var countryCheck = $('#countryCheck').is(':checked');
-            var keyset = ["campaign_id", "account_id", "campaign_name", "create_time",
-                "status", "budget", "bidding", "spend", "installed", "click", "cpa", "ctr", "cvr"];
-            if (countryCheck) {
-                keyset = ["country_name",
-                    "impressions","spend", "installed", "click", "cpa", "ctr", "cvr"];
-            }
-            for (var j = 0; j < keyset.length; j++) {
-                var td = $('<td></td>');
-                if (keyset[j] == 'budget' || keyset[j] == 'bidding') {
-                    td.text(one[keyset[j]] / 100);
-                } else {
-                    td.text(one[keyset[j]]);
-                }
-                tr.append(td);
-            }
-            var admobCheck = $('#admobCheck').is(':checked');
-            var countryCheck = $('#countryCheck').is(':checked');
-            if (!admobCheck && !countryCheck) {
-                var td = $('<td><a class="link_modify" href="javascript:void(0)">修改</a><a class="link_copy" href="javascript:void(0)">复制</a></td>');
-                tr.append(td);
-            }
-            $('#results_body').append(tr);
-        }
-        bindOp();
-    }
-
-    function bindOp() {
-        $(".link_modify").click(function() {
-            $('#modify_form').show();
-
-            $("#dlg_title").text("修改系列");
-
-            var tds = $(this).parents("tr").find('td');
-            campaignId = $(tds.get(0)).text();
-            var campaignName = $(tds.get(2)).text();
-            var status = $(tds.get(4)).text();
-            var budget = $(tds.get(5)).text();
-            var bidding = $(tds.get(6)).text();
-
-            $('#inputCampaignName').val(campaignName);
-            if (status.toLowerCase() == 'active') {
-                $('#inputStatus').prop('checked', true);
-            } else {
-                $('#inputStatus').prop('checked', false);
-            }
-            $('#inputBudget').val(budget);
-            $('#inputBidding').val(bidding);
-
-            $("#new_campaign_dlg").modal("show");
-        });
-
-        $(".link_copy").click(function() {
-            var tds = $(this).parents("tr").find('td');
-            $.post('campaign/find_create_data', {
-                campaignId: $(tds.get(0)).text(),
-            }, function (data) {
-                if (data && data.ret == 1) {
-                    var list = [];
-                    var keys = ["tag_name", "app_name", "facebook_app_id", "account_id", "country_region",
-                        "language","age", "gender", "detail_target", "campaign_name", "page_id", "bugdet", "bidding", "max_cpa", "title", "message"];
-                    var data = data.data;
-                    for (var i = 0; i < keys.length; i++) {
-                        list.push(data[keys[i]]);
-                    }
-                    admanager.showCommonDlg("请手动创建", list.join("\t"));
-                } else {
-                    admanager.showCommonDlg("错误", data.message);
-                }
-            }, 'json');
-        });
-    }
-
-    function bindSortOp() {
-        $('.sorter').click(function() {
-            var sorterId = $(this).attr('sorterId');
-            sorterId = parseInt(sorterId);
-            if ($(this).hasClass("glyphicon-arrow-up")) {
-                $(this).removeClass("glyphicon-arrow-up");
-                $(this).addClass("glyphicon-arrow-down");
-                sorterId += 1000;
-            } else {
-                $(this).removeClass("glyphicon-arrow-down");
-                $(this).addClass("glyphicon-arrow-up");
-            }
-
-            var query = $("#inputSearch").val();
-            var startTime = $('#inputStartTime').val();
-            var endTime = $('#inputEndTime').val();
-            var emptyCampaign = $('#emptyCampaignCheck').is(':checked');
-            var admobCheck = $('#admobCheck').is(':checked');
-            var countryCheck = $('#countryCheck').is(':checked');
-
-            $.post('temp_query', {
-                tag: query,
-                startTime: startTime,
-                endTime: endTime,
-                emptyCampaign: emptyCampaign,
-                admobCheck: admobCheck,
-                countryCheck: countryCheck,
-                sorterId: sorterId
-            }, function (data) {
-                if (data && data.ret == 1) {
-                    data = data.data;
-                    setData(data);
-                    var str = "总花费: " + data.total_spend + " 总安装: " + data.total_installed +
-                            " 总展示: " + data.total_impressions + " 总点击: " + data.total_click +
-                            " CTR: " + data.total_ctr + " CPA: " + data.total_cpa + " CVR: " + data.total_cvr;
-                    $('#total_result').text(str);
-                } else {
-                    admanager.showCommonDlg("错误", data.message);
-                }
-            }, 'json');
-        });
     }
 
     init();
-
-    $('#btnSummary').click();
 </script>
 </body>
 </html>

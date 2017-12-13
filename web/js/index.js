@@ -606,8 +606,11 @@ function bindBatchModifyOperation() {
             }
             list.push(one);
         });
+        var query = $("#inputSearch").val();
         $.post('campaign/batch_change', {
             data: JSON.stringify(list),
+            appName: query,
+            countryCode: countryCode
         }, function (data) {
             if (data && data.ret == 1) {
                 admanager.showCommonDlg("提示", "修改任务提交成功");

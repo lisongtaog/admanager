@@ -23,6 +23,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.lang.*;
 import java.lang.System;
+import java.math.BigDecimal;
 import java.util.*;
 
 @WebServlet(name = "Campaign", urlPatterns = "/campaign/*")
@@ -106,6 +107,7 @@ public class Campaign extends HttpServlet {
                 }
 
                 if (result.result) {
+
                     Calendar calendar = Calendar.getInstance();
                     String campaignNameOld = campaignName + "_";
                     String[] accountNameArr = accountName.split(",");
@@ -118,6 +120,7 @@ public class Campaign extends HttpServlet {
                             String now  = String.format("%d-%02d-%02d %02d:%02d:%02d", calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH),
                                     calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), calendar.get(Calendar.SECOND));
                             String s = String.valueOf(System.currentTimeMillis());
+                            s = s.substring(9,s.length());
                             campaignName = campaignNameOld.replace(accountNameArrStr,accountNameArr[j]) + s + "_" + i;
 
                             long genId = DB.insert("ad_campaigns")
@@ -150,9 +153,39 @@ public class Campaign extends HttpServlet {
                                     DB.updateBySql(sql);
                                 }
                             }
+                            if(genId >0){
+                                try {
+                                    String[] split = region.split(",");
+                                    String countryNamesStr = "";
+                                    for(int k=0,ee=split.length;k<ee;k++){
+                                        countryNamesStr += "'" + split[k] + "',";
+                                    }
+                                    if(countryNamesStr != null && countryNamesStr.length()>0){
+                                        countryNamesStr = countryNamesStr.substring(0,countryNamesStr.length()-1);
+                                    }
+                                    String sql = "select country_code from app_country_code_dict where country_name in ("+countryNamesStr+")";
+                                    List<JSObject> countryCodeJSObjectList = DB.findListBySql(sql);
+                                    for(JSObject m: countryCodeJSObjectList){
+                                        String countryCodeStr = m.get("country_code");
+                                        DB.insert("web_ad_campaign_operation_log")
+                                                .put("operation_date", DateUtil.convertDateStrToDate(now,"yyyy-MM-dd"))
+                                                .put("app_name",appName)
+                                                .put("country_code", countryCodeStr)
+                                                .put("campaign_name",campaignName)
+                                                .put("enabled",1)
+                                                .put("bidding",bidding)
+                                                .execute();
+                                    }
+
+
+
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                            }
+
                         }
                     }
-
                     result.result = true;
                 }
             } catch (Exception ex) {
@@ -575,6 +608,8 @@ public class Campaign extends HttpServlet {
         } else if (path.startsWith("/batch_change")) {
             try {
                 String data = request.getParameter("data");
+                String  appName = request.getParameter("appName");
+
                 JsonParser parser = new JsonParser();
                 Gson gson = new Gson();
                 JsonArray array = parser.parse(data).getAsJsonArray();
@@ -582,9 +617,24 @@ public class Campaign extends HttpServlet {
 
                 for (int i = 0; i < array.size(); i++) {
                     BatchChangeItem item = gson.fromJson(array.get(i), BatchChangeItem.class);
+                    String sql = "";
+
+
                     JSObject record = DB.simpleScan("web_ad_batch_change_campaigns")
                             .select("id").where(DB.filter().whereEqualTo("campaign_id", item.campaignId))
                             .and(DB.filter().whereEqualTo("success", 0)).execute();
+
+                    String sqlNetwork = "";
+                    String sqlCountry = "";
+                    if("admob".equals(item.network)){
+                        sqlNetwork = "select campaign_name,budget,bidding from web_ad_campaigns_admob where campaign_id = '"+item.campaignId+"'";
+                        sqlCountry = "select DISTINCT country_code from web_ad_campaigns_country_history_admob where campaign_id = '"+item.campaignId+"'";
+                    }else if("facebook".equals(item.network)){
+                        sqlNetwork = "select campaign_name,budget,bidding from web_ad_campaigns where campaign_id = '"+item.campaignId+"'";
+                        sqlCountry = "select DISTINCT country_code from web_ad_campaigns_country_history where campaign_id = '"+item.campaignId+"'";
+                    }
+                    JSObject one = DB.findOneBySql(sqlNetwork);
+                    List<JSObject> countryJSObjectList = DB.findListBySql(sqlCountry);
                     int enabled = -1;
                     if (item.enabled != null) {
                         enabled = item.enabled ? 1 : 0;
@@ -616,6 +666,39 @@ public class Campaign extends HttpServlet {
                                 .put("create_time", now)
                                 .put("success", 0)
                                 .execute();
+                    }
+
+                    String budgetStr = "";
+                    String biddingStr = "";
+                    if(record.hasObjectData()){
+                        double bugdet = one.get("budget");
+                        bugdet = bugdet / 100;
+                        double bidding = one.get("bidding");
+                        bidding = bidding / 100;
+                        if(bugdet  < item.budget){
+                            budgetStr = "预算上升；";
+                        }
+                        if(bugdet > item.budget){
+                            budgetStr = "预算下降；";
+                        }
+                        if(bidding < item.bidding){
+                            biddingStr = "竞价上升；";
+                        }
+                        if(bidding > item.bidding){
+                            biddingStr = "竞价下降；";
+                        }
+                        for(JSObject js : countryJSObjectList){
+                            DB.insert("web_ad_campaign_operation_log")
+                                    .put("operation_date", DateUtil.convertDateStrToDate(now,"yyyy-MM-dd"))
+                                    .put("app_name",appName)
+                                    .put("country_code",js.get("country_code"))
+                                    .put("campaign_id",item.campaignId)
+                                    .put("campaign_name", one.get("campaign_name"))
+                                    .put("enabled",enabled)
+                                    .put("details_text",budgetStr + biddingStr)
+                                    .execute();
+                        }
+
                     }
                 }
                 json.addProperty("ret", 1);

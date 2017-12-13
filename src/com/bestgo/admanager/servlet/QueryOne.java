@@ -20,8 +20,6 @@ import java.util.concurrent.Executors;
 
 @WebServlet(name = "QueryOne", urlPatterns = {"/query_one/*"}, asyncSupported = true)
 public class QueryOne extends HttpServlet {
-    private static ExecutorService executors = Executors.newFixedThreadPool(1);
-
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         doPost(request, response);
     }
@@ -43,10 +41,6 @@ public class QueryOne extends HttpServlet {
 
         if (path.startsWith("/query_not_has_data")) {
             try {
-                int sorter = 0;
-                if (sorterId != null) {
-                    sorter = Utils.parseInt(sorterId, 0);
-                }
                 JSObject tagObject = DB.simpleScan("web_tag")
                         .select("id", "tag_name")
                         .where(DB.filter().whereEqualTo("tag_name", tag)).execute();
@@ -54,10 +48,8 @@ public class QueryOne extends HttpServlet {
                     Long tagId = tagObject.get("id");
                     JsonObject jsonObject = null;
                     if (adwordsCheck != null && adwordsCheck.equals("false") && facebookCheck != null && facebookCheck.equals("false")) {
-                        JsonObject admob = fetchOneAppData(tagId, startTime, endTime,
-                                sorter,  true);
-                        JsonObject facebook = fetchOneAppData(tagId, startTime, endTime,
-                                sorter,  false);
+                        JsonObject admob = fetchOneAppData(tagId, startTime, endTime, true);
+                        JsonObject facebook = fetchOneAppData(tagId, startTime, endTime, false);
                         double total_spend = admob.get("total_spend").getAsDouble() + facebook.get("total_spend").getAsDouble();
                         double total_installed = admob.get("total_installed").getAsDouble() + facebook.get("total_installed").getAsDouble();
                         double total_impressions = admob.get("total_impressions").getAsDouble() + facebook.get("total_impressions").getAsDouble();
@@ -79,8 +71,7 @@ public class QueryOne extends HttpServlet {
                         }
                         jsonObject = admob;
                     } else {
-                        jsonObject = fetchOneAppData(tagId, startTime, endTime,
-                                sorter,  "true".equals(adwordsCheck));
+                        jsonObject = fetchOneAppData(tagId, startTime, endTime, "true".equals(adwordsCheck));
                     }
 
                     json.add("data", jsonObject);
@@ -103,8 +94,7 @@ public class QueryOne extends HttpServlet {
     }
 
 
-    private JsonObject fetchOneAppData(long tagId, String startTime, String endTime,
-                                       int sorterId, boolean admobCheck) throws Exception {
+    private JsonObject fetchOneAppData(long tagId, String startTime, String endTime, boolean admobCheck) throws Exception {
         String relationTable = "web_ad_campaign_tag_rel";
         String webAdCampaignTable = "web_ad_campaigns";
         String webAdCampaignHistoryTable = "web_ad_campaigns_history";
@@ -132,58 +122,6 @@ public class QueryOne extends HttpServlet {
         }
         if(campaignIds != null && campaignIds.length()>0){
             campaignIds = campaignIds.substring(0,campaignIds.length()-1);
-        }
-
-        String orderStr = "";
-        if (sorterId >= 0) {
-            switch (sorterId) {
-                case 0:
-                case 1:
-                case 1001:
-                    orderStr = "order by create_time ";
-                    break;
-                case 2:
-                case 1002:
-                    orderStr = "order by status ";
-                    break;
-                case 3:
-                case 1003:
-                    orderStr = "order by budget ";
-                    break;
-                case 4:
-                case 1004:
-                    orderStr = "order by bidding ";
-                    break;
-                case 5:
-                case 1005:
-                    orderStr = "order by spend ";
-                    break;
-                case 6:
-                case 1006:
-                    orderStr = "order by installed ";
-                    break;
-                case 7:
-                case 1007:
-                    orderStr = "order by click ";
-                    break;
-                case 8:
-                case 1008:
-                    orderStr = "order by cpa ";
-                    break;
-                case 9:
-                case 1009:
-                    orderStr = "order by ctr ";
-                    break;
-                case 10:
-                case 1010:
-                    orderStr = "order by cvr ";
-                    break;
-                default:
-                    orderStr = "order by create_time ";
-            }
-            if (sorterId > 1000) {
-                orderStr += " desc";
-            }
         }
 
         if (!campaignIds.isEmpty()) {
