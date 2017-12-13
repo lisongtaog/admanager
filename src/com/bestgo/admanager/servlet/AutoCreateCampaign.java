@@ -311,6 +311,10 @@ public class AutoCreateCampaign extends HttpServlet {
                 result.message = "图片路径不存在";
             }
 
+            if (campaignName.length() > 100) {
+                campaignName = campaignName.substring(0, 100);
+            }
+
             if (result.result) {
                 long recordId = DB.insert("ad_campaigns_auto_create")
                         .put("app_name", appName)
@@ -422,7 +426,9 @@ public class AutoCreateCampaign extends HttpServlet {
                 result.result = false;
                 result.message = "图片路径不存在";
             }
-
+            if (campaignName.length() > 100) {
+                campaignName = campaignName.substring(0, 100);
+            }
             if (result.result) {
                 DB.update("ad_campaigns_auto_create")
                         .put("app_name", appName)
@@ -594,7 +600,9 @@ public class AutoCreateCampaign extends HttpServlet {
                 result.result = false;
                 result.message = "bidding超过了1,   " + bidding;
             }
-
+            if (campaignName.length() > 100) {
+                campaignName = campaignName.substring(0, 100);
+            }
             File imagesPath = new File(imageRoot + File.separatorChar + imagePath);
             if (!imagesPath.exists()) {
                 result.result = false;
@@ -712,7 +720,9 @@ public class AutoCreateCampaign extends HttpServlet {
                 result.result = false;
                 result.message = "图片路径不存在";
             }
-
+            if (campaignName.length() > 100) {
+                campaignName = campaignName.substring(0, 100);
+            }
             if (result.result) {
                 DB.update("ad_campaigns_admob_auto_create")
                         .put("app_name", appName)
