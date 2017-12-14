@@ -98,11 +98,12 @@ public class QueryOne extends HttpServlet {
         String relationTable = "web_ad_campaign_tag_rel";
         String webAdCampaignTable = "web_ad_campaigns";
         String webAdCampaignHistoryTable = "web_ad_campaigns_history";
-
+        String webAccountIdTable = "web_account_id";
         if (admobCheck) {
             relationTable = "web_ad_campaign_tag_admob_rel";
             webAdCampaignTable = "web_ad_campaigns_admob";
             webAdCampaignHistoryTable = "web_ad_campaigns_history_admob";
+            webAccountIdTable = "web_account_id_admob";
         }
 
         HashMap<String ,String> countryMap = Utils.getCountryMap();
@@ -129,10 +130,10 @@ public class QueryOne extends HttpServlet {
             if(admobCheck){
                 List<JSObject> listAll = new ArrayList<>();
                 List<JSObject> listHasData = new ArrayList<>();
-                sql = "select campaign_id, account_id, campaign_name, create_time, status, budget, bidding, total_spend, total_installed, total_click, total_impressions, cpa,ctr, " +
+                sql = "select campaign_id, short_name, campaign_name, create_time, status, budget, bidding, total_spend, total_installed, total_click, total_impressions, cpa,ctr, " +
                         "(case when total_click > 0 then total_installed/total_click else 0 end) as cvr " +
-                        " from " + webAdCampaignTable + " where status != 'paused' and " +
-                        "campaign_id in (" + campaignIds + ")";
+                        " from " + webAdCampaignTable + " a , "+webAccountIdTable+" b where status != 'paused' and " +
+                        "campaign_id in (" + campaignIds + ") and a.account_id = b.account_id";
                 listAll = DB.findListBySql(sql);
                 sql = "select campaign_id, impressions from ( " +
                         "select ch.campaign_id, " +
@@ -145,7 +146,7 @@ public class QueryOne extends HttpServlet {
                 listHasData = DB.findListBySql(sql);
                 list = Utils.getDiffJSObjectList(listAll, listHasData, "campaign_id");
             }else{//Facebook
-                sql = "select campaign_id, account_id, campaign_name, status, create_time, budget, bidding, spend, installed, impressions, click" +
+                sql = "select campaign_id, short_name, campaign_name, status, create_time, budget, bidding, spend, installed, impressions, click" +
                         ", (case when impressions > 0 then click/impressions else 0 end) as ctr" +
                         ", (case when installed > 0 then spend/installed else 0 end) as cpa" +
                         ", (case when click > 0 then installed/click else 0 end) as cvr" +
@@ -156,7 +157,7 @@ public class QueryOne extends HttpServlet {
                         "where c.campaign_id=ch.campaign_id and status != 'paused' " +
                         "and date between '" + startTime + "' and '" + endTime + "' " +
                         "and c.campaign_id in (" + campaignIds + ")" +
-                        "group by ch.campaign_id having impressions = 0 ) a ";
+                        "group by ch.campaign_id having impressions = 0 ) a  left join " + webAccountIdTable + " b on a.account_id = b.account_id";
                 list = DB.findListBySql(sql);
             }
         } else {
@@ -177,7 +178,7 @@ public class QueryOne extends HttpServlet {
             JSObject one = list.get(i);
             String campaign_id = one.get("campaign_id");
 
-            String account_id = one.get("account_id");
+            String short_name = one.get("short_name");
             String campaign_name = one.get("campaign_name");
             String status = one.get("status");
             String create_time = one.get("create_time").toString();
@@ -218,7 +219,7 @@ public class QueryOne extends HttpServlet {
 
             JsonObject d = new JsonObject();
             d.addProperty("campaign_id", campaign_id);
-            d.addProperty("account_id", account_id);
+            d.addProperty("short_name", short_name);
             d.addProperty("campaign_name", campaign_name);
             d.addProperty("status", status);
             d.addProperty("create_time", create_time);

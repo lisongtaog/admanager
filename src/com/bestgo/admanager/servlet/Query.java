@@ -447,6 +447,7 @@ public class Query extends HttpServlet {
                             for(Campaigns c : campaignsList){
                                 JsonObject j = new JsonObject();
                                 j.addProperty("campaign_id",c.campaign_id);
+                                j.addProperty("short_name",c.short_name);
                                 j.addProperty("account_id",c.account_id);
                                 j.addProperty("campaign_name",c.campaign_name);
                                 j.addProperty("status",c.status);
@@ -825,6 +826,7 @@ public class Query extends HttpServlet {
     class Campaigns {
         public String campaign_id;
         public String account_id;
+        public String short_name;
         public String campaign_name;
         public String status;
         public String create_time;
@@ -847,6 +849,7 @@ public class Query extends HttpServlet {
         String relationTable = "web_ad_campaign_tag_rel";
         String webAdCampaignTable = "web_ad_campaigns";
         String webAdCampaignHistoryTable = "web_ad_campaigns_history";
+        String webAccountIdTable = "web_account_id";
         if (countryCheck || (countryCode != null && !countryCode.isEmpty())) {
             webAdCampaignHistoryTable = "web_ad_campaigns_country_history";
         }
@@ -854,6 +857,7 @@ public class Query extends HttpServlet {
             relationTable = "web_ad_campaign_tag_admob_rel";
             webAdCampaignTable = "web_ad_campaigns_admob";
             webAdCampaignHistoryTable = "web_ad_campaigns_history_admob";
+            webAccountIdTable = "web_account_id_admob";
             if (countryCheck || (countryCode != null && !countryCode.isEmpty())) {
                 webAdCampaignHistoryTable = "web_ad_campaigns_country_history_admob";
             }
@@ -922,7 +926,7 @@ public class Query extends HttpServlet {
                 for(JSObject j : listCampaignSpend4CountryCode){
                     countryCampaignspendMap.put(j.get("campaign_id"),j);
                 }
-                sql = "select campaign_id, account_id, campaign_name, status, create_time, budget, bidding, spend, installed, impressions, click" +
+                sql = "select campaign_id, a.account_id,short_name, campaign_name, status, create_time, budget, bidding, spend, installed, impressions, click" +
                         ", (case when impressions > 0 then click/impressions else 0 end) as ctr" +
                         ", (case when installed > 0 then spend/installed else 0 end) as cpa" +
                         ", (case when click > 0 then installed/click else 0 end) as cvr" +
@@ -940,10 +944,10 @@ public class Query extends HttpServlet {
                         ((likeCampaignName != null) ? " and campaign_name like '%" + likeCampaignName +"%' " : "")  +
                         "and date between '" + startTime + "' and '" + endTime + "' " +
                         "and c.campaign_id in (" + campaignIds + ")" +
-                        "group by ch.campaign_id) a ";
+                        "group by ch.campaign_id) a left join " + webAccountIdTable + " b on a.account_id = b.account_id";
                 list = DB.findListBySql(sql);
             }else if (countryCheck) {
-                sql = "select campaign_id, country_code, account_id, campaign_name, status, create_time, budget, bidding, spend, installed, impressions, click" +
+                sql = "select campaign_id, country_code, a.account_id,short_name, campaign_name, status, create_time, budget, bidding, spend, installed, impressions, click" +
                         ", (case when impressions > 0 then click/impressions else 0 end) as ctr" +
                         ", (case when installed > 0 then spend/installed else 0 end) as cpa" +
                         ", (case when click > 0 then installed/click else 0 end) as cvr" +
@@ -955,10 +959,10 @@ public class Query extends HttpServlet {
                         ((likeCampaignName != null) ? " and campaign_name like '%" + likeCampaignName +"%' " : "")  +
                         "and date between '" + startTime + "' and '" + endTime + "' " +
                         "and c.campaign_id in (" + campaignIds + ")" +
-                        "group by ch.campaign_id, country_code) a ";
+                        "group by ch.campaign_id, country_code) a left join " + webAccountIdTable + " b on a.account_id = b.account_id";
                 list = DB.findListBySql(sql);
             }else{
-                sql = "select campaign_id, account_id, campaign_name, status, create_time, budget, bidding, spend, installed, impressions, click" +
+                sql = "select campaign_id, a.account_id,short_name, campaign_name, status, create_time, budget, bidding, spend, installed, impressions, click" +
                         ", (case when impressions > 0 then click/impressions else 0 end) as ctr" +
                         ", (case when installed > 0 then spend/installed else 0 end) as cpa" +
                         ", (case when click > 0 then installed/click else 0 end) as cvr" +
@@ -970,7 +974,7 @@ public class Query extends HttpServlet {
                         ((likeCampaignName != null) ? " and campaign_name like '%" + likeCampaignName +"%' " : "")  +
                         "and date between '" + startTime + "' and '" + endTime + "' " +
                         "and c.campaign_id in (" + campaignIds + ")" +
-                        "group by ch.campaign_id) a ";
+                        "group by ch.campaign_id) a left join " + webAccountIdTable + " b on a.account_id = b.account_id";
                 list = DB.findListBySql(sql);
             }
 
@@ -1038,6 +1042,7 @@ public class Query extends HttpServlet {
                 }
             }
 
+            String short_name = one.get("short_name");
             String account_id = one.get("account_id");
             String campaign_name = one.get("campaign_name");
             String status = one.get("status");
@@ -1074,6 +1079,7 @@ public class Query extends HttpServlet {
 
             JsonObject d = new JsonObject();
             d.addProperty("campaign_id", campaign_id);
+            d.addProperty("short_name", short_name);
             d.addProperty("account_id", account_id);
             d.addProperty("campaign_name", campaign_name);
             d.addProperty("status", status);
