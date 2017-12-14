@@ -122,6 +122,9 @@ public class CampaignAdmob extends HttpServlet {
                             countryListStr += j.get("country_name") + ",";
                         }
                     }
+                    if (countryListStr.length() > 30) {
+                        countryListStr = countryListStr.substring(0, 30);
+                    }
                     if(countryListStr != null && countryListStr.length()>0){
                         campaignNameOld = campaignName.replace(region,countryListStr)+"_";
                     }else{
@@ -139,6 +142,9 @@ public class CampaignAdmob extends HttpServlet {
                             String r = String.valueOf(random.nextInt());
                             String s = String.valueOf(System.currentTimeMillis());
                             campaignName = campaignNameOld + accountNameArr[j] + "_"+ r  + "_"+ s + "_" + i;
+                            if (campaignName.length() > 100) {
+                                campaignName = campaignName.substring(0, 100);
+                            }
                             long genId = DB.insert("ad_campaigns_admob")
                                     .put("account_id", accountIdArr[j])
                                     .put("campaign_name", campaignName)
