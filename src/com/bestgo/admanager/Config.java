@@ -52,6 +52,17 @@ public class Config {
 
     public static Map<String, String> getRegionLanguageRelMap() {
         Map<String, String> regionLanguageRelMap = new HashMap<>();
+
+
+        //同一个国家，不同的写法
+        regionLanguageRelMap.put("Côte d'Ivoire","French");
+        regionLanguageRelMap.put("Cote d'Ivoire","French");
+        regionLanguageRelMap.put("Ivory Coast","French");
+
+        //台湾
+        regionLanguageRelMap.put("Taiwan, China","Traditional");
+        regionLanguageRelMap.put("Taiwan","Traditional");
+
         regionLanguageRelMap.put("Afghanistan","Pashto");
 
         regionLanguageRelMap.put("Burkina Faso","French");
@@ -59,8 +70,6 @@ public class Config {
         regionLanguageRelMap.put("Burundi","French");
 
         regionLanguageRelMap.put("Central African Republic","French");
-
-        regionLanguageRelMap.put("Ivory Coast","French");
 
         regionLanguageRelMap.put("Malawi","English");
         regionLanguageRelMap.put("The Gambia","Arabic");
@@ -179,7 +188,7 @@ public class Config {
         regionLanguageRelMap.put("Mauritius","English");
         regionLanguageRelMap.put("Turkey","Turkish");
         regionLanguageRelMap.put("Mexico","Spanish");
-        regionLanguageRelMap.put("Malaysia","Malay");
+        regionLanguageRelMap.put("Malaysia","Malagasy");
         regionLanguageRelMap.put("Kazakhstan","Russian");
         regionLanguageRelMap.put("Costa Rica","Spanish");
         regionLanguageRelMap.put("Croatia","Croatian");
@@ -206,7 +215,9 @@ public class Config {
         regionLanguageRelMap.put("Slovenia","Slovenian");
         regionLanguageRelMap.put("Cyprus","Greek");
         regionLanguageRelMap.put("Malta","English");
-        regionLanguageRelMap.put("Taiwan, China","Traditional");
+
+
+
         regionLanguageRelMap.put("Bahrain","Arabic");
         regionLanguageRelMap.put("The Bahamas","English");
         regionLanguageRelMap.put("Spain","Spanish");
@@ -260,7 +271,7 @@ public class Config {
         regionLanguageRelMap.put("Saint Kitts and Nevis","English");
         regionLanguageRelMap.put("Cayman Islands","English");
         regionLanguageRelMap.put("Marshall Islands","English");
-        regionLanguageRelMap.put("Macau","Chinese");
+        regionLanguageRelMap.put("Macau","Traditional");
         regionLanguageRelMap.put("Northern Mariana Islands","English");
         regionLanguageRelMap.put("Martinique","French");
         regionLanguageRelMap.put("New Caledonia","French");

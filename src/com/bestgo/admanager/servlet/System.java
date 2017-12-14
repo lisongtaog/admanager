@@ -137,15 +137,16 @@ public class System extends HttpServlet {
             Logger logger = Logger.getRootLogger();
             logger.error(e.getMessage(), e);
         }
-
         return ret;
+
     }
 
     public static List<JSObject> fetchFacebookAppRelationData(String word) {
         List<JSObject> list = new ArrayList<>();
         try {
             return DB.scan("web_facebook_app_ids_rel").select("id", "tag_name", "account_id", "fb_app_id", "page_id", "google_package_id")
-                    .where(DB.filter().whereLikeTo("tag_name", "%" + word + "%")).orderByAsc("id").execute();
+                    .where(DB.filter().whereLikeTo("tag_name", "%" + word + "%")).orderByAsc("tag_name").execute();
+//                  .where(DB.filter().whereLikeTo("tag_name", "%" + word + "%")).orderByAsc("id").execute();
         } catch (Exception ex) {
             Logger logger = Logger.getRootLogger();
             logger.error(ex.getMessage(), ex);

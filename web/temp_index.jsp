@@ -403,6 +403,8 @@
     init();
 
     $('#btnSummary').click();
+
+
 </script>
 </body>
 </html>
