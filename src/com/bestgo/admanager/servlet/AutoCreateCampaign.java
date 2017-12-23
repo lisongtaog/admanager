@@ -42,6 +42,9 @@ public class AutoCreateCampaign extends HttpServlet {
                 case "/delete":
                     result = facebookCampaignDelete(request);
                     break;
+                case "/enable":
+                    result = facebookCampaignEnable(request);
+                    break;
                 case "/modify":
                     result = facebookCampaignUpdate(request);
                     break;
@@ -111,6 +114,9 @@ public class AutoCreateCampaign extends HttpServlet {
                     break;
                 case "/delete":
                     result = adwordsCampaignDelete(request);
+                    break;
+                case "/enable":
+                    result = adwordsCampaignEnable(request);
                     break;
                 case "/modify":
                     result = adwordsCampaignUpdate(request);
@@ -193,7 +199,7 @@ public class AutoCreateCampaign extends HttpServlet {
 
     static String[] FB_CAMPAIGN_FIELDS = {"id", "app_name", "create_count", "account_id", "country_region", "explode_country",
     "excluded_region", "language", "age", "explode_age", "gender", "explode_gender", "detail_target", "user_os", "user_devices",
-    "campaign_name", "bugdet", "bidding", "explode_bidding", "max_cpa", "title", "message", "image_path", "create_time", "update_time"};
+    "campaign_name", "bugdet", "bidding", "explode_bidding", "max_cpa", "title", "message", "image_path", "create_time", "update_time", "enabled"};
 
     public static JSObject facebookFetchById(String id) {
         try {
@@ -482,9 +488,27 @@ public class AutoCreateCampaign extends HttpServlet {
         return result;
     }
 
+    private OperationResult facebookCampaignEnable(HttpServletRequest request) {
+        OperationResult result = new OperationResult();
+        try {
+            String id = request.getParameter("id");
+            String enable = request.getParameter("enable");
+            DB.update("ad_campaigns_auto_create")
+                    .put("enabled", "true".equals(enable) ? 1 : 0)
+                    .where(DB.filter().whereEqualTo("id", id))
+                    .execute();
+            result.result = true;
+            result.message = "操作成功";
+        } catch (Exception ex) {
+            result.result = false;
+            result.message = ex.getMessage();
+        }
+        return result;
+    }
+
     static String[] ADWORDS_CAMPAIGN_FIELDS = {"id", "app_name", "create_count", "account_id", "country_region", "explode_country",
             "excluded_region", "language", "message1", "message2", "message3", "message4",
-            "campaign_name", "bugdet", "bidding", "explode_bidding", "max_cpa", "image_path", "create_time", "update_time"};
+            "campaign_name", "bugdet", "bidding", "explode_bidding", "max_cpa", "image_path", "create_time", "update_time", "enabled"};
 
     public static JSObject adwordsFetchById(String id) {
         try {
@@ -764,6 +788,24 @@ public class AutoCreateCampaign extends HttpServlet {
                     .execute();
             result.result = true;
             result.message = "删除成功";
+        } catch (Exception ex) {
+            result.result = false;
+            result.message = ex.getMessage();
+        }
+        return result;
+    }
+
+    private OperationResult adwordsCampaignEnable(HttpServletRequest request) {
+        OperationResult result = new OperationResult();
+        try {
+            String id = request.getParameter("id");
+            String enable = request.getParameter("enable");
+            DB.update("ad_campaigns_admob_auto_create")
+                    .put("enabled", "true".equals(enable) ? 1 : 0)
+                    .where(DB.filter().whereEqualTo("id", id))
+                    .execute();
+            result.result = true;
+            result.message = "操作成功";
         } catch (Exception ex) {
             result.result = false;
             result.message = ex.getMessage();
