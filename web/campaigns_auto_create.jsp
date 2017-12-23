@@ -74,7 +74,7 @@
 
       <table class="table">
         <thead>
-        <tr><th>序号</th><th>应用</th><th>国家</th><th>语言</th><th>系列名称</th><th>预算</th><th>出价</th><th>操作</th></tr>
+        <tr><th>序号</th><th>应用</th><th>国家</th><th>语言</th><th>系列名称</th><th>预算</th><th>出价</th><th>操作</th><th>开启</th></tr>
         </thead>
         <tbody>
         <%
@@ -90,6 +90,7 @@
           <td><%=one.get("bugdet")%></td>
           <td><%=one.get("bidding")%></td>
           <td><a class="link_modify" target="_blank" href="campaigns_create.jsp?type=auto_create&network=<%=network%>&id=<%=one.get("id")%>">修改</a>&nbsp;&nbsp;<a class="link_delete" href="#">删除</a></td>
+          <td><input class="checkbox_campaign_enable" type="checkbox" <% if (one.get("enabled").equals(1)) { %> checked <% }%> /></td>
         </tr>
         <% } %>
 
@@ -195,11 +196,33 @@
         tr.append(td);
         td = $('<td><a class="link_modify" target="_blank" href="campaigns_create.jsp?type=auto_create&network=<%=network%>&id=' + one.id + '">修改</a><a class="link_delete" href="#">删除</a></td>');
         tr.append(td);
+        td = $('<td></td>');
+        td.html('<input class="checkbox_campaign_enable" type="checkbox" ' + (one.enabled == 1 ? 'checked' : '') + ' />');
+        tr.append(td);
         $('.table tbody').append(tr);
       }
     }
 
     function bindOp() {
+      $(".checkbox_campaign_enable").click(function() {
+        var tr = $(this).parents("tr");
+        var tds = tr.find('td');
+        var id = $(tds.get(0)).text();
+
+        var checked = $(this).prop('checked');
+        $.post('auto_create_campaign/<%=network%>/enable', {
+          id: id,
+          enable: checked,
+        }, function(data) {
+          if (data && data.ret == 1) {
+            admanager.showCommonDlg("成功", data.message);
+          } else {
+            admanager.showCommonDlg("错误", data.message);
+          }
+        }, 'json');
+
+      });
+
       $(".link_delete").click(function() {
         var tr = $(this).parents("tr");
         var tds = tr.find('td');
