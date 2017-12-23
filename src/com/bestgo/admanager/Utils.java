@@ -82,6 +82,16 @@ public class Utils {
         return Double.parseDouble(String.format("%.4f", value));
     }
 
+
+    /**
+     * double类型的数据保留三位小数
+     * @param value
+     * @return
+     */
+    public static double trimDouble3(double value) {
+        return Double.parseDouble(String.format("%.3f", value));
+    }
+
     public static String getAccessToken() {
         try {
             JSObject jsObject = DB.simpleScan("ad_app_config").select("access_token").execute();

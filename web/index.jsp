@@ -62,6 +62,7 @@
         <li role="presentation" class="active"><a href="#">首页</a></li>
         <li role="presentation"><a href="campaigns_create.jsp">创建广告</a></li>
         <li role="presentation"><a href="campaigns_update_daily_log.jsp">日更记录</a></li>
+        <li role="presentation"><a href="country_analysis_report.jsp">分析报告</a></li>
         <li role="presentation"><a href="adaccounts.jsp">广告账号管理</a></li>
         <li role="presentation"><a href="adaccounts_admob.jsp">广告账号管理(AdMob)</a></li>
         <li role="presentation"><a href="campaigns.jsp">广告系列管理</a></li>
@@ -73,7 +74,7 @@
         <li role="presentation"><a href="advert_insert.jsp">广告存储</a></li>
         <li role="presentation"><a href="country_revenue_spend.jsp">国家收支</a></li>
         <li role="presentation"><a href="operation_log.jsp">操作日志</a></li>
-        <li role="presentation"><a href="temp_index2.jsp">临时用的2</a></li>
+
 
     </ul>
 
