@@ -1205,6 +1205,7 @@
     $('#selectRegion').change(function () {
         if (isAutoCreate && !firstInitForm) {
             firstInitForm = true;
+            return;
         }
         var region = $('#selectRegion').val();
         if(region != null && region.length >0){
@@ -1243,6 +1244,7 @@
     $('#selectRegionAdmob').change(function () {
         if (isAutoCreate && !firstInitForm) {
             firstInitForm = true;
+            return;
         }
         var selectOptions = $('#selectRegionAdmob option:selected');
         var regionAdmob = [];
