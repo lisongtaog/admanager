@@ -34,11 +34,11 @@
         .red {
             color: red;
         }
-        .blue {
-            color: #0f0;
+        .green {
+            color: green;
         }
-        .yellow{
-            color: #ffa17a;
+        .orange{
+            color: orange;
         }
     </style>
 </head>
@@ -227,6 +227,17 @@
             for (var j = 0; j < keyset.length; j++) {
                 var td = $('<td></td>');
                 var r = one[keyset[j]];
+                if('incoming' == keyset[j]){
+                    if(r <0){
+                        td.addClass("red");
+                    }
+                }else if('estimated_revenues_dev_cost' == keyset[j]){
+                    if(r > data.es14_dev_cost){
+                        td.addClass("green");
+                    }else if(r < data.es14_dev_cost){
+                        td.addClass("orange");
+                    }
+                }
                 td.text(r);
                 tr.append(td);
             }

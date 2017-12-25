@@ -197,7 +197,7 @@ public class QueryThree extends HttpServlet {
 
                                 JsonObject d = new JsonObject();
                                 d.addProperty("country_name", countryName);
-                                d.addProperty("costs", costs);
+                                d.addProperty("costs", Utils.trimDouble3(costs));
                                 d.addProperty("purchased_users", purchased_users);
                                 d.addProperty("installed", installed);
                                 d.addProperty("uninstalled", uninstalled);
