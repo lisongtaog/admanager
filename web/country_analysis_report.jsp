@@ -89,6 +89,10 @@
             <button id="btnSearch" class="btn btn-default">查找</button>
         </div>
     </div>
+    <div class="panel panel-default">
+        <div class="panel-body" id="total_result">
+        </div>
+    </div>
     <table class="table table-hover">
         <thead id="result_header">
         <tr>
@@ -158,30 +162,77 @@
             endTime: endTime,
         },function(data){
             if(data && data.ret == 1){
-                $('#result_header').html("<tr><th>国家</th><th>Cost</th><th>PurchasedUser</th><th>Installed</th><th>Uninstalled</th><th>UninstalledRate</th><th>TotalUser</th><th>ActiveUser</th><th>Revenue</th><th>ECPM</th><th>Incoming</th><th>EstimatedRevenue14</th><th>Revenue14/Cost</th><th>成本价</th><th>出价</th><th>CPA</th></tr>");
-                $('#results_body > tr').remove();
-                var arr = data.array;
-                var len = arr.length;
-                for (var i = 0; i < len; i++) {
-                    var one = arr[i];
-                    var tr = $('<tr></tr>');
-
-                    var keyset = ["country_name", "costs", "purchased_users", "installed",
-                        "uninstalled", "uninstalled_rate", "users", "active_users", "revenues",
-                        "ecpm", "incoming", "estimated_revenues","estimated_revenues_dev_cost","price","bidding","cpa"];
-                    for (var j = 0; j < keyset.length; j++) {
-                        var td = $('<td></td>');
-                        var r = one[keyset[j]];
-                        td.text(r);
-                        tr.append(td);
-                    }
-                    $('#results_body').append(tr);
-                }
+                $('#result_header').html("<tr><th>国家</th><th>Cost<span sorterId=\"31\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>PurchasedUser<span sorterId=\"32\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>Installed<span sorterId=\"33\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>Uninstalled<span sorterId=\"34\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>UninstalledRate<span sorterId=\"35\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>TotalUser<span sorterId=\"36\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>ActiveUser<span sorterId=\"37\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>Revenue<span sorterId=\"38\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>ECPM<span sorterId=\"39\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>Incoming<span sorterId=\"40\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>EstimatedRevenue14<span sorterId=\"41\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>Revenue14/Cost<span sorterId=\"42\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>成本价<span sorterId=\"43\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>出价<span sorterId=\"44\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>CPA<span sorterId=\"45\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th></tr>");
+                setData(data);
+                bindSortOp();
+                var str = "Cost: " + data.total_cost + "&nbsp;&nbsp;&nbsp;&nbsp;PuserchaedUser: " + data.total_puserchaed_user +
+                    "&nbsp;&nbsp;&nbsp;&nbsp;CPA: " + data.total_cpa + "&nbsp;&nbsp;&nbsp;&nbsp;Revenue: " + data.total_revenue +
+                    "&nbsp;&nbsp;&nbsp;&nbsp;Es14: " + data.total_es14 + "&nbsp;&nbsp;&nbsp;&nbsp;Es14/Cost: " + data.es14_dev_cost;
+                str += "<br/><span class='estimateResult'></span>"
+                $('#total_result').html(str);
+                $('#total_result').removeClass("editable");
             } else {
                 admanager.showCommonDlg("错误", data.message);
             }
         },'json');
     });
+    function bindSortOp() {
+        $('.sorter').click(function() {
+            var sorterId = $(this).attr('sorterId');
+            sorterId = parseInt(sorterId);
+            if ($(this).hasClass("glyphicon-arrow-up")) {
+                $(this).removeClass("glyphicon-arrow-up");
+                $(this).addClass("glyphicon-arrow-down");
+                sorterId += 1000;
+            } else {
+                $(this).removeClass("glyphicon-arrow-down");
+                $(this).addClass("glyphicon-arrow-up");
+            }
+
+            var query = $("#inputSearch").val();
+            var startTime = $('#inputStartTime').val();
+            var endTime = $('#inputEndTime').val();
+            $.post('query_three/query_country_analysis_report', {
+                tagName: query,
+                startTime: startTime,
+                endTime: endTime,
+                sorterId: sorterId
+            },function(data){
+                if (data && data.ret == 1) {
+                    setData(data);
+                    var str = "Cost: " + data.total_cost + "&nbsp;&nbsp;&nbsp;&nbsp;PuserchaedUser: " + data.total_puserchaed_user +
+                        "&nbsp;&nbsp;&nbsp;&nbsp;CPA: " + data.total_cpa + "&nbsp;&nbsp;&nbsp;&nbsp;Revenue: " + data.total_revenue +
+                        "&nbsp;&nbsp;&nbsp;&nbsp;Es14: " + data.total_es14 + "&nbsp;&nbsp;&nbsp;&nbsp;Es14/Cost: " + data.es14_dev_cost;
+
+                    str += "<br/><span class='estimateResult'></span>"
+                    $('#total_result').removeClass("editable");
+                    $('#total_result').html(str);
+                } else {
+                    admanager.showCommonDlg("错误", data.message);
+                }
+            }, 'json');
+        });
+    }
+    function setData(data) {
+        $('#results_body > tr').remove();
+        var arr = data.array;
+        var len = arr.length;
+        for (var i = 0; i < len; i++) {
+            var one = arr[i];
+            var tr = $('<tr></tr>');
+
+            var keyset = ["country_name", "costs", "purchased_users", "installed",
+                "uninstalled", "uninstalled_rate", "users", "active_users", "revenues",
+                "ecpm", "incoming", "estimated_revenues","estimated_revenues_dev_cost","price","bidding","cpa"];
+            for (var j = 0; j < keyset.length; j++) {
+                var td = $('<td></td>');
+                var r = one[keyset[j]];
+                td.text(r);
+                tr.append(td);
+            }
+            $('#results_body').append(tr);
+        }
+    }
 </script>
 <script src="js/interlaced-color-change.js"></script>
 </body>

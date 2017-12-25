@@ -92,7 +92,7 @@ public class QueryZero extends HttpServlet {
                     "from web_ad_campaigns_history history, web_ad_campaigns ad\n" +
                     "where date between ? and ? and history.campaign_id=ad.campaign_id and status='ACTIVE'\n" +
                     "and history.total_installed " + op + " ?";
-            if (network.equals("admob")) {
+            if ("admob".equals(network)) {
                 sql = "select history.campaign_id, account_id, campaign_name, create_time, status, ad.budget, ad.bidding, \n" +
                         "history.total_spend, history.total_installed, history.total_click, history.total_impressions\n" +
                         "from web_ad_campaigns_history_admob history, web_ad_campaigns_admob ad\n" +
@@ -104,47 +104,50 @@ public class QueryZero extends HttpServlet {
 
             for (int i = 0; i < list.size(); i++) {
                 JSObject one = list.get(i);
-                String campaign_id = one.get("campaign_id");
-                String account_id = one.get("account_id");
-                double budget = one.get("budget");
-                double spend = Utils.convertDouble(one.get("total_spend"), 0);
+                if(one != null && one.hasObjectData()){
+                    String campaign_id = one.get("campaign_id");
+                    String account_id = one.get("account_id");
+                    double budget = one.get("budget");
+                    double spend = Utils.convertDouble(one.get("total_spend"), 0);
 
-                if ("1".equals(costOp)) {
-                    if (spend * 100 / budget < dCost) {
-                        continue;
+                    if ("1".equals(costOp)) {
+                        if (spend * 100 / budget < dCost) {
+                            continue;
+                        }
+                    } else {
+                        if (spend * 100 / budget > dCost) {
+                            continue;
+                        }
                     }
-                } else {
-                    if (spend * 100 / budget > dCost) {
-                        continue;
+
+                    JSObject record = DB.simpleScan("web_ad_batch_change_campaigns")
+                            .select("id").where(DB.filter().whereEqualTo("campaign_id", campaign_id))
+                            .and(DB.filter().whereEqualTo("success", 0)).execute();
+                    int enabled = 0;
+                    if (record.hasObjectData()) {
+                        long id = record.get("id");
+                        DB.update("web_ad_batch_change_campaigns")
+                                .put("enabled", enabled)
+                                .put("success", 0)
+                                .where(DB.filter().whereEqualTo("id", id))
+                                .execute();
+                    } else {
+                        String now = DateUtil.getNow();
+                        DB.insert("web_ad_batch_change_campaigns")
+                                .put("enabled", enabled)
+                                .put("bugdet", 0)
+                                .put("bidding", 0)
+                                .put("network", network)
+                                .put("account_id", account_id)
+                                .put("campaign_id", campaign_id)
+                                .put("campaign_name", "")
+                                .put("excluded_country", "")
+                                .put("create_time", now)
+                                .put("success", 0)
+                                .execute();
                     }
                 }
 
-                JSObject record = DB.simpleScan("web_ad_batch_change_campaigns")
-                        .select("id").where(DB.filter().whereEqualTo("campaign_id", campaign_id))
-                        .and(DB.filter().whereEqualTo("success", 0)).execute();
-                int enabled = 0;
-                if (record.hasObjectData()) {
-                    long id = record.get("id");
-                    DB.update("web_ad_batch_change_campaigns")
-                            .put("enabled", enabled)
-                            .put("success", 0)
-                            .where(DB.filter().whereEqualTo("id", id))
-                            .execute();
-                } else {
-                    String now = DateUtil.getNow();
-                    DB.insert("web_ad_batch_change_campaigns")
-                            .put("enabled", enabled)
-                            .put("bugdet", 0)
-                            .put("bidding", 0)
-                            .put("network", network)
-                            .put("account_id", account_id)
-                            .put("campaign_id", campaign_id)
-                            .put("campaign_name", "")
-                            .put("excluded_country", "")
-                            .put("create_time", now)
-                            .put("success", 0)
-                            .execute();
-                }
             }
         }
         return true;

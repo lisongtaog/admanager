@@ -30,7 +30,7 @@ public class QueryThree extends HttpServlet {
 
         String path = request.getPathInfo();
         JsonObject jsonObject = new JsonObject();
-
+        String sorterId = request.getParameter("sorterId");
         String tagName = request.getParameter("tagName");
         String startTime = request.getParameter("startTime");
         String endTime = request.getParameter("endTime");
@@ -51,6 +51,12 @@ public class QueryThree extends HttpServlet {
                                 "and date BETWEEN '" + startTime + "' AND '" + endTime + "' GROUP BY country_code;";
                         List<JSObject> countryDetailJSObjectList = DB.findListBySql(sql);
 
+                        double total_cost = 0;
+                        double total_puserchaed_user = 0;
+                        double total_cpa = 0;
+                        double total_revenue = 0;
+                        double total_es14 = 0;
+                        double es14_dev_cost = 0;
 
                         for(JSObject j : countryDetailJSObjectList){
                             if(j != null && j.hasObjectData()){
@@ -69,7 +75,7 @@ public class QueryThree extends HttpServlet {
                                 double uninstalled = Utils.convertDouble(j.get("uninstalled"),0);
                                 double total_today_uninstalled = Utils.convertDouble(j.get("total_today_uninstalled"),0);
                                 double uninstalledRate = installed != 0 ? total_today_uninstalled / installed : 0;
-                                double cpa = installed != 0 ? costs / installed : 0;
+                                double cpa = purchased_users != 0 ? costs / purchased_users : 0;
 
                                 double users = Utils.convertDouble(j.get("users"),0);
                                 double active_users = Utils.convertDouble(j.get("active_users"),0);
@@ -118,6 +124,12 @@ public class QueryThree extends HttpServlet {
                                     biddingsStr = "--";
                                 }
 
+                                total_cost += costs;
+                                total_puserchaed_user += purchased_users;
+                                total_cpa += cpa;
+                                total_revenue += revenues;
+                                total_es14 += estimated_revenues;
+
                                 JsonObject d = new JsonObject();
                                 d.addProperty("country_name", countryName);
                                 d.addProperty("costs", costs);
@@ -145,8 +157,17 @@ public class QueryThree extends HttpServlet {
                             }
 
                         }
-                        jsonObject.addProperty("ret", 1);
+                        es14_dev_cost = total_cost != 0 ? total_es14 / total_cost : 0;
                         jsonObject.add("array", jsonArray);
+
+                        jsonObject.addProperty("total_cost", Utils.trimDouble3(total_cost));
+                        jsonObject.addProperty("total_puserchaed_user", Utils.trimDouble3(total_puserchaed_user));
+                        jsonObject.addProperty("total_cpa", Utils.trimDouble3(total_cpa));
+                        jsonObject.addProperty("total_revenue", Utils.trimDouble3(total_revenue));
+                        jsonObject.addProperty("total_es14", Utils.trimDouble3(total_es14));
+                        jsonObject.addProperty("es14_dev_cost", Utils.trimDouble3(es14_dev_cost));
+                        jsonObject.addProperty("ret", 1);
+
                     }
                 }
 
