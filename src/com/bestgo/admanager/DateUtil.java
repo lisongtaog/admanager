@@ -10,7 +10,7 @@ public class DateUtil {
 
     /**
      * 时间戳转换成日期格式字符串
-     * @param seconds 精确到秒的字符串
+     * @param seconds 格式为format的字符串
      * @param format
      * @return
      */

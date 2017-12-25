@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
+import java.lang.System;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -634,6 +635,7 @@ public class AutoCreateCampaign extends HttpServlet {
             }
 
             if (result.result) {
+                String s = String.valueOf(System.currentTimeMillis());
                 long recordId = DB.insert("ad_campaigns_admob_auto_create")
                         .put("app_name", appName)
                         .put("create_count", Utils.parseInt(createCount, 0))
@@ -642,7 +644,7 @@ public class AutoCreateCampaign extends HttpServlet {
                         .put("explode_country", Boolean.parseBoolean(explodeCountry) ? 1 : 0)
                         .put("excluded_region", excludedRegion)
                         .put("language", language)
-                        .put("campaign_name", campaignName)
+                        .put("campaign_name", campaignName+"_"+s.substring(s.length() - 4, s.length()))
                         .put("bugdet", bugdet)
                         .put("bidding", bidding)
                         .put("message1", message1)
