@@ -47,8 +47,73 @@ public class QueryThree extends HttpServlet {
                         String sql = "select country_code, sum(cost) as total_cost, sum(purchased_user) as total_purchased_user, " +
                                 "sum(total_installed) as installed, sum(total_uninstalled) as uninstalled, sum(today_uninstalled) as total_today_uninstalled, " +
                                 "sum(total_user) as users, sum(active_user) as active_users, sum(impression) as impressions, sum(revenue) as revenues, " +
-                                "sum(estimated_revenue) as estimated_revenues from web_ad_country_analysis_report_history where app_id = '"+google_package_id+"' " +
-                                "and date BETWEEN '" + startTime + "' AND '" + endTime + "' GROUP BY country_code;";
+                                "sum(estimated_revenue) as estimated_revenues " +
+                                ", (case when sum(cost) > 0 then sum(estimated_revenue) / sum(cost) else 0 end) as est_rev_dev_cost " +
+                                "from web_ad_country_analysis_report_history where app_id = '"+google_package_id+"' " +
+                                "and date BETWEEN '" + startTime + "' AND '" + endTime + "' GROUP BY country_code";
+                        int sorter = 0;
+                        if (sorterId != null) {
+                            sorter = Utils.parseInt(sorterId, 0);
+                        }
+                        switch(sorter){
+                            case 1031:
+                                sql += " order by total_cost desc";
+                                break;
+                            case 31:
+                                sql += " order by total_cost";
+                                break;
+                            case 1032:
+                                sql += " order by total_purchased_user desc";
+                                break;
+                            case 32:
+                                sql += " order by total_purchased_user";
+                                break;
+                            case 1033:
+                                sql += " order by installed desc";
+                                break;
+                            case 33:
+                                sql += " order by installed";
+                                break;
+
+                            case 1034:
+                                sql += " order by uninstalled desc";
+                                break;
+                            case 34:
+                                sql += " order by uninstalled";
+                                break;
+                            case 1036:
+                                sql += " order by users desc";
+                                break;
+                            case 36:
+                                sql += " order by users";
+                                break;
+                            case 1037:
+                                sql += " order by active_users desc";
+                                break;
+                            case 37:
+                                sql += " order by active_users";
+                                break;
+                            case 1038:
+                                sql += " order by revenues desc";
+                                break;
+                            case 38:
+                                sql += " order by revenues";
+                                break;
+                            case 1041:
+                                sql += " order by estimated_revenues desc";
+                                break;
+                            case 41:
+                                sql += " order by estimated_revenues";
+                                break;
+                            case 1042:
+                                sql += " order by est_rev_dev_cost desc";
+                                break;
+                            case 42:
+                                sql += " order by est_rev_dev_cost";
+                                break;
+                            default:
+                                sql += " order by total_cost desc";
+                        }
                         List<JSObject> countryDetailJSObjectList = DB.findListBySql(sql);
 
                         double total_cost = 0;
@@ -56,7 +121,7 @@ public class QueryThree extends HttpServlet {
                         double total_cpa = 0;
                         double total_revenue = 0;
                         double total_es14 = 0;
-                        double es14_dev_cost = 0;
+
 
                         for(JSObject j : countryDetailJSObjectList){
                             if(j != null && j.hasObjectData()){
@@ -84,7 +149,7 @@ public class QueryThree extends HttpServlet {
                                 double estimated_revenues = j.get("estimated_revenues");
                                 double ecpm = impressions != 0 ? revenues / impressions / 1000 : 0;
                                 double incoming = revenues - costs;
-                                double estRevDevCost = costs != 0 ? estimated_revenues / costs : 0;
+                                double estRevDevCost = Utils.convertDouble(j.get("est_rev_dev_cost"),0);
 
 
                                 String sqlAB = "select bidding from ad_campaigns_admob_auto_create where app_name = '"
@@ -157,7 +222,7 @@ public class QueryThree extends HttpServlet {
                             }
 
                         }
-                        es14_dev_cost = total_cost != 0 ? total_es14 / total_cost : 0;
+                        double es14_dev_cost = total_cost != 0 ? total_es14 / total_cost : 0;
                         jsonObject.add("array", jsonArray);
 
                         jsonObject.addProperty("total_cost", Utils.trimDouble3(total_cost));

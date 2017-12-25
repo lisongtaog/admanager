@@ -162,7 +162,7 @@
             endTime: endTime,
         },function(data){
             if(data && data.ret == 1){
-                $('#result_header').html("<tr><th>国家</th><th>Cost<span sorterId=\"31\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>PurchasedUser<span sorterId=\"32\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>Installed<span sorterId=\"33\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>Uninstalled<span sorterId=\"34\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>UninstalledRate<span sorterId=\"35\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>TotalUser<span sorterId=\"36\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>ActiveUser<span sorterId=\"37\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>Revenue<span sorterId=\"38\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>ECPM<span sorterId=\"39\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>Incoming<span sorterId=\"40\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>EstimatedRevenue14<span sorterId=\"41\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>Revenue14/Cost<span sorterId=\"42\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>成本价<span sorterId=\"43\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>出价<span sorterId=\"44\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>CPA<span sorterId=\"45\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th></tr>");
+                $('#result_header').html("<tr><th>国家</th><th>Cost<span sorterId=\"1031\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th><th>PurchasedUser<span sorterId=\"1032\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th><th>Installed<span sorterId=\"1033\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th><th>Uninstalled<span sorterId=\"1034\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th><th>UninstalledRate</th><th>TotalUser<span sorterId=\"1036\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th><th>ActiveUser<span sorterId=\"1037\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th><th>Revenue<span sorterId=\"1038\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th><th>ECPM</th><th>Incoming</th><th>EstimatedRevenue14<span sorterId=\"1041\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th><th>Revenue14/Cost<span sorterId=\"1042\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th><th>成本价</th><th>出价</th><th>CPA</th></tr>");
                 setData(data);
                 bindSortOp();
                 var str = "Cost: " + data.total_cost + "&nbsp;&nbsp;&nbsp;&nbsp;PuserchaedUser: " + data.total_puserchaed_user +
@@ -180,13 +180,13 @@
         $('.sorter').click(function() {
             var sorterId = $(this).attr('sorterId');
             sorterId = parseInt(sorterId);
-            if ($(this).hasClass("glyphicon-arrow-up")) {
-                $(this).removeClass("glyphicon-arrow-up");
-                $(this).addClass("glyphicon-arrow-down");
-                sorterId += 1000;
-            } else {
+            if ($(this).hasClass("glyphicon-arrow-down")) {
                 $(this).removeClass("glyphicon-arrow-down");
                 $(this).addClass("glyphicon-arrow-up");
+                sorterId -= 1000;
+            } else {
+                $(this).removeClass("glyphicon-arrow-up");
+                $(this).addClass("glyphicon-arrow-down");
             }
 
             var query = $("#inputSearch").val();

@@ -34,7 +34,6 @@ public class QueryOne extends HttpServlet {
         String tag = request.getParameter("tag");
         String startTime = request.getParameter("startTime");
         String endTime = request.getParameter("endTime");
-        String sorterId = request.getParameter("sorterId");
         String adwordsCheck = request.getParameter("adwordsCheck");
         String facebookCheck = request.getParameter("facebookCheck");
 
