@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -80,37 +81,41 @@ public class QueryThree extends HttpServlet {
                                 double estRevDevCost = costs != 0 ? estimated_revenues / costs : 0;
 
 
-                                String sqlFB = "select DISTINCT bidding from web_ad_batch_change_campaigns bcc, web_ad_campaigns_country_history cch " +
-                                        "where bcc.campaign_id = cch.campaign_id and  country_code = '"+country_code+"' and date BETWEEN '"+startTime+"' and '"+endTime+"';";
+                                String sqlAB = "select bidding from ad_campaigns_admob_auto_create where app_name = '"
+                                                       + tagName + "' and country_region like '%" + country_code + "%'";
+                                List<JSObject> adwordsBiddingList = DB.findListBySql(sqlAB);
+
+                                String sqlFB = "select bidding from ad_campaigns_auto_create where app_name = '"
+                                                       + tagName + "' and country_region like '%" + countryName + "%'";
                                 List<JSObject> facebookBiddingList = DB.findListBySql(sqlFB);
 
-                                String sqlAB = "select DISTINCT bidding from web_ad_batch_change_campaigns bcc, web_ad_campaigns_country_history_admob cch " +
-                                        "where bcc.campaign_id = cch.campaign_id and  country_code = '"+country_code+"' and date BETWEEN '"+startTime+"' and '"+endTime+"';";
-                                List<JSObject> adwordsBiddingList = DB.findListBySql(sqlAB);
+
                                 Set<String> biddingSet = new HashSet<>();
                                 for(JSObject ff : facebookBiddingList){
                                     if(ff != null && ff.hasObjectData()){
                                         String bidding = ff.get("bidding");
-                                        if(bidding != null && !"0".equals(bidding) && !"0.0".equals(bidding)){
-                                            biddingSet.add(bidding);
+                                        String[] split = bidding.split(",");
+                                        for(String s : split){
+                                            biddingSet.add(s);
                                         }
                                     }
                                 }
                                 for(JSObject aa : adwordsBiddingList){
                                     if(aa != null && aa.hasObjectData()){
                                         String bidding = aa.get("bidding");
-                                        if(bidding != null){
-                                            biddingSet.add(bidding);
+                                        String[] split = bidding.split(",");
+                                        for(String s : split){
+                                            biddingSet.add(s);
                                         }
                                     }
                                 }
                                 String biddingsStr = "";
                                 if(biddingSet != null && biddingSet.size()>0){
                                     for(String s : biddingSet){
-                                        biddingsStr += s + " ,";
+                                        biddingsStr += s + "，";
                                     }
                                 }else{
-                                    biddingsStr = "NULL";
+                                    biddingsStr = "--";
                                 }
 
                                 JsonObject d = new JsonObject();
