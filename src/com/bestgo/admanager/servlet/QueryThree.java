@@ -118,7 +118,6 @@ public class QueryThree extends HttpServlet {
 
                         double total_cost = 0;
                         double total_puserchaed_user = 0;
-                        double total_cpa = 0;
                         double total_revenue = 0;
                         double total_es14 = 0;
 
@@ -191,7 +190,6 @@ public class QueryThree extends HttpServlet {
 
                                 total_cost += costs;
                                 total_puserchaed_user += purchased_users;
-                                total_cpa += cpa;
                                 total_revenue += revenues;
                                 total_es14 += estimated_revenues;
 
@@ -223,6 +221,7 @@ public class QueryThree extends HttpServlet {
 
                         }
                         double es14_dev_cost = total_cost != 0 ? total_es14 / total_cost : 0;
+                        double total_cpa = total_puserchaed_user != 0 ? total_cost / total_puserchaed_user : 0;
                         jsonObject.add("array", jsonArray);
 
                         jsonObject.addProperty("total_cost", Utils.trimDouble3(total_cost));
