@@ -1005,9 +1005,5 @@ public class Campaign extends HttpServlet {
         }
         return retList;
     }
-
-
-
-
 }
 

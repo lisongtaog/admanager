@@ -129,7 +129,7 @@ public class QueryOne extends HttpServlet {
             if(admobCheck){
                 List<JSObject> listAll = new ArrayList<>();
                 List<JSObject> listHasData = new ArrayList<>();
-                sql = "select campaign_id, short_name, campaign_name, create_time, status, budget, bidding, total_spend, total_installed, total_click, total_impressions, cpa,ctr, " +
+                sql = "select campaign_id, a.account_id, short_name, campaign_name, create_time, status, budget, bidding, total_spend, total_installed, total_click, total_impressions, cpa,ctr, " +
                         "(case when total_click > 0 then total_installed/total_click else 0 end) as cvr " +
                         " from " + webAdCampaignTable + " a , "+webAccountIdTable+" b where status != 'paused' and " +
                         "campaign_id in (" + campaignIds + ") and a.account_id = b.account_id";
@@ -145,7 +145,7 @@ public class QueryOne extends HttpServlet {
                 listHasData = DB.findListBySql(sql);
                 list = Utils.getDiffJSObjectList(listAll, listHasData, "campaign_id");
             }else{//Facebook
-                sql = "select campaign_id, short_name, campaign_name, status, create_time, budget, bidding, spend, installed, impressions, click" +
+                sql = "select campaign_id, a.account_id, short_name, campaign_name, status, create_time, budget, bidding, spend, installed, impressions, click" +
                         ", (case when impressions > 0 then click/impressions else 0 end) as ctr" +
                         ", (case when installed > 0 then spend/installed else 0 end) as cpa" +
                         ", (case when click > 0 then installed/click else 0 end) as cvr" +
@@ -178,6 +178,7 @@ public class QueryOne extends HttpServlet {
             String campaign_id = one.get("campaign_id");
 
             String short_name = one.get("short_name");
+            String account_id = one.get("account_id");
             String campaign_name = one.get("campaign_name");
             String status = one.get("status");
             String create_time = one.get("create_time").toString();
@@ -219,6 +220,7 @@ public class QueryOne extends HttpServlet {
             JsonObject d = new JsonObject();
             d.addProperty("campaign_id", campaign_id);
             d.addProperty("short_name", short_name);
+            d.addProperty("account_id", account_id);
             d.addProperty("campaign_name", campaign_name);
             d.addProperty("status", status);
             d.addProperty("create_time", create_time);

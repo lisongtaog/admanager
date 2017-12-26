@@ -260,7 +260,7 @@
             var one = data.array[i];
             var tr = $('<tr></tr>');
             var countryCheck = $('#countryCheck').is(':checked');
-            var keyset = ["campaign_id", "account_id", "campaign_name", "create_time",
+            var keyset = ["campaign_id", "account_id", "short_name","campaign_name", "create_time",
                 "status", "budget", "bidding", "spend", "installed", "click", "cpa", "ctr", "cvr"];
             var modifyColumns = ["campaign_name", "budget", "bidding"];
             if (countryCheck) {

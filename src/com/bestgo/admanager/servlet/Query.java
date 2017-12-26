@@ -467,7 +467,7 @@ public class Query extends HttpServlet {
                                 j.addProperty("network",c.network);
                                 jsonArray.add(j);
                             }
-                            jsonObject.addProperty("total_spend", total_spend);
+                            jsonObject.addProperty("total_spend", Utils.trimDouble(total_spend));
                             jsonObject.addProperty("total_installed", total_installed);
                             jsonObject.addProperty("total_impressions", total_impressions);
                             jsonObject.addProperty("total_click", total_click);
@@ -476,7 +476,7 @@ public class Query extends HttpServlet {
                             jsonObject.addProperty("total_cvr", Utils.trimDouble(total_cvr));
                             jsonObject.add("array",jsonArray);
                         }else{
-                            admob.addProperty("total_spend", total_spend);
+                            admob.addProperty("total_spend", Utils.trimDouble(total_spend));
                             admob.addProperty("total_installed", total_installed);
                             admob.addProperty("total_impressions", total_impressions);
                             admob.addProperty("total_click", total_click);
@@ -1089,7 +1089,7 @@ public class Query extends HttpServlet {
             d.addProperty("budget", budget);
             d.addProperty("bidding", bidding);
             d.addProperty("impressions", impressions);
-            d.addProperty("spend", spend);
+            d.addProperty("spend", Utils.trimDouble(spend));
             d.addProperty("campaign_spends", campaign_spends);
             d.addProperty("installed", installed);
             d.addProperty("click", click);
@@ -1105,7 +1105,7 @@ public class Query extends HttpServlet {
             array.add(d);
         }
         jsonObject.add("array", array);
-        jsonObject.addProperty("total_spend", total_spend);
+        jsonObject.addProperty("total_spend", Utils.trimDouble(total_spend));
         jsonObject.addProperty("total_installed", total_installed);
         jsonObject.addProperty("total_impressions", total_impressions);
         jsonObject.addProperty("total_click", total_click);
