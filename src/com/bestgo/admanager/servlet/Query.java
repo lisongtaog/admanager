@@ -36,7 +36,9 @@ public class Query extends HttpServlet {
         JsonObject json = new JsonObject();
         String tag = request.getParameter("tag");
         String startTime = request.getParameter("startTime");
+        startTime = "2017-10-22";
         String endTime = request.getParameter("endTime");
+        endTime = "2017-10-22";
         String campaignCreateTime = request.getParameter("campaignCreateTime");
         String isSummary = request.getParameter("summary");
         String sorterId = request.getParameter("sorterId");
@@ -45,18 +47,19 @@ public class Query extends HttpServlet {
         String facebookCheck = request.getParameter("facebookCheck");
         String countryCode = request.getParameter("countryCode");
         String likeCampaignName = request.getParameter("likeCampaignName");
+        HashMap<String ,String> countryMap = Utils.getCountryMap();
 
         if (isSummary != null) {
             try {
                 List<JSObject> tags = DB.scan("web_tag")
                         .select("id", "tag_name").orderByAsc("tag_name").execute();
                 JsonArray arr = new JsonArray();
-                if (adwordsCheck != null && adwordsCheck.equals("false") && facebookCheck != null && facebookCheck.equals("false")) {
+                if ("false".equals(adwordsCheck) && "false".equals(facebookCheck)) {
                     for (int i = 0; i < tags.size(); i++) {
                         long id = tags.get(i).get("id");
                         String tagName = tags.get(i).get("tag_name");
-                        JsonObject admob = fetchOneAppData(id, tagName,startTime, endTime, true, false, countryCode,likeCampaignName,campaignCreateTime,false);
-                        JsonObject facebook = fetchOneAppData(id, tagName,startTime, endTime, false, false, countryCode,likeCampaignName,campaignCreateTime,false);
+                        JsonObject admob = fetchOneAppData(id, tagName,startTime, endTime, true, false, countryCode,likeCampaignName,campaignCreateTime,false,countryMap);
+                        JsonObject facebook = fetchOneAppData(id, tagName,startTime, endTime, false, false, countryCode,likeCampaignName,campaignCreateTime,false,countryMap);
                         double total_spend = admob.get("total_spend").getAsDouble() + facebook.get("total_spend").getAsDouble();
                         double total_installed = admob.get("total_installed").getAsDouble() + facebook.get("total_installed").getAsDouble();
                         double total_impressions = admob.get("total_impressions").getAsDouble() + facebook.get("total_impressions").getAsDouble();
@@ -81,7 +84,7 @@ public class Query extends HttpServlet {
                     for (int i = 0; i < tags.size(); i++) {
                         long id = tags.get(i).get("id");
                         String tagName = tags.get(i).get("tag_name");
-                        JsonObject jsonObject = fetchOneAppData(id, tagName,startTime, endTime,  "true".equals(adwordsCheck), false, countryCode,likeCampaignName,campaignCreateTime,false);
+                        JsonObject jsonObject = fetchOneAppData(id, tagName,startTime, endTime,  "true".equals(adwordsCheck), false, countryCode,likeCampaignName,campaignCreateTime,false,countryMap);
                         double total_impression = jsonObject.get("total_impressions").getAsDouble();
                         if (total_impression == 0) {
                             continue;
@@ -116,8 +119,8 @@ public class Query extends HttpServlet {
                         countryCheck = "false";
                     }
                     if (adwordsCheck != null && adwordsCheck.equals("false") && facebookCheck != null && facebookCheck.equals("false")) {
-                        JsonObject admob = fetchOneAppData(id, tag,startTime, endTime, true, "true".equals(countryCheck), countryCode,likeCampaignName,campaignCreateTime,true);
-                        JsonObject facebook = fetchOneAppData(id, tag,startTime, endTime,false, "true".equals(countryCheck), countryCode,likeCampaignName,campaignCreateTime,true);
+                        JsonObject admob = fetchOneAppData(id, tag,startTime, endTime, true, "true".equals(countryCheck), countryCode,likeCampaignName,campaignCreateTime,true,countryMap);
+                        JsonObject facebook = fetchOneAppData(id, tag,startTime, endTime,false, "true".equals(countryCheck), countryCode,likeCampaignName,campaignCreateTime,true,countryMap);
                         double total_spend = admob.get("total_spend").getAsDouble() + facebook.get("total_spend").getAsDouble();
                         double total_installed = admob.get("total_installed").getAsDouble() + facebook.get("total_installed").getAsDouble();
                         double total_impressions = admob.get("total_impressions").getAsDouble() + facebook.get("total_impressions").getAsDouble();
@@ -488,7 +491,7 @@ public class Query extends HttpServlet {
 
 
                     } else {
-                        jsonObject = fetchOneAppData(id, tag,startTime, endTime, "true".equals(adwordsCheck), "true".equals(countryCheck), countryCode,likeCampaignName,campaignCreateTime,true);
+                        jsonObject = fetchOneAppData(id, tag,startTime, endTime, "true".equals(adwordsCheck), "true".equals(countryCheck), countryCode,likeCampaignName,campaignCreateTime,true,countryMap);
                     }
                     if ("true".equals(countryCheck)) {
                         JsonArray array = jsonObject.getAsJsonArray("array");
@@ -845,7 +848,7 @@ public class Query extends HttpServlet {
         public String network;
     }
 
-    private JsonObject fetchOneAppData(long tagId, String tagName, String startTime, String endTime, boolean admobCheck, boolean countryCheck, String countryCode,String likeCampaignName,String campaignCreateTime,boolean hasROI) throws Exception {
+    private JsonObject fetchOneAppData(long tagId, String tagName, String startTime, String endTime, boolean admobCheck, boolean countryCheck, String countryCode,String likeCampaignName,String campaignCreateTime,boolean hasROI,HashMap<String ,String> countryMap) throws Exception {
         String relationTable = "web_ad_campaign_tag_rel";
         String webAdCampaignTable = "web_ad_campaigns";
         String webAdCampaignHistoryTable = "web_ad_campaigns_history";
@@ -862,8 +865,6 @@ public class Query extends HttpServlet {
                 webAdCampaignHistoryTable = "web_ad_campaigns_country_history_admob";
             }
         }
-
-        HashMap<String ,String> countryMap = Utils.getCountryMap();
 
         List<JSObject> list = DB.scan(relationTable).select("campaign_id")
                 .where(DB.filter().whereEqualTo("tag_id", tagId)).execute();
