@@ -182,7 +182,7 @@ public class QueryThree extends HttpServlet {
                                 String biddingsStr = "";
                                 if(biddingSet != null && biddingSet.size()>0){
                                     for(String s : biddingSet){
-                                        biddingsStr += s + "，";
+                                        biddingsStr += s + ",";
                                     }
                                 }else{
                                     biddingsStr = "--";

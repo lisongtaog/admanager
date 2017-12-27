@@ -231,14 +231,19 @@
                     if(r <0){
                         td.addClass("red");
                     }
+                    td.text(r);
                 }else if('estimated_revenues_dev_cost' == keyset[j]){
                     if(r > data.es14_dev_cost){
                         td.addClass("green");
                     }else if(r < data.es14_dev_cost){
                         td.addClass("orange");
                     }
+                    td.text(r);
+                }else if('bidding' == keyset[j]){
+                    td.append('<input type="button" class="bidding_input" value="'+r+'">');
+                }else{
+                    td.text(r);
                 }
-                td.text(r);
                 tr.append(td);
             }
             $('#results_body').append(tr);

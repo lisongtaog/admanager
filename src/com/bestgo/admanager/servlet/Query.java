@@ -911,8 +911,7 @@ public class Query extends HttpServlet {
         if (!campaignIds.isEmpty()) {
             String sql = "";
             if(countryCode != null && countryCode.length()>0){
-                sql = "select campaign_id, campaign_spends" +
-                        " from (" +
+                sql = "select campaign_id, campaign_spends from (" +
                         "select ch.campaign_id, sum(ch.total_spend) as campaign_spends " +
                         " from " + webAdCampaignTable + " c, " + webAdCampaignHistoryTable + " ch " +
                         "where c.campaign_id=ch.campaign_id\n" +
