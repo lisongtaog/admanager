@@ -36,9 +36,7 @@ public class Query extends HttpServlet {
         JsonObject json = new JsonObject();
         String tag = request.getParameter("tag");
         String startTime = request.getParameter("startTime");
-        startTime = "2017-10-22";
         String endTime = request.getParameter("endTime");
-        endTime = "2017-10-22";
         String campaignCreateTime = request.getParameter("campaignCreateTime");
         String isSummary = request.getParameter("summary");
         String sorterId = request.getParameter("sorterId");
