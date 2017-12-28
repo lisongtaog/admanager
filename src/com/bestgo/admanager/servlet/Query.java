@@ -917,7 +917,7 @@ public class Query extends HttpServlet {
                         "where c.campaign_id=ch.campaign_id\n" +
                         ((likeCampaignName != null) ? " and campaign_name like '%" + likeCampaignName +"%' " : "")  +
                         "and date between '" + startTime + "' and '" + endTime + "' " +
-                        "and c.campaign_id in (" + campaignIds + ")" +
+                        "and c.status != 'removed' and c.campaign_id in (" + campaignIds + ")" +
                         "group by ch.campaign_id) a ";
                 listCampaignSpend4CountryCode = DB.findListBySql(sql);
 
@@ -941,7 +941,7 @@ public class Query extends HttpServlet {
                 sql += "where c.campaign_id=ch.campaign_id and country_code= '" + countryCode + "' " +
                         ((likeCampaignName != null) ? " and campaign_name like '%" + likeCampaignName +"%' " : "")  +
                         "and date between '" + startTime + "' and '" + endTime + "' " +
-                        "and c.campaign_id in (" + campaignIds + ")" +
+                        "and c.status != 'removed' and c.campaign_id in (" + campaignIds + ")" +
                         "group by ch.campaign_id) a left join " + webAccountIdTable + " b on a.account_id = b.account_id";
                 list = DB.findListBySql(sql);
             }else if (countryCheck) {
@@ -956,7 +956,7 @@ public class Query extends HttpServlet {
                         "where c.campaign_id=ch.campaign_id\n" +
                         ((likeCampaignName != null) ? " and campaign_name like '%" + likeCampaignName +"%' " : "")  +
                         "and date between '" + startTime + "' and '" + endTime + "' " +
-                        "and c.campaign_id in (" + campaignIds + ")" +
+                        "and c.status != 'removed' and c.campaign_id in (" + campaignIds + ")" +
                         "group by ch.campaign_id, country_code) a left join " + webAccountIdTable + " b on a.account_id = b.account_id";
                 list = DB.findListBySql(sql);
             }else{
@@ -971,7 +971,7 @@ public class Query extends HttpServlet {
                         "where c.campaign_id=ch.campaign_id\n" +
                         ((likeCampaignName != null) ? " and campaign_name like '%" + likeCampaignName +"%' " : "")  +
                         "and date between '" + startTime + "' and '" + endTime + "' " +
-                        "and c.campaign_id in (" + campaignIds + ")" +
+                        "and c.status != 'removed' and c.campaign_id in (" + campaignIds + ")" +
                         "group by ch.campaign_id) a left join " + webAccountIdTable + " b on a.account_id = b.account_id";
                 list = DB.findListBySql(sql);
             }

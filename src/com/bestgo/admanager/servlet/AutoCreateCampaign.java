@@ -625,6 +625,8 @@ public class AutoCreateCampaign extends HttpServlet {
                 result.result = false;
                 result.message = "bidding超过了0.5,   " + bidding;
             }
+            String s = String.valueOf(System.currentTimeMillis());
+            campaignName = campaignName+"_"+s.substring(s.length() - 6, s.length());
             if (campaignName.length() > 100) {
                 campaignName = campaignName.substring(0, 100);
             }
@@ -635,7 +637,7 @@ public class AutoCreateCampaign extends HttpServlet {
             }
 
             if (result.result) {
-                String s = String.valueOf(System.currentTimeMillis());
+
                 long recordId = DB.insert("ad_campaigns_admob_auto_create")
                         .put("app_name", appName)
                         .put("create_count", Utils.parseInt(createCount, 0))
@@ -644,7 +646,7 @@ public class AutoCreateCampaign extends HttpServlet {
                         .put("explode_country", Boolean.parseBoolean(explodeCountry) ? 1 : 0)
                         .put("excluded_region", excludedRegion)
                         .put("language", language)
-                        .put("campaign_name", campaignName+"_"+s.substring(s.length() - 4, s.length()))
+                        .put("campaign_name", campaignName)
                         .put("bugdet", bugdet)
                         .put("bidding", bidding)
                         .put("message1", message1)
