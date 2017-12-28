@@ -241,6 +241,35 @@ public class QueryThree extends HttpServlet {
                 jsonObject.addProperty("ret", 0);
                 jsonObject.addProperty("message", e.getMessage());
             }
+        }else if(path.startsWith("/query_id_of_auto_create_campaigns")){
+            try{
+                String curr_country_name = request.getParameter("curr_country_name");
+                String sqlF = "select id from ad_campaigns_auto_create where app_name = '" + tagName + "' and country_region like '%" + curr_country_name + "%'";
+                JSObject oneF = DB.findOneBySql(sqlF);
+                long id_facebook = -1;
+                if(oneF != null && oneF.hasObjectData()){
+                    id_facebook = oneF.get("id");
+                }
+                String sqlC = "select country_code from app_country_code_dict where country_name = '" + curr_country_name + "'";
+                JSObject oneC = DB.findOneBySql(sqlC);
+                String curr_country_code = null;
+                if(oneC != null && oneC.hasObjectData()){
+                    curr_country_code = oneC.get("country_code");
+                }
+                String sqlA = "select id from ad_campaigns_admob_auto_create where app_name = '" + tagName + "' and country_region like '%" + curr_country_code + "%'";
+                JSObject oneA = DB.findOneBySql(sqlA);
+                long id_adwords = -1;
+                if(oneA != null && oneA.hasObjectData()){
+                    id_adwords = oneA.get("id");
+                }
+                jsonObject.addProperty("id_facebook", id_facebook);
+                jsonObject.addProperty("id_adwords", id_adwords);
+                jsonObject.addProperty("ret", 1);
+                jsonObject.addProperty("message", "执行成功");
+            } catch (Exception e) {
+                jsonObject.addProperty("ret", 0);
+                jsonObject.addProperty("message", e.getMessage());
+            }
         }
         response.getWriter().write(jsonObject.toString());
     }

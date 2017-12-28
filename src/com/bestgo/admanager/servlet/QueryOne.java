@@ -36,7 +36,7 @@ public class QueryOne extends HttpServlet {
         String endTime = request.getParameter("endTime");
         String adwordsCheck = request.getParameter("adwordsCheck");
         String facebookCheck = request.getParameter("facebookCheck");
-
+        HashMap<String ,String> countryMap = Utils.getCountryMap();
 
         if (path.startsWith("/query_not_has_data")) {
             try {
@@ -47,8 +47,8 @@ public class QueryOne extends HttpServlet {
                     Long tagId = tagObject.get("id");
                     JsonObject jsonObject = null;
                     if (adwordsCheck != null && adwordsCheck.equals("false") && facebookCheck != null && facebookCheck.equals("false")) {
-                        JsonObject admob = fetchOneAppData(tagId, startTime, endTime, true);
-                        JsonObject facebook = fetchOneAppData(tagId, startTime, endTime, false);
+                        JsonObject admob = fetchOneAppData(tagId, startTime, endTime, true,countryMap);
+                        JsonObject facebook = fetchOneAppData(tagId, startTime, endTime, false,countryMap);
                         double total_spend = admob.get("total_spend").getAsDouble() + facebook.get("total_spend").getAsDouble();
                         double total_installed = admob.get("total_installed").getAsDouble() + facebook.get("total_installed").getAsDouble();
                         double total_impressions = admob.get("total_impressions").getAsDouble() + facebook.get("total_impressions").getAsDouble();
@@ -70,7 +70,7 @@ public class QueryOne extends HttpServlet {
                         }
                         jsonObject = admob;
                     } else {
-                        jsonObject = fetchOneAppData(tagId, startTime, endTime, "true".equals(adwordsCheck));
+                        jsonObject = fetchOneAppData(tagId, startTime, endTime, "true".equals(adwordsCheck),countryMap);
                     }
 
                     json.add("data", jsonObject);
@@ -93,7 +93,7 @@ public class QueryOne extends HttpServlet {
     }
 
 
-    private JsonObject fetchOneAppData(long tagId, String startTime, String endTime, boolean admobCheck) throws Exception {
+    private JsonObject fetchOneAppData(long tagId, String startTime, String endTime, boolean admobCheck,HashMap<String ,String> countryMap) throws Exception {
         String relationTable = "web_ad_campaign_tag_rel";
         String webAdCampaignTable = "web_ad_campaigns";
         String webAdCampaignHistoryTable = "web_ad_campaigns_history";
@@ -104,8 +104,6 @@ public class QueryOne extends HttpServlet {
             webAdCampaignHistoryTable = "web_ad_campaigns_history_admob";
             webAccountIdTable = "web_account_id_admob";
         }
-
-        HashMap<String ,String> countryMap = Utils.getCountryMap();
 
         List<JSObject> list = DB.scan(relationTable).select("campaign_id")
                 .where(DB.filter().whereEqualTo("tag_id", tagId)).execute();
@@ -131,16 +129,16 @@ public class QueryOne extends HttpServlet {
                 List<JSObject> listHasData = new ArrayList<>();
                 sql = "select campaign_id, a.account_id, short_name, campaign_name, create_time, status, budget, bidding, total_spend, total_installed, total_click, total_impressions, cpa,ctr, " +
                         "(case when total_click > 0 then total_installed/total_click else 0 end) as cvr " +
-                        " from " + webAdCampaignTable + " a , "+webAccountIdTable+" b where status != 'paused' and " +
+                        " from " + webAdCampaignTable + " a , "+webAccountIdTable+" b where a.status != 'paused' and a.status != 'removed' and " +
                         "campaign_id in (" + campaignIds + ") and a.account_id = b.account_id";
                 listAll = DB.findListBySql(sql);
                 sql = "select campaign_id, impressions from ( " +
                         "select ch.campaign_id, " +
                         " sum(ch.total_impressions) as impressions " +
                         " from " + webAdCampaignTable + " c, " + webAdCampaignHistoryTable + " ch " +
-                        "where c.campaign_id=ch.campaign_id " +
+                        "where c.campaign_id = ch.campaign_id " +
                         "and date between '" + startTime + "' and '" + endTime + "' " +
-                        "and c.campaign_id in (" + campaignIds + ") " +
+                        "and c.status != 'removed' and c.campaign_id in (" + campaignIds + ") " +
                         "group by ch.campaign_id having impressions > 0 ) a ";
                 listHasData = DB.findListBySql(sql);
                 list = Utils.getDiffJSObjectList(listAll, listHasData, "campaign_id");
@@ -155,7 +153,7 @@ public class QueryOne extends HttpServlet {
                         ",sum(ch.total_click) as click from " + webAdCampaignTable + " c, " + webAdCampaignHistoryTable + " ch " +
                         "where c.campaign_id=ch.campaign_id and status != 'paused' " +
                         "and date between '" + startTime + "' and '" + endTime + "' " +
-                        "and c.campaign_id in (" + campaignIds + ")" +
+                        "and c.status != 'removed' and c.campaign_id in (" + campaignIds + ") " +
                         "group by ch.campaign_id having impressions = 0 ) a  left join " + webAccountIdTable + " b on a.account_id = b.account_id";
                 list = DB.findListBySql(sql);
             }
