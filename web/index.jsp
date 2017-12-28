@@ -111,7 +111,6 @@
                 <label>转化</label><select id="selectConversionOp"><option value="1">大于等于</option><option value="2" selected="true">小于等于</option></select>
                 <input id="inputConversion" class="form-control" style="display: inline; width: auto;" type="text" value="1"/>
                 <button id="btnQueryZero" class="btn btn-default">查询Zero</button>
-                <button id="btnCloseZero" class="btn btn-default">关闭这些</button>
             </div>
         </div>
     </div>

@@ -213,6 +213,7 @@
             }, 'json');
         });
     }
+
     function setData(data) {
         $('#results_body > tr').remove();
         var arr = data.array;
@@ -230,7 +231,7 @@
                 if('incoming' == keyset[j]){
                     if(r <0){
                         td.addClass("red");
-                    }
+                    }''
                     td.text(r);
                 }else if('estimated_revenues_dev_cost' == keyset[j]){
                     if(r > data.es14_dev_cost){
@@ -240,7 +241,12 @@
                     }
                     td.text(r);
                 }else if('bidding' == keyset[j]){
-                    td.append('<input type="button" class="bidding_input" value="'+r+'">');
+                    var btn = $('<input type="button" value="'+ r + '">');
+                    btn.click(function(){
+                        window.open("campaigns_create.jsp","_blank");
+                        window.open("campaigns_create.jsp","_blank");
+                    })
+                    td.append(btn);
                 }else{
                     td.text(r);
                 }

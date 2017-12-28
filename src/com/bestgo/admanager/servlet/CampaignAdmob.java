@@ -91,9 +91,9 @@ public class CampaignAdmob extends HttpServlet {
                     result.message = "出价不能为空";
                 }
                 double dBidding = Utils.parseDouble(bidding, 0);
-                if (dBidding >= 1) {
+                if (dBidding >= 0.5) {
                     result.result = false;
-                    result.message = "bidding超过了1,   " + bidding;
+                    result.message = "bidding超过了0.5,   " + bidding;
                 }
 
                 File imagesPath = new File(imageRoot + File.separatorChar + imagePath);
