@@ -156,7 +156,7 @@
         var query = $("#inputSearch").val();
         var startTime = $('#inputStartTime').val();
         var endTime = $('#inputEndTime').val();
-        $.post('query_three/query_country_analysis_report', {
+        $.post('country_analysis_report/query_country_analysis_report', {
             tagName: query,
             startTime: startTime,
             endTime: endTime,
@@ -201,7 +201,7 @@
             var query = $("#inputSearch").val();
             var startTime = $('#inputStartTime').val();
             var endTime = $('#inputEndTime').val();
-            $.post('query_three/query_country_analysis_report', {
+            $.post('country_analysis_report/query_country_analysis_report', {
                 tagName: query,
                 startTime: startTime,
                 endTime: endTime,
@@ -259,7 +259,7 @@
             btn.data("country_name", one['country_name']);
             btn.click(function(){
                 var country_name = $(this).data("country_name");
-                $.post('query_three/query_id_of_auto_create_campaigns', {
+                $.post('country_analysis_report/query_id_of_auto_create_campaigns', {
                     tagName: tagName,
                     curr_country_name: country_name
             },function(data){
