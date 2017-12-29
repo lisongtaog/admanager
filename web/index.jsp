@@ -129,6 +129,7 @@
             <th>预算</th>
             <th>竞价</th>
             <th>总花费</th>
+            <th>总营收</th>
             <th>总安装</th>
             <th>总点击</th>
             <th>CPA</th>
