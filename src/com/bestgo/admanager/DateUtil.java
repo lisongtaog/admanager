@@ -77,7 +77,25 @@ public class DateUtil {
             Calendar cd = Calendar.getInstance();
             cd.setTime(sdf.parse(s));
             cd.add(Calendar.DATE, n);//增加一天
-            //cd.add(Calendar.MONTH, n);//增加一个月
+            return sdf.format(cd.getTime());
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    /**
+     * 日期字符串增加 n 月
+     * @param s
+     * @param n
+     * @param format
+     * @return 日期字符串
+     */
+    public static String addMonth(String s, int n,String format) {
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat(format);
+            Calendar cd = Calendar.getInstance();
+            cd.setTime(sdf.parse(s));
+            cd.add(Calendar.MONTH, n);//增加一个月
             return sdf.format(cd.getTime());
         } catch (Exception e) {
             return null;

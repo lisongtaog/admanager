@@ -1,5 +1,6 @@
 package com.bestgo.admanager.servlet;
 
+import com.bestgo.admanager.DateUtil;
 import com.bestgo.admanager.Utils;
 import com.bestgo.common.database.services.DB;
 import com.bestgo.common.database.utils.JSObject;
@@ -31,11 +32,11 @@ public class QueryTwo extends HttpServlet {
         String path = request.getPathInfo();
         JsonObject jsonObject = new JsonObject();
 
-        String tagName = request.getParameter("tagName");
-        String countryName = request.getParameter("countryName");
-
+        JsonArray jsonArray = new JsonArray();
 
         if (path.startsWith("/query_operation_log")) {
+            String tagName = request.getParameter("tagName");
+            String countryName = request.getParameter("countryName");
             try {
                 String sql = "select country_code from app_country_code_dict where country_name = '" + countryName + "'";
                 JSObject countryCodeJSObject = DB.findOneBySql(sql);
@@ -45,7 +46,7 @@ public class QueryTwo extends HttpServlet {
                         "from web_ad_campaign_operation_log where app_name = '"+tagName+"' " +
                         "and country_code = '" + country_code + "' order by operation_date desc";
                 List<JSObject> objectList = DB.findListBySql(sqlA);
-                JsonArray jsonArray = new JsonArray();
+
                 boolean flag = false;
                 boolean sign = false;
                 String biddingsStr = "出价=<[";
@@ -89,7 +90,95 @@ public class QueryTwo extends HttpServlet {
                 jsonObject.addProperty("ret", 0);
                 jsonObject.addProperty("message", e.getMessage());
             }
+        }else  if (path.startsWith("/query_create_campaign_statistics")) {
+            String campaignCreateTime = request.getParameter("campaignCreateTime");
+            String addDay = DateUtil.addDay(campaignCreateTime, 1, "yyyy-MM-dd");
+            try {
+                List<JSObject> tags = DB.scan("web_tag")
+                        .select("tag_name").execute();
+                String sqlAllFacebook = "select app_name,count(id) as all_f  from ad_campaigns where create_time >= '"+campaignCreateTime+"' and create_time < '"+addDay+"' group by app_name";
+                java.lang.System.out.println(sqlAllFacebook);
+                List<JSObject> listAllF = DB.findListBySql(sqlAllFacebook);
+
+                String sqlFacebookHander = "select app_name,count(id) as facebook  from ad_campaigns where auto_create_id = 0 and create_time >= '"+campaignCreateTime+"' and create_time < '"+addDay+"' group by app_name";
+                List<JSObject> listFH = DB.findListBySql(sqlFacebookHander);
+
+                String sqlAllAdmob = "select app_name,count(id) as all_a from ad_campaigns_admob where create_time >= '"+campaignCreateTime+"' and create_time < '"+addDay+"' group by app_name";
+                List<JSObject> listAllA = DB.findListBySql(sqlAllAdmob);
+
+                String sqlAdwordsHander = "select app_name,count(id) as adwords  from ad_campaigns_admob where auto_create_id = 0 and create_time >= '"+campaignCreateTime+"' and create_time < '"+addDay+"' group by app_name";
+                List<JSObject> listAH = DB.findListBySql(sqlAdwordsHander);
+
+                for(JSObject tag : tags){
+                    Count count = new Count();
+                    count.appName = tag.get("tag_name");
+
+                    for(JSObject f : listAllF){
+                        String app_name = f.get("app_name");
+                        if(count.appName.equals(app_name)){
+                            count.allF = f.get("all_f");
+                            break;
+                        }
+                    }
+                    for(JSObject fh : listFH){
+                        String app_name = fh.get("app_name");
+                        if(count.appName.equals(app_name)){
+                            count.facebook_hander = fh.get("facebook");
+                            count.facebook_auto = count.allF - count.facebook_hander;
+                            break;
+                        }
+                    }
+                    for(JSObject a : listAllA){
+                        String app_name = a.get("app_name");
+                        if(count.appName.equals(app_name)){
+                            count.allA = a.get("all_a");
+
+                            break;
+                        }
+                    }
+
+                    for(JSObject ah : listAH){
+                        String app_name = ah.get("app_name");
+                        if(count.appName.equals(app_name)){
+                            count.adwords_hander = ah.get("adwords");
+                            count.facebook_auto = count.allA - count.adwords_hander;
+                            break;
+                        }
+                    }
+                    count.all = count.allA + count.allF;
+                    if(count.all > 0){
+                        JsonObject d = new JsonObject();
+                        d.addProperty("app_name", count.appName);
+                        d.addProperty("facebook_hander", count.facebook_hander);
+                        d.addProperty("facebook_auto", count.facebook_auto);
+                        d.addProperty("adwords_hander", count.adwords_hander);
+                        d.addProperty("adwords_auto", count.adwords_auto);
+                        d.addProperty("facebook_all", count.allF);
+                        d.addProperty("adwords_all", count.allA);
+                        d.addProperty("all", count.all);
+                        jsonArray.add(d);
+                    }
+
+                }
+                jsonObject.addProperty("ret", 1);
+                jsonObject.addProperty("message", "执行成功");
+                jsonObject.add("array", jsonArray);
+            } catch (Exception e) {
+                jsonObject.addProperty("ret", 0);
+                jsonObject.addProperty("message", e.getMessage());
+            }
         }
         response.getWriter().write(jsonObject.toString());
+    }
+
+    class Count{
+        public String appName;
+        public long allF;
+        public long allA;
+        public long all;
+        public long facebook_hander;
+        public long facebook_auto;
+        public long adwords_auto;
+        public long adwords_hander;
     }
 }
