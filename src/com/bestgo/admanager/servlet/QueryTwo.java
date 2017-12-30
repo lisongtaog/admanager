@@ -108,7 +108,8 @@ public class QueryTwo extends HttpServlet {
 
                 String sqlAdwordsHander = "select app_name,count(id) as adwords  from ad_campaigns_admob where auto_create_id = 0 and create_time >= '"+campaignCreateTime+"' and create_time < '"+addDay+"' group by app_name";
                 List<JSObject> listAH = DB.findListBySql(sqlAdwordsHander);
-
+                long total_all_f = 0;
+                long total_all_a = 0;
                 for(JSObject tag : tags){
                     Count count = new Count();
                     count.appName = tag.get("tag_name");
@@ -147,6 +148,8 @@ public class QueryTwo extends HttpServlet {
                     }
                     count.all = count.allA + count.allF;
                     if(count.all > 0){
+                        total_all_a += count.allA;
+                        total_all_f += count.allF;
                         JsonObject d = new JsonObject();
                         d.addProperty("app_name", count.appName);
                         d.addProperty("facebook_hander", count.facebook_hander);
@@ -160,7 +163,11 @@ public class QueryTwo extends HttpServlet {
                     }
 
                 }
+                long total_all = total_all_a + total_all_f;
                 jsonObject.addProperty("ret", 1);
+                jsonObject.addProperty("total_all", total_all);
+                jsonObject.addProperty("total_all_a", total_all_a);
+                jsonObject.addProperty("total_all_f", total_all_f);
                 jsonObject.addProperty("message", "执行成功");
                 jsonObject.add("array", jsonArray);
             } catch (Exception e) {

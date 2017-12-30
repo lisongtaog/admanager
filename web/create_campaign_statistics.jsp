@@ -120,6 +120,10 @@
                     }
                     $('#results_body').append(tr);
                 }
+                var str = "Facebook创建总数: " + data.total_all_f + "  Adwords创建总数: " + data.total_all_f  + "   所有系列创建总数: " + data.total_all;
+                str += "<br/><span class='estimateResult'></span>"
+                $('#total_result').removeClass("editable");
+                $('#total_result').html(str);
             } else {
                 admanager.showCommonDlg("错误", data.message);
             }
