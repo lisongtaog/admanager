@@ -940,7 +940,7 @@ public class Query extends HttpServlet {
                 for(JSObject j : listCampaignSpend4CountryCode){
                     countryCampaignspendMap.put(j.get("campaign_id"),j);
                 }
-                sql = "select campaign_id, a.account_id,short_name, campaign_name, status, create_time, budget, bidding, spend, installed, impressions, click" +
+                sql = "select campaign_id, a.account_id,short_name, campaign_name, a.status, create_time, budget, bidding, spend, installed, impressions, click" +
                         ", (case when impressions > 0 then click/impressions else 0 end) as ctr" +
                         ", (case when installed > 0 then spend/installed else 0 end) as cpa" +
                         ", (case when click > 0 then installed/click else 0 end) as cvr" +
@@ -961,7 +961,7 @@ public class Query extends HttpServlet {
                         "group by ch.campaign_id) a left join " + webAccountIdTable + " b on a.account_id = b.account_id";
                 list = DB.findListBySql(sql);
             }else if (countryCheck) {
-                sql = "select campaign_id, country_code, a.account_id,short_name, campaign_name, status, create_time, budget, bidding, spend, installed, impressions, click" +
+                sql = "select campaign_id, country_code, a.account_id,short_name, campaign_name, a.status, create_time, budget, bidding, spend, installed, impressions, click" +
                         ", (case when impressions > 0 then click/impressions else 0 end) as ctr" +
                         ", (case when installed > 0 then spend/installed else 0 end) as cpa" +
                         ", (case when click > 0 then installed/click else 0 end) as cvr" +
@@ -976,7 +976,7 @@ public class Query extends HttpServlet {
                         "group by ch.campaign_id, country_code) a left join " + webAccountIdTable + " b on a.account_id = b.account_id";
                 list = DB.findListBySql(sql);
             }else{
-                sql = "select campaign_id, a.account_id,short_name, campaign_name, status, create_time, budget, bidding, spend, installed, impressions, click" +
+                sql = "select campaign_id, a.account_id,short_name, campaign_name, a.status, create_time, budget, bidding, spend, installed, impressions, click" +
                         ", (case when impressions > 0 then click/impressions else 0 end) as ctr" +
                         ", (case when installed > 0 then spend/installed else 0 end) as cpa" +
                         ", (case when click > 0 then installed/click else 0 end) as cvr" +
