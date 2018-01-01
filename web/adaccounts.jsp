@@ -45,7 +45,7 @@
 
       <table class="table">
         <thead>
-        <tr><th>序号</th><th>广告账号</th><th>缩写</th><th>操作</th></tr>
+        <tr><th>序号</th><th>广告账号</th><th>缩写</th><th>状态</th><th>余额</th><th>操作</th></tr>
         </thead>
         <tbody>
 
@@ -66,11 +66,21 @@
         <%
           for (int i = 0; i < data.size(); i++) {
             JSObject one = data.get(i);
+            int status = one.get("status");
+            String statusStr = "关闭";
+            if(status == 1){
+                statusStr = "开启";
+            }
+            int spend_cap = one.get("spend_cap");
+            int amount_spent = one.get("amount_spent");
+            int balance = spend_cap - amount_spent;
         %>
         <tr>
           <td><%=one.get("id")%></td>
           <td><%=one.get("account_id")%></td>
           <td><%=one.get("short_name")%></td>
+          <td><%=statusStr%></td>
+          <td><%=balance %></td>
           <td><a class="link_modify" href="#">修改</a>&nbsp;&nbsp;<a class="link_delete" href="#">删除</a></td>
         </tr>
         <% } %>
@@ -220,6 +230,16 @@
         tr.append(td);
         td = $('<td></td>');
         td.text(one.short_name);
+        tr.append(td);
+        td = $('<td></td>');
+        if(one.status == 1){
+            td.text("开启");
+        }else{
+            td.text("关闭");
+        }
+        tr.append(td);
+        td = $('<td></td>');
+        td.text(one.balance);
         tr.append(td);
         td = $('<td><a class="link_modify" href="#">修改</a><a class="link_delete" href="#">删除</a></td>');
         tr.append(td);

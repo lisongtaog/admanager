@@ -980,7 +980,6 @@ public class Query extends HttpServlet {
                         "and date between '" + startTime + "' and '" + endTime + "' " +
                         "and c.status != 'removed' and c.campaign_id in (" + campaignIds + ")" +
                         "group by ch.campaign_id) a left join " + webAccountIdTable + " b on a.account_id = b.account_id";
-                java.lang.System.out.println(sql);
                 list = DB.findListBySql(sql);
             }
 
