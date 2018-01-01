@@ -96,17 +96,17 @@ public class QueryTwo extends HttpServlet {
             try {
                 List<JSObject> tags = DB.scan("web_tag")
                         .select("tag_name").execute();
-                String sqlAllFacebook = "select app_name,count(id) as all_f  from ad_campaigns where create_time >= '"+campaignCreateTime+"' and create_time < '"+addDay+"' group by app_name";
+                String sqlAllFacebook = "select app_name,count(id) as facebook_all  from ad_campaigns where create_time >= '"+campaignCreateTime+"' and create_time < '"+addDay+"' group by app_name";
                 java.lang.System.out.println(sqlAllFacebook);
                 List<JSObject> listAllF = DB.findListBySql(sqlAllFacebook);
 
-                String sqlFacebookHander = "select app_name,count(id) as facebook  from ad_campaigns where auto_create_id = 0 and create_time >= '"+campaignCreateTime+"' and create_time < '"+addDay+"' group by app_name";
+                String sqlFacebookHander = "select app_name,count(id) as facebook_hander  from ad_campaigns where auto_create_id = 0 and create_time >= '"+campaignCreateTime+"' and create_time < '"+addDay+"' group by app_name";
                 List<JSObject> listFH = DB.findListBySql(sqlFacebookHander);
 
-                String sqlAllAdmob = "select app_name,count(id) as all_a from ad_campaigns_admob where create_time >= '"+campaignCreateTime+"' and create_time < '"+addDay+"' group by app_name";
+                String sqlAllAdmob = "select app_name,count(id) as adwords_all from ad_campaigns_admob where create_time >= '"+campaignCreateTime+"' and create_time < '"+addDay+"' group by app_name";
                 List<JSObject> listAllA = DB.findListBySql(sqlAllAdmob);
 
-                String sqlAdwordsHander = "select app_name,count(id) as adwords  from ad_campaigns_admob where auto_create_id = 0 and create_time >= '"+campaignCreateTime+"' and create_time < '"+addDay+"' group by app_name";
+                String sqlAdwordsHander = "select app_name,count(id) as adwords_hander  from ad_campaigns_admob where auto_create_id = 0 and create_time >= '"+campaignCreateTime+"' and create_time < '"+addDay+"' group by app_name";
                 List<JSObject> listAH = DB.findListBySql(sqlAdwordsHander);
                 long total_all_f = 0;
                 long total_all_a = 0;
@@ -116,36 +116,35 @@ public class QueryTwo extends HttpServlet {
 
                     for(JSObject f : listAllF){
                         String app_name = f.get("app_name");
-                        if(count.appName.equals(app_name)){
-                            count.allF = f.get("all_f");
+                        if(count.appName.equalsIgnoreCase(app_name)){
+                            count.allF = f.get("facebook_all");
                             break;
                         }
                     }
                     for(JSObject fh : listFH){
                         String app_name = fh.get("app_name");
-                        if(count.appName.equals(app_name)){
-                            count.facebook_hander = fh.get("facebook");
-                            count.facebook_auto = count.allF - count.facebook_hander;
+                        if(count.appName.equalsIgnoreCase(app_name)){
+                            count.facebook_hander = fh.get("facebook_hander");
                             break;
                         }
                     }
+                    count.facebook_auto = count.allF - count.facebook_hander;
                     for(JSObject a : listAllA){
                         String app_name = a.get("app_name");
-                        if(count.appName.equals(app_name)){
-                            count.allA = a.get("all_a");
-
+                        if(count.appName.equalsIgnoreCase(app_name)){
+                            count.allA = a.get("adwords_all");
                             break;
                         }
                     }
 
                     for(JSObject ah : listAH){
                         String app_name = ah.get("app_name");
-                        if(count.appName.equals(app_name)){
-                            count.adwords_hander = ah.get("adwords");
-                            count.facebook_auto = count.allA - count.adwords_hander;
+                        if(count.appName.equalsIgnoreCase(app_name)){
+                            count.adwords_hander = ah.get("adwords_hander");
                             break;
                         }
                     }
+                    count.adwords_auto = count.allA - count.adwords_hander;
                     count.all = count.allA + count.allF;
                     if(count.all > 0){
                         total_all_a += count.allA;
