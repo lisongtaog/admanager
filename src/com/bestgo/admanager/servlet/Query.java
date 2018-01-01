@@ -941,9 +941,6 @@ public class Query extends HttpServlet {
                     countryCampaignspendMap.put(j.get("campaign_id"),j);
                 }
                 sql = "select campaign_id, a.account_id,short_name, campaign_name, status, create_time, budget, bidding, spend, installed, impressions, click" +
-                        ", (case when impressions > 0 then click/impressions else 0 end) as ctr" +
-                        ", (case when installed > 0 then spend/installed else 0 end) as cpa" +
-                        ", (case when click > 0 then installed/click else 0 end) as cvr" +
                         " from (" +
                         "select ch.campaign_id, account_id, campaign_name,c.status, create_time, c.budget, c.bidding, sum(ch.total_spend) as spend, " +
                         "sum(ch.total_installed) as installed, sum(ch.total_impressions) as impressions " +
@@ -962,9 +959,6 @@ public class Query extends HttpServlet {
                 list = DB.findListBySql(sql);
             }else if (countryCheck) {
                 sql = "select campaign_id, country_code, a.account_id,short_name, campaign_name, status, create_time, budget, bidding, spend, installed, impressions, click" +
-                        ", (case when impressions > 0 then click/impressions else 0 end) as ctr" +
-                        ", (case when installed > 0 then spend/installed else 0 end) as cpa" +
-                        ", (case when click > 0 then installed/click else 0 end) as cvr" +
                         " from (" +
                         "select ch.campaign_id, country_code, account_id, campaign_name,c.status, create_time, c.budget, c.bidding, sum(ch.total_spend) as spend, " +
                         "sum(ch.total_installed) as installed, sum(ch.total_impressions) as impressions " +
@@ -976,19 +970,15 @@ public class Query extends HttpServlet {
                         "group by ch.campaign_id, country_code) a left join " + webAccountIdTable + " b on a.account_id = b.account_id";
                 list = DB.findListBySql(sql);
             }else{
-                sql = "select campaign_id, a.account_id,short_name, campaign_name, status, create_time, budget, bidding, spend, installed, impressions, click" +
-                        ", (case when impressions > 0 then click/impressions else 0 end) as ctr" +
-                        ", (case when installed > 0 then spend/installed else 0 end) as cpa" +
-                        ", (case when click > 0 then installed/click else 0 end) as cvr" +
-                        " from (" +
-                        "select ch.campaign_id, account_id, campaign_name,c.status, create_time, c.budget, c.bidding, sum(ch.total_spend) as spend, " +
-                        "sum(ch.total_installed) as installed, sum(ch.total_impressions) as impressions " +
-                        ",sum(ch.total_click) as click from " + webAdCampaignTable + " c, " + webAdCampaignHistoryTable + " ch " +
-                        "where c.campaign_id=ch.campaign_id " +
+                sql = "select ch.campaign_id, c.account_id, b.short_name, campaign_name,c.status, " +
+                        "create_time, c.budget, c.bidding, sum(ch.total_spend) as spend, sum(ch.total_installed) as installed, " +
+                        "sum(ch.total_impressions) as impressions ,sum(ch.total_click) as click " +
+                        "from " + webAdCampaignTable + " c, " + webAdCampaignHistoryTable + " ch, " + webAccountIdTable + " b " +
+                        "where c.campaign_id = ch.campaign_id " +
                         ((likeCampaignName != null) ? " and campaign_name like '%" + likeCampaignName +"%' " : "")  +
                         "and date between '" + startTime + "' and '" + endTime + "' " +
-                        "and c.status != 'removed' and c.campaign_id in (" + campaignIds + ")" +
-                        "group by ch.campaign_id) a left join " + webAccountIdTable + " b on a.account_id = b.account_id";
+                        "and c.status != 'removed' and c.campaign_id in (" + campaignIds + ") " +
+                        "and c.account_id = b.account_id group by ch.campaign_id;";
                 list = DB.findListBySql(sql);
             }
 
