@@ -20,6 +20,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.lang.System;
 import java.util.*;
 
 @WebServlet(name = "query", urlPatterns = {"/query"}, asyncSupported = true)
@@ -49,15 +50,16 @@ public class Query extends HttpServlet {
 
         if (isSummary != null) {
             try {
-                List<JSObject> tags = DB.scan("web_tag")
-                        .select("id", "tag_name").orderByAsc("tag_name").execute();
                 JsonArray arr = new JsonArray();
                 if ("false".equals(adwordsCheck) && "false".equals(facebookCheck)) {
-                    for (int i = 0; i < tags.size(); i++) {
-                        long id = tags.get(i).get("id");
-                        String tagName = tags.get(i).get("tag_name");
-                        JsonObject admob = fetchOneAppData(id, tagName,startTime, endTime, true, false, countryCode,likeCampaignName,campaignCreateTime,false,countryMap);
-                        JsonObject facebook = fetchOneAppData(id, tagName,startTime, endTime, false, false, countryCode,likeCampaignName,campaignCreateTime,false,countryMap);
+                    String sqlTag = "select t.id,t.tag_name,google_package_id from web_tag t LEFT JOIN web_facebook_app_ids_rel air ON t.tag_name = air.tag_name ORDER BY t.tag_name";
+                    List<JSObject> tagList = DB.findListBySql(sqlTag);
+                    for (int i = 0,len=tagList.size(); i < len; i++) {
+                        JSObject tagJSObject = tagList.get(i);
+                        long id = tagJSObject.get("id");
+                        String tagName = tagJSObject.get("tag_name");
+                        JsonObject admob = fetchOneAppDataSummary(id, startTime, endTime,true);
+                        JsonObject facebook =  fetchOneAppDataSummary(id, startTime, endTime,false);
                         double total_impressions = admob.get("total_impressions").getAsDouble() + facebook.get("total_impressions").getAsDouble();
                         if (total_impressions == 0) {
                             continue;
@@ -76,29 +78,27 @@ public class Query extends HttpServlet {
                         admob.addProperty("total_cpa", Utils.trimDouble(total_cpa));
                         admob.addProperty("total_cvr", Utils.trimDouble(total_cvr));
                         admob.addProperty("name", tagName);
-                        String sqlG = "select google_package_id from web_facebook_app_ids_rel WHERE tag_name = '" + tagName + "'";
-                        JSObject oneG = DB.findOneBySql(sqlG);
                         double total_revenue = 0;
-                        if(oneG != null){
-                            String google_package_id = oneG.get("google_package_id");
-                            if(google_package_id != null){
-                                String sqlR = "select sum(revenue) as revenues " +
-                                        "from web_ad_country_analysis_report_history where app_id = '"
-                                        + google_package_id + "' and date BETWEEN '" + startTime + "' AND '" + endTime + "'";
-                                JSObject oneR = DB.findOneBySql(sqlR);
-                                if(oneR != null){
-                                    total_revenue = Utils.convertDouble(oneR.get("revenues"),0);
-                                }
+                        String google_package_id = tagJSObject.get("google_package_id");
+                        if(google_package_id != null){
+                            String sqlR = "select sum(revenue) as revenues " +
+                                    "from web_ad_country_analysis_report_history where app_id = '"
+                                    + google_package_id + "' and date BETWEEN '" + startTime + "' AND '" + endTime + "'";
+                            JSObject oneR = DB.findOneBySql(sqlR);
+                            if(oneR != null){
+                                total_revenue = Utils.convertDouble(oneR.get("revenues"),0);
                             }
                         }
                         admob.addProperty("total_revenue",Utils.trimDouble(total_revenue));
                         arr.add(admob);
                     }
                 } else {
-                    for (int i = 0; i < tags.size(); i++) {
-                        long id = tags.get(i).get("id");
-                        String tagName = tags.get(i).get("tag_name");
-                        JsonObject jsonObject = fetchOneAppData(id, tagName,startTime, endTime,  "true".equals(adwordsCheck), false, countryCode,likeCampaignName,campaignCreateTime,false,countryMap);
+                    String sqlTag = "select id,tag_name from web_tag ORDER BY tag_name";
+                    List<JSObject> tagList = DB.findListBySql(sqlTag);
+                    for (int i = 0; i < tagList.size(); i++) {
+                        long id = tagList.get(i).get("id");
+                        String tagName = tagList.get(i).get("tag_name");
+                        JsonObject jsonObject =  fetchOneAppDataSummary(id, startTime, endTime,"true".equals(adwordsCheck));
                         double total_impression = jsonObject.get("total_impressions").getAsDouble();
                         if (total_impression == 0) {
                             continue;
@@ -940,10 +940,7 @@ public class Query extends HttpServlet {
                 for(JSObject j : listCampaignSpend4CountryCode){
                     countryCampaignspendMap.put(j.get("campaign_id"),j);
                 }
-                sql = "select campaign_id, a.account_id,short_name, campaign_name, a.status, create_time, budget, bidding, spend, installed, impressions, click" +
-                        ", (case when impressions > 0 then click/impressions else 0 end) as ctr" +
-                        ", (case when installed > 0 then spend/installed else 0 end) as cpa" +
-                        ", (case when click > 0 then installed/click else 0 end) as cvr" +
+                sql = "select campaign_id, a.account_id,short_name, campaign_name, status, create_time, budget, bidding, spend, installed, impressions, click" +
                         " from (" +
                         "select ch.campaign_id, account_id, campaign_name,c.status, create_time, c.budget, c.bidding, sum(ch.total_spend) as spend, " +
                         "sum(ch.total_installed) as installed, sum(ch.total_impressions) as impressions " +
@@ -961,10 +958,7 @@ public class Query extends HttpServlet {
                         "group by ch.campaign_id) a left join " + webAccountIdTable + " b on a.account_id = b.account_id";
                 list = DB.findListBySql(sql);
             }else if (countryCheck) {
-                sql = "select campaign_id, country_code, a.account_id,short_name, campaign_name, a.status, create_time, budget, bidding, spend, installed, impressions, click" +
-                        ", (case when impressions > 0 then click/impressions else 0 end) as ctr" +
-                        ", (case when installed > 0 then spend/installed else 0 end) as cpa" +
-                        ", (case when click > 0 then installed/click else 0 end) as cvr" +
+                sql = "select campaign_id, country_code, a.account_id,short_name, campaign_name, status, create_time, budget, bidding, spend, installed, impressions, click" +
                         " from (" +
                         "select ch.campaign_id, country_code, account_id, campaign_name,c.status, create_time, c.budget, c.bidding, sum(ch.total_spend) as spend, " +
                         "sum(ch.total_installed) as installed, sum(ch.total_impressions) as impressions " +
@@ -977,9 +971,6 @@ public class Query extends HttpServlet {
                 list = DB.findListBySql(sql);
             }else{
                 sql = "select campaign_id, a.account_id,short_name, campaign_name, a.status, create_time, budget, bidding, spend, installed, impressions, click" +
-                        ", (case when impressions > 0 then click/impressions else 0 end) as ctr" +
-                        ", (case when installed > 0 then spend/installed else 0 end) as cpa" +
-                        ", (case when click > 0 then installed/click else 0 end) as cvr" +
                         " from (" +
                         "select ch.campaign_id, account_id, campaign_name,c.status, create_time, c.budget, c.bidding, sum(ch.total_spend) as spend, " +
                         "sum(ch.total_installed) as installed, sum(ch.total_impressions) as impressions " +
@@ -1118,6 +1109,69 @@ public class Query extends HttpServlet {
             }
             array.add(d);
         }
+        jsonObject.add("array", array);
+        jsonObject.addProperty("total_spend", total_spend);
+        jsonObject.addProperty("total_installed", total_installed);
+        jsonObject.addProperty("total_impressions", total_impressions);
+        jsonObject.addProperty("total_click", total_click);
+        jsonObject.addProperty("total_ctr", Utils.trimDouble(total_ctr));
+        jsonObject.addProperty("total_cpa", Utils.trimDouble(total_cpa));
+        jsonObject.addProperty("total_cvr", Utils.trimDouble(total_cvr));
+        return jsonObject;
+    }
+
+    private JsonObject fetchOneAppDataSummary(long tagId, String startTime, String endTime, boolean admobCheck) throws Exception {
+        String relationTable = "web_ad_campaign_tag_rel";
+        String webAdCampaignTable = "web_ad_campaigns";
+        String webAdCampaignHistoryTable = "web_ad_campaigns_history";
+        if (admobCheck) {
+            relationTable = "web_ad_campaign_tag_admob_rel";
+            webAdCampaignTable = "web_ad_campaigns_admob";
+            webAdCampaignHistoryTable = "web_ad_campaigns_history_admob";
+        }
+        String sql = "select sum(ch.total_spend) as spend, " +
+                "sum(ch.total_installed) as installed, sum(ch.total_impressions) as impressions " +
+                ",sum(ch.total_click) as click from " + webAdCampaignTable + " c, " + webAdCampaignHistoryTable + " ch, " +
+                "(select distinct campaign_id from " + relationTable + " where tag_id = " + tagId + ") rt " +
+                "where rt.campaign_id = ch.campaign_id and c.campaign_id = ch.campaign_id " +
+                "and date between '" + startTime + "' and '" + endTime + "' " +
+                "and c.status != 'removed' " +
+                "group by ch.campaign_id";
+        List<JSObject> list = DB.findListBySql(sql);
+
+        JsonObject jsonObject = new JsonObject();
+        JsonArray array = new JsonArray();
+        double total_spend = 0;
+        double total_installed = 0;
+        double total_impressions = 0;
+        double total_click = 0;
+
+        for (int i = 0,len=list.size(); i < len; i++) {
+            JSObject one = list.get(i);
+            double impressions = Utils.convertDouble(one.get("impressions"), 0);
+            if (impressions == 0) {
+                continue;
+            }
+            double installed = Utils.convertDouble(one.get("installed"), 0);
+            double spend = Utils.convertDouble(one.get("spend"), 0);
+
+            double click = Utils.convertDouble(one.get("click"), 0);
+
+            total_spend += spend;
+            total_installed += installed;
+            total_impressions += impressions;
+            total_click += click;
+
+            JsonObject d = new JsonObject();
+            d.addProperty("impressions", impressions);
+            d.addProperty("spend", Utils.trimDouble(spend));
+            d.addProperty("installed", installed);
+            d.addProperty("click", click);
+            array.add(d);
+        }
+        double total_ctr = total_impressions > 0 ? total_click / total_impressions : 0;
+        double total_cpa = total_installed > 0 ? total_spend / total_installed : 0;
+        double total_cvr = total_click > 0 ? total_installed / total_click : 0;
         jsonObject.add("array", array);
         jsonObject.addProperty("total_spend", total_spend);
         jsonObject.addProperty("total_installed", total_installed);

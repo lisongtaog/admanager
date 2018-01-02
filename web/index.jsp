@@ -265,6 +265,5 @@
         }, 'json');
     });
 </script>
-<script src="js/interlaced-color-change.js"></script>
 </body>
 </html>

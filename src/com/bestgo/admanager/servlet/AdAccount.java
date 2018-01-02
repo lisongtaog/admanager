@@ -62,10 +62,16 @@ public class AdAccount extends HttpServlet {
                     List<JSObject> data = fetchData(word);
                     json.addProperty("ret", 1);
                     JsonArray array = new JsonArray();
-                    for (int i = 0; i < data.size(); i++) {
+                    for (int i = 0,len = data.size(); i < len; i++) {
+                        JSObject js = data.get(i);
                         JsonObject one = new JsonObject();
-                        one.addProperty("account_id", (String)data.get(i).get("account_id"));
-                        one.addProperty("short_name", (String)data.get(i).get("short_name"));
+                        one.addProperty("account_id", (String)js.get("account_id"));
+                        one.addProperty("short_name", (String)js.get("short_name"));
+                        int status = js.get("status");
+                        one.addProperty("status", status);
+                        int spend_cap = data.get(i).get("spend_cap");
+                        int amount_spent = data.get(i).get("amount_spent");
+                        one.addProperty("balance", spend_cap - amount_spent);
                         one.addProperty("id", (long)data.get(i).get("id"));
                         array.add(one);
                     }
@@ -82,6 +88,10 @@ public class AdAccount extends HttpServlet {
                         JsonObject one = new JsonObject();
                         one.addProperty("account_id", (String)data.get(i).get("account_id"));
                         one.addProperty("short_name", (String)data.get(i).get("short_name"));
+                        one.addProperty("status", (String)data.get(i).get("status"));
+                        int spend_cap = data.get(i).get("spend_cap");
+                        int amount_spent = data.get(i).get("amount_spent");
+                        one.addProperty("balance", String.valueOf(spend_cap - amount_spent));
                         one.addProperty("id", (long)data.get(i).get("id"));
                         array.add(one);
                     }
@@ -102,7 +112,7 @@ public class AdAccount extends HttpServlet {
     public static List<JSObject> fetchData(String word) {
         List<JSObject> list = new ArrayList<>();
         try {
-            return DB.scan("web_account_id").select("id", "account_id", "short_name")
+            return DB.scan("web_account_id").select("id", "account_id", "short_name", "status" ,"spend_cap", "amount_spent")
                     .where(DB.filter().whereLikeTo("account_id", "%" + word + "%"))
                     .or(DB.filter().whereLikeTo("short_name", "%" + word + "%")).orderByAsc("id").execute();
         } catch (Exception ex) {
@@ -115,7 +125,7 @@ public class AdAccount extends HttpServlet {
     public static List<JSObject> fetchData(int index, int size) {
         List<JSObject> list = new ArrayList<>();
         try {
-            return DB.scan("web_account_id").select("id", "account_id", "short_name").limit(size).start(index * size).orderByAsc("id").execute();
+            return DB.scan("web_account_id").select("id", "account_id", "short_name", "status" ,"spend_cap", "amount_spent").limit(size).start(index * size).orderByAsc("id").execute();
         } catch (Exception ex) {
             Logger logger = Logger.getRootLogger();
             logger.error(ex.getMessage(), ex);
