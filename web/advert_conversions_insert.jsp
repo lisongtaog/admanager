@@ -22,6 +22,12 @@
     if (object == null) {
         response.sendRedirect("login.jsp");
     }
+
+    List<JSObject> allTags = Tags.fetchAllTags();
+    JsonArray array = new JsonArray();
+    for (int i = 0; i < allTags.size(); i++) {
+        array.add((String) allTags.get(i).get("tag_name"));
+    }
 %>
 
 <div class="container-fluid">
@@ -55,7 +61,13 @@
 
 
     <form class="form-horizontal" action="#" id="formFacebook">
-
+        <div class="form-group">
+            <label for="selectApp" class="col-sm-2 control-label">应用</label>
+            <div class="col-sm-10">
+                <select class="form-control" id="selectApp">
+                </select>
+            </div>
+        </div>
         <div class="form-group">
             <label for="inputID" class="col-sm-2 control-label">转化ID</label>
             <div class="col-sm-10">
@@ -77,6 +89,14 @@
 
 
     <form class="form-horizontal" action="#" id="formAdmob">
+        <div class="form-group">
+            <label for="selectApp" class="col-sm-2 control-label">应用</label>
+            <div class="col-sm-10">
+                <select class="form-control" id="selectAppAdmob">
+
+                </select>
+            </div>
+        </div>
         <div class="form-group">
             <label for="inputID" class="col-sm-2 control-label">转化ID</label>
             <div class="col-sm-10">
@@ -113,6 +133,19 @@
 <script>
     function init() {
         $('.select2').select2();
+        $.post('system/fb_app_id_rel/query', {
+            word: '',
+        }, function(data) {
+            if (data && data.ret == 1) {
+                appList = data.data;
+                appList.forEach(function(one) {
+                    $('#selectApp').append($("<option>" + one.tag_name + "</option>"));
+                    $('#selectAppAdmob').append($("<option>" + one.tag_name + "</option>"));
+                })
+            } else {
+                admanager.showCommonDlg("错误", data.message);
+            }
+        }, 'json');
 
         $('#checkAdmob').click(function () {
             if ($('#checkAdmob').prop('checked')) {
@@ -133,10 +166,12 @@
     init();
 
     $('#btnInsertAdmob').click(function() {
-        var ocid = $('#inputIDAdmob').val();
+        var appName = $('#selectAppAdmob').val();
+        var ctid = $('#inputIDAdmob').val();
         var conversionName = $('#inputNameAdmob').val();
         $.post("advert_conversion_admob/save_advert_conversion", {
-            ocid: ocid,
+            appName: appName,
+            ctid: ctid,
             conversionName: conversionName
         }, function (data) {
             if (data && data.ret == 1) {
@@ -154,10 +189,12 @@
 
 
     $('#btnInsert').click(function () {
-        var ocid = $('#inputID').val();
+        var appName = $('#selectApp').val();
+        var ctid = $('#inputID').val();
         var conversionName = $('#inputName').val();
         $.post("advert_conversion/save_advert_conversion", {
-            ocid: ocid,
+            appName: appName,
+            ctid: ctid,
             conversionName: conversionName
         }, function (data) {
             if (data && data.ret == 1) {

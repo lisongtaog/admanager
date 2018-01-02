@@ -25,14 +25,15 @@ public class AdvertConversion extends HttpServlet {
         JsonObject json = new JsonObject();
 
         if (path.startsWith("/save_advert_conversion")) {
-            String ocid = request.getParameter("ocid");
+            String appName = request.getParameter("appName");
+            String ctid = request.getParameter("ctid");
             String conversionName = request.getParameter("conversionName");
 
             OperationResult result = new OperationResult();
             try {
                 result.result = true;
 
-                if (ocid.isEmpty()) {
+                if (ctid.isEmpty()) {
                     result.result = false;
                     result.message = "转化ID不能为空！";
                 }
@@ -42,19 +43,19 @@ public class AdvertConversion extends HttpServlet {
                 }
 
                 if (result.result) {
-                    String sqlQuery = "select id from web_ad_conversions where conversion_id = '" + ocid + "' or conversion_name = '" + conversionName + "'";
+                    String sqlQuery = "select id from web_ad_conversions where app_name = '"+appName+"' and  conversion_id = '" + ctid + "'";
                     JSObject one = DB.findOneBySql(sqlQuery);
                     if(one != null && one.hasObjectData()){
-                        long id = one.get("id");
                         DB.update("web_ad_conversions")
                                 .put("conversion_name", conversionName)
-                                .put("conversion_id", ocid)
-                                .where(DB.filter().whereEqualTo("id", id))
+                                .where(DB.filter().whereEqualTo("app_name", appName))
+                                .and(DB.filter().whereEqualTo("conversion_id", ctid))
                                 .execute();
                         json.addProperty("existData","true");
                     }else{
                         DB.insert("web_ad_conversions")
-                                .put("conversion_id", ocid)
+                                .put("app_name", appName)
+                                .put("conversion_id", ctid)
                                 .put("conversion_name", conversionName)
                                 .execute();
                         json.addProperty("existData","false");
