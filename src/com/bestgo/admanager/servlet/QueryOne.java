@@ -126,7 +126,7 @@ public class QueryOne extends HttpServlet {
             String sql = "";
             List<JSObject> listAll = new ArrayList<>();
             List<JSObject> listHasData = new ArrayList<>();
-            sql = "select campaign_id, a.account_id, short_name, campaign_name, create_time, status, budget, bidding, total_spend, total_installed, total_click, cpa,ctr, " +
+            sql = "select campaign_id, a.account_id, short_name, campaign_name, create_time, a.status, budget, bidding, total_spend, total_installed, total_click, cpa,ctr, " +
                     "(case when total_click > 0 then total_installed/total_click else 0 end) as cvr " +
                     " from " + webAdCampaignTable + " a , "+webAccountIdTable+" b where a.status != 'paused' and a.status != 'removed' and " +
                     "campaign_id in (" + campaignIds + ") and a.account_id = b.account_id";
