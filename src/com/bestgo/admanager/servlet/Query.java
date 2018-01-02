@@ -1129,41 +1129,16 @@ public class Query extends HttpServlet {
             webAdCampaignTable = "web_ad_campaigns_admob";
             webAdCampaignHistoryTable = "web_ad_campaigns_history_admob";
         }
+        String sql = "select sum(ch.total_spend) as spend, " +
+                "sum(ch.total_installed) as installed, sum(ch.total_impressions) as impressions " +
+                ",sum(ch.total_click) as click from " + webAdCampaignTable + " c, " + webAdCampaignHistoryTable + " ch, " +
+                "(select distinct campaign_id from " + relationTable + " where tag_id = " + tagId + ") rt " +
+                "where rt.campaign_id = ch.campaign_id and c.campaign_id = ch.campaign_id " +
+                "and date between '" + startTime + "' and '" + endTime + "' " +
+                "and c.status != 'removed' " +
+                "group by ch.campaign_id";
+        List<JSObject> list = DB.findListBySql(sql);
 
-        List<JSObject> list = DB.scan(relationTable).select("campaign_id")
-                .where(DB.filter().whereEqualTo("tag_id", tagId)).execute();
-
-
-        Set<String> campaignIdSet = new HashSet<>();
-        for(JSObject j : list){
-            campaignIdSet.add(j.get("campaign_id"));
-        }
-
-        String campaignIds = "";
-
-        for(String s : campaignIdSet){
-            campaignIds += "'" + s + "',";
-        }
-        if(campaignIds != null && campaignIds.length()>0){
-            campaignIds = campaignIds.substring(0,campaignIds.length()-1);
-        }
-
-        if (!campaignIds.isEmpty()) {
-            String sql = "";
-            sql = "select spend, installed, impressions, click" +
-                    " from (" +
-                    "select sum(ch.total_spend) as spend, " +
-                    "sum(ch.total_installed) as installed, sum(ch.total_impressions) as impressions " +
-                    ",sum(ch.total_click) as click from " + webAdCampaignTable + " c, " + webAdCampaignHistoryTable + " ch " +
-                    "where c.campaign_id=ch.campaign_id " +
-                    "and date between '" + startTime + "' and '" + endTime + "' " +
-                    "and c.status != 'removed' and c.campaign_id in (" + campaignIds + ")" +
-                    "group by ch.campaign_id) a ";
-            list = DB.findListBySql(sql);
-
-        } else {
-            list.clear();
-        }
         JsonObject jsonObject = new JsonObject();
         JsonArray array = new JsonArray();
         double total_spend = 0;
@@ -1171,14 +1146,14 @@ public class Query extends HttpServlet {
         double total_impressions = 0;
         double total_click = 0;
 
-        for (int i = 0; i < list.size(); i++) {
+        for (int i = 0,len=list.size(); i < len; i++) {
             JSObject one = list.get(i);
             double impressions = Utils.convertDouble(one.get("impressions"), 0);
             if (impressions == 0) {
                 continue;
             }
-            double spend = Utils.convertDouble(one.get("spend"), 0);
             double installed = Utils.convertDouble(one.get("installed"), 0);
+            double spend = Utils.convertDouble(one.get("spend"), 0);
 
             double click = Utils.convertDouble(one.get("click"), 0);
 
@@ -1208,13 +1183,3 @@ public class Query extends HttpServlet {
         return jsonObject;
     }
 }
-   /* String sql = "select campaign_id, a.account_id,short_name, campaign_name, a.status, create_time, budget, bidding, spend, installed, impressions, click" +
-            " from (" +
-            "select ch.campaign_id, account_id, campaign_name,c.status, create_time, c.budget, c.bidding, sum(ch.total_spend) as spend, " +
-            "sum(ch.total_installed) as installed, sum(ch.total_impressions) as impressions " +
-            ",sum(ch.total_click) as click from " + webAdCampaignTable + " c, " + webAdCampaignHistoryTable + " ch, " + relationTable + " rt " +
-            "where rt.tag_id = " + tagId + " and c.campaign_id = ch.campaign_id and c.campaign_id = rt.campaign_id" +
-            ((likeCampaignName != null) ? " and campaign_name like '%" + likeCampaignName +"%' " : "")  +
-            "and date between '" + startTime + "' and '" + endTime + "' " +
-            "and c.status != 'removed' " +
-            "group by ch.campaign_id) a left join " + webAccountIdTable + " b on a.account_id = b.account_id";*/
