@@ -98,23 +98,15 @@ function init() {
         },function(data){
             if(data && data.ret == 1){
                 appQueryData = data.data.array;
-                $('#result_header').html("<tr><th>Network</th><th>系列ID</th><th>账户ID</th><th>账户简称</th><th>系列名称</th><th>创建时间</th><th>状态</th><th>预算</th><th>竞价</th><th>总花费</th><th>总安装</th><th>总点击</th><th>CPA</th><th>CVR</th></tr>");
+                $('#result_header').html("<tr><th>系列ID</th><th>账户ID</th><th>账户简称</th><th>系列名称</th><th>创建时间</th><th>状态</th><th>预算</th><th>竞价</th><th>总花费</th><th>总安装</th><th>总点击</th><th>CPA</th><th>CTR</span></th><th>CVR</th><th>ROI</th></tr>");
                 data = data.data;
-                var keyset = ["network","campaign_id", "account_id", "short_name", "campaign_name", "create_time",
-                    "status", "budget", "bidding", "spend", "installed", "click", "cpa", "cvr"];
-                $('#results_body > tr').remove();
-                for (var i = 0; i < data.array.length; i++) {
-                    var one = data.array[i];
-                    var tr = $('<tr></tr>');
-
-                    for (var j = 0; j < keyset.length; j++) {
-                        var td = $('<td></td>');
-                        td.text(one[keyset[j]]);
-                        tr.append(td);
-                    }
-                    $('#results_body').append(tr);
-                }
-                $('#total_result').html("");
+                setData(data);
+                bindSortOp();
+                var str = "总花费: " + data.total_spend + " 总安装: " + data.total_installed +
+                    " 总展示: " + data.total_impressions + " 总点击: " + data.total_click +
+                    " CTR: " + data.total_ctr + " CPA: " + data.total_cpa + " CVR: " + data.total_cvr;
+                str += "<br/><span class='estimateResult'></span>"
+                $('#total_result').html(str);
                 $('#total_result').removeClass("editable");
             } else {
                 admanager.showCommonDlg("错误", data.message);

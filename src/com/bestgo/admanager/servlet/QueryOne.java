@@ -192,11 +192,7 @@ public class QueryOne extends HttpServlet {
             d.addProperty("click", click);
             d.addProperty("cpa", Utils.trimDouble(cpa));
             d.addProperty("cvr", Utils.trimDouble(cvr));
-            if(admobCheck){
-                d.addProperty("network", "Adwords");
-            }else{
-                d.addProperty("network", "Facebook");
-            }
+
             array.add(d);
         }
         double total_ctr = total_impressions > 0 ? total_click / total_impressions : 0;
