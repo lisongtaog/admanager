@@ -1,6 +1,7 @@
 package com.bestgo.common.database.dao;
 
 import com.bestgo.common.database.utils.JSObject;
+import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +20,9 @@ public class DaoProxy implements IDao {
         try {
             return this.dao.findModeResult(con, params);
         } catch (Exception e) {
+            Logger logger = Logger.getRootLogger();
+            logger.error(con);
+            logger.error(e.getMessage(), e);
             e.printStackTrace();
         } finally {
             try {
@@ -36,6 +40,9 @@ public class DaoProxy implements IDao {
         try {
             return this.dao.findSimpleResult(con, params);
         } catch (Exception e) {
+            Logger logger = Logger.getRootLogger();
+            logger.error(con);
+            logger.error(e.getMessage(), e);
             e.printStackTrace();
         } finally {
             try {
@@ -53,6 +60,9 @@ public class DaoProxy implements IDao {
         try {
             return this.dao.updateByPreparedStatement(con, params);
         } catch (Exception e) {
+            Logger logger = Logger.getRootLogger();
+            logger.error(con);
+            logger.error(e.getMessage(), e);
             e.printStackTrace();
         } finally {
             try {
@@ -69,6 +79,9 @@ public class DaoProxy implements IDao {
         try {
             return this.dao.insertByPreparedStatement(con, params);
         } catch (Exception e) {
+            Logger logger = Logger.getRootLogger();
+            logger.error(con);
+            logger.error(e.getMessage(), e);
             e.printStackTrace();
         } finally {
             try {

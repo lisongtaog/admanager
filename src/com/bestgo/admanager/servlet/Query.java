@@ -940,7 +940,7 @@ public class Query extends HttpServlet {
                 for(JSObject j : listCampaignSpend4CountryCode){
                     countryCampaignspendMap.put(j.get("campaign_id"),j);
                 }
-                sql = "select campaign_id, a.account_id,short_name, campaign_name, status, create_time, budget, bidding, spend, installed, impressions, click" +
+                sql = "select campaign_id, a.account_id,short_name, campaign_name, a.status, create_time, budget, bidding, spend, installed, impressions, click" +
                         " from (" +
                         "select ch.campaign_id, account_id, campaign_name,c.status, create_time, c.budget, c.bidding, sum(ch.total_spend) as spend, " +
                         "sum(ch.total_installed) as installed, sum(ch.total_impressions) as impressions " +
@@ -958,7 +958,7 @@ public class Query extends HttpServlet {
                         "group by ch.campaign_id) a left join " + webAccountIdTable + " b on a.account_id = b.account_id";
                 list = DB.findListBySql(sql);
             }else if (countryCheck) {
-                sql = "select campaign_id, country_code, a.account_id,short_name, campaign_name, status, create_time, budget, bidding, spend, installed, impressions, click" +
+                sql = "select campaign_id, country_code, a.account_id,short_name, campaign_name, a.status, create_time, budget, bidding, spend, installed, impressions, click" +
                         " from (" +
                         "select ch.campaign_id, country_code, account_id, campaign_name,c.status, create_time, c.budget, c.bidding, sum(ch.total_spend) as spend, " +
                         "sum(ch.total_installed) as installed, sum(ch.total_impressions) as impressions " +
