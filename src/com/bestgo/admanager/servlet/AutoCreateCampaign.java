@@ -509,7 +509,7 @@ public class AutoCreateCampaign extends HttpServlet {
 
     static String[] ADWORDS_CAMPAIGN_FIELDS = {"id", "app_name", "create_count", "account_id", "country_region", "explode_country",
             "excluded_region", "language", "message1", "message2", "message3", "message4",
-            "campaign_name", "bugdet", "bidding", "explode_bidding", "max_cpa", "image_path", "create_time", "update_time", "enabled"};
+            "campaign_name", "bugdet", "bidding", "explode_bidding", "max_cpa", "image_path", "create_time", "update_time", "enabled","conversion_id"};
 
     public static JSObject adwordsFetchById(String id) {
         try {
@@ -566,6 +566,7 @@ public class AutoCreateCampaign extends HttpServlet {
             String createCount = request.getParameter("createCount");
             String excludedRegion = request.getParameter("excludedRegion");
             String language = request.getParameter("language");
+            String conversionId = request.getParameter("conversion_id");
             String campaignName = request.getParameter("campaignName");
             String bugdet = request.getParameter("bugdet");
             String maxCPA = request.getParameter("maxCPA");
@@ -646,6 +647,7 @@ public class AutoCreateCampaign extends HttpServlet {
                         .put("explode_country", Boolean.parseBoolean(explodeCountry) ? 1 : 0)
                         .put("excluded_region", excludedRegion)
                         .put("language", language)
+                        .put("conversion_id", conversionId)
                         .put("campaign_name", campaignName)
                         .put("bugdet", bugdet)
                         .put("bidding", bidding)

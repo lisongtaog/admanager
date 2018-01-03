@@ -56,6 +56,7 @@
         <li role="presentation"><a href="query.jsp">查询</a></li>
         <li role="presentation"><a href="system.jsp">系统管理</a></li>
         <li role="presentation"><a href="advert_insert.jsp">广告存储</a></li>
+        <li role="presentation"><a href="advert_conversions_insert.jsp">转化录入</a></li>
     </ul>
 
     <div class="panel panel-default" style="margin-top: 10px">
@@ -320,6 +321,14 @@
         </div>
 
         <div class="form-group">
+            <label for="selectIncidentAdmob" class="col-sm-2 control-label">事件</label>
+            <div class="col-sm-10">
+                <select class="form-control" id="selectIncidentAdmob">
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group">
             <label for="inputBudget" class="col-sm-2 control-label">预算</label>
             <div class="col-sm-10">
                 <input class="form-control" id="inputBudgetAdmob" />
@@ -501,6 +510,11 @@
         }
 
         dims.push( $('#selectLanguageAdmob option:selected').text() );
+
+        var curr_event = $('#selectIncidentAdmob option:selected').text();
+        if(curr_event != "null"){
+            dims.push( "event_" + $('#selectIncidentAdmob option:selected').text() );
+        }
 
         if( params.bidding ){
             dims.push( params.bidding );
@@ -724,6 +738,7 @@
             var region = $('#selectRegionAdmob').val();
             var excludedRegion = $('#selectRegionUnselectedAdmob').val();
             var language = $('#selectLanguageAdmob').val();
+            var conversion_id = $('#selectIncidentAdmob').val();
             var campaignName = $('#inputCampaignNameAdmob').val();
             var bugdet = $('#inputBudgetAdmob').val();
             var bidding = $('#inputBiddingAdmob').val();
@@ -782,6 +797,7 @@
                 //region: region.join(','),
                 excludedRegion: excludedRegion.join(','),
                 language: language,
+                conversion_id: conversion_id,
                 bugdet: bugdet,
                 //bidding: bidding,
                 gpPackageId: app.google_package_id,
@@ -1063,37 +1079,6 @@
                     }, "json");
                 }
             });
-
-            /*$.post("campaign/create", {
-                appName: appName,
-                appId: app.fb_app_id,
-                accoutName:accountName.join(","),
-                accountId: accountId.join(","),
-                createCount: createCount,
-                pageId: app.page_id,
-                region: region.join(","),
-                excludedRegion: excludedRegion.join(","),
-                language: language,
-                age: age,
-                gender: gender,
-                interest: interest,
-                userOs: userOs,
-                userDevice: userDevice,
-                campaignName: campaignName,
-                bugdet: bugdet,
-                bidding: bidding,
-                maxCPA: maxCPA,
-                title: title,
-                message: message,
-                imagePath: imagePath
-            }, function (data) {
-                if (data && data.ret == 1) {
-                    admanager.showCommonDlg("提示", "添加记录成功");
-                } else {
-                    admanager.showCommonDlg("提示", data.message);
-                }
-            }, "json");*/
-
             return false;
         });
 
@@ -1163,44 +1148,26 @@
             $("#inputMessage3").val("");
             $("#inputMessage4").val("");
         }
+       $.post('advert_conversion_admob/query_advert_conversion_by_app_name',{appName: appNameAdmob}, function(result) {
+           if (result && result.ret == 1) {
+               var incidentList = result.data;
+               $('#selectIncidentAdmob option').remove();
+               $('#selectIncidentAdmob').append($("<option value=''>null</option>"));
+               incidentList.forEach(function(one) {
+                   $('#selectIncidentAdmob').append($("<option value='" + one.conversion_id + "'>" + one.conversion_name + "</option>"));
+               });
+               /*pendingList.shift();
+               if (pendingList.length == 0) {
+                   initFormData();
+               }*/
+           } else {
+               admanager.showCommonDlg("错误", data.message);
+           }
+       }, 'json');
 
         return false;
     });
 
-    /*$('#selectLanguageAdmob').change(function () {
-        var selectOptions = $('#selectLanguageAdmob option:selected');
-        var languageAdmob = [];
-        selectOptions.each(function () {
-            languageAdmob.push($(this).text())
-        });
-        if(languageAdmob != null && languageAdmob.length > 0){
-            var appNameAdmob = $('#selectAppAdmob').val();
-            $.post("campaign/selectAdmobMessage", {
-                appNameAdmob: appNameAdmob,
-                languageAdmob: languageAdmob.join(",")
-            }, function (data) {
-                if(data && data.ret == 1){
-                    $("#inputMessage1").val(data.message1);
-                    $("#inputMessage2").val(data.message2);
-                    $("#inputMessage3").val(data.message3);
-                    $("#inputMessage4").val(data.message4);
-                }else{
-                    $("#inputMessage1").val("");
-                    $("#inputMessage2").val("");
-                    $("#inputMessage3").val("");
-                    $("#inputMessage4").val("");
-                    admanager.showCommonDlg("提示", "数据为空！");
-                }
-            }, "json");
-        }else{
-            $("#inputMessage1").val("");
-            $("#inputMessage2").val("");
-            $("#inputMessage3").val("");
-            $("#inputMessage4").val("");
-        }
-
-        return false;
-    });*/
 
     $('#selectRegion').change(function () {
         if (isAutoCreate && !firstInitForm) {
@@ -1258,12 +1225,6 @@
                 regionAdmob: regionAdmob.join(",")
             }, function (data) {
                 if (data && data.ret == 1) {
-                    /*$.each(admobLanguageCodes, function (n, value) {
-                        if(value.name == data.languageAdmob){
-                            $("#selectLanguageAdmob").val(value.code);
-                            return false;
-                        }
-                    });*/
                     $("#inputMessage1").val(data.message1);
                     $("#inputMessage2").val(data.message2);
                     $("#inputMessage3").val(data.message3);
