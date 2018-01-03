@@ -57,15 +57,16 @@ public class Campaign extends HttpServlet {
             String title = request.getParameter("title");
             String message = request.getParameter("message");
             String imagePath = request.getParameter("imagePath");
+            String videoPath = request.getParameter("videoPath");
 
 
             OperationResult result = new OperationResult();
             try {
-                JSObject record = DB.simpleScan("web_system_config").select("config_value").where(DB.filter().whereEqualTo("config_key", "fb_image_path")).execute();
+                /*JSObject record = DB.simpleScan("web_system_config").select("config_value").where(DB.filter().whereEqualTo("config_key", "fb_image_path")).execute();
                 String imageRoot = null;
                 if (record.hasObjectData()) {
                     imageRoot = record.get("config_value");
-                }
+                }*/
 
                 result.result = true;
 
@@ -100,11 +101,11 @@ public class Campaign extends HttpServlet {
                     result.message = "bidding超过了0.5,   " + bidding;
                 }
 
-                File imagesPath = new File(imageRoot + File.separatorChar + imagePath);
+                /*File imagesPath = new File(imageRoot + File.separatorChar + imagePath);
                 if (!imagesPath.exists()) {
                     result.result = false;
                     result.message = "图片路径不存在";
-                }
+                }*/
 
                 if (result.result) {
 
@@ -114,7 +115,7 @@ public class Campaign extends HttpServlet {
                     String accountNameArrStr = accountName.replace(",", "");
                     String[] accountIdArr = accountId.split(",");
                     int createCountInt = Integer.parseInt(createCount);
-                    Collection<File> uploadImages = FileUtils.listFiles(imagesPath, null, false);
+                    //Collection<File> uploadImages = FileUtils.listFiles(imagesPath, null, false);
                     for(int j=0,len = accountNameArr.length;j<len;j++){
                         for(int i=0;i<createCountInt;i++){
                             String now  = String.format("%d-%02d-%02d %02d:%02d:%02d", calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH),
@@ -147,15 +148,16 @@ public class Campaign extends HttpServlet {
                                     .put("max_cpa", maxCPA)
                                     .put("user_devices", userDevice)
                                     .put("user_os", userOs)
+                                    .put("video_path", videoPath)
                                     .executeReturnId();
 
-                            for (File file : uploadImages) {
+                            /*for (File file : uploadImages) {
                                 String fileName = file.getAbsolutePath().toLowerCase();
                                 if (fileName.endsWith("jpg") || fileName.endsWith("jpeg") || fileName.endsWith("png")) {
                                     String sql = "insert into ad_ads set parent_id=" + genId + ", image_file_path='" + file.getAbsolutePath() + "'";
                                     DB.updateBySql(sql);
                                 }
-                            }
+                            }*/
                             if(genId >0){
                                 try {
                                     String[] split = region.split(",");
