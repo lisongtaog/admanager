@@ -52,11 +52,11 @@ public class CampaignAdmob extends HttpServlet {
 
             OperationResult result = new OperationResult();
             try {
-                /*JSObject record = DB.simpleScan("web_system_config").select("config_value").where(DB.filter().whereEqualTo("config_key", "admob_image_path")).execute();
+                JSObject record = DB.simpleScan("web_system_config").select("config_value").where(DB.filter().whereEqualTo("config_key", "admob_image_path")).execute();
                 String imageRoot = null;
                 if (record.hasObjectData()) {
                     imageRoot = record.get("config_value");
-                }*/
+                }
 
                 result.result = true;
 
@@ -98,11 +98,11 @@ public class CampaignAdmob extends HttpServlet {
                     result.message = "bidding超过了0.5,   " + bidding;
                 }
 
-                /*File imagesPath = new File(imageRoot + File.separatorChar + imagePath);
+                File imagesPath = new File(imageRoot + File.separatorChar + imagePath);
                 if (!imagesPath.exists()) {
                     result.result = false;
                     result.message = "图片路径不存在";
-                }*/
+                }
 
 
                 if (result.result) {
@@ -165,8 +165,7 @@ public class CampaignAdmob extends HttpServlet {
                                     .put("message4", message4)
                                     .put("app_name", appName)
                                     .put("tag_name", appName)
-                                    //.put("image_path", imagesPath.getAbsolutePath())
-                                    .put("image_path", "xx")
+                                    .put("image_path", imagesPath.getAbsolutePath())
                                     .put("video_path", videoPath)
                                     .executeReturnId();
                             if(genId > 0){
