@@ -531,7 +531,7 @@
         dims.push( $('#selectLanguageAdmob option:selected').text() );
 
         var curr_event = $('#selectIncidentAdmob option:selected').text();
-        if(curr_event != "null"){
+        if(curr_event != "null" && curr_event != ""){
             dims.push( "event_" + $('#selectIncidentAdmob option:selected').text() );
         }
 
