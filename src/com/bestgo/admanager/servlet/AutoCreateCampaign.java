@@ -510,7 +510,7 @@ public class AutoCreateCampaign extends HttpServlet {
 
     static String[] ADWORDS_CAMPAIGN_FIELDS = {"id", "app_name", "create_count", "account_id", "country_region", "explode_country",
             "excluded_region", "language", "message1", "message2", "message3", "message4",
-            "campaign_name", "bugdet", "bidding", "explode_bidding", "max_cpa", "image_path", "create_time", "update_time", "enabled","conversion_id","video_path"};
+            "campaign_name", "bugdet", "bidding", "explode_bidding", "max_cpa", "image_path", "create_time", "update_time", "enabled","conversion_id"};
 
     public static JSObject adwordsFetchById(String id) {
         try {
@@ -660,7 +660,7 @@ public class AutoCreateCampaign extends HttpServlet {
                         .put("explode_bidding", Boolean.parseBoolean(explodeBidding) ? 1 : 0)
                         .put("max_cpa", maxCPA)
                         .put("image_path", imagePath)
-                        .put("video_path", videoPath)
+//                        .put("video_path", videoPath)
                         .put("create_time", DateUtil.getNow())
                         .executeReturnId();
                 if (recordId > 0) {

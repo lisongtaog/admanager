@@ -385,12 +385,12 @@
                 <input class="form-control" id="inputImagePathAdmob" />
             </div>
         </div>
-        <div class="form-group">
+        <%--<div class="form-group">
             <label for="inputVideoPathAdmob" class="col-sm-2 control-label">视频路径</label>
             <div class="col-sm-10">
                 <input class="form-control" id="inputVideoPathAdmob" />
             </div>
-        </div>
+        </div>--%>
         <div class="form-group">
             <div class="col-sm-10" style="text-align: center">
                 <label><input type="checkbox" id="checkAdmobAutoCreate"/>设置为自动创建</label> <input type="submit" class="btn btn-primary" style="width: 100px;" id="btnCreateAdmob" value="创建"/>
@@ -540,10 +540,10 @@
         }else{
             dims.push( $('#inputBiddingAdmob').val() );
         }
-        var videoPath = $('#inputVideoPathAdmob').val();
-        if(videoPath != ""){
-            dims.push("视频");
-        }
+//        var videoPath = $('#inputVideoPathAdmob').val();
+//        if(videoPath != ""){
+//            dims.push("视频");
+//        }
 
 
         dims.push(now.getFullYear() +"" + (now.getMonth() + 1) + "" + now.getDate());
@@ -772,7 +772,7 @@
             var message3 = $('#inputMessage3').val();
             var message4 = $('#inputMessage4').val();
             var imagePath = $('#inputImagePathAdmob').val();
-            var videoPath = $('#inputVideoPathAdmob').val();
+//            var videoPath = $('#inputVideoPathAdmob').val();
 
             var app = null;
             for (var i = 0; i < appList.length; i++) {
@@ -832,7 +832,7 @@
                 message3: message3,
                 message4: message4,
                 imagePath: imagePath,
-                videoPath: videoPath
+//                videoPath: videoPath
             }
 
             var requestPool = [];
