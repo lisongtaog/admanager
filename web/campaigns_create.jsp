@@ -496,12 +496,10 @@
         var videoPath = $('#inputVideoPath').val();
         if(videoPath != ""){
             dims.push("视频");
+        }else{
+            var imagePath = $('#inputImagePath').val();
+            dims.push(imagePath);
         }
-
-        var imagePath = $('#inputImagePath').val();
-        dims.push(imagePath);
-
-
 
         if( params.bidding ){
             dims.push(params.bidding);
@@ -1341,14 +1339,6 @@
             }, "json");
         }
     }
-
-/*    function F_Open_dialog() {
-        document.getElementById("btnVideo").click();
-    }
-
-    function showName(name) {
-        document.getElementById("fileName").innerHTML=name
-    }*/
 </script>
 </body>
 </html>

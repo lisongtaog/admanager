@@ -276,11 +276,7 @@ public class AutoCreateCampaign extends HttpServlet {
             String explodeBidding = request.getParameter("explodeBidding");
             String videoPath = request.getParameter("videoPath");
             result.result = true;
-            JSObject record = DB.simpleScan("web_system_config").select("config_value").where(DB.filter().whereEqualTo("config_key", "fb_image_path")).execute();
-            String imageRoot = null;
-            if (record.hasObjectData()) {
-                imageRoot = record.get("config_value");
-            }
+
             if (createCount.isEmpty()) {
                 result.result = false;
                 result.message = "创建数量不能为空";
@@ -312,15 +308,40 @@ public class AutoCreateCampaign extends HttpServlet {
                 result.message = "bidding超过了0.5,   " + bidding;
             }
 
-            File imagesPath = new File(imageRoot + File.separatorChar + imagePath);
-            if (!imagesPath.exists()) {
+            File imagesPath = null;
+            File videosPath = null;
+            if(!imagePath.isEmpty()){
+                JSObject record = DB.simpleScan("web_system_config").select("config_value").where(DB.filter().whereEqualTo("config_key", "fb_image_path")).execute();
+                String imageRoot = null;
+                if (record.hasObjectData()) {
+                    imageRoot = record.get("config_value");
+                }
+                imagesPath = new File(imageRoot + File.separatorChar + imagePath);
+                if (!imagesPath.exists()) {
+                    result.result = false;
+                    result.message = "图片路径不存在";
+                }
+            }else if(!videoPath.isEmpty()){
+                JSObject record = DB.simpleScan("web_system_config").select("config_value").where(DB.filter().whereEqualTo("config_key", "fb_video_path")).execute();
+                String videoRoot = null;
+                if (record.hasObjectData()) {
+                    videoRoot = record.get("config_value");
+                }
+                videosPath = new File(videoRoot + File.separatorChar + videoPath);
+                if (!videosPath.exists()) {
+                    result.result = false;
+                    result.message = "视频路径不存在";
+                }
+            }else {
                 result.result = false;
-                result.message = "图片路径不存在";
+                result.message = "图片或视频路径二选一，不能为空！";
             }
+
 
             if (campaignName.length() > 100) {
                 campaignName = campaignName.substring(0, 100);
             }
+
 
             if (result.result) {
                 long recordId = DB.insert("ad_campaigns_auto_create")
@@ -338,7 +359,7 @@ public class AutoCreateCampaign extends HttpServlet {
                         .put("detail_target", interest)
                         .put("user_os", userOs)
                         .put("user_devices", userDevice)
-                        .put("campaign_name", campaignName)
+                        .put("campaign_name", "Test_"+campaignName)
                         .put("bugdet", bugdet)
                         .put("bidding", bidding)
                         .put("explode_bidding", Boolean.parseBoolean(explodeBidding) ? 1 : 0)
