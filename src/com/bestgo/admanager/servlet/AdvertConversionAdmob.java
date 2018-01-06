@@ -80,29 +80,28 @@ public class AdvertConversionAdmob extends HttpServlet {
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
+        } else if (path.startsWith("/query_advert_conversion_by_app_name")) {
+            String sqlQuery = "select conversion_id, conversion_name from ad_conversions_admob where app_name = '" + appName + "'";
+            try {
+                List<JSObject> list = DB.findListBySql(sqlQuery);
+                JsonArray array = new JsonArray();
+                for(JSObject j : list){
+                    String  conversion_id = j.get("conversion_id");
+                    String  conversion_name = j.get("conversion_name");
+                    if(conversion_id != null && conversion_name != null){
+                        JsonObject js = new JsonObject();
+                        js.addProperty("conversion_id",conversion_id);
+                        js.addProperty("conversion_name",conversion_name);
+                        array.add(js);
+                    }
+                }
+                json.addProperty("ret", 1);
+                json.add("data", array);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+
         }
-//         else if (path.startsWith("/query_advert_conversion_by_app_name")) {
-//            String sqlQuery = "select conversion_id, conversion_name from ad_conversions_admob where app_name = '" + appName + "'";
-//            try {
-//                List<JSObject> list = DB.findListBySql(sqlQuery);
-//                JsonArray array = new JsonArray();
-//                for(JSObject j : list){
-//                    String  conversion_id = j.get("conversion_id");
-//                    String  conversion_name = j.get("conversion_name");
-//                    if(conversion_id != null && conversion_name != null){
-//                        JsonObject js = new JsonObject();
-//                        js.addProperty("conversion_id",conversion_id);
-//                        js.addProperty("conversion_name",conversion_name);
-//                        array.add(js);
-//                    }
-//                }
-//                json.addProperty("ret", 1);
-//                json.add("data", array);
-//            } catch (Exception ex) {
-//                ex.printStackTrace();
-//            }
-//
-//        }
         response.getWriter().write(json.toString());
     }
 
