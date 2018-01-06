@@ -359,7 +359,7 @@ public class AutoCreateCampaign extends HttpServlet {
                         .put("detail_target", interest)
                         .put("user_os", userOs)
                         .put("user_devices", userDevice)
-                        .put("campaign_name", "Test_"+campaignName)
+                        .put("campaign_name", campaignName)
                         .put("bugdet", bugdet)
                         .put("bidding", bidding)
                         .put("explode_bidding", Boolean.parseBoolean(explodeBidding) ? 1 : 0)
@@ -404,6 +404,7 @@ public class AutoCreateCampaign extends HttpServlet {
             String title = request.getParameter("title");
             String message = request.getParameter("message");
             String imagePath = request.getParameter("imagePath");
+            String videoPath = request.getParameter("videoPath");
             String region = request.getParameter("region");
             String age = request.getParameter("age");
             String gender = request.getParameter("gender");
@@ -412,6 +413,7 @@ public class AutoCreateCampaign extends HttpServlet {
             String explodeAge = request.getParameter("explodeAge");
             String explodeGender = request.getParameter("explodeGender");
             String explodeBidding = request.getParameter("explodeBidding");
+
 
             result.result = true;
             JSObject record = DB.simpleScan("web_system_config").select("config_value").where(DB.filter().whereEqualTo("config_key", "fb_image_path")).execute();
@@ -482,6 +484,7 @@ public class AutoCreateCampaign extends HttpServlet {
                         .put("title", title)
                         .put("message", message)
                         .put("image_path", imagePath)
+                        .put("video_path", videoPath)
                         .put("update_time", DateUtil.getNow())
                         .where(DB.filter().whereEqualTo("id", id))
                         .execute();
@@ -597,7 +600,6 @@ public class AutoCreateCampaign extends HttpServlet {
             String message3 = request.getParameter("message3");
             String message4 = request.getParameter("message4");
             String imagePath = request.getParameter("imagePath");
-            String videoPath = request.getParameter("videoPath");
             String region = request.getParameter("region");
             String bidding = request.getParameter("bidding");
             String explodeCountry = request.getParameter("explodeCountry");
