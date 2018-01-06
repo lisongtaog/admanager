@@ -177,6 +177,7 @@
         var ctid = $('#inputIDAdmob').val();
         var conversionName = $('#inputNameAdmob').val();
         var existConversionName = $('#existConversionNameAdmob').val();
+        $('#inputIDAdmob').val("");
         $('#existConversionNameAdmob').val("false");
         $.post("advert_conversion_admob/save_advert_conversion", {
             appName: appName,
