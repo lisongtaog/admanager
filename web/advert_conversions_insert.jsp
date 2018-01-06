@@ -89,6 +89,13 @@
 
 
     <form class="form-horizontal" action="#" id="formAdmob">
+        <%--<div class="form-group">--%>
+            <%--<label for="existConversionNameAdmob" class="col-sm-2 control-label">转化名称</label>--%>
+            <%--<div class="col-sm-10">--%>
+                <%--<input type="hidden"  class="form-control" id="existConversionNameAdmob" />--%>
+            <%--</div>--%>
+        <%--</div>--%>
+        <input type="hidden" id="existConversionNameAdmob">
         <div class="form-group">
             <label for="selectApp" class="col-sm-2 control-label">应用</label>
             <div class="col-sm-10">
@@ -169,10 +176,13 @@
         var appName = $('#selectAppAdmob').val();
         var ctid = $('#inputIDAdmob').val();
         var conversionName = $('#inputNameAdmob').val();
+        var existConversionName = $('#existConversionNameAdmob').val();
+        $('#existConversionNameAdmob').val("false");
         $.post("advert_conversion_admob/save_advert_conversion", {
             appName: appName,
             ctid: ctid,
-            conversionName: conversionName
+            conversionName: conversionName,
+            existConversionName: existConversionName
         }, function (data) {
             if (data && data.ret == 1) {
                 if(data.existData == "true"){
@@ -187,27 +197,23 @@
         return false;
     });
 
-
-    $('#btnInsert').click(function () {
-        var appName = $('#selectApp').val();
-        var ctid = $('#inputID').val();
-        var conversionName = $('#inputName').val();
-        $.post("advert_conversion/save_advert_conversion", {
-            appName: appName,
-            ctid: ctid,
-            conversionName: conversionName
-        }, function (data) {
-            if (data && data.ret == 1) {
-                if(data.existData == "true"){
-                    admanager.showCommonDlg("提示", "更新记录成功");
-                }else{
-                    admanager.showCommonDlg("提示", "添加记录成功");
+    $('#selectAppAdmob,#inputIDAdmob').change(function() {
+        var appName = $('#selectAppAdmob').val();
+        var ctid = $('#inputIDAdmob').val();
+        if(appName != "" && ctid != ""){
+            $.post("advert_conversion_admob/query_advert_conversion_by_app_name_and_ctid", {
+                appName: appName,
+                ctid: ctid
+            }, function (data) {
+                if (data && data.ret == 1) {
+                    $('#inputNameAdmob').val(data.conversion_name);
+                    if(data.conversion_name != ""){
+                        $('#existConversionNameAdmob').val("true");
+                    }
                 }
-            } else {
-                admanager.showCommonDlg("提示", data.message);
-            }
-        }, "json");
-        return false;
+            }, "json");
+            return false;
+        }
     });
 
 </script>

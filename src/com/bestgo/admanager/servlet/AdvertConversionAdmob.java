@@ -23,11 +23,11 @@ public class AdvertConversionAdmob extends HttpServlet {
         String path = request.getPathInfo();
         JsonObject json = new JsonObject();
         String appName = request.getParameter("appName");
+        String ctid = request.getParameter("ctid");
+        String conversionName = request.getParameter("conversionName");
+
         if (path.startsWith("/save_advert_conversion")) {
-
-            String ctid = request.getParameter("ctid");
-            String conversionName = request.getParameter("conversionName");
-
+            String existConversionName = request.getParameter("existConversionName");
             OperationResult result = new OperationResult();
             try {
                 result.result = true;
@@ -42,17 +42,16 @@ public class AdvertConversionAdmob extends HttpServlet {
                 }
 
                 if (result.result) {
-                    String sqlQuery = "select id from web_ad_conversions_admob where app_name = '"+appName+"' and  conversion_id = '" + ctid + "' and conversion_name = '" + conversionName + "'";
-                    JSObject one = DB.findOneBySql(sqlQuery);
-                    if(one != null && one.hasObjectData()){
-                        DB.update("web_ad_conversions_admob")
+                    if("true".equals(existConversionName)){
+                        DB.update("ad_conversions_admob")
                                 .put("conversion_name", conversionName)
                                 .where(DB.filter().whereEqualTo("app_name", appName))
                                 .and(DB.filter().whereEqualTo("conversion_id", ctid))
                                 .execute();
                         json.addProperty("existData","true");
+                        existConversionName = "false";
                     }else{
-                        DB.insert("web_ad_conversions_admob")
+                        DB.insert("ad_conversions_admob")
                                 .put("app_name", appName)
                                 .put("conversion_id", ctid)
                                 .put("conversion_name", conversionName)
@@ -67,29 +66,43 @@ public class AdvertConversionAdmob extends HttpServlet {
             }
             json.addProperty("ret", result.result ? 1 : 0);
             json.addProperty("message", result.message);
-        } else if (path.startsWith("/query_advert_conversion_by_app_name")) {
-            String sqlQuery = "select conversion_id, conversion_name from web_ad_conversions_admob where app_name = '" + appName + "'";
+        } else if (path.startsWith("/query_advert_conversion_by_app_name_and_ctid")) {
+            String sqlQuery = "select conversion_name from ad_conversions_admob where app_name = '" + appName + "' and conversion_id = '" + ctid + "'";
             try {
-                List<JSObject> list = DB.findListBySql(sqlQuery);
-                JsonArray array = new JsonArray();
-                for(JSObject j : list){
-                    String  conversion_id = j.get("conversion_id");
-                    String  conversion_name = j.get("conversion_name");
-                    if(conversion_id != null && conversion_name != null){
-                        JsonObject js = new JsonObject();
-                        js.addProperty("conversion_id",conversion_id);
-                        js.addProperty("conversion_name",conversion_name);
-                        array.add(js);
-                    }
+                JSObject one = DB.findOneBySql(sqlQuery);
+                if (one != null && one.hasObjectData()) {
+                    String conversion_name = one.get("conversion_name");
+                    json.addProperty("conversion_name", conversion_name);
+                } else {
+                    json.addProperty("conversion_name", "");
                 }
                 json.addProperty("ret", 1);
-                json.add("data", array);
             } catch (Exception ex) {
-               ex.printStackTrace();
+                ex.printStackTrace();
             }
-
         }
-
+//         else if (path.startsWith("/query_advert_conversion_by_app_name")) {
+//            String sqlQuery = "select conversion_id, conversion_name from ad_conversions_admob where app_name = '" + appName + "'";
+//            try {
+//                List<JSObject> list = DB.findListBySql(sqlQuery);
+//                JsonArray array = new JsonArray();
+//                for(JSObject j : list){
+//                    String  conversion_id = j.get("conversion_id");
+//                    String  conversion_name = j.get("conversion_name");
+//                    if(conversion_id != null && conversion_name != null){
+//                        JsonObject js = new JsonObject();
+//                        js.addProperty("conversion_id",conversion_id);
+//                        js.addProperty("conversion_name",conversion_name);
+//                        array.add(js);
+//                    }
+//                }
+//                json.addProperty("ret", 1);
+//                json.add("data", array);
+//            } catch (Exception ex) {
+//                ex.printStackTrace();
+//            }
+//
+//        }
         response.getWriter().write(json.toString());
     }
 
