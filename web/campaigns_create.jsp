@@ -532,10 +532,6 @@
         }else{
             dims.push( $('#inputBiddingAdmob').val() );
         }
-//        var videoPath = $('#inputVideoPathAdmob').val();
-//        if(videoPath != ""){
-//            dims.push("视频");
-//        }
 
 
         dims.push(now.getFullYear() +"" + (now.getMonth() + 1) + "" + now.getDate());
@@ -1168,10 +1164,6 @@
                incidentList.forEach(function(one) {
                    $('#selectIncidentAdmob').append($("<option value='" + one.conversion_id + "'>" + one.conversion_name + "</option>"));
                });
-               /*pendingList.shift();
-               if (pendingList.length == 0) {
-                   initFormData();
-               }*/
            } else {
                admanager.showCommonDlg("错误", data.message);
            }
