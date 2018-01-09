@@ -46,7 +46,6 @@ public class CampaignAdmob extends HttpServlet {
             String message3 = request.getParameter("message3");
             String message4 = request.getParameter("message4");
             String imagePath = request.getParameter("imagePath");
-//            String videoPath = request.getParameter("videoPath");
 
             if (maxCPA == null) maxCPA = "";
 
@@ -166,7 +165,6 @@ public class CampaignAdmob extends HttpServlet {
                                     .put("app_name", appName)
                                     .put("tag_name", appName)
                                     .put("image_path", imagesPath.getAbsolutePath())
-//                                    .put("video_path", videoPath)
                                     .executeReturnId();
                             if(genId > 0){
                                 try {

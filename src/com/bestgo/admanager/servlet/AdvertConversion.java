@@ -16,6 +16,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * 暂未启用，需要时，要修改！！！
+ */
 @WebServlet(name = "AdvertConversion", urlPatterns = "/advert_conversion/*")
 public class AdvertConversion extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
