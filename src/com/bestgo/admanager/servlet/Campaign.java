@@ -178,7 +178,7 @@ public class Campaign extends HttpServlet {
                             if(uploadImages != null){
                                 for (File file : uploadImages) {
                                     String fileName = file.getAbsolutePath().toLowerCase();
-                                    if (fileName.endsWith("jpg") || fileName.endsWith("jpeg") || fileName.endsWith("png")) {
+                                    if (fileName.endsWith("gif") || fileName.endsWith("jpg") || fileName.endsWith("jpeg") || fileName.endsWith("png")) {
                                         String sql = "insert into ad_ads set parent_id=" + genId + ", image_file_path='" + file.getAbsolutePath() + "'";
                                         DB.updateBySql(sql);
                                     }
@@ -192,7 +192,7 @@ public class Campaign extends HttpServlet {
 //                                    String xxx = file.getAbsolutePath().replaceAll("\\\\","/");
                                     if (fileName.endsWith("mp4") || fileName.endsWith("mov") || fileName.endsWith("gif")) {
                                         video_file_path = fileAbsolutePath;
-                                    }else if (fileName.endsWith("jpg") || fileName.endsWith("jpeg") || fileName.endsWith("png")) {
+                                    }else if (fileName.endsWith("jpg") || fileName.endsWith("jpeg") || fileName.endsWith("png") || fileName.endsWith("gif")) {
                                         thumbnail_image_file_path = fileAbsolutePath;
                                     }
                                 }
