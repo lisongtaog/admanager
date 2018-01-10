@@ -193,6 +193,11 @@ public class QueryNotExistData extends HttpServlet {
             d.addProperty("click", click);
             d.addProperty("cpa", Utils.trimDouble(cpa));
             d.addProperty("cvr", Utils.trimDouble(cvr));
+            if (admobCheck) {
+                d.addProperty("network", "admob");
+            } else {
+                d.addProperty("network", "facebook");
+            }
 
             array.add(d);
         }

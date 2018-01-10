@@ -256,6 +256,7 @@
         <div class="form-group">
             <div class="col-sm-10" style="text-align: center">
                 <label><input type="checkbox" id="checkAutoCreate"/>设置为自动创建</label> <input type="submit" class="btn btn-primary" style="width: 100px;" id="btnCreate" value="创建"/>
+                <label><input type="checkbox" id="onlyCheckAutoCreate"/>仅设置为自动创建</label>
             </div>
         </div>
     </form>
@@ -388,6 +389,7 @@
         <div class="form-group">
             <div class="col-sm-10" style="text-align: center">
                 <label><input type="checkbox" id="checkAdmobAutoCreate"/>设置为自动创建</label> <input type="submit" class="btn btn-primary" style="width: 100px;" id="btnCreateAdmob" value="创建"/>
+                <label><input type="checkbox" id="onlyCheckAdmobAutoCreate"/>仅设置为自动创建</label>
             </div>
         </div>
     </form>
@@ -833,58 +835,86 @@
                 requestPool.push( cloned );
             });
 //弹一个进度条出来
-            var bFinished = false;
-            batchRequest(requestPool, function(param, onSuccess, onFail){
-                //fake
-                console.log("start.. ", param);
-                /*setTimeout(function(){
-                    if( Math.random()< 0.5){
-                        onSuccess();
-                    }else{
-                        onFail("随机错误");
-                    }
-                },100);*/
-
-                $.post("campaign_admob/create", param, function (data) {
+            var onlyAutoCreateCheck = $('#onlyCheckAdmobAutoCreate').prop('checked');
+            if (onlyAutoCreateCheck) {
+                var explodeCountry = $("#selectRegionAdmobExplode").prop("checked");
+                var explodeBidding = $("#inputBiddingAdmobExplode").prop("checked");
+                var autoCreateParams = $.extend({}, baseParam);
+                autoCreateParams.region = region.join(",");
+                autoCreateParams.bidding = bidding;
+                autoCreateParams.explodeCountry = explodeCountry;
+                autoCreateParams.explodeBidding = explodeBidding;
+                autoCreateParams.campaignName = $('#inputCampaignNameAdmob').val();
+                var url = "auto_create_campaign/adwords/create";
+                var messageBody = "创建成功";
+                if (isAutoCreate && modifyRecordId > 0) {
+                    autoCreateParams.id = modifyRecordId;
+                    url = "auto_create_campaign/adwords/modify";
+                    messageBody = "更新成功";
+                }
+                $.post(url, autoCreateParams, function(data) {
                     if (data && data.ret == 1) {
-                        onSuccess()
+                        admanager.showCommonDlg("提示", messageBody, function(){
+                        });
                     } else {
-                        onFail(data.message)
+                        admanager.showCommonDlg("提示", data.message, function(){
+                        });
                     }
                 }, "json");
+            } else {
+                var bFinished = false;
+                batchRequest(requestPool, function(param, onSuccess, onFail){
+                    //fake
+                    console.log("start.. ", param);
+                    /*setTimeout(function(){
+                     if( Math.random()< 0.5){
+                     onSuccess();
+                     }else{
+                     onFail("随机错误");
+                     }
+                     },100);*/
 
-            }, function(errorLog){
-                //队列全部处理完成
-                var checked = $('#checkAdmobAutoCreate').prop('checked');
-                if (checked && !bFinished && errorLog && errorLog.length == 0) {
-                    bFinished = true;
-                    var explodeCountry = $("#selectRegionAdmobExplode").prop("checked");
-                    var explodeBidding = $("#inputBiddingAdmobExplode").prop("checked");
-                    var autoCreateParams = $.extend({}, baseParam);
-                    autoCreateParams.region = region.join(",");
-                    autoCreateParams.bidding = bidding;
-                    autoCreateParams.explodeCountry = explodeCountry;
-                    autoCreateParams.explodeBidding = explodeBidding;
-                    autoCreateParams.campaignName = $('#inputCampaignNameAdmob').val();
-                    var url = "auto_create_campaign/adwords/create";
-                    var messageBody = "创建成功";
-                    if (isAutoCreate && modifyRecordId > 0) {
-                        autoCreateParams.id = modifyRecordId;
-                        url = "auto_create_campaign/adwords/modify";
-                        messageBody = "更新成功";
-                    }
-                    $.post(url, autoCreateParams, function(data) {
+                    $.post("campaign_admob/create", param, function (data) {
                         if (data && data.ret == 1) {
-                            admanager.showCommonDlg("提示", messageBody, function(){
-                            });
+                            onSuccess()
                         } else {
-                            admanager.showCommonDlg("提示", data.message, function(){
-                            });
+                            onFail(data.message)
                         }
                     }, "json");
-                }
 
-            })
+                }, function(errorLog){
+                    //队列全部处理完成
+                    var checked = $('#checkAdmobAutoCreate').prop('checked');
+                    if (checked && !bFinished && errorLog && errorLog.length == 0) {
+                        bFinished = true;
+                        var explodeCountry = $("#selectRegionAdmobExplode").prop("checked");
+                        var explodeBidding = $("#inputBiddingAdmobExplode").prop("checked");
+                        var autoCreateParams = $.extend({}, baseParam);
+                        autoCreateParams.region = region.join(",");
+                        autoCreateParams.bidding = bidding;
+                        autoCreateParams.explodeCountry = explodeCountry;
+                        autoCreateParams.explodeBidding = explodeBidding;
+                        autoCreateParams.campaignName = $('#inputCampaignNameAdmob').val();
+                        var url = "auto_create_campaign/adwords/create";
+                        var messageBody = "创建成功";
+                        if (isAutoCreate && modifyRecordId > 0) {
+                            autoCreateParams.id = modifyRecordId;
+                            url = "auto_create_campaign/adwords/modify";
+                            messageBody = "更新成功";
+                        }
+                        $.post(url, autoCreateParams, function(data) {
+                            if (data && data.ret == 1) {
+                                admanager.showCommonDlg("提示", messageBody, function(){
+                                });
+                            } else {
+                                admanager.showCommonDlg("提示", data.message, function(){
+                                });
+                            }
+                        }, "json");
+                    }
+
+                });
+            }
 
             return false;
         });
@@ -1029,64 +1059,98 @@
                 requestPool.push( cloned );
             });
 
-            //弹一个进度条出来
-            var bFinished = false;
-            batchRequest(requestPool, function(param, onSuccess, onFail){
-                //fake
-                console.log("start.. ", param);
-                /*setTimeout(function(){
-                    if( Math.random()< 0.5){
-                        onSuccess();
-                    }else{
-                        onFail("随机错误");
-                    }
-                },100);*/
-
-                $.post("campaign/create", param, function (data) {
+            var onlyAutoCreateCheck = $('#onlyCheckAutoCreate').prop('checked');
+            if (onlyAutoCreateCheck) {
+                var explodeCountry = $("#selectRegionExplode").prop("checked");
+                var explodeAge = $("#inputAgeExplode").prop("checked");
+                var explodeGender = $("#selectGenderExplode").prop("checked");
+                var explodeBidding = $("#inputBiddingExplode").prop("checked");
+                var autoCreateParams = $.extend({}, baseParam);
+                autoCreateParams.region = region.join(",");
+                autoCreateParams.age = age;
+                autoCreateParams.gender = gender.join(",");
+                autoCreateParams.bidding = bidding;
+                autoCreateParams.explodeCountry = explodeCountry;
+                autoCreateParams.explodeAge = explodeAge;
+                autoCreateParams.explodeGender = explodeGender;
+                autoCreateParams.explodeBidding = explodeBidding;
+                autoCreateParams.campaignName = $('#inputCampaignName').val();
+                var url = "auto_create_campaign/facebook/create";
+                var messageBody = "创建成功";
+                if (isAutoCreate && modifyRecordId > 0) {
+                    autoCreateParams.id = modifyRecordId;
+                    url = "auto_create_campaign/facebook/modify";
+                    messageBody = "更新成功";
+                }
+                $.post(url, autoCreateParams, function(data) {
                     if (data && data.ret == 1) {
-                        onSuccess()
+                        admanager.showCommonDlg("提示", messageBody, function(){
+                        });
                     } else {
-                        onFail(data.message)
+                        admanager.showCommonDlg("提示", data.message, function(){
+                        });
                     }
                 }, "json");
+            } else {
+//弹一个进度条出来
+                var bFinished = false;
+                batchRequest(requestPool, function(param, onSuccess, onFail){
+                    //fake
+                    console.log("start.. ", param);
+                    /*setTimeout(function(){
+                     if( Math.random()< 0.5){
+                     onSuccess();
+                     }else{
+                     onFail("随机错误");
+                     }
+                     },100);*/
 
-            }, function(errorLog){
-                //队列全部处理完成
-                var checked = $('#checkAutoCreate').prop('checked');
-                if (checked && !bFinished && errorLog && errorLog.length == 0) {
-                    bFinished = true;
-                    var explodeCountry = $("#selectRegionExplode").prop("checked");
-                    var explodeAge = $("#inputAgeExplode").prop("checked");
-                    var explodeGender = $("#selectGenderExplode").prop("checked");
-                    var explodeBidding = $("#inputBiddingExplode").prop("checked");
-                    var autoCreateParams = $.extend({}, baseParam);
-                    autoCreateParams.region = region.join(",");
-                    autoCreateParams.age = age;
-                    autoCreateParams.gender = gender.join(",");
-                    autoCreateParams.bidding = bidding;
-                    autoCreateParams.explodeCountry = explodeCountry;
-                    autoCreateParams.explodeAge = explodeAge;
-                    autoCreateParams.explodeGender = explodeGender;
-                    autoCreateParams.explodeBidding = explodeBidding;
-                    autoCreateParams.campaignName = $('#inputCampaignName').val();
-                    var url = "auto_create_campaign/facebook/create";
-                    var messageBody = "创建成功";
-                    if (isAutoCreate && modifyRecordId > 0) {
-                        autoCreateParams.id = modifyRecordId;
-                        url = "auto_create_campaign/facebook/modify";
-                        messageBody = "更新成功";
-                    }
-                    $.post(url, autoCreateParams, function(data) {
+                    $.post("campaign/create", param, function (data) {
                         if (data && data.ret == 1) {
-                            admanager.showCommonDlg("提示", messageBody, function(){
-                            });
+                            onSuccess()
                         } else {
-                            admanager.showCommonDlg("提示", data.message, function(){
-                            });
+                            onFail(data.message)
                         }
                     }, "json");
-                }
-            });
+
+                }, function(errorLog){
+                    //队列全部处理完成
+                    var checked = $('#checkAutoCreate').prop('checked');
+                    if (checked && !bFinished && errorLog && errorLog.length == 0) {
+                        bFinished = true;
+                        var explodeCountry = $("#selectRegionExplode").prop("checked");
+                        var explodeAge = $("#inputAgeExplode").prop("checked");
+                        var explodeGender = $("#selectGenderExplode").prop("checked");
+                        var explodeBidding = $("#inputBiddingExplode").prop("checked");
+                        var autoCreateParams = $.extend({}, baseParam);
+                        autoCreateParams.region = region.join(",");
+                        autoCreateParams.age = age;
+                        autoCreateParams.gender = gender.join(",");
+                        autoCreateParams.bidding = bidding;
+                        autoCreateParams.explodeCountry = explodeCountry;
+                        autoCreateParams.explodeAge = explodeAge;
+                        autoCreateParams.explodeGender = explodeGender;
+                        autoCreateParams.explodeBidding = explodeBidding;
+                        autoCreateParams.campaignName = $('#inputCampaignName').val();
+                        var url = "auto_create_campaign/facebook/create";
+                        var messageBody = "创建成功";
+                        if (isAutoCreate && modifyRecordId > 0) {
+                            autoCreateParams.id = modifyRecordId;
+                            url = "auto_create_campaign/facebook/modify";
+                            messageBody = "更新成功";
+                        }
+                        $.post(url, autoCreateParams, function(data) {
+                            if (data && data.ret == 1) {
+                                admanager.showCommonDlg("提示", messageBody, function(){
+                                });
+                            } else {
+                                admanager.showCommonDlg("提示", data.message, function(){
+                                });
+                            }
+                        }, "json");
+                    }
+                });
+            }
             return false;
         });
 
