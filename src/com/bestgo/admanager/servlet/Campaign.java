@@ -190,7 +190,7 @@ public class Campaign extends HttpServlet {
                                     String fileAbsolutePath = file.getAbsolutePath();
                                     String fileName = fileAbsolutePath.toLowerCase();
 //                                    String xxx = file.getAbsolutePath().replaceAll("\\\\","/");
-                                    if (fileName.endsWith("mp4") || fileName.endsWith("mov") || fileName.endsWith("gif")) {
+                                    if (fileName.endsWith("mp4") || fileName.endsWith("mov")) {
                                         video_file_path = fileAbsolutePath;
                                     }else if (fileName.endsWith("jpg") || fileName.endsWith("jpeg") || fileName.endsWith("png") || fileName.endsWith("gif")) {
                                         thumbnail_image_file_path = fileAbsolutePath;

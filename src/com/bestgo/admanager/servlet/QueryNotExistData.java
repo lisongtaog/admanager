@@ -18,8 +18,11 @@ import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-@WebServlet(name = "QueryOne", urlPatterns = {"/query_one/*"}, asyncSupported = true)
-public class QueryOne extends HttpServlet {
+/**
+ *
+ */
+@WebServlet(name = "QueryNotExistData", urlPatterns = {"/query_not_exist_data"}, asyncSupported = true)
+public class QueryNotExistData extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         doPost(request, response);
     }
@@ -38,55 +41,53 @@ public class QueryOne extends HttpServlet {
         String facebookCheck = request.getParameter("facebookCheck");
         HashMap<String ,String> countryMap = Utils.getCountryMap();
 
-        if (path.startsWith("/query_not_has_data")) {
-            try {
-                JSObject tagObject = DB.simpleScan("web_tag")
-                        .select("id", "tag_name")
-                        .where(DB.filter().whereEqualTo("tag_name", tag)).execute();
-                if (tagObject.hasObjectData()) {
-                    Long tagId = tagObject.get("id");
-                    JsonObject jsonObject = null;
-                    if (adwordsCheck != null && adwordsCheck.equals("false") && facebookCheck != null && facebookCheck.equals("false")) {
-                        JsonObject admob = fetchOneAppData(tagId, startTime, endTime, true,countryMap);
-                        JsonObject facebook = fetchOneAppData(tagId, startTime, endTime, false,countryMap);
-                        double total_spend = admob.get("total_spend").getAsDouble() + facebook.get("total_spend").getAsDouble();
-                        double total_installed = admob.get("total_installed").getAsDouble() + facebook.get("total_installed").getAsDouble();
-                        double total_impressions = admob.get("total_impressions").getAsDouble() + facebook.get("total_impressions").getAsDouble();
-                        double total_click = admob.get("total_click").getAsDouble() + facebook.get("total_click").getAsDouble();
-                        double total_ctr = total_impressions > 0 ? total_click / total_impressions : 0;
-                        double total_cpa = total_installed > 0 ? total_spend / total_installed : 0;
-                        double total_cvr = total_click > 0 ? total_installed / total_click : 0;
-                        admob.addProperty("total_spend", total_spend);
-                        admob.addProperty("total_installed", total_installed);
-                        admob.addProperty("total_impressions", total_impressions);
-                        admob.addProperty("total_click", total_click);
-                        admob.addProperty("total_ctr", Utils.trimDouble(total_ctr));
-                        admob.addProperty("total_cpa", Utils.trimDouble(total_cpa));
-                        admob.addProperty("total_cvr", Utils.trimDouble(total_cvr));
-                        JsonArray array = admob.getAsJsonArray("array");
-                        JsonArray array1 = facebook.getAsJsonArray("array");
-                        for (int i = 0; i < array1.size(); i++) {
-                            array.add(array1.get(i));
-                        }
-                        jsonObject = admob;
-                    } else {
-                        jsonObject = fetchOneAppData(tagId, startTime, endTime, "true".equals(adwordsCheck),countryMap);
+        try {
+            JSObject tagObject = DB.simpleScan("web_tag")
+                    .select("id", "tag_name")
+                    .where(DB.filter().whereEqualTo("tag_name", tag)).execute();
+            if (tagObject.hasObjectData()) {
+                Long tagId = tagObject.get("id");
+                JsonObject jsonObject = null;
+                if (adwordsCheck != null && adwordsCheck.equals("false") && facebookCheck != null && facebookCheck.equals("false")) {
+                    JsonObject admob = fetchOneAppData(tagId, startTime, endTime, true,countryMap);
+                    JsonObject facebook = fetchOneAppData(tagId, startTime, endTime, false,countryMap);
+                    double total_spend = admob.get("total_spend").getAsDouble() + facebook.get("total_spend").getAsDouble();
+                    double total_installed = admob.get("total_installed").getAsDouble() + facebook.get("total_installed").getAsDouble();
+                    double total_impressions = admob.get("total_impressions").getAsDouble() + facebook.get("total_impressions").getAsDouble();
+                    double total_click = admob.get("total_click").getAsDouble() + facebook.get("total_click").getAsDouble();
+                    double total_ctr = total_impressions > 0 ? total_click / total_impressions : 0;
+                    double total_cpa = total_installed > 0 ? total_spend / total_installed : 0;
+                    double total_cvr = total_click > 0 ? total_installed / total_click : 0;
+                    admob.addProperty("total_spend", total_spend);
+                    admob.addProperty("total_installed", total_installed);
+                    admob.addProperty("total_impressions", total_impressions);
+                    admob.addProperty("total_click", total_click);
+                    admob.addProperty("total_ctr", Utils.trimDouble(total_ctr));
+                    admob.addProperty("total_cpa", Utils.trimDouble(total_cpa));
+                    admob.addProperty("total_cvr", Utils.trimDouble(total_cvr));
+                    JsonArray array = admob.getAsJsonArray("array");
+                    JsonArray array1 = facebook.getAsJsonArray("array");
+                    for (int i = 0; i < array1.size(); i++) {
+                        array.add(array1.get(i));
                     }
-
-                    json.add("data", jsonObject);
-
-                    json.addProperty("ret", 1);
-                    json.addProperty("message", "执行成功");
+                    jsonObject = admob;
                 } else {
-                    json.addProperty("ret", 0);
-                    json.addProperty("message", "标签不存在");
+                    jsonObject = fetchOneAppData(tagId, startTime, endTime, "true".equals(adwordsCheck),countryMap);
                 }
-            } catch (Exception ex) {
+
+                json.add("data", jsonObject);
+
+                json.addProperty("ret", 1);
+                json.addProperty("message", "执行成功");
+            } else {
                 json.addProperty("ret", 0);
-                json.addProperty("message", ex.getMessage());
-                Logger logger = Logger.getRootLogger();
-                logger.error(ex.getMessage(), ex);
+                json.addProperty("message", "标签不存在");
             }
+        } catch (Exception ex) {
+            json.addProperty("ret", 0);
+            json.addProperty("message", ex.getMessage());
+            Logger logger = Logger.getRootLogger();
+            logger.error(ex.getMessage(), ex);
         }
 
         response.getWriter().write(json.toString());
