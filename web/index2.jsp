@@ -113,7 +113,6 @@
 
                 <button id="btnSummary" class="btn btn-default">汇总数据</button>
                 <button id="btnModifyBatch" class="btn btn-default">批量修改</button>
-                <button id="btnQueryNoData" class="btn btn-default">查询无数据的系列</button>
                 <input type="button" class="btn btn-default" id="btnBatchChangeStatus" value="修改状态监控"/>
             </div>
         </div>
@@ -206,7 +205,7 @@
 <script src="jqueryui/jquery-ui.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.4/js/select2.min.js"></script>
 <script src="js/country-name-code-dict.js"></script>
-<script src="js/index.js?t=20171128"></script>
+<script src="js/index2.js?t=20171128"></script>
 
 <script>
     var data = <%=array.toString()%>;
