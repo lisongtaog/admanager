@@ -806,6 +806,7 @@ public class QueryByMultiCondition extends HttpServlet {
     }
 
     private JsonObject fetchOneAppData(long tagId, String tagName, String startTime, String endTime, boolean admobCheck, boolean countryCheck, String countryCode,String likeCampaignName,String campaignCreateTime,boolean hasROI,HashMap<String ,String> countryMap,String totalInstallComparisonValue) throws Exception {
+        List<JSObject> listNotExistData = null;
         String relationTable = "web_ad_campaign_tag_rel";
         String webAdCampaignTable = "web_ad_campaigns";
         String webAdCampaignHistoryTable = "web_ad_campaigns_history";
@@ -877,7 +878,6 @@ public class QueryByMultiCondition extends HttpServlet {
                         " and date between '" + startTime + "' and '" + endTime + "' " +
                         " and c.status != 'removed' and c.campaign_id in (" + campaignIds + ")" +
                         " group by ch.campaign_id";
-                System.out.println(sql);
                 listCampaignSpend4CountryCode = DB.findListBySql(sql);
 
                 for(JSObject j : listCampaignSpend4CountryCode){
@@ -915,7 +915,6 @@ public class QueryByMultiCondition extends HttpServlet {
                         " group by ch.campaign_id, country_code " +
                         ((totalInstallComparisonValue == null || totalInstallComparisonValue == "") ? " " : " having installed " + totalInstallComparisonValue)  +
                         ") a left join " + webAccountIdTable + " b on a.account_id = b.account_id";
-
                 list = DB.findListBySql(sql);
             }else{
                 sql = "select campaign_id, a.account_id,short_name, campaign_name, a.status, create_time, budget, bidding, spend, installed, impressions, click" +
@@ -931,12 +930,23 @@ public class QueryByMultiCondition extends HttpServlet {
                         ((totalInstallComparisonValue == null || totalInstallComparisonValue == "") ? " " : " having installed " + totalInstallComparisonValue)  +
                         ") a left join " + webAccountIdTable + " b on a.account_id = b.account_id";
                 list = DB.findListBySql(sql);
+                sql = "select campaign_id, a.account_id, short_name, campaign_name, create_time, a.status, budget, bidding, total_spend, total_installed, total_click, cpa,ctr, " +
+                        "(case when total_click > 0 then total_installed/total_click else 0 end) as cvr " +
+                        " from " + webAdCampaignTable + " a , "+webAccountIdTable+" b where a.status != 'paused' and a.status != 'removed' and " +
+                        "campaign_id in (" + campaignIds + ") and a.account_id = b.account_id";
+                List<JSObject> listAll = DB.findListBySql(sql);
+                sql = "select campaign_id, impressions from ( " +
+                        "select ch.campaign_id, " +
+                        " sum(ch.total_impressions) as impressions " +
+                        " from " + webAdCampaignTable + " c, " + webAdCampaignHistoryTable + " ch " +
+                        "where c.campaign_id = ch.campaign_id " +
+                        "and date between '" + startTime + "' and '" + endTime + "' " +
+                        "and c.status != 'removed' and c.campaign_id in (" + campaignIds + ") " +
+                        "group by ch.campaign_id having impressions > 0 ) a ";
+                List<JSObject> listHasData = DB.findListBySql(sql);
+                listNotExistData = Utils.getDiffJSObjectList(listAll, listHasData, "campaign_id");
             }
-            sql = "select campaign_id from " +
-                    webAdCampaignTable + " a , "+webAccountIdTable+" b where a.status != 'paused' and a.status != 'removed' and " +
-                    "campaign_id in (" + campaignIds + ") and a.account_id = b.account_id";
-            List<JSObject> listAll = DB.findListBySql(sql);
-            List<JSObject> listNotExistData = Utils.getDiffJSObjectList(listAll, list, "campaign_id");
+
         } else {
             list.clear();
         }
@@ -1063,6 +1073,53 @@ public class QueryByMultiCondition extends HttpServlet {
             }
             array.add(d);
         }
+
+        if(listNotExistData != null){
+            for(JSObject j : listNotExistData){
+                if(j != null && j.hasObjectData()){
+                    JsonObject d = new JsonObject();
+                    String campaign_id = j.get("campaign_id");
+                    String short_name = j.get("short_name");
+                    String account_id = j.get("account_id");
+                    String campaign_name = j.get("campaign_name");
+                    String create_time = j.get("create_time").toString();
+                    create_time = create_time.substring(0,create_time.length()-5);
+                    String status = j.get("status");
+                    double budget = j.get("budget");
+                    double bidding = j.get("bidding");
+                    double cpa = Utils.convertDouble(j.get("cpa"),0);
+                    double ctr = Utils.convertDouble(j.get("ctr"),0);
+                    double cvr = Utils.convertDouble(j.get("cvr"),0);
+
+                    double spend = Utils.convertDouble(j.get("total_spend"), 0);
+                    double installed = Utils.convertDouble(j.get("total_installed"), 0);
+                    double click = Utils.convertDouble(j.get("total_click"), 0);
+                    d.addProperty("campaign_id", campaign_id);
+                    d.addProperty("short_name", short_name);
+                    d.addProperty("account_id", account_id);
+                    d.addProperty("campaign_name", campaign_name);
+                    d.addProperty("status", status);
+                    d.addProperty("create_time", create_time);
+                    d.addProperty("budget", budget);
+                    d.addProperty("bidding", bidding);
+                    d.addProperty("impressions", "--");
+                    d.addProperty("spend", Utils.trimDouble(spend));
+                    d.addProperty("installed", installed);
+                    d.addProperty("click", click);
+                    d.addProperty("ctr", ctr);
+                    d.addProperty("cpa", cpa);
+                    d.addProperty("cvr", cvr);
+                    d.addProperty("roi", "--");
+                    if (admobCheck) {
+                        d.addProperty("network", "admob");
+                    } else {
+                        d.addProperty("network", "facebook");
+                    }
+                    array.add(d);
+                }
+            }
+        }
+
         jsonObject.add("array", array);
         jsonObject.addProperty("total_spend", total_spend);
         jsonObject.addProperty("total_installed", total_installed);
