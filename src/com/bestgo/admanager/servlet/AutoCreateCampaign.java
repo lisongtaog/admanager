@@ -683,7 +683,6 @@ public class AutoCreateCampaign extends HttpServlet {
                         .put("explode_bidding", Boolean.parseBoolean(explodeBidding) ? 1 : 0)
                         .put("max_cpa", maxCPA)
                         .put("image_path", imagePath)
-//                        .put("video_path", videoPath)
                         .put("create_time", DateUtil.getNow())
                         .executeReturnId();
                 if (recordId > 0) {

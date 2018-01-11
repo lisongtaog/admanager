@@ -19,9 +19,8 @@
 <body>
 
 <div class="container">
-
     <form class="form-signin">
-        <h2 class="form-signin-heading">投放项目后台管理中心</h2>
+        <h2 class="form-signin-heading">投放项目后台管理平台</h2>
         <label for="inputUserName" class="sr-only">用户名</label>
         <input type="text" id="inputUserName" class="form-control" placeholder="用户名" required autofocus>
         <label for="inputPassword" class="sr-only">密码</label>

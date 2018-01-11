@@ -883,24 +883,26 @@ public class Query extends HttpServlet {
     }
 
     private JsonObject fetchOneAppData(long tagId, String tagName, String startTime, String endTime, boolean admobCheck, boolean countryCheck, String countryCode,String likeCampaignName,String campaignCreateTime,boolean hasROI,HashMap<String ,String> countryMap,String totalInstallComparisonValue) throws Exception {
-        String relationTable = "web_ad_campaign_tag_rel";
-        String webAdCampaignTable = "web_ad_campaigns";
-        String webAdCampaignHistoryTable = "web_ad_campaigns_history";
+        String webAdCampaignTagRelTable = "web_ad_campaign_tag_rel";
+        String webAdCampaignsTable = "web_ad_campaigns";
+        String adCampaignsTable = "ad_campaigns";
+        String webAdCampaignsHistoryTable = "web_ad_campaigns_history";
         String webAccountIdTable = "web_account_id";
         if (countryCheck || (countryCode != null && countryCode != "")) {
-            webAdCampaignHistoryTable = "web_ad_campaigns_country_history";
+            webAdCampaignsHistoryTable = "web_ad_campaigns_country_history";
         }
         if (admobCheck) {
-            relationTable = "web_ad_campaign_tag_admob_rel";
-            webAdCampaignTable = "web_ad_campaigns_admob";
-            webAdCampaignHistoryTable = "web_ad_campaigns_history_admob";
+            adCampaignsTable = "ad_campaigns_admob";
+            webAdCampaignTagRelTable = "web_ad_campaign_tag_admob_rel";
+            webAdCampaignsTable = "web_ad_campaigns_admob";
+            webAdCampaignsHistoryTable = "web_ad_campaigns_history_admob";
             webAccountIdTable = "web_account_id_admob";
             if (countryCheck || (countryCode != null && countryCode != "")) {
-                webAdCampaignHistoryTable = "web_ad_campaigns_country_history_admob";
+                webAdCampaignsHistoryTable = "web_ad_campaigns_country_history_admob";
             }
         }
 
-        List<JSObject> list = DB.scan(relationTable).select("campaign_id")
+        List<JSObject> list = DB.scan(webAdCampaignTagRelTable).select("campaign_id")
                 .where(DB.filter().whereEqualTo("tag_id", tagId)).execute();
 
 
@@ -912,13 +914,8 @@ public class Query extends HttpServlet {
         String campaignIds = "";
         if(campaignCreateTime != null && campaignCreateTime != ""){
             List<JSObject> campaignIdJSObjectList = new ArrayList<>();
-            if(admobCheck){
-                String sqlAdmobCampaignId = "select campaign_id from ad_campaigns_admob where app_name = '"+ tagName +"' and create_time like '" + campaignCreateTime + "%'";
-                campaignIdJSObjectList  = DB.findListBySql(sqlAdmobCampaignId);
-            }else{
-                String sqlFacebookCampaignId = "select campaign_id from ad_campaigns where app_name = '"+ tagName +"' and create_time like '" + campaignCreateTime + "%'";
-                campaignIdJSObjectList  = DB.findListBySql(sqlFacebookCampaignId);
-            }
+            String sqlQuery = "select campaign_id from "+adCampaignsTable+" where app_name = '"+ tagName +"' and create_time like '" + campaignCreateTime + "%'";
+            campaignIdJSObjectList  = DB.findListBySql(sqlQuery);
 
             if(campaignIdJSObjectList != null && campaignIdJSObjectList.size()>0){
                 Set<String> campaignIdcommonSet = new HashSet<>();
@@ -948,7 +945,7 @@ public class Query extends HttpServlet {
             String sql = "";
             if(countryCode != null && countryCode != ""){
                 sql = "select ch.campaign_id, sum(ch.total_spend) as campaign_spends " +
-                        " from " + webAdCampaignTable + " c, " + webAdCampaignHistoryTable + " ch " +
+                        " from " + webAdCampaignsTable + " c, " + webAdCampaignsHistoryTable + " ch " +
                         " where c.campaign_id=ch.campaign_id " +
                         ((likeCampaignName == null || likeCampaignName == "") ? " " : " and campaign_name like '%" + likeCampaignName +"%' " )  +
                         " and date between '" + startTime + "' and '" + endTime + "' " +
@@ -963,7 +960,7 @@ public class Query extends HttpServlet {
                         " from (" +
                         "select ch.campaign_id, account_id, campaign_name,c.status, create_time, c.budget, c.bidding, sum(ch.total_spend) as spend, " +
                         "sum(ch.total_installed) as installed, sum(ch.total_impressions) as impressions " +
-                        ",sum(ch.total_click) as click from " + webAdCampaignTable + " c, ";
+                        ",sum(ch.total_click) as click from " + webAdCampaignsTable + " c, ";
                 if(admobCheck){
                     sql += " web_ad_campaigns_country_history_admob ch ";
                 }else{
@@ -983,7 +980,7 @@ public class Query extends HttpServlet {
                         " from (" +
                         "select ch.campaign_id, country_code, account_id, campaign_name,c.status, create_time, c.budget, c.bidding, sum(ch.total_spend) as spend, " +
                         "sum(ch.total_installed) as installed, sum(ch.total_impressions) as impressions " +
-                        ",sum(ch.total_click) as click from " + webAdCampaignTable + " c, " + webAdCampaignHistoryTable + " ch " +
+                        ",sum(ch.total_click) as click from " + webAdCampaignsTable + " c, " + webAdCampaignsHistoryTable + " ch " +
                         "where c.campaign_id=ch.campaign_id " +
                         ((likeCampaignName == null || likeCampaignName == "") ? " " : " and campaign_name like '%" + likeCampaignName +"%' " )  +
                         " and date between '" + startTime + "' and '" + endTime + "' " +
@@ -997,7 +994,7 @@ public class Query extends HttpServlet {
                         " from (" +
                         "select ch.campaign_id, account_id, campaign_name,c.status, create_time, c.budget, c.bidding, sum(ch.total_spend) as spend, " +
                         "sum(ch.total_installed) as installed, sum(ch.total_impressions) as impressions " +
-                        ",sum(ch.total_click) as click from " + webAdCampaignTable + " c, " + webAdCampaignHistoryTable + " ch " +
+                        ",sum(ch.total_click) as click from " + webAdCampaignsTable + " c, " + webAdCampaignsHistoryTable + " ch " +
                         "where c.campaign_id=ch.campaign_id " +
                         ((likeCampaignName == null || likeCampaignName == "") ? " " : " and campaign_name like '%" + likeCampaignName +"%' " )  +
                         " and date between '" + startTime + "' and '" + endTime + "' " +
@@ -1146,18 +1143,18 @@ public class Query extends HttpServlet {
     }
 
     private JsonObject fetchOneAppDataSummary(long tagId, String startTime, String endTime, boolean admobCheck) throws Exception {
-        String relationTable = "web_ad_campaign_tag_rel";
-        String webAdCampaignTable = "web_ad_campaigns";
-        String webAdCampaignHistoryTable = "web_ad_campaigns_history";
+        String webAdCampaignTagRelTable = "web_ad_campaign_tag_rel";
+        String webAdCampaignsTable = "web_ad_campaigns";
+        String webAdCampaignsHistoryTable = "web_ad_campaigns_history";
         if (admobCheck) {
-            relationTable = "web_ad_campaign_tag_admob_rel";
-            webAdCampaignTable = "web_ad_campaigns_admob";
-            webAdCampaignHistoryTable = "web_ad_campaigns_history_admob";
+            webAdCampaignTagRelTable = "web_ad_campaign_tag_admob_rel";
+            webAdCampaignsTable = "web_ad_campaigns_admob";
+            webAdCampaignsHistoryTable = "web_ad_campaigns_history_admob";
         }
         String sql = "select sum(ch.total_spend) as spend, " +
                 "sum(ch.total_installed) as installed, sum(ch.total_impressions) as impressions " +
-                ",sum(ch.total_click) as click from " + webAdCampaignTable + " c, " + webAdCampaignHistoryTable + " ch, " +
-                "(select distinct campaign_id from " + relationTable + " where tag_id = " + tagId + ") rt " +
+                ",sum(ch.total_click) as click from " + webAdCampaignsTable + " c, " + webAdCampaignsHistoryTable + " ch, " +
+                "(select distinct campaign_id from " + webAdCampaignTagRelTable + " where tag_id = " + tagId + ") rt " +
                 "where rt.campaign_id = ch.campaign_id and c.campaign_id = ch.campaign_id " +
                 "and date between '" + startTime + "' and '" + endTime + "' " +
                 "and c.status != 'removed' " +
