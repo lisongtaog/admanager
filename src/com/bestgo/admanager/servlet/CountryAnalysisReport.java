@@ -12,6 +12,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -35,7 +37,7 @@ public class CountryAnalysisReport extends HttpServlet {
         String startTime = request.getParameter("startTime");
         String endTime = request.getParameter("endTime");
 
-
+//        DecimalFormat df   = new DecimalFormat("######0.00000000");
         if (path.startsWith("/query_country_analysis_report")) {
             try {
                 String sqlG = "select google_package_id from web_facebook_app_ids_rel WHERE tag_name = '" + tagName + "'";
@@ -146,7 +148,8 @@ public class CountryAnalysisReport extends HttpServlet {
                                 double impressions = Utils.convertDouble(j.get("impressions"),0);
                                 double revenues = j.get("revenues");
                                 double estimated_revenues = j.get("estimated_revenues");
-                                double ecpm = impressions != 0 ? revenues / impressions / 1000 : 0;
+                                double ecpm = impressions == 0 ? 0 : Utils.trimDouble3(revenues * 1000 / impressions );
+//                                String ecpm = impressions == 0 ? "0" : (df.format(revenues / impressions ));
                                 double incoming = revenues - costs;
                                 double estRevDevCost = Utils.convertDouble(j.get("est_rev_dev_cost"),0);
 
@@ -203,7 +206,7 @@ public class CountryAnalysisReport extends HttpServlet {
                                 d.addProperty("users", users);
                                 d.addProperty("active_users", active_users);
                                 d.addProperty("revenues", Utils.trimDouble3(revenues));
-                                d.addProperty("ecpm", Utils.trimDouble3(ecpm));
+                                d.addProperty("ecpm", ecpm);
                                 d.addProperty("incoming", Utils.trimDouble3(incoming));
                                 d.addProperty("estimated_revenues", Utils.trimDouble3(estimated_revenues));
                                 d.addProperty("estimated_revenues_dev_cost", Utils.trimDouble3(estRevDevCost));
