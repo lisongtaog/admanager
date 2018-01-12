@@ -31,7 +31,6 @@ public class QueryNotExistData extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         if (!Utils.isAdmin(request, response)) return;
 
-        String path = request.getPathInfo();
         JsonObject json = new JsonObject();
 
         String tag = request.getParameter("tag");
