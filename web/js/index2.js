@@ -82,37 +82,6 @@ function init() {
         }
     });
 
-    // $("#btnQueryNoData").click(function(){
-    //     var query = $("#inputSearch").val();
-    //     var startTime = $('#inputStartTime').val();
-    //     var endTime = $('#inputEndTime').val();
-    //     var adwordsCheck = $('#adwordsCheck').is(':checked');
-    //     var facebookCheck = $('#facebookCheck').is(':checked');
-    //
-    //     $.post('query_not_exist_data', {
-    //         tag: query,
-    //         startTime: startTime,
-    //         endTime: endTime,
-    //         adwordsCheck: adwordsCheck,
-    //         facebookCheck: facebookCheck
-    //     },function(data){
-    //         if(data && data.ret == 1){
-    //             appQueryData = data.data.array;
-    //             $('#result_header').html("<tr><th>系列ID</th><th>账户ID</th><th>账户简称</th><th>系列名称</th><th>创建时间</th><th>状态</th><th>预算</th><th>竞价</th><th>总花费</th><th>总安装</th><th>总点击</th><th>CPA</th><th>CTR</span></th><th>CVR</th><th>ROI</th></tr>");
-    //             data = data.data;
-    //             setData(data);
-    //             bindSortOp();
-    //             var str = "总花费: " + data.total_spend + " 总安装: " + data.total_installed +
-    //                 " 总展示: " + data.total_impressions + " 总点击: " + data.total_click +
-    //                 " CTR: " + data.total_ctr + " CPA: " + data.total_cpa + " CVR: " + data.total_cvr;
-    //             str += "<br/><span class='estimateResult'></span>"
-    //             $('#total_result').html(str);
-    //             $('#total_result').removeClass("editable");
-    //         } else {
-    //             admanager.showCommonDlg("错误", data.message);
-    //         }
-    //     },'json');
-    // });
     $('#btnSearch').click(function () {
         var startTime = $('#inputStartTime').val();
         var endTime = $('#inputEndTime').val();
@@ -301,7 +270,9 @@ function setData(data) {
                     td.text(one[keyset[j]] + " / " + totalSpend);
                 } else if(keyset[j] == 'roi'){
                     var r = one[keyset[j]];
-                    if(r <0){
+                    if(r == -100000){
+                        r= "--";
+                    }else if(r <0){
                         td.addClass("red");
                     }else if(r>0){
                         td.addClass("blue");
@@ -391,32 +362,40 @@ function bindSortOp() {
             $(this).addClass("glyphicon-arrow-up");
         }
 
-        var query = $("#inputSearch").val();
         var startTime = $('#inputStartTime').val();
         var endTime = $('#inputEndTime').val();
-        var countryName = $('#inputCountry').val();
+        var query = $("#inputSearch").val();
+        var campaignCreateTime = $('#inputCampaignCreateTime').val();
         var countryCode = '';
         var adwordsCheck = $('#adwordsCheck').is(':checked');
         var countryCheck = $('#countryCheck').is(':checked');
         var facebookCheck = $('#facebookCheck').is(':checked');
-        var  likeCampaignName = $("#inputQueryByCampaignNameText").val();
-        for (var i = 0; i < regionList.length; i++) {
-            if (countryName == regionList[i].name) {
-                countryCode = regionList[i].country_code;
-                break;
+        var likeCampaignName = $('#inputLikeCampaignName').val();
+        var totalInstallComparisonValue = $('#inputTotalInstallComparisonValue').val();
+        var totalInstallOperator = $('#totalInstallOperator option:selected').val();
+        var countryName = $('#inputCountry').val();
+        if(countryName != ""){
+            for (var i = 0; i < regionList.length; i++) {
+                if (countryName == regionList[i].name) {
+                    countryCode = regionList[i].country_code;
+                    break;
+                }
             }
         }
 
-        $.post('query', {
+        $.post('query_by_multi_condition', {
             tag: query,
             startTime: startTime,
             endTime: endTime,
+            totalInstallOperator: totalInstallOperator,
+            totalInstallComparisonValue: totalInstallComparisonValue,
             adwordsCheck: adwordsCheck,
             countryCheck: countryCheck,
             facebookCheck: facebookCheck,
             countryCode: countryCode,
-            sorterId: sorterId,
-            likeCampaignName: likeCampaignName
+            likeCampaignName: likeCampaignName,
+            campaignCreateTime: campaignCreateTime,
+            sorterId: sorterId
         }, function (data) {
             if (data && data.ret == 1) {
                 data = data.data;
