@@ -1171,7 +1171,7 @@ public class QueryByMultiCondition extends HttpServlet {
                         ") a left join web_account_id_admob b on a.account_id = b.account_id";
                 list = DB.findListBySql(sql);
                 sql = "select campaign_id, a.account_id, short_name, campaign_name, create_time, a.status, budget, bidding, total_spend, total_installed " +
-                        " from web_ad_campaigns_admob a,web_account_id_admob b where total_click = 0 and ctr =0 and a.`status` = 'enabled' and a.account_id = b.account_id " +
+                        " from web_ad_campaigns_admob a,web_account_id_admob b where total_click = 0 and ctr =0 and a.status = 'enabled' and a.account_id = b.account_id " +
                         " and cpa = 0 and campaign_id in (" + campaignIds + ")";
                 listNotExistData = DB.findListBySql(sql);
 //                sql = "select campaign_id, a.account_id, short_name, campaign_name, create_time, a.status, budget, bidding, total_spend, total_installed, total_click, cpa,ctr, " +

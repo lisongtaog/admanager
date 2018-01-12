@@ -97,13 +97,13 @@ public class QueryNotExistData extends HttpServlet {
     private JsonObject fetchOneAppData(long tagId, String startTime, String endTime, boolean admobCheck,HashMap<String ,String> countryMap) throws Exception {
         String relationTable = "web_ad_campaign_tag_rel";
         String webAdCampaignTable = "web_ad_campaigns";
-        String webAdCampaignHistoryTable = "web_ad_campaigns_history";
         String webAccountIdTable = "web_account_id";
+        String FieldStatus = "ACTIVE";
         if (admobCheck) {
             relationTable = "web_ad_campaign_tag_admob_rel";
             webAdCampaignTable = "web_ad_campaigns_admob";
-            webAdCampaignHistoryTable = "web_ad_campaigns_history_admob";
             webAccountIdTable = "web_account_id_admob";
+            FieldStatus = "enabled";
         }
 
         List<JSObject> list = DB.scan(relationTable).select("campaign_id")
@@ -124,24 +124,10 @@ public class QueryNotExistData extends HttpServlet {
         }
 
         if (!campaignIds.isEmpty()) {
-            String sql = "";
-            List<JSObject> listAll = new ArrayList<>();
-            List<JSObject> listHasData = new ArrayList<>();
-            sql = "select campaign_id, a.account_id, short_name, campaign_name, create_time, a.status, budget, bidding, total_spend, total_installed, total_click, cpa,ctr, " +
-                    "(case when total_click > 0 then total_installed/total_click else 0 end) as cvr " +
-                    " from " + webAdCampaignTable + " a , "+webAccountIdTable+" b where a.status != 'paused' and a.status != 'removed' and " +
-                    "campaign_id in (" + campaignIds + ") and a.account_id = b.account_id";
-            listAll = DB.findListBySql(sql);
-            sql = "select campaign_id, impressions from ( " +
-                    "select ch.campaign_id, " +
-                    " sum(ch.total_impressions) as impressions " +
-                    " from " + webAdCampaignTable + " c, " + webAdCampaignHistoryTable + " ch " +
-                    "where c.campaign_id = ch.campaign_id " +
-                    "and date between '" + startTime + "' and '" + endTime + "' " +
-                    "and c.status != 'removed' and c.campaign_id in (" + campaignIds + ") " +
-                    "group by ch.campaign_id having impressions > 0 ) a ";
-            listHasData = DB.findListBySql(sql);
-            list = Utils.getDiffJSObjectList(listAll, listHasData, "campaign_id");
+            String sql = "select campaign_id, a.account_id, short_name, campaign_name, create_time, a.status, budget, bidding, total_spend, total_installed " +
+                    " from " + webAdCampaignTable + " a," + webAccountIdTable + " b where total_click = 0 and ctr =0 and a.status = '" + FieldStatus + "' and a.account_id = b.account_id " +
+                    " and cpa = 0 and campaign_id in (" + campaignIds + ")";
+            list = DB.findListBySql(sql);
         } else {
             list.clear();
         }
@@ -154,10 +140,6 @@ public class QueryNotExistData extends HttpServlet {
 
         for (int i = 0; i < list.size(); i++) {
             JSObject one = list.get(i);
-            double click = Utils.convertDouble(one.get("total_click"), 0);
-            if ( click > 0) {
-                continue;
-            }
             String campaign_id = one.get("campaign_id");
 
             String short_name = one.get("short_name");
@@ -171,12 +153,12 @@ public class QueryNotExistData extends HttpServlet {
 
             double spend = Utils.convertDouble(one.get("total_spend"), 0);
             double installed = Utils.convertDouble(one.get("total_installed"), 0);
-            double cpa = installed > 0 ? spend / installed : 0;
-            double cvr = click > 0 ? installed / click : 0;
+            double cpa =  0;
+            double cvr = 0;
+            double click = 0;
 
             total_spend += spend;
             total_installed += installed;
-            total_click += click;
 
             JsonObject d = new JsonObject();
             d.addProperty("campaign_id", campaign_id);
@@ -208,7 +190,7 @@ public class QueryNotExistData extends HttpServlet {
         jsonObject.addProperty("total_spend", total_spend);
         jsonObject.addProperty("total_installed", total_installed);
         jsonObject.addProperty("total_impressions", total_impressions);
-        jsonObject.addProperty("total_click", total_click);
+        jsonObject.addProperty("total_click", 0);
         jsonObject.addProperty("total_ctr", Utils.trimDouble(total_ctr));
         jsonObject.addProperty("total_cpa", Utils.trimDouble(total_cpa));
         jsonObject.addProperty("total_cvr", Utils.trimDouble(total_cvr));
