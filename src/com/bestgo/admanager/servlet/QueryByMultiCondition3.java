@@ -880,7 +880,7 @@ public class QueryByMultiCondition3 extends HttpServlet {
                         ((totalInstallComparisonValue == null || totalInstallComparisonValue == "") ? " " : " having installed " + totalInstallComparisonValue)  +
                         ") a left join web_account_id b on a.account_id = b.account_id";
                 list = DB.findListBySql(sql);
-                sql = "select c.campaign_id, c.account_id,short_name, c.campaign_name, c.status, create_time, budget, bidding,c.total_spend as spend,c.total_installed as installed " +
+                sql = "select c.campaign_id, c.account_id,short_name, c.campaign_name, c.status, create_time, budget, bidding,c.total_spend,c.total_installed " +
                         " from web_ad_campaigns_country_history ch,web_ad_campaigns c,web_account_id b where ch.campaign_id = c.campaign_id and " +
                         " c.account_id = b.account_id and country_code = '" + countryCode + "' and ch.total_click = 0 and ch.total_impressions = 0 " +
                         " and ch.cpa = 0 and ch.ctr = 0 and c.status = 'ACTIVE' " +
@@ -900,7 +900,7 @@ public class QueryByMultiCondition3 extends HttpServlet {
                         ((totalInstallComparisonValue == null || totalInstallComparisonValue == "") ? " " : " having installed " + totalInstallComparisonValue)  +
                         ") a left join web_account_id b on a.account_id = b.account_id";
                 list = DB.findListBySql(sql);
-                sql = "select ch.country_code, c.campaign_id, c.account_id,short_name, c.campaign_name, c.status, create_time, budget, bidding,c.total_spend as spend,c.total_installed as installed " +
+                sql = "select ch.country_code, c.campaign_id, c.account_id,short_name, c.campaign_name, c.status, create_time, budget, bidding,c.total_spend,c.total_installed " +
                         " from web_ad_campaigns_country_history ch,web_ad_campaigns c,web_account_id b where ch.campaign_id = c.campaign_id and " +
                         " c.account_id = b.account_id and  ch.total_click = 0 and ch.total_impressions = 0 " +
                         " and ch.cpa = 0 and ch.ctr = 0 and c.status = 'ACTIVE' " +
@@ -1154,7 +1154,7 @@ public class QueryByMultiCondition3 extends HttpServlet {
                         ((totalInstallComparisonValue == null || totalInstallComparisonValue == "") ? " " : " having installed " + totalInstallComparisonValue)  +
                         ") a left join web_account_id b on a.account_id = b.account_id";
                 list = DB.findListBySql(sql);
-                sql = "select c.campaign_id, c.account_id,short_name, c.campaign_name, c.status, create_time, budget, bidding,c.total_spend as spend,c.total_installed as installed " +
+                sql = "select c.campaign_id, c.account_id,short_name, c.campaign_name, c.status, create_time, budget, bidding,c.total_spend,c.total_installed " +
                         " from web_ad_campaigns_country_history_admob ch,web_ad_campaigns_admob c,web_account_id_admob b where ch.campaign_id = c.campaign_id and " +
                         " c.account_id = b.account_id and country_code = '" + countryCode + "' and ch.total_click = 0 and ch.total_impressions = 0 " +
                         " and ch.cpa = 0 and ch.ctr = 0 and c.status = 'enabled' " +
@@ -1174,7 +1174,7 @@ public class QueryByMultiCondition3 extends HttpServlet {
                         ((totalInstallComparisonValue == null || totalInstallComparisonValue == "") ? " " : " having installed " + totalInstallComparisonValue)  +
                         ") a left join web_account_id_admob b on a.account_id = b.account_id";
                 list = DB.findListBySql(sql);
-                sql = "select ch.country_code, c.campaign_id, c.account_id,short_name, c.campaign_name, c.status, create_time, budget, bidding,c.total_spend as spend,c.total_installed as installed " +
+                sql = "select ch.country_code, c.campaign_id, c.account_id,short_name, c.campaign_name, c.status, create_time, budget, bidding,c.total_spend,c.total_installed" +
                         " from web_ad_campaigns_country_history_admob ch,web_ad_campaigns_admob c,web_account_id_admob b where ch.campaign_id = c.campaign_id and " +
                         " c.account_id = b.account_id and  ch.total_click = 0 and ch.total_impressions = 0 " +
                         " and ch.cpa = 0 and ch.ctr = 0 and c.status = 'enabled' " +
