@@ -265,25 +265,24 @@ function setData(data) {
             var td = $('<td></td>');
             if (keyset[j] == 'budget' || keyset[j] == 'bidding') {
                 td.text(one[keyset[j]] / 100);
-            } else {
-                if (keyset[j] == 'spend') {
+            } else if (keyset[j] == 'spend') {
                     td.text(one[keyset[j]] + " / " + totalSpend);
-                } else if(keyset[j] == 'roi'){
-                    var r = one[keyset[j]];
-                    if(r == -100000){
-                        r= "--";
-                    }else if(r <0){
-                        td.addClass("red");
-                    }else if(r>0){
-                        td.addClass("blue");
-                    }else{
-                        td.addClass("yellow");
-                    }
-                    td.text(r);
+            } else if(keyset[j] == 'roi'){
+                var r = one[keyset[j]];
+                if(r == -100000){
+                    r= "--";
+                }else if(r <0){
+                    td.addClass("red");
+                }else if(r>0){
+                    td.addClass("blue");
                 }else{
-                    td.text(one[keyset[j]]);
+                    td.addClass("yellow");
                 }
+                td.text(r);
+            }else{
+                td.text(one[keyset[j]]);
             }
+
             if (modifyColumns.indexOf(keyset[j]) != -1) {
                 td.addClass("editable");
                 td[0].cloumnName = keyset[j];

@@ -41,9 +41,7 @@ public class QueryByMultiCondition extends HttpServlet {
             JSObject tagObject = DB.simpleScan("web_tag").select("id", "tag_name").where(DB.filter().whereEqualTo("tag_name", tag)).execute();
             if (tagObject.hasObjectData()) {
                 String startTime = request.getParameter("startTime");
-                startTime = "2017-10-12";
                 String endTime = request.getParameter("endTime");
-                endTime = "2017-10-12";
                 String sorterId = request.getParameter("sorterId");
                 int sorter = 0;
                 if (sorterId != null) {
@@ -910,21 +908,10 @@ public class QueryByMultiCondition extends HttpServlet {
                         ((totalInstallComparisonValue == null || totalInstallComparisonValue == "") ? " " : " having installed " + totalInstallComparisonValue)  +
                         ") a left join web_account_id b on a.account_id = b.account_id";
                 list = DB.findListBySql(sql);
-                sql = "select campaign_id, a.account_id, short_name, campaign_name, create_time, a.status, budget, bidding, total_spend, total_installed, total_click, cpa,ctr, " +
-                        "(case when total_click > 0 then total_installed/total_click else 0 end) as cvr " +
-                        " from web_ad_campaigns a , web_account_id b where a.status != 'paused' and a.status != 'removed' and " +
-                        "campaign_id in (" + campaignIds + ") and a.account_id = b.account_id";
-                List<JSObject> listAll = DB.findListBySql(sql);
-                sql = "select campaign_id, impressions from ( " +
-                        "select ch.campaign_id, " +
-                        " sum(ch.total_impressions) as impressions " +
-                        " from web_ad_campaigns c, web_ad_campaigns_history ch " +
-                        "where c.campaign_id = ch.campaign_id " +
-                        "and date between '" + startTime + "' and '" + endTime + "' " +
-                        "and c.status != 'removed' and c.campaign_id in (" + campaignIds + ") " +
-                        "group by ch.campaign_id having impressions > 0 ) a ";
-                List<JSObject> listHasData = DB.findListBySql(sql);
-                listNotExistData = Utils.getDiffJSObjectList(listAll, listHasData, "campaign_id");
+                sql = "select campaign_id, a.account_id, short_name, campaign_name, create_time, a.status, budget, bidding, total_spend, total_installed" +
+                        " from web_ad_campaigns a,web_account_id b where total_click = 0 and ctr =0 and a.`status` = 'ACTIVE' and a.account_id = b.account_id " +
+                        " and cpa = 0 and campaign_id in (" + campaignIds + ")";
+                listNotExistData = DB.findListBySql(sql);
             }
 
         } else {
@@ -1050,13 +1037,9 @@ public class QueryByMultiCondition extends HttpServlet {
                     String status = j.get("status");
                     double budget = j.get("budget");
                     double bidding = j.get("bidding");
-                    double cpa = Utils.convertDouble(j.get("cpa"),0);
-                    double ctr = Utils.convertDouble(j.get("ctr"),0);
-                    double cvr = Utils.convertDouble(j.get("cvr"),0);
 
                     double spend = Utils.convertDouble(j.get("total_spend"), 0);
                     double installed = Utils.convertDouble(j.get("total_installed"), 0);
-                    double click = Utils.convertDouble(j.get("total_click"), 0);
                     d.addProperty("campaign_id", campaign_id);
                     d.addProperty("short_name", short_name);
                     d.addProperty("account_id", account_id);
@@ -1065,15 +1048,15 @@ public class QueryByMultiCondition extends HttpServlet {
                     d.addProperty("create_time", create_time);
                     d.addProperty("budget", budget);
                     d.addProperty("bidding", bidding);
-//                    d.addProperty("impressions", 0);
                     d.addProperty("spend", Utils.trimDouble(spend));
                     d.addProperty("installed", installed);
-                    d.addProperty("click", click);
-                    d.addProperty("ctr", ctr);
-                    d.addProperty("cpa", cpa);
-                    d.addProperty("cvr", cvr);
 
                     //假定数字，页面显示时是"--",这里为了排序
+                    d.addProperty("click", 0);
+                    d.addProperty("impressions", 0);
+                    d.addProperty("ctr", 0);
+                    d.addProperty("cpa", 0);
+                    d.addProperty("cvr", 0);
                     d.addProperty("roi", -100000);
 
                     d.addProperty("network", "facebook");
@@ -1187,21 +1170,25 @@ public class QueryByMultiCondition extends HttpServlet {
                         ((totalInstallComparisonValue == null || totalInstallComparisonValue == "") ? " " : " having installed " + totalInstallComparisonValue)  +
                         ") a left join web_account_id_admob b on a.account_id = b.account_id";
                 list = DB.findListBySql(sql);
-                sql = "select campaign_id, a.account_id, short_name, campaign_name, create_time, a.status, budget, bidding, total_spend, total_installed, total_click, cpa,ctr, " +
-                        "(case when total_click > 0 then total_installed/total_click else 0 end) as cvr " +
-                        " from web_ad_campaigns_admob a , web_account_id_admob b where a.status != 'paused' and a.status != 'removed' and " +
-                        "campaign_id in (" + campaignIds + ") and a.account_id = b.account_id";
-                List<JSObject> listAll = DB.findListBySql(sql);
-                sql = "select campaign_id, impressions from ( " +
-                        "select ch.campaign_id, " +
-                        " sum(ch.total_impressions) as impressions " +
-                        " from web_ad_campaigns_admob c, web_ad_campaigns_history_admob ch " +
-                        "where c.campaign_id = ch.campaign_id " +
-                        "and date between '" + startTime + "' and '" + endTime + "' " +
-                        "and c.status != 'removed' and c.campaign_id in (" + campaignIds + ") " +
-                        "group by ch.campaign_id having impressions > 0 ) a ";
-                List<JSObject> listHasData = DB.findListBySql(sql);
-                listNotExistData = Utils.getDiffJSObjectList(listAll, listHasData, "campaign_id");
+                sql = "select campaign_id, a.account_id, short_name, campaign_name, create_time, a.status, budget, bidding, total_spend, total_installed " +
+                        " from web_ad_campaigns_admob a,web_account_id_admob b where total_click = 0 and ctr =0 and a.`status` = 'enabled' and a.account_id = b.account_id " +
+                        " and cpa = 0 and campaign_id in (" + campaignIds + ")";
+                listNotExistData = DB.findListBySql(sql);
+//                sql = "select campaign_id, a.account_id, short_name, campaign_name, create_time, a.status, budget, bidding, total_spend, total_installed, total_click, cpa,ctr, " +
+//                        "(case when total_click > 0 then total_installed/total_click else 0 end) as cvr " +
+//                        " from web_ad_campaigns_admob a , web_account_id_admob b where a.status != 'paused' and a.status != 'removed' and " +
+//                        "campaign_id in (" + campaignIds + ") and a.account_id = b.account_id";
+//                List<JSObject> listAll = DB.findListBySql(sql);
+//                sql = "select campaign_id, impressions from ( " +
+//                        "select ch.campaign_id, " +
+//                        " sum(ch.total_impressions) as impressions " +
+//                        " from web_ad_campaigns_admob c, web_ad_campaigns_history_admob ch " +
+//                        "where c.campaign_id = ch.campaign_id " +
+//                        "and date between '" + startTime + "' and '" + endTime + "' " +
+//                        "and c.status != 'removed' and c.campaign_id in (" + campaignIds + ") " +
+//                        "group by ch.campaign_id having impressions > 0 ) a ";
+//                List<JSObject> listHasData = DB.findListBySql(sql);
+//                listNotExistData = Utils.getDiffJSObjectList(listAll, listHasData, "campaign_id");
             }
 
         } else {
@@ -1327,13 +1314,9 @@ public class QueryByMultiCondition extends HttpServlet {
                     String status = j.get("status");
                     double budget = j.get("budget");
                     double bidding = j.get("bidding");
-                    double cpa = Utils.convertDouble(j.get("cpa"),0);
-                    double ctr = Utils.convertDouble(j.get("ctr"),0);
-                    double cvr = Utils.convertDouble(j.get("cvr"),0);
 
                     double spend = Utils.convertDouble(j.get("total_spend"), 0);
                     double installed = Utils.convertDouble(j.get("total_installed"), 0);
-                    double click = Utils.convertDouble(j.get("total_click"), 0);
                     d.addProperty("campaign_id", campaign_id);
                     d.addProperty("short_name", short_name);
                     d.addProperty("account_id", account_id);
@@ -1342,15 +1325,15 @@ public class QueryByMultiCondition extends HttpServlet {
                     d.addProperty("create_time", create_time);
                     d.addProperty("budget", budget);
                     d.addProperty("bidding", bidding);
-//                    d.addProperty("impressions", -10000);
                     d.addProperty("spend", Utils.trimDouble(spend));
                     d.addProperty("installed", installed);
-                    d.addProperty("click", click);
-                    d.addProperty("ctr", ctr);
-                    d.addProperty("cpa", cpa);
-                    d.addProperty("cvr", cvr);
 
                     //假定数字，页面显示时是"--",这里为了排序
+                    d.addProperty("click", 0);
+                    d.addProperty("impressions", 0);
+                    d.addProperty("ctr", 0);
+                    d.addProperty("cpa", 0);
+                    d.addProperty("cvr", 0);
                     d.addProperty("roi", -100000);
 
                     d.addProperty("network", "admob");
