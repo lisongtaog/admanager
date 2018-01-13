@@ -880,11 +880,10 @@ public class QueryByMultiCondition3 extends HttpServlet {
                         ((totalInstallComparisonValue == null || totalInstallComparisonValue == "") ? " " : " having installed " + totalInstallComparisonValue)  +
                         ") a left join web_account_id b on a.account_id = b.account_id";
                 list = DB.findListBySql(sql);
-                sql = "select c.campaign_id, c.account_id,short_name, c.campaign_name, c.status, create_time, budget, bidding,c.total_spend,c.total_installed " +
-                        " from web_ad_campaigns_country_history ch,web_ad_campaigns c,web_account_id b where ch.campaign_id = c.campaign_id and " +
-                        " c.account_id = b.account_id and country_code = '" + countryCode + "' and ch.total_click = 0 and ch.total_impressions = 0 " +
-                        " and ch.cpa = 0 and ch.ctr = 0 and c.status = 'ACTIVE' " +
-                        " and date BETWEEN '" + startTime + "' AND '" + endTime + "'";
+                sql = "select c.campaign_id, c.account_id,short_name, c.campaign_name, c.status, create_time, budget, bidding,c.total_spend,c.total_installed \n" +
+                        " from web_ad_campaigns_country_history ch,web_ad_campaigns c,web_account_id b where ch.campaign_id = c.campaign_id \n" +
+                        "and c.account_id = b.account_id and ch.country_code = '" + countryCode + "'" +
+                        " and ch.total_impressions = 0 and ch.total_click = 0 and c.`status` = 'ACTIVE'";
                 listNotExistData = DB.findListBySql(sql);
             }else if (countryCheck) {
                 sql = "select campaign_id, country_code, a.account_id,short_name, campaign_name, a.status, create_time, budget, bidding, spend, installed, impressions, click" +
@@ -900,11 +899,9 @@ public class QueryByMultiCondition3 extends HttpServlet {
                         ((totalInstallComparisonValue == null || totalInstallComparisonValue == "") ? " " : " having installed " + totalInstallComparisonValue)  +
                         ") a left join web_account_id b on a.account_id = b.account_id";
                 list = DB.findListBySql(sql);
-                sql = "select ch.country_code, c.campaign_id, c.account_id,short_name, c.campaign_name, c.status, create_time, budget, bidding,c.total_spend,c.total_installed " +
-                        " from web_ad_campaigns_country_history ch,web_ad_campaigns c,web_account_id b where ch.campaign_id = c.campaign_id and " +
-                        " c.account_id = b.account_id and  ch.total_click = 0 and ch.total_impressions = 0 " +
-                        " and ch.cpa = 0 and ch.ctr = 0 and c.status = 'ACTIVE' " +
-                        " and date BETWEEN '" + startTime + "' AND '" + endTime + "'";
+                sql = "select c.campaign_id, c.account_id,short_name, c.campaign_name, c.status, create_time, budget, bidding,c.total_spend,c.total_installed " +
+                        " from web_ad_campaigns_country_history ch,web_ad_campaigns c,web_account_id b where ch.campaign_id = c.campaign_id and c.account_id = b.account_id and " +
+                        " ch.total_impressions = 0 and ch.total_click = 0 and c.`status` = 'ACTIVE'";
                 listNotExistData = DB.findListBySql(sql);
             }else{
                 sql = "select campaign_id, a.account_id,short_name, campaign_name, a.status, create_time, budget, bidding, spend, installed, impressions, click" +
@@ -1154,11 +1151,10 @@ public class QueryByMultiCondition3 extends HttpServlet {
                         ((totalInstallComparisonValue == null || totalInstallComparisonValue == "") ? " " : " having installed " + totalInstallComparisonValue)  +
                         ") a left join web_account_id b on a.account_id = b.account_id";
                 list = DB.findListBySql(sql);
-                sql = "select c.campaign_id, c.account_id,short_name, c.campaign_name, c.status, create_time, budget, bidding,c.total_spend,c.total_installed " +
-                        " from web_ad_campaigns_country_history_admob ch,web_ad_campaigns_admob c,web_account_id_admob b where ch.campaign_id = c.campaign_id and " +
-                        " c.account_id = b.account_id and country_code = '" + countryCode + "' and ch.total_click = 0 and ch.total_impressions = 0 " +
-                        " and ch.cpa = 0 and ch.ctr = 0 and c.status = 'enabled' " +
-                        " and date BETWEEN '" + startTime + "' AND '" + endTime + "'";
+                sql = "select c.campaign_id, c.account_id,short_name, c.campaign_name, c.status, create_time, budget, bidding,c.total_spend,c.total_installed \n" +
+                        " from web_ad_campaigns_country_history_admob ch,web_ad_campaigns_admob c,web_account_id_admob b where ch.campaign_id = c.campaign_id \n" +
+                        "and c.account_id = b.account_id and ch.country_code = '" + countryCode + "'" +
+                        " and ch.total_impressions = 0 and ch.total_click = 0 and c.`status` = 'enabled'";
                 listNotExistData = DB.findListBySql(sql);
             }else if (countryCheck) {
                 sql = "select campaign_id, country_code, a.account_id,short_name, campaign_name, a.status, create_time, budget, bidding, spend, installed, impressions, click" +
@@ -1174,11 +1170,9 @@ public class QueryByMultiCondition3 extends HttpServlet {
                         ((totalInstallComparisonValue == null || totalInstallComparisonValue == "") ? " " : " having installed " + totalInstallComparisonValue)  +
                         ") a left join web_account_id_admob b on a.account_id = b.account_id";
                 list = DB.findListBySql(sql);
-                sql = "select ch.country_code, c.campaign_id, c.account_id,short_name, c.campaign_name, c.status, create_time, budget, bidding,c.total_spend,c.total_installed" +
-                        " from web_ad_campaigns_country_history_admob ch,web_ad_campaigns_admob c,web_account_id_admob b where ch.campaign_id = c.campaign_id and " +
-                        " c.account_id = b.account_id and  ch.total_click = 0 and ch.total_impressions = 0 " +
-                        " and ch.cpa = 0 and ch.ctr = 0 and c.status = 'enabled' " +
-                        " and date BETWEEN '" + startTime + "' AND '" + endTime + "'";
+                sql = "select c.campaign_id, c.account_id,short_name, c.campaign_name, c.status, create_time, budget, bidding,c.total_spend,c.total_installed " +
+                        " from web_ad_campaigns_country_history_admob ch,web_ad_campaigns_admob c,web_account_id_admob b where ch.campaign_id = c.campaign_id and c.account_id = b.account_id and " +
+                        " ch.total_impressions = 0 and ch.total_click = 0 and c.`status` = 'enabled'";
                 listNotExistData = DB.findListBySql(sql);
             }else{
                 sql = "select campaign_id, a.account_id,short_name, campaign_name, a.status, create_time, budget, bidding, spend, installed, impressions, click" +
@@ -1198,21 +1192,6 @@ public class QueryByMultiCondition3 extends HttpServlet {
                         " from web_ad_campaigns_admob a,web_account_id_admob b where total_click = 0 and ctr =0 and a.status = 'enabled' and a.account_id = b.account_id " +
                         " and cpa = 0 and campaign_id in (" + campaignIds + ")";
                 listNotExistData = DB.findListBySql(sql);
-//                sql = "select campaign_id, a.account_id, short_name, campaign_name, create_time, a.status, budget, bidding, total_spend, total_installed, total_click, cpa,ctr, " +
-//                        "(case when total_click > 0 then total_installed/total_click else 0 end) as cvr " +
-//                        " from web_ad_campaigns_admob a , web_account_id_admob b where a.status != 'paused' and a.status != 'removed' and " +
-//                        "campaign_id in (" + campaignIds + ") and a.account_id = b.account_id";
-//                List<JSObject> listAll = DB.findListBySql(sql);
-//                sql = "select campaign_id, impressions from ( " +
-//                        "select ch.campaign_id, " +
-//                        " sum(ch.total_impressions) as impressions " +
-//                        " from web_ad_campaigns_admob c, web_ad_campaigns_history_admob ch " +
-//                        "where c.campaign_id = ch.campaign_id " +
-//                        "and date between '" + startTime + "' and '" + endTime + "' " +
-//                        "and c.status != 'removed' and c.campaign_id in (" + campaignIds + ") " +
-//                        "group by ch.campaign_id having impressions > 0 ) a ";
-//                List<JSObject> listHasData = DB.findListBySql(sql);
-//                listNotExistData = Utils.getDiffJSObjectList(listAll, listHasData, "campaign_id");
             }
 
         } else {
