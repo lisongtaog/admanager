@@ -14,7 +14,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @WebServlet(name = "AdvertAdMob", urlPatterns = {"/advert_admob/*"})
 public class AdvertAdmob extends HttpServlet {
@@ -28,33 +30,43 @@ public class AdvertAdmob extends HttpServlet {
             String appName = request.getParameter("appName");
             String language = request.getParameter("language");
             String message1 = request.getParameter("message1");
+            message1 = message1.trim();
             String message2 = request.getParameter("message2");
+            message2 = message2.trim();
             String message3 = request.getParameter("message3");
+            message3 = message3.trim();
             String message4 = request.getParameter("message4");
-
+            message4 = message4.trim();
             List<JSObject> list = new ArrayList<>();
             String sql = "select message1,message2,message3,message4 from web_ad_descript_dict_admob where app_name='" + appName + "' and language = '" + language + "'";
             list = fetchData(sql);
             OperationResult result = new OperationResult();
             try {
-                result.result = true;
+                result.result = false;
+                if (language == "") {
+                    result.message = "【语言】不能为空";
+                }else if (message1.isEmpty() || message1.length() > 24) {
+                    result.message = "【广告语1】不能为空，且长度不能超过24个字符！";
+                }else if (message2.isEmpty() || message2.length() > 24) {
+                    result.message = "【广告语2】不能为空，且长度不能超过24个字符！";
+                }else if (message3.isEmpty() || message3.length() > 24) {
+                    result.message = "【广告语3】不能为空，且长度不能超过24个字符！";
+                }else if (message4.isEmpty() || message4.length() > 24) {
+                    result.message = "【广告语4】不能为空，且长度不能超过24个字符！";
+                }else {
+                    Set<String> messageSet = new HashSet<>();
+                    messageSet.add(message1);
+                    messageSet.add(message2);
+                    messageSet.add(message3);
+                    messageSet.add(message4);
+                    if(messageSet.size() == 4){
+                        result.result = true;
+                    }else{
+                        result.message = "广告语描述有重复！";
+                    }
 
-                if (message1.isEmpty()) {
-                    result.result = false;
-                    result.message = "【广告语1】不能为空";
                 }
-                if (message2.isEmpty()) {
-                    result.result = false;
-                    result.message = "【广告语2】不能为空";
-                }
-                if (message3.isEmpty()) {
-                    result.result = false;
-                    result.message = "【广告语3】不能为空";
-                }
-                if (message4.isEmpty()) {
-                    result.result = false;
-                    result.message = "【广告语4】不能为空";
-                }
+
 
                 if (result.result) {
                     if(list != null && list.size() > 0 ){
@@ -78,8 +90,6 @@ public class AdvertAdmob extends HttpServlet {
                                 .execute();
                         json.addProperty("existDataAdmob","false");
                     }
-
-                    result.result = true;
                 }
             } catch (Exception ex) {
                 result.message = ex.getMessage();
