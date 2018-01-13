@@ -104,7 +104,7 @@ function init() {
             }
         }
 
-        $.post('query_by_multi_condition3', {
+        $.post('query_by_multi_condition', {
             tag: query,
             startTime: startTime,
             endTime: endTime,
