@@ -114,6 +114,7 @@ public class Query extends HttpServlet {
             }
         } else {
             String countryCheck = request.getParameter("countryCheck");
+            String containsNoDataCampaignCheck = request.getParameter("containsNoDataCampaignCheck");
             String campaignCreateTime = request.getParameter("campaignCreateTime");
             String countryCode = request.getParameter("countryCode");
 
@@ -135,9 +136,9 @@ public class Query extends HttpServlet {
                     if (countryCode != null && countryCode != "") {
                         countryCheck = "false";
                     }
-                    if (adwordsCheck != null && adwordsCheck.equals("false") && facebookCheck != null && facebookCheck.equals("false")) {
-                        JsonObject admob = fetchOneAppData(id, tag,startTime, endTime, true, "true".equals(countryCheck), countryCode,likeCampaignName,campaignCreateTime,true,countryMap,totalInstallComparisonValue);
-                        JsonObject facebook = fetchOneAppData(id, tag,startTime, endTime,false, "true".equals(countryCheck), countryCode,likeCampaignName,campaignCreateTime,true,countryMap,totalInstallComparisonValue);
+                    if ("false".equals(adwordsCheck) && "false".equals(facebookCheck)) {
+                        JsonObject admob = fetchOneAppData(id, tag,startTime, endTime, true, "true".equals(countryCheck), countryCode,likeCampaignName,campaignCreateTime,true,countryMap,totalInstallComparisonValue, "true".equals(containsNoDataCampaignCheck));
+                        JsonObject facebook = fetchOneAppData(id, tag,startTime, endTime,false, "true".equals(countryCheck), countryCode,likeCampaignName,campaignCreateTime,true,countryMap,totalInstallComparisonValue, "true".equals(containsNoDataCampaignCheck));
                         double total_spend = admob.get("total_spend").getAsDouble() + facebook.get("total_spend").getAsDouble();
                         double total_installed = admob.get("total_installed").getAsDouble() + facebook.get("total_installed").getAsDouble();
                         double total_impressions = admob.get("total_impressions").getAsDouble() + facebook.get("total_impressions").getAsDouble();
@@ -508,7 +509,7 @@ public class Query extends HttpServlet {
 
 
                     } else {
-                        jsonObject = fetchOneAppData(id, tag,startTime, endTime, "true".equals(adwordsCheck), "true".equals(countryCheck), countryCode,likeCampaignName,campaignCreateTime,true,countryMap,totalInstallComparisonValue);
+                        jsonObject = fetchOneAppData(id, tag,startTime, endTime, "true".equals(adwordsCheck), "true".equals(countryCheck), countryCode,likeCampaignName,campaignCreateTime,true,countryMap,totalInstallComparisonValue, "true".equals(containsNoDataCampaignCheck));
                     }
                     if ("true".equals(countryCheck)) {
                         JsonArray array = jsonObject.getAsJsonArray("array");
@@ -865,7 +866,7 @@ public class Query extends HttpServlet {
         public String network;
     }
 
-    private JsonObject fetchOneAppData(long tagId, String tagName, String startTime, String endTime, boolean admobCheck, boolean countryCheck, String countryCode,String likeCampaignName,String campaignCreateTime,boolean hasROI,HashMap<String ,String> countryMap,String totalInstallComparisonValue) throws Exception {
+    private JsonObject fetchOneAppData(long tagId, String tagName, String startTime, String endTime, boolean admobCheck, boolean countryCheck, String countryCode,String likeCampaignName,String campaignCreateTime,boolean hasROI,HashMap<String ,String> countryMap,String totalInstallComparisonValue, boolean containsNoDataCampaignCheck) throws Exception {
         String webAdCampaignTagRelTable = "web_ad_campaign_tag_rel";
         String webAdCampaignsTable = "web_ad_campaigns";
         String adCampaignsTable = "ad_campaigns";
@@ -994,6 +995,18 @@ public class Query extends HttpServlet {
 
         for (int i = 0; i < list.size(); i++) {
             JSObject one = list.get(i);
+            double impressions = Utils.convertDouble(one.get("impressions"), 0);
+            String status = one.get("status");
+            if (impressions == 0) {
+                if(containsNoDataCampaignCheck){
+                    if(!"enabled".equalsIgnoreCase(status) && !"active".equalsIgnoreCase(status)){
+                        continue;
+                    }
+                }else{
+                    continue;
+                }
+            }
+
             String campaign_id = one.get("campaign_id");
             double roi = 0;
             if(hasROI){
@@ -1031,7 +1044,7 @@ public class Query extends HttpServlet {
             String short_name = one.get("short_name");
             String account_id = one.get("account_id");
             String campaign_name = one.get("campaign_name");
-            String status = one.get("status");
+
             String create_time = one.get("create_time").toString();
             create_time = create_time.substring(0,create_time.length()-5);
             String country_code = one.get("country_code");
@@ -1039,7 +1052,7 @@ public class Query extends HttpServlet {
             double bidding = one.get("bidding");
             double spend = Utils.convertDouble(one.get("spend"), 0);
             double installed = Utils.convertDouble(one.get("installed"), 0);
-            double impressions = Utils.convertDouble(one.get("impressions"), 0);
+
             double click = Utils.convertDouble(one.get("click"), 0);
             double ctr = impressions > 0 ? click / impressions : 0;
             double cpa = installed > 0 ? spend / installed : 0;
@@ -1051,9 +1064,7 @@ public class Query extends HttpServlet {
                 campaign_spends = Utils.convertDouble(js.get("campaign_spends"), 0);
             }
 
-            if (impressions == 0) {
-                continue;
-            }
+
             total_spend += spend;
             total_installed += installed;
             total_impressions += impressions;

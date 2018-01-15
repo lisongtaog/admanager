@@ -159,7 +159,7 @@ function init() {
         var countryCheck = $('#countryCheck').is(':checked');
         var facebookCheck = $('#facebookCheck').is(':checked');
         var likeCampaignName = $('#inputLikeCampaignName').val();
-
+        var containsNoDataCampaignCheck = $('#containsNoDataCampaignCheck').is(':checked');
         var ex = /^\d+$/;
         var totalInstallComparisonValue = $('#inputTotalInstallComparisonValue').val();
         var totalInstallOperator = $('#totalInstallOperator option:selected').val();
@@ -200,7 +200,8 @@ function init() {
             facebookCheck: facebookCheck,
             countryCode: countryCode,
             likeCampaignName: likeCampaignName,
-            campaignCreateTime: campaignCreateTime
+            campaignCreateTime: campaignCreateTime,
+            containsNoDataCampaignCheck: containsNoDataCampaignCheck
             },function(data){
                 if(data && data.ret == 1){
                     appQueryData = data.data.array;
@@ -348,30 +349,36 @@ function setData(data) {
                 }
             }
             var td = $('<td></td>');
-            if (keyset[j] == 'budget' || keyset[j] == 'bidding') {
-                td.text(one[keyset[j]] / 100);
-            } else {
-                if (keyset[j] == 'spend') {
-                    td.text(one[keyset[j]] + " / " + totalSpend);
-                } else if(keyset[j] == 'roi'){
-                    var r = one[keyset[j]];
-                    if(r <0){
-                        td.addClass("red");
-                    }else if(r>0){
-                        td.addClass("blue");
-                    }else{
-                        td.addClass("yellow");
-                    }
-                    td.text(r);
+            var field = keyset[j];
+            var field_value = one[field];
+
+            if (field == 'budget' || field == 'bidding') {
+                td.text(field_value / 100);
+            } else if (field == 'spend') {
+                td.text(field_value + " / " + totalSpend);
+            } else if(field == 'roi'){
+                if(field_value <0){
+                    td.addClass("red");
+                }else if(field_value > 0){
+                    td.addClass("blue");
                 }else{
-                    td.text(one[keyset[j]]);
+                    td.addClass("yellow");
                 }
+                td.text(field_value);
+            }else{
+                td.text(field_value);
             }
-            if (modifyColumns.indexOf(keyset[j]) != -1) {
+
+            if (modifyColumns.indexOf(field) != -1) {
                 td.addClass("editable");
-                td[0].cloumnName = keyset[j];
+                td[0].cloumnName = field;
             }
+
+
             tr.append(td);
+        }
+        if(one["impressions"] == 0){
+            tr.addClass("lilac");
         }
         tr[0].origCampaignData = one;
         tr[0].changedCampainData = {};

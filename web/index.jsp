@@ -40,6 +40,9 @@
         .yellow{
             color: #ffa17a;
         }
+        .lilac{
+            color: #a8b6ff;
+        }
     </style>
 </head>
 <body>
@@ -102,6 +105,7 @@
             <input type="checkbox" name="adnetwork" id="facebookCheck"/><label for="facebookCheck">只显示Facebook</label>
             <input type="checkbox" name="adnetwork" id="adwordsCheck"/><label for="adwordsCheck">只显示AdWords</label>
             <input type="checkbox" id="countryCheck"/><label for="countryCheck">细分到国家</label>
+            <input type="checkbox" id="containsNoDataCampaignCheck" checked/><label for="containsNoDataCampaignCheck">包含无数据的系列</label>
 
 
             <div>
@@ -113,7 +117,7 @@
 
                 <button id="btnSummary" class="btn btn-default">汇总数据</button>
                 <button id="btnModifyBatch" class="btn btn-default">批量修改</button>
-                <button id="btnQueryNoData" class="btn btn-default">查询无数据的系列</button>
+                <%--<button id="btnQueryNoData" class="btn btn-default">查询无数据的系列</button>--%>
                 <input type="button" class="btn btn-default" id="btnBatchChangeStatus" value="修改状态监控"/>
             </div>
         </div>
