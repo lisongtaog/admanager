@@ -42,51 +42,331 @@ public class Query extends HttpServlet {
         String sorterId = request.getParameter("sorterId");
         String adwordsCheck = request.getParameter("adwordsCheck");
         String facebookCheck = request.getParameter("facebookCheck");
-
-        if (isSummary != null) {
+        int sorter = 0;
+        if (sorterId != null && sorterId != "") {
+            sorter = Utils.parseInt(sorterId, 0);
+        }
+        if ("true".equals(isSummary)) {
             try {
                 JsonArray arr = new JsonArray();
                 if ("false".equals(adwordsCheck) && "false".equals(facebookCheck)) {
-                    String sqlTag = "select t.id,t.tag_name,google_package_id from web_tag t LEFT JOIN web_facebook_app_ids_rel air ON t.tag_name = air.tag_name ORDER BY t.tag_name";
-                    List<JSObject> tagList = DB.findListBySql(sqlTag);
-                    for (int i = 0,len=tagList.size(); i < len; i++) {
-                        JSObject tagJSObject = tagList.get(i);
-                        long id = tagJSObject.get("id");
-                        String tagName = tagJSObject.get("tag_name");
-                        JsonObject admob = fetchOneAppDataSummary(id, startTime, endTime,true);
-                        JsonObject facebook =  fetchOneAppDataSummary(id, startTime, endTime,false);
-                        double total_impressions = admob.get("total_impressions").getAsDouble() + facebook.get("total_impressions").getAsDouble();
-                        if (total_impressions == 0) {
-                            continue;
+                    if(sorter > 0){
+                        ArrayList<CampaignsSummary> campaignsSummaryList = new ArrayList<>();
+                        String sqlTag = "select t.id,t.tag_name,google_package_id from web_tag t LEFT JOIN web_facebook_app_ids_rel air ON t.tag_name = air.tag_name";
+                        List<JSObject> tagList = DB.findListBySql(sqlTag);
+                        for (int i = 0,len=tagList.size(); i < len; i++) {
+                            CampaignsSummary campaignsSummary = new CampaignsSummary();
+                            JSObject tagJSObject = tagList.get(i);
+                            long id = tagJSObject.get("id");
+                            campaignsSummary.name = tagJSObject.get("tag_name");
+                            JsonObject admob = fetchOneAppDataSummary(id, startTime, endTime,true);
+                            JsonObject facebook =  fetchOneAppDataSummary(id, startTime, endTime,false);
+                            campaignsSummary.total_impressions = admob.get("total_impressions").getAsDouble() + facebook.get("total_impressions").getAsDouble();
+                            if (campaignsSummary.total_impressions == 0) {
+                                continue;
+                            }
+                            campaignsSummary.total_spend = admob.get("total_spend").getAsDouble() + facebook.get("total_spend").getAsDouble();
+                            campaignsSummary.total_installed = admob.get("total_installed").getAsDouble() + facebook.get("total_installed").getAsDouble();
+                            campaignsSummary.total_click = admob.get("total_click").getAsDouble() + facebook.get("total_click").getAsDouble();
+                            campaignsSummary.total_ctr = campaignsSummary.total_impressions > 0 ? campaignsSummary.total_click / campaignsSummary.total_impressions : 0;
+                            campaignsSummary.total_cpa = campaignsSummary.total_installed > 0 ? campaignsSummary.total_spend / campaignsSummary.total_installed : 0;
+                            campaignsSummary.total_cvr = campaignsSummary.total_click > 0 ? campaignsSummary.total_installed / campaignsSummary.total_click : 0;
+                            String google_package_id = tagJSObject.get("google_package_id");
+                            if(google_package_id != null){
+                                String sqlR = "select sum(revenue) as revenues " +
+                                        "from web_ad_country_analysis_report_history where app_id = '"
+                                        + google_package_id + "' and date BETWEEN '" + startTime + "' AND '" + endTime + "'";
+                                JSObject oneR = DB.findOneBySql(sqlR);
+                                if(oneR != null){
+                                    campaignsSummary.total_revenue = Utils.convertDouble(oneR.get("revenues"),0);
+                                }
+                            }
+                            campaignsSummaryList.add(campaignsSummary);
                         }
-                        double total_spend = admob.get("total_spend").getAsDouble() + facebook.get("total_spend").getAsDouble();
-                        double total_installed = admob.get("total_installed").getAsDouble() + facebook.get("total_installed").getAsDouble();
-                        double total_click = admob.get("total_click").getAsDouble() + facebook.get("total_click").getAsDouble();
-                        double total_ctr = total_impressions > 0 ? total_click / total_impressions : 0;
-                        double total_cpa = total_installed > 0 ? total_spend / total_installed : 0;
-                        double total_cvr = total_click > 0 ? total_installed / total_click : 0;
-                        admob.addProperty("total_spend", Utils.trimDouble(total_spend));
-                        admob.addProperty("total_installed", total_installed);
-                        admob.addProperty("total_impressions", total_impressions);
-                        admob.addProperty("total_click", total_click);
-                        admob.addProperty("total_ctr", Utils.trimDouble(total_ctr));
-                        admob.addProperty("total_cpa", Utils.trimDouble(total_cpa));
-                        admob.addProperty("total_cvr", Utils.trimDouble(total_cvr));
-                        admob.addProperty("name", tagName);
-                        double total_revenue = 0;
-                        String google_package_id = tagJSObject.get("google_package_id");
-                        if(google_package_id != null){
-                            String sqlR = "select sum(revenue) as revenues " +
-                                    "from web_ad_country_analysis_report_history where app_id = '"
-                                    + google_package_id + "' and date BETWEEN '" + startTime + "' AND '" + endTime + "'";
-                            JSObject oneR = DB.findOneBySql(sqlR);
-                            if(oneR != null){
-                                total_revenue = Utils.convertDouble(oneR.get("revenues"),0);
+                        if(campaignsSummaryList != null && campaignsSummaryList.size() > 0){
+                            switch (sorter){
+                                case 70:
+                                    Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
+                                        @Override
+                                        public int compare(CampaignsSummary a, CampaignsSummary b) {
+                                            if(a.total_spend > b.total_spend){
+                                                return 1;
+                                            }else if(a.total_spend < b.total_spend){
+                                                return -1;
+                                            }else{
+                                                return 0;
+                                            }
+                                        }
+                                    });
+                                    break;
+                                case 1070:
+                                    Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
+                                        @Override
+                                        public int compare(CampaignsSummary a, CampaignsSummary b) {
+                                            if(a.total_spend < b.total_spend){
+                                                return 1;
+                                            }else if(a.total_spend > b.total_spend){
+                                                return -1;
+                                            }else{
+                                                return 0;
+                                            }
+                                        }
+                                    });
+                                    break;
+                                case 71:
+                                    Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
+                                        @Override
+                                        public int compare(CampaignsSummary a, CampaignsSummary b) {
+                                            if(a.total_revenue> b.total_revenue){
+                                                return 1;
+                                            }else if(a.total_revenue < b.total_revenue){
+                                                return -1;
+                                            }else{
+                                                return 0;
+                                            }
+                                        }
+                                    });
+                                    break;
+                                case 1071:
+                                    Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
+                                        @Override
+                                        public int compare(CampaignsSummary a, CampaignsSummary b) {
+                                            if(a.total_revenue < b.total_revenue){
+                                                return 1;
+                                            }else if(a.total_revenue > b.total_revenue){
+                                                return -1;
+                                            }else{
+                                                return 0;
+                                            }
+                                        }
+                                    });
+                                    break;
+                                case 72:
+                                    Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
+                                        @Override
+                                        public int compare(CampaignsSummary a, CampaignsSummary b) {
+                                            if(a.total_installed> b.total_installed){
+                                                return 1;
+                                            }else if(a.total_installed < b.total_installed){
+                                                return -1;
+                                            }else{
+                                                return 0;
+                                            }
+                                        }
+                                    });
+                                    break;
+                                case 1072:
+                                    Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
+                                        @Override
+                                        public int compare(CampaignsSummary a, CampaignsSummary b) {
+                                            if(a.total_installed < b.total_installed){
+                                                return 1;
+                                            }else if(a.total_installed > b.total_installed){
+                                                return -1;
+                                            }else{
+                                                return 0;
+                                            }
+                                        }
+                                    });
+                                    break;
+                                case 73:
+                                    Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
+                                        @Override
+                                        public int compare(CampaignsSummary a, CampaignsSummary b) {
+                                            if(a.total_impressions> b.total_impressions){
+                                                return 1;
+                                            }else if(a.total_impressions < b.total_impressions){
+                                                return -1;
+                                            }else{
+                                                return 0;
+                                            }
+                                        }
+                                    });
+                                    break;
+                                case 1073:
+                                    Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
+                                        @Override
+                                        public int compare(CampaignsSummary a, CampaignsSummary b) {
+                                            if(a.total_impressions < b.total_impressions){
+                                                return 1;
+                                            }else if(a.total_impressions > b.total_impressions){
+                                                return -1;
+                                            }else{
+                                                return 0;
+                                            }
+                                        }
+                                    });
+                                    break;
+                                case 74:
+                                    Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
+                                        @Override
+                                        public int compare(CampaignsSummary a, CampaignsSummary b) {
+                                            if(a.total_click> b.total_click){
+                                                return 1;
+                                            }else if(a.total_click < b.total_click){
+                                                return -1;
+                                            }else{
+                                                return 0;
+                                            }
+                                        }
+                                    });
+                                    break;
+                                case 1074:
+                                    Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
+                                        @Override
+                                        public int compare(CampaignsSummary a, CampaignsSummary b) {
+                                            if(a.total_click < b.total_click){
+                                                return 1;
+                                            }else if(a.total_click > b.total_click){
+                                                return -1;
+                                            }else{
+                                                return 0;
+                                            }
+                                        }
+                                    });
+                                    break;
+                                case 75:
+                                    Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
+                                        @Override
+                                        public int compare(CampaignsSummary a, CampaignsSummary b) {
+                                            if(a.total_ctr> b.total_ctr){
+                                                return 1;
+                                            }else if(a.total_ctr < b.total_ctr){
+                                                return -1;
+                                            }else{
+                                                return 0;
+                                            }
+                                        }
+                                    });
+                                    break;
+                                case 1075:
+                                    Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
+                                        @Override
+                                        public int compare(CampaignsSummary a, CampaignsSummary b) {
+                                            if(a.total_ctr < b.total_ctr){
+                                                return 1;
+                                            }else if(a.total_ctr > b.total_ctr){
+                                                return -1;
+                                            }else{
+                                                return 0;
+                                            }
+                                        }
+                                    });
+                                    break;
+                                case 76:
+                                    Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
+                                        @Override
+                                        public int compare(CampaignsSummary a, CampaignsSummary b) {
+                                            if(a.total_cpa> b.total_cpa){
+                                                return 1;
+                                            }else if(a.total_cpa < b.total_cpa){
+                                                return -1;
+                                            }else{
+                                                return 0;
+                                            }
+                                        }
+                                    });
+                                    break;
+                                case 1076:
+                                    Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
+                                        @Override
+                                        public int compare(CampaignsSummary a, CampaignsSummary b) {
+                                            if(a.total_cpa < b.total_cpa){
+                                                return 1;
+                                            }else if(a.total_cpa > b.total_cpa){
+                                                return -1;
+                                            }else{
+                                                return 0;
+                                            }
+                                        }
+                                    });
+                                    break;
+                                case 77:
+                                    Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
+                                        @Override
+                                        public int compare(CampaignsSummary a, CampaignsSummary b) {
+                                            if(a.total_cvr> b.total_cvr){
+                                                return 1;
+                                            }else if(a.total_cvr < b.total_cvr){
+                                                return -1;
+                                            }else{
+                                                return 0;
+                                            }
+                                        }
+                                    });
+                                    break;
+                                case 1077:
+                                    Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
+                                        @Override
+                                        public int compare(CampaignsSummary a, CampaignsSummary b) {
+                                            if(a.total_cvr < b.total_cvr){
+                                                return 1;
+                                            }else if(a.total_cvr > b.total_cvr){
+                                                return -1;
+                                            }else{
+                                                return 0;
+                                            }
+                                        }
+                                    });
+                                    break;
+                            }
+                            for(CampaignsSummary cs : campaignsSummaryList){
+                                JsonObject j = new JsonObject();
+                                j.addProperty("name",cs.name);
+                                j.addProperty("total_spend",cs.total_spend);
+                                j.addProperty("total_installed",cs.total_installed);
+                                j.addProperty("total_impressions",cs.total_impressions);
+                                j.addProperty("total_click",cs.total_click);
+                                j.addProperty("total_ctr",cs.total_ctr);
+                                j.addProperty("total_cpa",cs.total_cpa);
+                                j.addProperty("total_cvr",cs.total_cvr);
+                                j.addProperty("total_revenue",cs.total_revenue);
+                                arr.add(j);
                             }
                         }
-                        admob.addProperty("total_revenue",Utils.trimDouble(total_revenue));
-                        arr.add(admob);
+                    }else{
+                        String sqlTag = "select t.id,t.tag_name,google_package_id from web_tag t LEFT JOIN web_facebook_app_ids_rel air ON t.tag_name = air.tag_name ORDER BY t.tag_name";
+                        List<JSObject> tagList = DB.findListBySql(sqlTag);
+                        for (int i = 0,len=tagList.size(); i < len; i++) {
+                            JSObject tagJSObject = tagList.get(i);
+                            long id = tagJSObject.get("id");
+                            String tagName = tagJSObject.get("tag_name");
+                            JsonObject admob = fetchOneAppDataSummary(id, startTime, endTime,true);
+                            JsonObject facebook =  fetchOneAppDataSummary(id, startTime, endTime,false);
+                            double total_impressions = admob.get("total_impressions").getAsDouble() + facebook.get("total_impressions").getAsDouble();
+                            if (total_impressions == 0) {
+                                continue;
+                            }
+                            double total_spend = admob.get("total_spend").getAsDouble() + facebook.get("total_spend").getAsDouble();
+                            double total_installed = admob.get("total_installed").getAsDouble() + facebook.get("total_installed").getAsDouble();
+                            double total_click = admob.get("total_click").getAsDouble() + facebook.get("total_click").getAsDouble();
+                            double total_ctr = total_impressions > 0 ? total_click / total_impressions : 0;
+                            double total_cpa = total_installed > 0 ? total_spend / total_installed : 0;
+                            double total_cvr = total_click > 0 ? total_installed / total_click : 0;
+                            admob.addProperty("total_spend", Utils.trimDouble(total_spend));
+                            admob.addProperty("total_installed", total_installed);
+                            admob.addProperty("total_impressions", total_impressions);
+                            admob.addProperty("total_click", total_click);
+                            admob.addProperty("total_ctr", Utils.trimDouble(total_ctr));
+                            admob.addProperty("total_cpa", Utils.trimDouble(total_cpa));
+                            admob.addProperty("total_cvr", Utils.trimDouble(total_cvr));
+                            admob.addProperty("name", tagName);
+                            double total_revenue = 0;
+                            String google_package_id = tagJSObject.get("google_package_id");
+                            if(google_package_id != null){
+                                String sqlR = "select sum(revenue) as revenues " +
+                                        "from web_ad_country_analysis_report_history where app_id = '"
+                                        + google_package_id + "' and date BETWEEN '" + startTime + "' AND '" + endTime + "'";
+                                JSObject oneR = DB.findOneBySql(sqlR);
+                                if(oneR != null){
+                                    total_revenue = Utils.convertDouble(oneR.get("revenues"),0);
+                                }
+                            }
+                            admob.addProperty("total_revenue",Utils.trimDouble(total_revenue));
+                            arr.add(admob);
+                        }
                     }
+
                 } else {
                     String sqlTag = "select id,tag_name from web_tag ORDER BY tag_name";
                     List<JSObject> tagList = DB.findListBySql(sqlTag);
@@ -124,10 +404,6 @@ public class Query extends HttpServlet {
             String likeCampaignName = request.getParameter("likeCampaignName");
             HashMap<String ,String> countryMap = Utils.getCountryMap();
             try {
-                int sorter = 0;
-                if (sorterId != null) {
-                    sorter = Utils.parseInt(sorterId, 0);
-                }
                 JSObject tagObject = DB.simpleScan("web_tag")
                         .select("id", "tag_name")
                         .where(DB.filter().whereEqualTo("tag_name", tag)).execute();
@@ -138,8 +414,8 @@ public class Query extends HttpServlet {
                         countryCheck = "false";
                     }
                     if ("false".equals(adwordsCheck) && "false".equals(facebookCheck)) {
-                        JsonObject admob = fetchOneAppData(id, tag,startTime, endTime, true, "true".equals(countryCheck), countryCode,likeCampaignName,campaignCreateTime,true,countryMap,totalInstallComparisonValue, "true".equals(containsNoDataCampaignCheck));
-                        JsonObject facebook = fetchOneAppData(id, tag,startTime, endTime,false, "true".equals(countryCheck), countryCode,likeCampaignName,campaignCreateTime,true,countryMap,totalInstallComparisonValue, "true".equals(containsNoDataCampaignCheck));
+                        JsonObject admob = fetchOneAppData(id, tag,startTime, endTime, true, "true".equals(countryCheck), countryCode,likeCampaignName,campaignCreateTime,true,countryMap,totalInstallComparisonValue, "true".equals(containsNoDataCampaignCheck), "true".equals(onlyQueryNoDataCampaignCheck));
+                        JsonObject facebook = fetchOneAppData(id, tag,startTime, endTime,false, "true".equals(countryCheck), countryCode,likeCampaignName,campaignCreateTime,true,countryMap,totalInstallComparisonValue, "true".equals(containsNoDataCampaignCheck),"true".equals(onlyQueryNoDataCampaignCheck));
                         double total_spend = admob.get("total_spend").getAsDouble() + facebook.get("total_spend").getAsDouble();
                         double total_installed = admob.get("total_installed").getAsDouble() + facebook.get("total_installed").getAsDouble();
                         double total_impressions = admob.get("total_impressions").getAsDouble() + facebook.get("total_impressions").getAsDouble();
@@ -510,7 +786,7 @@ public class Query extends HttpServlet {
 
 
                     } else {
-                        jsonObject = fetchOneAppData(id, tag,startTime, endTime, "true".equals(adwordsCheck), "true".equals(countryCheck), countryCode,likeCampaignName,campaignCreateTime,true,countryMap,totalInstallComparisonValue, "true".equals(containsNoDataCampaignCheck));
+                        jsonObject = fetchOneAppData(id, tag,startTime, endTime, "true".equals(adwordsCheck), "true".equals(countryCheck), countryCode,likeCampaignName,campaignCreateTime,true,countryMap,totalInstallComparisonValue, "true".equals(containsNoDataCampaignCheck),"true".equals(onlyQueryNoDataCampaignCheck));
                     }
                     if ("true".equals(countryCheck)) {
                         JsonArray array = jsonObject.getAsJsonArray("array");
@@ -834,40 +1110,9 @@ public class Query extends HttpServlet {
         response.getWriter().write(json.toString());
     }
 
-    class CountryRecord {
-        public String country_name;
-        public double impressions;
-        public double installed;
-        public double click;
-        public double spend;
-        public double ctr;
-        public double cpa;
-        public double cvr;
-        public double roi;
-    }
-    class Campaigns {
-        public String campaign_id;
-        public String account_id;
-        public String short_name;
-        public String campaign_name;
-        public String status;
-        public String create_time;
-        public String country_code;
-        public double budget;
-        public double bidding;
-        public double impressions;
-        public double installed;
-        public double click;
-        public double spend;
-        public double ctr;
-        public double cpa;
-        public double cvr;
-        public double roi;
-        public double campaign_spends;
-        public String network;
-    }
 
-    private JsonObject fetchOneAppData(long tagId, String tagName, String startTime, String endTime, boolean admobCheck, boolean countryCheck, String countryCode,String likeCampaignName,String campaignCreateTime,boolean hasROI,HashMap<String ,String> countryMap,String totalInstallComparisonValue, boolean containsNoDataCampaignCheck) throws Exception {
+
+    private JsonObject fetchOneAppData(long tagId, String tagName, String startTime, String endTime, boolean admobCheck, boolean countryCheck, String countryCode,String likeCampaignName,String campaignCreateTime,boolean hasROI,HashMap<String ,String> countryMap,String totalInstallComparisonValue, boolean containsNoDataCampaignCheck,boolean onlyQueryNoDataCampaignCheck) throws Exception {
         String webAdCampaignTagRelTable = "web_ad_campaign_tag_rel";
         String webAdCampaignsTable = "web_ad_campaigns";
         String adCampaignsTable = "ad_campaigns";
@@ -965,14 +1210,14 @@ public class Query extends HttpServlet {
                         ") a left join " + webAccountIdTable + " b on a.account_id = b.account_id";
                 list = DB.findListBySql(sql);
             }else{
-                sql = "select campaign_id, a.account_id,short_name, campaign_name, a.status, create_time, budget, bidding, spend, installed, impressions, click" +
+                sql = "select campaign_id, a.account_id,short_name, campaign_name, a.status, create_time, budget, bidding, spend, installed, impressions, click " +
                         " from (" +
-                        "select ch.campaign_id, account_id, campaign_name,c.status, create_time, c.budget, c.bidding, sum(ch.total_spend) as spend, " +
-                        "sum(ch.total_installed) as installed, sum(ch.total_impressions) as impressions " +
-                        ",sum(ch.total_click) as click from " + webAdCampaignsTable + " c, " + webAdCampaignsHistoryTable + " ch " +
-                        "where c.campaign_id=ch.campaign_id " +
+                        "select ch.campaign_id, account_id, campaign_name,c.status, create_time, c.budget, c.bidding, sum(ifnull(ch.total_spend,0)) as spend, " +
+                        "sum(ifnull(ch.total_installed,0)) as installed, sum(ifnull(ch.total_impressions,0)) as impressions " +
+                        ",sum(ifnull(ch.total_click,0)) as click from " + webAdCampaignsTable + " c left join " + webAdCampaignsHistoryTable + " ch " +
+                        "on c.campaign_id=ch.campaign_id where" +
+                        " date between '" + startTime + "' and '" + endTime + "' " +
                         ((likeCampaignName == "" || likeCampaignName == null) ? " " : " and campaign_name like '%" + likeCampaignName +"%' " )  +
-                        " and date between '" + startTime + "' and '" + endTime + "' " +
                         " and c.status != 'removed' and c.campaign_id in (" + campaignIds + ")" +
                         " group by ch.campaign_id " +
                         ((totalInstallComparisonValue == "" || totalInstallComparisonValue == null) ? " " : " having installed " + totalInstallComparisonValue)  +
@@ -1006,6 +1251,10 @@ public class Query extends HttpServlet {
                 }else{
                     continue;
                 }
+            }else {
+//                if(onlyQueryNoDataCampaignCheck){
+//                    continue;
+//                }
             }
 
             String campaign_id = one.get("campaign_id");
@@ -1174,5 +1423,51 @@ public class Query extends HttpServlet {
         jsonObject.addProperty("total_cpa", Utils.trimDouble(total_cpa));
         jsonObject.addProperty("total_cvr", Utils.trimDouble(total_cvr));
         return jsonObject;
+    }
+
+    class CountryRecord {
+        public String country_name;
+        public double impressions;
+        public double installed;
+        public double click;
+        public double spend;
+        public double ctr;
+        public double cpa;
+        public double cvr;
+        public double roi;
+    }
+    class Campaigns {
+        public String campaign_id;
+        public String account_id;
+        public String short_name;
+        public String campaign_name;
+        public String status;
+        public String create_time;
+        public String country_code;
+        public double budget;
+        public double bidding;
+        public double impressions;
+        public double installed;
+        public double click;
+        public double spend;
+        public double ctr;
+        public double cpa;
+        public double cvr;
+        public double roi;
+        public double campaign_spends;
+        public String network;
+    }
+
+    class CampaignsSummary {
+        public String name;
+        public double total_spend;
+        public double total_installed;
+        public double total_impressions;
+        public double total_click;
+        public double total_ctr;
+        public double total_cpa;
+        public double total_cvr;
+        public double total_revenue;
+        public String network;
     }
 }

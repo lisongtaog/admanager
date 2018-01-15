@@ -262,65 +262,74 @@ function init() {
             facebookCheck: facebookCheck,
         }, function (data) {
             if (data && data.ret == 1) {
-                var keyset = ["name", "total_spend", "total_revenue", "total_installed", "total_impressions", "total_click",
-                    "total_ctr", "total_cpa", "total_cvr"];
-                if(adwordsCheck || facebookCheck){
-                    $('#result_header').html("<tr><th>应用名称</th><th>总花费</th><th>总安装</th><th>总展示</th><th>总点击</th><th>CTR</th><th>CPA</th><th>CVR</th></tr>");
-                    keyset = ["name", "total_spend", "total_installed", "total_impressions", "total_click",
-                        "total_ctr", "total_cpa", "total_cvr"];
-                }else{
-                    $('#result_header').html("<tr><th>应用名称</th><th>总花费</th><th>总营收</th><th>总安装</th><th>总展示</th><th>总点击</th><th>CTR</th><th>CPA</th><th>CVR</th></tr>");
-                }
+
+                // if(adwordsCheck || facebookCheck){
+                //     $('#result_header').html("<tr><th>应用名称</th><th>总花费</th><th>总安装</th><th>总展示</th><th>总点击</th><th>CTR</th><th>CPA</th><th>CVR</th></tr>");
+                // }else{
+                //     $('#result_header').html("<tr><th>应用名称<span sorterId=\"70\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>总花费<span sorterId=\"71\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>总营收<span sorterId=\"72\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>总安装<span sorterId=\"73\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>总展示<span sorterId=\"74\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>总点击<span sorterId=\"75\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>CTR<span sorterId=\"76\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>CPA<span sorterId=\"77\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>CVR<span sorterId=\"78\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th></tr>");
+                //
+                // }
+                $('#result_header').html("<tr><th>应用名称</th><th>总花费<span sorterId=\"70\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>总营收<span sorterId=\"71\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>总安装<span sorterId=\"72\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>总展示<span sorterId=\"73\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>总点击<span sorterId=\"74\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>CTR<span sorterId=\"75\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>CPA<span sorterId=\"76\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>CVR<span sorterId=\"77\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th></tr>");
+
 
                 data = data.data;
-
-                var total_spend = 0;
-                var total_revenue = 0;
-                var total_installed = 0;
-                var total_impressions = 0;
-                var total_click = 0;
-                var total_ctr = 0;
-                var total_cpa = 0;
-                var total_cvr = 0;
-
-                $('#results_body > tr').remove();
-                for (var i = 0; i < data.length; i++) {
-                    var one = data[i];
-                    var tr = $('<tr></tr>');
-                    for (var j = 0; j < keyset.length; j++) {
-                        var td = $('<td></td>');
-                        td.text(one[keyset[j]]);
-                        tr.append(td);
-                    }
-                    total_spend += one['total_spend'];
-                    total_revenue += one['total_revenue'];
-                    total_installed += one['total_installed'];
-                    total_impressions += one['total_impressions'];
-                    total_click += one['total_click'];
-
-                    total_ctr = total_impressions > 0 ? total_click / total_impressions : 0;
-                    total_cpa = total_installed > 0 ? total_spend / total_installed : 0;
-                    total_cvr = total_click > 0 ? total_installed / total_click : 0;
-                    $('#results_body').append(tr);
-                }
-                if(adwordsCheck || facebookCheck){
-                    var str = "总花费: " + total_spend + " 总安装: " + total_installed +
-                        " 总展示: " + total_impressions + " 总点击: " + total_click +
-                        " CTR: " + total_ctr + " CPA: " + total_cpa + " CVR: " + total_cvr;
-                    $('#total_result').text(str);
-                }else{
-                    var str = "总花费: " + total_spend + "  总营收: " + total_revenue + " 总安装: " + total_installed +
-                        " 总展示: " + total_impressions + " 总点击: " + total_click +
-                        " CTR: " + total_ctr + " CPA: " + total_cpa + " CVR: " + total_cvr;
-                    $('#total_result').text(str);
-                }
-
-                $('#total_result').removeClass("editable");
+                setDataSummary(data);
+                bindSortOpSummary();
             } else {
                 admanager.showCommonDlg("错误", data.message);
             }
         }, 'json');
     });
+}
+
+function setDataSummary(data) {
+    var total_spend = 0;
+    var total_revenue = 0;
+    var total_installed = 0;
+    var total_impressions = 0;
+    var total_click = 0;
+    var total_ctr = 0;
+    var total_cpa = 0;
+    var total_cvr = 0;
+    var keyset = ["name", "total_spend", "total_revenue", "total_installed", "total_impressions", "total_click",
+        "total_ctr", "total_cpa", "total_cvr"];
+    // if(adwordsCheck || facebookCheck){
+    //     keyset = ["name", "total_spend", "total_installed", "total_impressions", "total_click",
+    //         "total_ctr", "total_cpa", "total_cvr"];
+    // }
+    $('#results_body > tr').remove();
+    for (var i = 0; i < data.length; i++) {
+        var one = data[i];
+        var tr = $('<tr></tr>');
+        for (var j = 0; j < keyset.length; j++) {
+            var td = $('<td></td>');
+            td.text(one[keyset[j]]);
+            tr.append(td);
+        }
+        total_spend += one['total_spend'];
+        total_revenue += one['total_revenue'];
+        total_installed += one['total_installed'];
+        total_impressions += one['total_impressions'];
+        total_click += one['total_click'];
+
+        total_ctr = total_impressions > 0 ? total_click / total_impressions : 0;
+        total_cpa = total_installed > 0 ? total_spend / total_installed : 0;
+        total_cvr = total_click > 0 ? total_installed / total_click : 0;
+        $('#results_body').append(tr);
+    }
+    if(adwordsCheck || facebookCheck){
+        var str = "总花费: " + total_spend + " 总安装: " + total_installed +
+            " 总展示: " + total_impressions + " 总点击: " + total_click +
+            " CTR: " + total_ctr + " CPA: " + total_cpa + " CVR: " + total_cvr;
+        $('#total_result').text(str);
+    }else{
+        var str = "总花费: " + total_spend + "  总营收: " + total_revenue + " 总安装: " + total_installed +
+            " 总展示: " + total_impressions + " 总点击: " + total_click +
+            " CTR: " + total_ctr + " CPA: " + total_cpa + " CVR: " + total_cvr;
+        $('#total_result').text(str);
+    }
+
+    $('#total_result').removeClass("editable");
 }
 
 function setData(data) {
@@ -434,6 +443,43 @@ function bindOp() {
                     list.push(data[keys[i]]);
                 }
                 admanager.showCommonDlg("请手动创建", list.join("\t"));
+            } else {
+                admanager.showCommonDlg("错误", data.message);
+            }
+        }, 'json');
+    });
+}
+
+function bindSortOpSummary() {
+    $('.sorter').click(function() {
+        var sorterId = $(this).attr('sorterId');
+        sorterId = parseInt(sorterId);
+        if ($(this).hasClass("glyphicon-arrow-up")) {
+            $(this).removeClass("glyphicon-arrow-up");
+            $(this).addClass("glyphicon-arrow-down");
+            sorterId += 1000;
+        } else {
+            $(this).removeClass("glyphicon-arrow-down");
+            $(this).addClass("glyphicon-arrow-up");
+        }
+
+        var query = $("#inputSearch").val();
+        var startTime = $('#inputStartTime').val();
+        var endTime = $('#inputEndTime').val();
+        var adwordsCheck = $('#adwordsCheck').is(':checked');
+        var facebookCheck = $('#facebookCheck').is(':checked');
+        $.post('query', {
+            tag: query,
+            startTime: startTime,
+            endTime: endTime,
+            adwordsCheck: adwordsCheck,
+            facebookCheck: facebookCheck,
+            sorterId: sorterId,
+            summary: true
+        }, function (data) {
+            if (data && data.ret == 1) {
+                data = data.data;
+                setDataSummary(data);
             } else {
                 admanager.showCommonDlg("错误", data.message);
             }
