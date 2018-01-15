@@ -118,23 +118,6 @@ public class Query extends HttpServlet {
             String countryCode = request.getParameter("countryCode");
 
             String totalInstallComparisonValue = request.getParameter("totalInstallComparisonValue");
-            String totalInstallOperator = request.getParameter("totalInstallOperator");
-            boolean isPositiveInteger = (totalInstallComparisonValue == "" || totalInstallComparisonValue == null) ? false : totalInstallComparisonValue.matches("^\\+?[1-9][0-9]*$");
-            if(isPositiveInteger){
-                if("1".equals(totalInstallOperator)){
-                    totalInstallComparisonValue = " >= " + totalInstallComparisonValue;
-                } else if("2".equals(totalInstallOperator)){
-                    totalInstallComparisonValue = " <= " + totalInstallComparisonValue;
-                } else {
-                    totalInstallComparisonValue = " = " + totalInstallComparisonValue;
-                }
-            }else if("0".equals(totalInstallComparisonValue) && "3".equals(totalInstallOperator)){
-                totalInstallComparisonValue = " = 0 ";
-            } else{
-                totalInstallComparisonValue = "";
-            }
-
-
 
             String likeCampaignName = request.getParameter("likeCampaignName");
             HashMap<String ,String> countryMap = Utils.getCountryMap();
@@ -888,18 +871,14 @@ public class Query extends HttpServlet {
         String adCampaignsTable = "ad_campaigns";
         String webAdCampaignsHistoryTable = "web_ad_campaigns_history";
         String webAccountIdTable = "web_account_id";
-        if (countryCheck || (countryCode != null && countryCode != "")) {
-            webAdCampaignsHistoryTable = "web_ad_campaigns_country_history";
-        }
+        String webAdCampaignsCountryHistoryTable = "web_ad_campaigns_country_history";
         if (admobCheck) {
             adCampaignsTable = "ad_campaigns_admob";
             webAdCampaignTagRelTable = "web_ad_campaign_tag_admob_rel";
             webAdCampaignsTable = "web_ad_campaigns_admob";
             webAdCampaignsHistoryTable = "web_ad_campaigns_history_admob";
             webAccountIdTable = "web_account_id_admob";
-            if (countryCheck || (countryCode != null && countryCode != "")) {
-                webAdCampaignsHistoryTable = "web_ad_campaigns_country_history_admob";
-            }
+            webAdCampaignsCountryHistoryTable = "web_ad_campaigns_country_history_admob";
         }
 
         List<JSObject> list = DB.scan(webAdCampaignTagRelTable).select("campaign_id")
@@ -945,9 +924,9 @@ public class Query extends HttpServlet {
             String sql = "";
             if(countryCode != null && countryCode != ""){
                 sql = "select ch.campaign_id, sum(ch.total_spend) as campaign_spends " +
-                        " from " + webAdCampaignsTable + " c, " + webAdCampaignsHistoryTable + " ch " +
+                        " from " + webAdCampaignsTable + " c, " + webAdCampaignsCountryHistoryTable + " ch " +
                         " where c.campaign_id=ch.campaign_id " +
-                        ((likeCampaignName == null || likeCampaignName == "") ? " " : " and campaign_name like '%" + likeCampaignName +"%' " )  +
+                        ((likeCampaignName == "" || likeCampaignName == null) ? " " : " and campaign_name like '%" + likeCampaignName +"%' " )  +
                         " and date between '" + startTime + "' and '" + endTime + "' " +
                         " and c.status != 'removed' and c.campaign_id in (" + campaignIds + ")" +
                         " group by ch.campaign_id";
@@ -960,19 +939,13 @@ public class Query extends HttpServlet {
                         " from (" +
                         "select ch.campaign_id, account_id, campaign_name,c.status, create_time, c.budget, c.bidding, sum(ch.total_spend) as spend, " +
                         "sum(ch.total_installed) as installed, sum(ch.total_impressions) as impressions " +
-                        ",sum(ch.total_click) as click from " + webAdCampaignsTable + " c, ";
-                if(admobCheck){
-                    sql += " web_ad_campaigns_country_history_admob ch ";
-                }else{
-                    sql += " web_ad_campaigns_country_history ch ";
-                }
-
-                sql += "where c.campaign_id=ch.campaign_id and country_code= '" + countryCode + "' " +
+                        ",sum(ch.total_click) as click from " + webAdCampaignsTable + " c, " + webAdCampaignsCountryHistoryTable + " ch " +
+                        "where c.campaign_id=ch.campaign_id and country_code= '" + countryCode + "' " +
                         ((likeCampaignName == null || likeCampaignName == "") ? " " : " and campaign_name like '%" + likeCampaignName +"%' " )  +
                         " and date between '" + startTime + "' and '" + endTime + "' " +
                         " and c.status != 'removed' and c.campaign_id in (" + campaignIds + ")" +
                         " group by ch.campaign_id " +
-                        ((totalInstallComparisonValue == null || totalInstallComparisonValue == "") ? " " : " having installed " + totalInstallComparisonValue)  +
+                        ((totalInstallComparisonValue == "" || totalInstallComparisonValue == null) ? " " : " having installed " + totalInstallComparisonValue)  +
                         ") a left join " + webAccountIdTable + " b on a.account_id = b.account_id";
                 list = DB.findListBySql(sql);
             }else if (countryCheck) {
@@ -980,7 +953,7 @@ public class Query extends HttpServlet {
                         " from (" +
                         "select ch.campaign_id, country_code, account_id, campaign_name,c.status, create_time, c.budget, c.bidding, sum(ch.total_spend) as spend, " +
                         "sum(ch.total_installed) as installed, sum(ch.total_impressions) as impressions " +
-                        ",sum(ch.total_click) as click from " + webAdCampaignsTable + " c, " + webAdCampaignsHistoryTable + " ch " +
+                        ",sum(ch.total_click) as click from " + webAdCampaignsTable + " c, " + webAdCampaignsCountryHistoryTable + " ch " +
                         "where c.campaign_id=ch.campaign_id " +
                         ((likeCampaignName == null || likeCampaignName == "") ? " " : " and campaign_name like '%" + likeCampaignName +"%' " )  +
                         " and date between '" + startTime + "' and '" + endTime + "' " +
@@ -996,11 +969,11 @@ public class Query extends HttpServlet {
                         "sum(ch.total_installed) as installed, sum(ch.total_impressions) as impressions " +
                         ",sum(ch.total_click) as click from " + webAdCampaignsTable + " c, " + webAdCampaignsHistoryTable + " ch " +
                         "where c.campaign_id=ch.campaign_id " +
-                        ((likeCampaignName == null || likeCampaignName == "") ? " " : " and campaign_name like '%" + likeCampaignName +"%' " )  +
+                        ((likeCampaignName == "" || likeCampaignName == null) ? " " : " and campaign_name like '%" + likeCampaignName +"%' " )  +
                         " and date between '" + startTime + "' and '" + endTime + "' " +
                         " and c.status != 'removed' and c.campaign_id in (" + campaignIds + ")" +
                         " group by ch.campaign_id " +
-                        ((totalInstallComparisonValue == null || totalInstallComparisonValue == "") ? " " : " having installed " + totalInstallComparisonValue)  +
+                        ((totalInstallComparisonValue == "" || totalInstallComparisonValue == null) ? " " : " having installed " + totalInstallComparisonValue)  +
                         ") a left join " + webAccountIdTable + " b on a.account_id = b.account_id";
                 list = DB.findListBySql(sql);
             }
@@ -1032,32 +1005,18 @@ public class Query extends HttpServlet {
                     JSObject oneI = DB.findOneBySql(sql);
                     if(one.hasObjectData()){
                         priceI = Utils.convertDouble(oneI.get("price"),0);
-                        String sqlT = "";
-                        if(admobCheck){
-                            sqlT = "select sum(total_installed) installed, sum(cpa) cpa from web_ad_campaigns_country_history_admob where campaign_id = '" + campaign_id + "' " +
-                                    "and country_code = '"+countryCode+"' and date between '"+startTime+"' and '"+endTime+"'";
-                        }else{
-                            sqlT = "select sum(total_installed) installed, sum(cpa) cpa from web_ad_campaigns_country_history where campaign_id = '" + campaign_id + "' " +
-                                    "and country_code = '"+countryCode+"' and date between '"+startTime+"' and '"+endTime+"'";
-                        }
+                        String sqlT = "select sum(total_installed) installed, sum(cpa) cpa from " + webAdCampaignsCountryHistoryTable + " where campaign_id = '" + campaign_id + "' " +
+                                "and country_code = '"+countryCode+"' and date between '"+startTime+"' and '"+endTime+"'";
                         JSObject twoI = DB.findOneBySql(sqlT);
                         cpaI = Utils.convertDouble(twoI.get("cpa"),0);
                         installedI = Utils.convertDouble(twoI.get("installed"),0);
                         roi = ( priceI - cpaI ) * installedI;
                     }
                 }else{
-                    String sql = "";
-                    if(admobCheck){
-                        sql = "select cch.country_code, sum(cpa) cpa, sum(total_installed) installed, price " +
-                                "from web_ad_campaigns_country_history_admob cch,web_ad_tag_country_price_dict cpd " +
-                                "where cch.country_code = cpd.country_code and campaign_id = '"+campaign_id+"' and tag_name = '"
-                                + tagName + "' and date between '"+startTime+"' and '"+endTime+"' group by cch.country_code";
-                    }else{
-                        sql = "select cch.country_code, sum(cpa) cpa, sum(total_installed) installed, price " +
-                                "from web_ad_campaigns_country_history cch,web_ad_tag_country_price_dict cpd " +
-                                "where cch.country_code = cpd.country_code and campaign_id = '"+campaign_id+"' and tag_name = '"
-                                + tagName + "' and date between '"+startTime+"' and '"+endTime+"' group by cch.country_code";
-                    }
+                    String sql = "select cch.country_code, sum(cpa) cpa, sum(total_installed) installed, price " +
+                            "from " + webAdCampaignsCountryHistoryTable + " cch,web_ad_tag_country_price_dict cpd " +
+                            "where cch.country_code = cpd.country_code and campaign_id = '"+campaign_id+"' and tag_name = '"
+                            + tagName + "' and date between '"+startTime+"' and '"+endTime+"' group by cch.country_code";
 
                     List<JSObject> listM = DB.findListBySql(sql);
                     for(JSObject j : listM){

@@ -88,13 +88,49 @@ function init() {
         var endTime = $('#inputEndTime').val();
         var adwordsCheck = $('#adwordsCheck').is(':checked');
         var facebookCheck = $('#facebookCheck').is(':checked');
+        var countryCode = '';
+        var countryName = $('#inputCountry').val();
+        if(countryName != ""){
+            for (var i = 0; i < regionList.length; i++) {
+                if (countryName == regionList[i].name) {
+                    countryCode = regionList[i].country_code;
+                    break;
+                }
+            }
+        }
+        var likeCampaignName = $('#inputLikeCampaignName').val();
 
+        var ex = /^\d+$/;
+        var totalInstallComparisonValue = $('#inputTotalInstallComparisonValue').val();
+        var totalInstallOperator = $('#totalInstallOperator option:selected').val();
+        if(ex.test(totalInstallComparisonValue)){
+            if(totalInstallComparisonValue == "0" && totalInstallOperator == "1"){
+                totalInstallComparisonValue = "";
+            }else{
+                if(totalInstallOperator == "1"){
+                    totalInstallOperator = " >= ";
+                }else if(totalInstallOperator == "2"){
+                    totalInstallOperator = " <= ";
+                }else {
+                    totalInstallOperator = " = ";
+                }
+                totalInstallComparisonValue = totalInstallOperator + totalInstallComparisonValue;
+            }
+        }else{
+            totalInstallComparisonValue = "";
+        }
+        var campaignCreateTime = $('#inputCampaignCreateTime').val();
         $.post('query_not_exist_data', {
             tag: query,
             startTime: startTime,
             endTime: endTime,
             adwordsCheck: adwordsCheck,
-            facebookCheck: facebookCheck
+            facebookCheck: facebookCheck,
+            countryCode: countryCode,
+            countryName: countryName,
+            likeCampaignName: likeCampaignName,
+            campaignCreateTime: campaignCreateTime,
+            totalInstallComparisonValue: totalInstallComparisonValue
         },function(data){
             if(data && data.ret == 1){
                 appQueryData = data.data.array;
@@ -123,8 +159,27 @@ function init() {
         var countryCheck = $('#countryCheck').is(':checked');
         var facebookCheck = $('#facebookCheck').is(':checked');
         var likeCampaignName = $('#inputLikeCampaignName').val();
+
+        var ex = /^\d+$/;
         var totalInstallComparisonValue = $('#inputTotalInstallComparisonValue').val();
         var totalInstallOperator = $('#totalInstallOperator option:selected').val();
+        if(ex.test(totalInstallComparisonValue)){
+            if(totalInstallComparisonValue == "0" && totalInstallOperator == "1"){
+                totalInstallComparisonValue = "";
+            }else{
+                if(totalInstallOperator == "1"){
+                    totalInstallOperator = " >= ";
+                }else if(totalInstallOperator == "2"){
+                    totalInstallOperator = " <= ";
+                }else {
+                    totalInstallOperator = " = ";
+                }
+                totalInstallComparisonValue = totalInstallOperator + totalInstallComparisonValue;
+            }
+        }else{
+            totalInstallComparisonValue = "";
+        }
+
         var countryName = $('#inputCountry').val();
         if(countryName != ""){
             for (var i = 0; i < regionList.length; i++) {
@@ -139,7 +194,6 @@ function init() {
             tag: query,
             startTime: startTime,
             endTime: endTime,
-            totalInstallOperator: totalInstallOperator,
             totalInstallComparisonValue: totalInstallComparisonValue,
             adwordsCheck: adwordsCheck,
             countryCheck: countryCheck,

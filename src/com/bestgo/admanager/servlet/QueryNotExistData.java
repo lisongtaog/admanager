@@ -6,6 +6,7 @@ import com.bestgo.common.database.services.DB;
 import com.bestgo.common.database.utils.JSObject;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.sun.xml.internal.bind.v2.runtime.unmarshaller.TagName;
 import org.apache.log4j.Logger;
 
 import javax.servlet.ServletException;
@@ -38,8 +39,11 @@ public class QueryNotExistData extends HttpServlet {
         String endTime = request.getParameter("endTime");
         String adwordsCheck = request.getParameter("adwordsCheck");
         String facebookCheck = request.getParameter("facebookCheck");
-        HashMap<String ,String> countryMap = Utils.getCountryMap();
-
+        String countryCode = request.getParameter("countryCode");
+//        HashMap<String ,String> countryMap = Utils.getCountryMap();
+        String countryName = request.getParameter("countryName");
+        String likeCampaignName = request.getParameter("likeCampaignName");
+        String campaignCreateTime = request.getParameter("campaignCreateTime");
         try {
             JSObject tagObject = DB.simpleScan("web_tag")
                     .select("id", "tag_name")
@@ -48,8 +52,8 @@ public class QueryNotExistData extends HttpServlet {
                 Long tagId = tagObject.get("id");
                 JsonObject jsonObject = null;
                 if (adwordsCheck != null && adwordsCheck.equals("false") && facebookCheck != null && facebookCheck.equals("false")) {
-                    JsonObject admob = fetchOneAppData(tagId, startTime, endTime, true,countryMap);
-                    JsonObject facebook = fetchOneAppData(tagId, startTime, endTime, false,countryMap);
+                    JsonObject admob = fetchOneAppData(tag,tagId, startTime, endTime, true,countryCode,likeCampaignName,campaignCreateTime);
+                    JsonObject facebook = fetchOneAppData(tag,tagId, startTime, endTime, false,countryName,likeCampaignName,campaignCreateTime);
                     double total_spend = admob.get("total_spend").getAsDouble() + facebook.get("total_spend").getAsDouble();
                     double total_installed = admob.get("total_installed").getAsDouble() + facebook.get("total_installed").getAsDouble();
                     double total_impressions = admob.get("total_impressions").getAsDouble() + facebook.get("total_impressions").getAsDouble();
@@ -71,7 +75,12 @@ public class QueryNotExistData extends HttpServlet {
                     }
                     jsonObject = admob;
                 } else {
-                    jsonObject = fetchOneAppData(tagId, startTime, endTime, "true".equals(adwordsCheck),countryMap);
+                    if("true".equals(adwordsCheck)){
+                        jsonObject = fetchOneAppData(tag,tagId, startTime, endTime, true,countryCode,likeCampaignName,campaignCreateTime);
+                    }else{
+                        jsonObject = fetchOneAppData(tag,tagId, startTime, endTime, false,countryName,likeCampaignName,campaignCreateTime);
+                    }
+
                 }
 
                 json.add("data", jsonObject);
@@ -93,40 +102,93 @@ public class QueryNotExistData extends HttpServlet {
     }
 
 
-    private JsonObject fetchOneAppData(long tagId, String startTime, String endTime, boolean admobCheck,HashMap<String ,String> countryMap) throws Exception {
-        String relationTable = "web_ad_campaign_tag_rel";
-        String webAdCampaignTable = "web_ad_campaigns";
+    private JsonObject fetchOneAppData(String tagName,long tagId, String startTime, String endTime, boolean admobCheck,String country,String likeCampaignName,String campaignCreateTime) throws Exception {
+        String webAdCampaignTagRelTable = "web_ad_campaign_tag_rel";
+        String webAdCampaignsTable = "web_ad_campaigns";
+        String adCampaignsTable = "ad_campaigns";
+        String webAdCampaignsHistoryTable = "web_ad_campaigns_history";
+        String webAdCampaignsCountryHistoryTable = "web_ad_campaigns_country_history";
         String webAccountIdTable = "web_account_id";
         String FieldStatus = "ACTIVE";
+        List<JSObject> listAll = new ArrayList<>();
+        List<JSObject> listHasData = new ArrayList<>();
         if (admobCheck) {
-            relationTable = "web_ad_campaign_tag_admob_rel";
-            webAdCampaignTable = "web_ad_campaigns_admob";
+            adCampaignsTable = "ad_campaigns_admob";
+            webAdCampaignTagRelTable = "web_ad_campaign_tag_admob_rel";
+            webAdCampaignsTable = "web_ad_campaigns_admob";
+            webAdCampaignsHistoryTable = "web_ad_campaigns_history_admob";
             webAccountIdTable = "web_account_id_admob";
             FieldStatus = "enabled";
+            webAdCampaignsCountryHistoryTable = "web_ad_campaigns_country_history_admob";
         }
-
-        List<JSObject> list = DB.scan(relationTable).select("campaign_id")
-                .where(DB.filter().whereEqualTo("tag_id", tagId)).execute();
-
-
+        List<JSObject> list = null;
+        if(country == "" || country == null){
+            list = DB.scan(webAdCampaignTagRelTable).select("campaign_id")
+                    .where(DB.filter().whereEqualTo("tag_id", tagId)).execute();
+        }else{
+            String sql = "select campaign_id from " + adCampaignsTable + " where app_name = '"+ tagName+"' and country_region like '%" + country + "%'";
+            list = DB.findListBySql(sql);
+        }
         Set<String> campaignIdSet = new HashSet<>();
         for(JSObject j : list){
             campaignIdSet.add(j.get("campaign_id"));
         }
 
         String campaignIds = "";
-        for(String s : campaignIdSet){
-            campaignIds += "'" + s + "',";
+        if(campaignCreateTime == "" || campaignCreateTime == null){
+            for(String s : campaignIdSet){
+                campaignIds += "'" + s + "',";
+            }
+        }else{
+            List<JSObject> campaignIdJSObjectList = new ArrayList<>();
+            String sqlQuery = "select campaign_id from "+adCampaignsTable+" where app_name = '"+ tagName +"' and create_time like '" + campaignCreateTime + "%'";
+            campaignIdJSObjectList  = DB.findListBySql(sqlQuery);
+
+            if(campaignIdJSObjectList != null && campaignIdJSObjectList.size()>0){
+                Set<String> campaignIdcommonSet = new HashSet<>();
+                for(JSObject j : campaignIdJSObjectList){
+                    String campaign_id = j.get("campaign_id");
+                    if(campaignIdSet.contains(campaign_id)){
+                        campaignIdcommonSet.add(campaign_id);
+                    }
+                }
+                for(String s : campaignIdcommonSet){
+                    campaignIds += "'" + s + "',";
+                }
+            }
         }
+
         if(campaignIds != null && campaignIds.length()>0){
             campaignIds = campaignIds.substring(0,campaignIds.length()-1);
         }
-
         if (!campaignIds.isEmpty()) {
-            String sql = "select campaign_id, a.account_id, short_name, campaign_name, create_time, a.status, budget, bidding, total_spend, total_installed " +
-                    " from " + webAdCampaignTable + " a," + webAccountIdTable + " b where total_click = 0 and ctr =0 and a.status = '" + FieldStatus + "' and a.account_id = b.account_id " +
-                    " and cpa = 0 and campaign_id in (" + campaignIds + ")";
-            list = DB.findListBySql(sql);
+            String sql = "select campaign_id, a.account_id, short_name, campaign_name, create_time, status, budget, bidding, total_spend, total_installed, total_click, total_impressions, cpa,ctr, " +
+                    "(case when total_click > 0 then total_installed/total_click else 0 end) as cvr " +
+                    " from " + webAdCampaignsTable + " a , "+webAccountIdTable+" b where a.status = '" + FieldStatus + "' and " +
+                    "campaign_id in (" + campaignIds + ") and a.account_id = b.account_id" +
+                    ((likeCampaignName == "" || likeCampaignName == null) ? "" : " and campaign_name like %" + likeCampaignName + "%");
+            listAll = DB.findListBySql(sql);
+            if(country == "" || country == null){
+                sql = "select campaign_id, impressions from ( " +
+                        "select ch.campaign_id, " +
+                        " sum(ch.total_impressions) as impressions " +
+                        " from " + webAdCampaignsTable + " c, " + webAdCampaignsHistoryTable + " ch " +
+                        "where c.campaign_id = ch.campaign_id " +
+                        "and date between '" + startTime + "' and '" + endTime + "' " +
+                        "and c.status != 'removed' and c.campaign_id in (" + campaignIds + ") " +
+                        "group by ch.campaign_id having impressions > 0 ) a ";
+            }else{
+                sql = "select campaign_id, impressions from ( " +
+                        "select ch.campaign_id, " +
+                        " sum(ch.total_impressions) as impressions " +
+                        " from " + webAdCampaignsTable + " c, " + webAdCampaignsCountryHistoryTable + " ch " +
+                        "where c.campaign_id = ch.campaign_id " +
+                        "and date between '" + startTime + "' and '" + endTime + "' " +
+                        "and c.status != 'removed' and c.campaign_id in (" + campaignIds + ") " +
+                        "group by ch.campaign_id having impressions > 0 ) a ";
+            }
+            listHasData = DB.findListBySql(sql);
+            list = Utils.getDiffJSObjectList(listAll, listHasData, "campaign_id");
         } else {
             list.clear();
         }
