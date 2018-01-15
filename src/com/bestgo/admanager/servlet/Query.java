@@ -115,6 +115,7 @@ public class Query extends HttpServlet {
         } else {
             String countryCheck = request.getParameter("countryCheck");
             String containsNoDataCampaignCheck = request.getParameter("containsNoDataCampaignCheck");
+            String onlyQueryNoDataCampaignCheck = request.getParameter("onlyQueryNoDataCampaignCheck");
             String campaignCreateTime = request.getParameter("campaignCreateTime");
             String countryCode = request.getParameter("countryCode");
 

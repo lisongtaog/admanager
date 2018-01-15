@@ -106,12 +106,13 @@
             <th>ActiveUser</th>
             <th>Revenue</th>
             <th>ECPM</th>
+            <th>CPA</th>
             <th>Incoming</th>
             <th>EstimatedRevenue14</th>
             <th>Revenue14/Cost</th>
             <th>成本价</th>
             <th>出价</th>
-            <th>CPA</th>
+
         </tr>
         </thead>
         <tbody id="results_body">
@@ -169,9 +170,12 @@
                     "<th>UninstalledRate</th><th>TotalUser<span sorterId=\"1036\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
                     "<th>ActiveUser<span sorterId=\"1037\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
                     "<th>Revenue<span sorterId=\"1038\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
-                    "<th>ECPM</th><th>Incoming</th><th>EstimatedRevenue14<span sorterId=\"1041\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
+                    "<th>ECPM<span sorterId=\"1039\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
+                    "<th>CPA<span sorterId=\"1040\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
+                    "<th>Incoming<span sorterId=\"1043\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
+                    "<th>EstimatedRevenue14<span sorterId=\"1041\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
                     "<th>Revenue14/Cost<span sorterId=\"1042\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
-                    "<th>成本价</th><th>出价</th><th>CPA</th></tr>");
+                    "<th>成本价</th><th>出价</th></tr>");
                 setData(data,query);
                 bindSortOp();
                 var str = "Cost: " + data.total_cost + "&nbsp;&nbsp;&nbsp;&nbsp;PuserchaedUser: " + data.total_puserchaed_user +
@@ -236,7 +240,7 @@
             tr.append(td_outer_a);
             var keyset = ["costs", "purchased_users", "installed",
                 "uninstalled", "uninstalled_rate", "users", "active_users", "revenues",
-                "ecpm", "incoming", "estimated_revenues","estimated_revenues_dev_cost","price","bidding","cpa"];
+                "ecpm","cpa", "incoming", "estimated_revenues","estimated_revenues_dev_cost","price","bidding"];
             for (var j = 0; j < keyset.length; j++) {
                 var td = $('<td></td>');
                 var r = one[keyset[j]];

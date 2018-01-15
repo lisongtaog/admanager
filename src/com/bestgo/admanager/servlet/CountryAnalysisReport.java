@@ -49,10 +49,14 @@ public class CountryAnalysisReport extends HttpServlet {
                         String sql = "select country_code, sum(cost) as total_cost, sum(purchased_user) as total_purchased_user, " +
                                 "sum(total_installed) as installed, sum(total_uninstalled) as uninstalled, sum(today_uninstalled) as total_today_uninstalled, " +
                                 "sum(total_user) as users, sum(active_user) as active_users, sum(impression) as impressions, sum(revenue) as revenues, " +
-                                "sum(estimated_revenue) as estimated_revenues " +
-                                ", (case when sum(cost) > 0 then sum(estimated_revenue) / sum(cost) else 0 end) as est_rev_dev_cost " +
+                                "sum(estimated_revenue) as estimated_revenues, " +
+                                " (sum(revenue) - sum(cost)) as incoming, "+
+                                "(case when sum(impression) > 0 then sum(revenue) * 1000 / sum(impression) else 0 end) as ecpm,"+
+                                "(case when sum(purchased_user) > 0 then sum(cost) / sum(purchased_user) else 0 end) as cpa, "+
+                                " (case when sum(cost) > 0 then sum(estimated_revenue) / sum(cost) else 0 end) as est_rev_dev_cost " +
                                 "from web_ad_country_analysis_report_history where app_id = '"+google_package_id+"' " +
                                 "and date BETWEEN '" + startTime + "' AND '" + endTime + "' GROUP BY country_code";
+
                         int sorter = 0;
                         if (sorterId != null) {
                             sorter = Utils.parseInt(sorterId, 0);
@@ -101,6 +105,18 @@ public class CountryAnalysisReport extends HttpServlet {
                             case 38:
                                 sql += " order by revenues";
                                 break;
+                            case 1039:
+                                sql += " order by ecpm desc";
+                                break;
+                            case 39:
+                                sql += " order by ecpm";
+                                break;
+                            case 1040:
+                                sql += " order by cpa desc";
+                                break;
+                            case 40:
+                                sql += " order by cpa";
+                                break;
                             case 1041:
                                 sql += " order by estimated_revenues desc";
                                 break;
@@ -112,6 +128,12 @@ public class CountryAnalysisReport extends HttpServlet {
                                 break;
                             case 42:
                                 sql += " order by est_rev_dev_cost";
+                                break;
+                            case 1043:
+                                sql += " order by incoming desc";
+                                break;
+                            case 43:
+                                sql += " order by incoming";
                                 break;
                             default:
                                 sql += " order by total_cost desc";

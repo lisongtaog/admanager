@@ -160,6 +160,7 @@ function init() {
         var facebookCheck = $('#facebookCheck').is(':checked');
         var likeCampaignName = $('#inputLikeCampaignName').val();
         var containsNoDataCampaignCheck = $('#containsNoDataCampaignCheck').is(':checked');
+        var onlyQueryNoDataCampaignCheck = $('#onlyQueryNoDataCampaignCheck').is(':checked');
         var ex = /^\d+$/;
         var totalInstallComparisonValue = $('#inputTotalInstallComparisonValue').val();
         var totalInstallOperator = $('#totalInstallOperator option:selected').val();
@@ -201,7 +202,8 @@ function init() {
             countryCode: countryCode,
             likeCampaignName: likeCampaignName,
             campaignCreateTime: campaignCreateTime,
-            containsNoDataCampaignCheck: containsNoDataCampaignCheck
+            containsNoDataCampaignCheck: containsNoDataCampaignCheck,
+            onlyQueryNoDataCampaignCheck: onlyQueryNoDataCampaignCheck
             },function(data){
                 if(data && data.ret == 1){
                     appQueryData = data.data.array;
