@@ -239,7 +239,7 @@ public class CountryAnalysisReport extends HttpServlet {
                                 d.addProperty("users", users);
                                 d.addProperty("active_users", active_users);
                                 d.addProperty("revenues", Utils.trimDouble3(revenues));
-                                d.addProperty("ecpm", ecpm);
+                                d.addProperty("ecpm", Utils.trimDouble3(ecpm));
                                 d.addProperty("seven_days_costs", Utils.trimDouble3(seven_days_costs));
                                 d.addProperty("seven_days_incoming", Utils.trimDouble3(seven_days_incoming));
                                 d.addProperty("seven_days_revenues", Utils.trimDouble3(seven_days_revenues));
