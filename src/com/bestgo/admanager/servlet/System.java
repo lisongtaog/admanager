@@ -50,12 +50,32 @@ public class System extends HttpServlet {
 
                 switch (path) {
                     case "/fb_app_id_rel/create": {
+                        if (!tagName.isEmpty()) {
+                            try {
+                                JSObject one = DB.simpleScan("web_tag").select("id").where(DB.filter().whereEqualTo("tag_name", tagName)).execute();
+                                if (!one.hasObjectData()) {
+                                    DB.insert("web_tag").put("tag_name", tagName).execute();
+                                }
+                            } catch (Exception ex) {
+                                ex.printStackTrace();
+                            }
+                        }
                         OperationResult result = createNewFacebookAppRelation(tagName, accountId, fbAppId, pageId, gpPackageId);
                         json.addProperty("ret", result.result ? 1 : 0);
                         json.addProperty("message", result.message);
                     }
                         break;
                     case "/fb_app_id_rel/update": {
+                        if (!tagName.isEmpty()) {
+                            try {
+                                JSObject one = DB.simpleScan("web_tag").select("id").where(DB.filter().whereEqualTo("tag_name", tagName)).execute();
+                                if (!one.hasObjectData()) {
+                                    DB.insert("web_tag").put("tag_name", tagName).execute();
+                                }
+                            } catch (Exception ex) {
+                                ex.printStackTrace();
+                            }
+                        }
                         OperationResult result = updateFacebookAppRelation(id, tagName, accountId, fbAppId, pageId, gpPackageId);
                         json.addProperty("ret", result.result ? 1 : 0);
                         json.addProperty("message", result.message);
