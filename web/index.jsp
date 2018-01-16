@@ -118,7 +118,7 @@
 
                 <button id="btnSummary" class="btn btn-default">汇总数据</button>
                 <button id="btnModifyBatch" class="btn btn-default">批量修改</button>
-                <%--<button id="btnQueryNoData" class="btn btn-default">查询无数据的系列</button>--%>
+                <button id="btnQueryNoData" class="btn btn-default">查询无数据的系列</button>
                 <input type="button" class="btn btn-default" id="btnBatchChangeStatus" value="修改状态监控"/>
             </div>
         </div>

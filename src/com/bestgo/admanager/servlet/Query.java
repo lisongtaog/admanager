@@ -1288,14 +1288,14 @@ public class Query extends HttpServlet {
             }else{
                 sql = "select campaign_id, a.account_id,short_name, campaign_name, a.status, create_time, budget, bidding, spend, installed, impressions, click " +
                         " from (" +
-                        "select ch.campaign_id, account_id, campaign_name,c.status, create_time, c.budget, c.bidding, sum(ifnull(ch.total_spend,0)) as spend, " +
+                        "select c.campaign_id, account_id, campaign_name,c.status, create_time, c.budget, c.bidding, sum(ifnull(ch.total_spend,0)) as spend, " +
                         "sum(ifnull(ch.total_installed,0)) as installed, sum(ifnull(ch.total_impressions,0)) as impressions " +
                         ",sum(ifnull(ch.total_click,0)) as click from " + webAdCampaignsTable + " c left join " + webAdCampaignsHistoryTable + " ch " +
                         "on c.campaign_id=ch.campaign_id where" +
                         " date between '" + startTime + "' and '" + endTime + "' " +
                         ((likeCampaignName == "" || likeCampaignName == null) ? " " : " and campaign_name like '%" + likeCampaignName +"%' " )  +
                         " and c.status != 'removed' and c.campaign_id in (" + campaignIds + ")" +
-                        " group by ch.campaign_id " +
+                        " group by c.campaign_id " +
                         ((totalInstallComparisonValue == "" || totalInstallComparisonValue == null) ? " " : " having installed " + totalInstallComparisonValue)  +
                         ") a left join " + webAccountIdTable + " b on a.account_id = b.account_id";
                 list = DB.findListBySql(sql);
@@ -1319,18 +1319,11 @@ public class Query extends HttpServlet {
             JSObject one = list.get(i);
             double impressions = Utils.convertDouble(one.get("impressions"), 0);
             String status = one.get("status");
-            if (impressions == 0) {
-                if(containsNoDataCampaignCheck){
-                    if(!"enabled".equalsIgnoreCase(status) && !"active".equalsIgnoreCase(status)){
-                        continue;
-                    }
-                }else{
-                    continue;
-                }
-            }else {
-//                if(onlyQueryNoDataCampaignCheck){
-//                    continue;
-//                }
+//            if(onlyQueryNoDataCampaignCheck && impressions != 0){//只查询无数据，containsNoDataCampaignCheck = false
+//                continue;
+//            }
+            if(!containsNoDataCampaignCheck && impressions == 0){//只查询有数据，containsNoDataCampaignCheck = true
+                continue;
             }
 
             String campaign_id = one.get("campaign_id");
