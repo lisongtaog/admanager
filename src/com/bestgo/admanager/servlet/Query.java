@@ -119,6 +119,34 @@ public class Query extends HttpServlet {
                                     Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
                                         @Override
                                         public int compare(CampaignsSummary a, CampaignsSummary b) {
+                                            if(a.seven_days_total_spend> b.seven_days_total_spend){
+                                                return 1;
+                                            }else if(a.seven_days_total_spend < b.seven_days_total_spend){
+                                                return -1;
+                                            }else{
+                                                return 0;
+                                            }
+                                        }
+                                    });
+                                    break;
+                                case 1071:
+                                    Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
+                                        @Override
+                                        public int compare(CampaignsSummary a, CampaignsSummary b) {
+                                            if(a.seven_days_total_spend < b.seven_days_total_spend){
+                                                return 1;
+                                            }else if(a.seven_days_total_spend > b.seven_days_total_spend){
+                                                return -1;
+                                            }else{
+                                                return 0;
+                                            }
+                                        }
+                                    });
+                                    break;
+                                case 72:
+                                    Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
+                                        @Override
+                                        public int compare(CampaignsSummary a, CampaignsSummary b) {
                                             if(a.total_revenue> b.total_revenue){
                                                 return 1;
                                             }else if(a.total_revenue < b.total_revenue){
@@ -129,7 +157,7 @@ public class Query extends HttpServlet {
                                         }
                                     });
                                     break;
-                                case 1071:
+                                case 1072:
                                     Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
                                         @Override
                                         public int compare(CampaignsSummary a, CampaignsSummary b) {
@@ -143,7 +171,35 @@ public class Query extends HttpServlet {
                                         }
                                     });
                                     break;
-                                case 72:
+                                case 73:
+                                    Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
+                                        @Override
+                                        public int compare(CampaignsSummary a, CampaignsSummary b) {
+                                            if(a.seven_days_total_revenue> b.seven_days_total_revenue){
+                                                return 1;
+                                            }else if(a.seven_days_total_revenue < b.seven_days_total_revenue){
+                                                return -1;
+                                            }else{
+                                                return 0;
+                                            }
+                                        }
+                                    });
+                                    break;
+                                case 1073:
+                                    Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
+                                        @Override
+                                        public int compare(CampaignsSummary a, CampaignsSummary b) {
+                                            if(a.seven_days_total_revenue < b.seven_days_total_revenue){
+                                                return 1;
+                                            }else if(a.seven_days_total_revenue > b.seven_days_total_revenue){
+                                                return -1;
+                                            }else{
+                                                return 0;
+                                            }
+                                        }
+                                    });
+                                    break;
+                                case 74:
                                     Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
                                         @Override
                                         public int compare(CampaignsSummary a, CampaignsSummary b) {
@@ -157,7 +213,7 @@ public class Query extends HttpServlet {
                                         }
                                     });
                                     break;
-                                case 1072:
+                                case 1074:
                                     Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
                                         @Override
                                         public int compare(CampaignsSummary a, CampaignsSummary b) {
@@ -171,7 +227,7 @@ public class Query extends HttpServlet {
                                         }
                                     });
                                     break;
-                                case 73:
+                                case 75:
                                     Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
                                         @Override
                                         public int compare(CampaignsSummary a, CampaignsSummary b) {
@@ -185,7 +241,7 @@ public class Query extends HttpServlet {
                                         }
                                     });
                                     break;
-                                case 1073:
+                                case 1075:
                                     Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
                                         @Override
                                         public int compare(CampaignsSummary a, CampaignsSummary b) {
@@ -199,7 +255,7 @@ public class Query extends HttpServlet {
                                         }
                                     });
                                     break;
-                                case 74:
+                                case 76:
                                     Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
                                         @Override
                                         public int compare(CampaignsSummary a, CampaignsSummary b) {
@@ -213,7 +269,7 @@ public class Query extends HttpServlet {
                                         }
                                     });
                                     break;
-                                case 1074:
+                                case 1076:
                                     Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
                                         @Override
                                         public int compare(CampaignsSummary a, CampaignsSummary b) {
@@ -227,7 +283,7 @@ public class Query extends HttpServlet {
                                         }
                                     });
                                     break;
-                                case 75:
+                                case 77:
                                     Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
                                         @Override
                                         public int compare(CampaignsSummary a, CampaignsSummary b) {
@@ -241,7 +297,7 @@ public class Query extends HttpServlet {
                                         }
                                     });
                                     break;
-                                case 1075:
+                                case 1077:
                                     Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
                                         @Override
                                         public int compare(CampaignsSummary a, CampaignsSummary b) {
@@ -255,7 +311,7 @@ public class Query extends HttpServlet {
                                         }
                                     });
                                     break;
-                                case 76:
+                                case 78:
                                     Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
                                         @Override
                                         public int compare(CampaignsSummary a, CampaignsSummary b) {
@@ -269,7 +325,7 @@ public class Query extends HttpServlet {
                                         }
                                     });
                                     break;
-                                case 1076:
+                                case 1078:
                                     Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
                                         @Override
                                         public int compare(CampaignsSummary a, CampaignsSummary b) {
@@ -283,7 +339,7 @@ public class Query extends HttpServlet {
                                         }
                                     });
                                     break;
-                                case 77:
+                                case 79:
                                     Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
                                         @Override
                                         public int compare(CampaignsSummary a, CampaignsSummary b) {
@@ -297,7 +353,7 @@ public class Query extends HttpServlet {
                                         }
                                     });
                                     break;
-                                case 1077:
+                                case 1079:
                                     Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
                                         @Override
                                         public int compare(CampaignsSummary a, CampaignsSummary b) {
