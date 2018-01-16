@@ -1,5 +1,6 @@
 package com.bestgo.admanager.servlet;
 
+import com.bestgo.admanager.DateUtil;
 import com.bestgo.admanager.Utils;
 import com.bestgo.common.database.services.DB;
 import com.bestgo.common.database.utils.JSObject;
@@ -36,8 +37,7 @@ public class CountryAnalysisReport extends HttpServlet {
         String tagName = request.getParameter("tagName");
         String startTime = request.getParameter("startTime");
         String endTime = request.getParameter("endTime");
-
-//        DecimalFormat df   = new DecimalFormat("######0.00000000");
+        String beforeSevenDays = DateUtil.addDay(endTime,-6,"yyyy-MM-dd");
         if (path.startsWith("/query_country_analysis_report")) {
             try {
                 String sqlG = "select google_package_id from web_facebook_app_ids_rel WHERE tag_name = '" + tagName + "'";
@@ -68,75 +68,74 @@ public class CountryAnalysisReport extends HttpServlet {
                             case 31:
                                 sql += " order by total_cost";
                                 break;
-                            case 1032:
+                            case 1033:
                                 sql += " order by total_purchased_user desc";
                                 break;
-                            case 32:
+                            case 33:
                                 sql += " order by total_purchased_user";
                                 break;
-                            case 1033:
+                            case 1034:
                                 sql += " order by installed desc";
                                 break;
-                            case 33:
+                            case 34:
                                 sql += " order by installed";
                                 break;
 
-                            case 1034:
+                            case 1035:
                                 sql += " order by uninstalled desc";
                                 break;
-                            case 34:
+                            case 35:
                                 sql += " order by uninstalled";
                                 break;
-                            case 1036:
+                            case 1037:
                                 sql += " order by users desc";
                                 break;
-                            case 36:
+                            case 37:
                                 sql += " order by users";
                                 break;
-                            case 1037:
+                            case 1038:
                                 sql += " order by active_users desc";
                                 break;
-                            case 37:
+                            case 38:
                                 sql += " order by active_users";
                                 break;
-                            case 1038:
+                            case 1039:
                                 sql += " order by revenues desc";
                                 break;
-                            case 38:
+                            case 39:
                                 sql += " order by revenues";
                                 break;
-                            case 1039:
+                            case 1040:
                                 sql += " order by ecpm desc";
                                 break;
-                            case 39:
+                            case 40:
                                 sql += " order by ecpm";
                                 break;
-                            case 1040:
+                            case 1041:
                                 sql += " order by cpa desc";
                                 break;
-                            case 40:
+                            case 41:
                                 sql += " order by cpa";
                                 break;
-                            case 1041:
-                                sql += " order by estimated_revenues desc";
-                                break;
-                            case 41:
-                                sql += " order by estimated_revenues";
-                                break;
                             case 1042:
-                                sql += " order by est_rev_dev_cost desc";
-                                break;
-                            case 42:
-                                sql += " order by est_rev_dev_cost";
-                                break;
-                            case 1043:
                                 sql += " order by incoming desc";
                                 break;
-                            case 43:
+                            case 42:
                                 sql += " order by incoming";
                                 break;
-                            default:
-                                sql += " order by total_cost desc";
+                            case 1044:
+                                sql += " order by estimated_revenues desc";
+                                break;
+                            case 44:
+                                sql += " order by estimated_revenues";
+                                break;
+                            case 1045:
+                                sql += " order by est_rev_dev_cost desc";
+                                break;
+                            case 45:
+                                sql += " order by est_rev_dev_cost";
+                                break;
+
                         }
                         List<JSObject> countryDetailJSObjectList = DB.findListBySql(sql);
 
@@ -149,6 +148,19 @@ public class CountryAnalysisReport extends HttpServlet {
                         for(JSObject j : countryDetailJSObjectList){
                             if(j != null && j.hasObjectData()){
                                 String country_code = j.get("country_code");
+                                sql = "select sum(cost) as seven_days_costs, sum(revenue) as seven_days_revenues " +
+                                        "from web_ad_country_analysis_report_history where app_id = '"+google_package_id+"' " +
+                                        " and country_code = '" + country_code + "' and date BETWEEN '" + beforeSevenDays + "' AND '" + endTime + "'";
+                                JSObject oneT = DB.findOneBySql(sql);
+                                double seven_days_costs  = 0;
+                                double seven_days_incoming  = 0;
+                                double seven_days_revenues = 0;
+                                if(oneT != null && oneT.hasObjectData()){
+                                    seven_days_costs  = oneT.get("seven_days_costs");
+                                    seven_days_revenues  = oneT.get("seven_days_revenues");
+                                    seven_days_incoming = seven_days_revenues - seven_days_costs;
+                                }
+
                                 String sqlC = "select country_name from app_country_code_dict where country_code = '" + country_code + "'";
                                 JSObject oneC = DB.findOneBySql(sqlC);
                                 String countryName = "";
@@ -163,18 +175,17 @@ public class CountryAnalysisReport extends HttpServlet {
                                 double uninstalled = Utils.convertDouble(j.get("uninstalled"),0);
                                 double total_today_uninstalled = Utils.convertDouble(j.get("total_today_uninstalled"),0);
                                 double uninstalledRate = installed != 0 ? total_today_uninstalled / installed : 0;
-                                double cpa = purchased_users != 0 ? costs / purchased_users : 0;
+
 
                                 double users = Utils.convertDouble(j.get("users"),0);
                                 double active_users = Utils.convertDouble(j.get("active_users"),0);
-                                double impressions = Utils.convertDouble(j.get("impressions"),0);
                                 double revenues = j.get("revenues");
                                 double estimated_revenues = j.get("estimated_revenues");
-                                double ecpm = impressions == 0 ? 0 : Utils.trimDouble3(revenues * 1000 / impressions );
-//                                String ecpm = impressions == 0 ? "0" : (df.format(revenues / impressions ));
-                                double incoming = revenues - costs;
+//                                double ecpm = impressions == 0 ? 0 : Utils.trimDouble3(revenues * 1000 / impressions );
+                                double ecpm = j.get("ecpm");
                                 double estRevDevCost = Utils.convertDouble(j.get("est_rev_dev_cost"),0);
-
+                                double cpa = j.get("cpa");
+                                double incoming = j.get("incoming");
 
                                 String sqlAB = "select bidding from ad_campaigns_admob_auto_create where app_name = '"
                                                        + tagName + "' and country_region like '%" + country_code + "%'";
@@ -229,6 +240,9 @@ public class CountryAnalysisReport extends HttpServlet {
                                 d.addProperty("active_users", active_users);
                                 d.addProperty("revenues", Utils.trimDouble3(revenues));
                                 d.addProperty("ecpm", ecpm);
+                                d.addProperty("seven_days_costs", Utils.trimDouble3(seven_days_costs));
+                                d.addProperty("seven_days_incoming", Utils.trimDouble3(seven_days_incoming));
+                                d.addProperty("seven_days_revenues", Utils.trimDouble3(seven_days_revenues));
                                 d.addProperty("incoming", Utils.trimDouble3(incoming));
                                 d.addProperty("estimated_revenues", Utils.trimDouble3(estimated_revenues));
                                 d.addProperty("estimated_revenues_dev_cost", Utils.trimDouble3(estRevDevCost));

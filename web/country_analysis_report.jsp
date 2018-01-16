@@ -123,7 +123,6 @@
 
 <jsp:include page="loading_dialog.jsp"></jsp:include>
 
-
 <script src="js/jquery.js"></script>
 <script src="bootstrap/js/bootstrap.min.js"></script>
 <script src="js/core.js"></script>
@@ -164,17 +163,17 @@
         },function(data){
             if(data && data.ret == 1){
                 $('#result_header').html("<tr><th>国家</th><th>Cost<span sorterId=\"1031\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
-                    "<th>PurchasedUser<span sorterId=\"1032\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
-                    "<th>Installed<span sorterId=\"1033\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
-                    "<th>Uninstalled<span sorterId=\"1034\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
-                    "<th>UninstalledRate</th><th>TotalUser<span sorterId=\"1036\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
-                    "<th>ActiveUser<span sorterId=\"1037\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
-                    "<th>Revenue<span sorterId=\"1038\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
-                    "<th>ECPM<span sorterId=\"1039\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
-                    "<th>CPA<span sorterId=\"1040\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
-                    "<th>Incoming<span sorterId=\"1043\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
-                    "<th>EstimatedRevenue14<span sorterId=\"1041\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
-                    "<th>Revenue14/Cost<span sorterId=\"1042\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
+                    "<th>7daysCost</th><th>PurchasedUser<span sorterId=\"1033\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
+                    "<th>Installed<span sorterId=\"1034\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
+                    "<th>Uninstalled<span sorterId=\"1035\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
+                    "<th>UninstalledRate</th><th>TotalUser<span sorterId=\"1037\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
+                    "<th>ActiveUser<span sorterId=\"1038\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
+                    "<th>Revenue<span sorterId=\"1039\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th><th>7daysRevenue</th>" +
+                    "<th>ECPM<span sorterId=\"1040\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
+                    "<th>CPA<span sorterId=\"1041\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
+                    "<th>Incoming<span sorterId=\"1042\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th><th>7daysIncoming</th>" +
+                    "<th>EstimatedRevenue14<span sorterId=\"1044\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
+                    "<th>Revenue14/Cost<span sorterId=\"1045\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
                     "<th>成本价</th><th>出价</th></tr>");
                 setData(data,query);
                 bindSortOp();
@@ -238,9 +237,9 @@
             var td_outer_a = $('<td></td>');
             td_outer_a.text(one['country_name']);
             tr.append(td_outer_a);
-            var keyset = ["costs", "purchased_users", "installed",
-                "uninstalled", "uninstalled_rate", "users", "active_users", "revenues",
-                "ecpm","cpa", "incoming", "estimated_revenues","estimated_revenues_dev_cost","price","bidding"];
+            var keyset = ["costs","seven_days_costs", "purchased_users", "installed",
+                "uninstalled", "uninstalled_rate", "users", "active_users", "revenues","seven_days_revenues",
+                "ecpm","cpa", "incoming","seven_days_incoming", "estimated_revenues","estimated_revenues_dev_cost","price","bidding"];
             for (var j = 0; j < keyset.length; j++) {
                 var td = $('<td></td>');
                 var r = one[keyset[j]];
