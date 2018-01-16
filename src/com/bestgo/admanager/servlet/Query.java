@@ -37,7 +37,9 @@ public class Query extends HttpServlet {
         JsonObject json = new JsonObject();
         String tag = request.getParameter("tag");
         String startTime = request.getParameter("startTime");
+        startTime = "2017-10-12";
         String endTime = request.getParameter("endTime");
+        endTime = "2017-10-12";
         String isSummary = request.getParameter("summary");
         String sorterId = request.getParameter("sorterId");
         String adwordsCheck = request.getParameter("adwordsCheck");
@@ -1377,44 +1379,18 @@ public class Query extends HttpServlet {
                 "(select distinct campaign_id from " + webAdCampaignTagRelTable + " where tag_id = " + tagId + ") rt " +
                 "where rt.campaign_id = ch.campaign_id and c.campaign_id = ch.campaign_id " +
                 "and date between '" + startTime + "' and '" + endTime + "' " +
-                "and c.status != 'removed' " +
-                "group by ch.campaign_id";
-        List<JSObject> list = DB.findListBySql(sql);
+                "and c.status != 'removed' ";
+        JSObject one = DB.findOneBySql(sql);
 
         JsonObject jsonObject = new JsonObject();
-        JsonArray array = new JsonArray();
-        double total_spend = 0;
-        double total_installed = 0;
-        double total_impressions = 0;
-        double total_click = 0;
+        double total_spend = Utils.convertDouble(one.get("spend"), 0);
+        double total_installed = Utils.convertDouble(one.get("installed"), 0);
+        double total_impressions = Utils.convertDouble(one.get("impressions"), 0);
+        double total_click = Utils.convertDouble(one.get("click"), 0);
 
-        for (int i = 0,len=list.size(); i < len; i++) {
-            JSObject one = list.get(i);
-            double impressions = Utils.convertDouble(one.get("impressions"), 0);
-            if (impressions == 0) {
-                continue;
-            }
-            double installed = Utils.convertDouble(one.get("installed"), 0);
-            double spend = Utils.convertDouble(one.get("spend"), 0);
-
-            double click = Utils.convertDouble(one.get("click"), 0);
-
-            total_spend += spend;
-            total_installed += installed;
-            total_impressions += impressions;
-            total_click += click;
-
-            JsonObject d = new JsonObject();
-            d.addProperty("impressions", impressions);
-            d.addProperty("spend", Utils.trimDouble(spend));
-            d.addProperty("installed", installed);
-            d.addProperty("click", click);
-            array.add(d);
-        }
         double total_ctr = total_impressions > 0 ? total_click / total_impressions : 0;
         double total_cpa = total_installed > 0 ? total_spend / total_installed : 0;
         double total_cvr = total_click > 0 ? total_installed / total_click : 0;
-        jsonObject.add("array", array);
         jsonObject.addProperty("total_spend", total_spend);
         jsonObject.addProperty("total_installed", total_installed);
         jsonObject.addProperty("total_impressions", total_impressions);
@@ -1461,6 +1437,7 @@ public class Query extends HttpServlet {
     class CampaignsSummary {
         public String name;
         public double total_spend;
+        public double seven_days_total_spend;
         public double total_installed;
         public double total_impressions;
         public double total_click;
@@ -1468,6 +1445,7 @@ public class Query extends HttpServlet {
         public double total_cpa;
         public double total_cvr;
         public double total_revenue;
+        public double seven_days_total_revenue;
         public String network;
     }
 }
