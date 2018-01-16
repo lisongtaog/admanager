@@ -247,14 +247,11 @@ function init() {
 
 
     $('#btnSummary').click(function () {
-        var query = $("#inputSearch").val();
         var startTime = $('#inputStartTime').val();
         var endTime = $('#inputEndTime').val();
         var adwordsCheck = $('#adwordsCheck').is(':checked');
         var facebookCheck = $('#facebookCheck').is(':checked');
-
         $.post('query', {
-            tag: query,
             summary: true,
             startTime: startTime,
             endTime: endTime,
@@ -457,13 +454,11 @@ function bindSortOpSummary() {
             $(this).addClass("glyphicon-arrow-up");
         }
 
-        var query = $("#inputSearch").val();
         var startTime = $('#inputStartTime').val();
         var endTime = $('#inputEndTime').val();
         var adwordsCheck = $('#adwordsCheck').is(':checked');
         var facebookCheck = $('#facebookCheck').is(':checked');
         $.post('query', {
-            tag: query,
             startTime: startTime,
             endTime: endTime,
             adwordsCheck: adwordsCheck,

@@ -35,7 +35,6 @@ public class Query extends HttpServlet {
         if (!Utils.isAdmin(request, response)) return;
 
         JsonObject json = new JsonObject();
-        String tag = request.getParameter("tag");
         String startTime = request.getParameter("startTime");
         String endTime = request.getParameter("endTime");
         String isSummary = request.getParameter("summary");
@@ -469,6 +468,7 @@ public class Query extends HttpServlet {
                 logger.error(ex.getMessage(), ex);
             }
         } else {
+            String tag = request.getParameter("tag");
             String countryCheck = request.getParameter("countryCheck");
             String containsNoDataCampaignCheck = request.getParameter("containsNoDataCampaignCheck");
             String onlyQueryNoDataCampaignCheck = request.getParameter("onlyQueryNoDataCampaignCheck");
