@@ -135,6 +135,8 @@ public class CountryAnalysisReport extends HttpServlet {
                             case 45:
                                 sql += " order by est_rev_dev_cost";
                                 break;
+                            default:
+                                sql += " order by total_cost desc";
 
                         }
                         List<JSObject> countryDetailJSObjectList = DB.findListBySql(sql);
@@ -151,25 +153,25 @@ public class CountryAnalysisReport extends HttpServlet {
                                 sql = "select sum(cost) as seven_days_costs, sum(revenue) as seven_days_revenues " +
                                         "from web_ad_country_analysis_report_history where app_id = '"+google_package_id+"' " +
                                         " and country_code = '" + country_code + "' and date BETWEEN '" + beforeSevenDays + "' AND '" + endTime + "'";
-                                JSObject oneT = DB.findOneBySql(sql);
+                                JSObject oneC = DB.findOneBySql(sql);
                                 double seven_days_costs  = 0;
                                 double seven_days_incoming  = 0;
                                 double seven_days_revenues = 0;
-                                if(oneT != null && oneT.hasObjectData()){
-                                    seven_days_costs  = oneT.get("seven_days_costs");
-                                    seven_days_revenues  = oneT.get("seven_days_revenues");
-                                    seven_days_incoming = seven_days_revenues - seven_days_costs;
+                                if(oneC != null && oneC.hasObjectData()){
+                                    seven_days_costs  = Utils.convertDouble(oneC.get("seven_days_costs"),0);
+                                    seven_days_revenues  = Utils.convertDouble(oneC.get("seven_days_revenues"),0);
+                                    seven_days_incoming = Utils.convertDouble(seven_days_revenues - seven_days_costs,0);
                                 }
 
-                                String sqlC = "select country_name from app_country_code_dict where country_code = '" + country_code + "'";
-                                JSObject oneC = DB.findOneBySql(sqlC);
+                                sql = "select country_name from app_country_code_dict where country_code = '" + country_code + "'";
+                                oneC = DB.findOneBySql(sql);
                                 String countryName = "";
                                 if(oneC != null && oneC.hasObjectData()){
                                     countryName = oneC.get("country_name");
                                 }else{
                                     countryName = country_code;
                                 }
-                                double costs = j.get("total_cost");
+                                double costs = Utils.convertDouble(j.get("total_cost"),0);
                                 double purchased_users = Utils.convertDouble(j.get("total_purchased_user"),0);
                                 double installed = Utils.convertDouble(j.get("installed"),0);
                                 double uninstalled = Utils.convertDouble(j.get("uninstalled"),0);
@@ -179,13 +181,13 @@ public class CountryAnalysisReport extends HttpServlet {
 
                                 double users = Utils.convertDouble(j.get("users"),0);
                                 double active_users = Utils.convertDouble(j.get("active_users"),0);
-                                double revenues = j.get("revenues");
-                                double estimated_revenues = j.get("estimated_revenues");
+                                double revenues = Utils.convertDouble(j.get("revenues"),0);
+                                double estimated_revenues = Utils.convertDouble(j.get("estimated_revenues"),0);
 //                                double ecpm = impressions == 0 ? 0 : Utils.trimDouble3(revenues * 1000 / impressions );
-                                double ecpm = j.get("ecpm");
+                                double ecpm = Utils.convertDouble(j.get("ecpm"),0);
                                 double estRevDevCost = Utils.convertDouble(j.get("est_rev_dev_cost"),0);
-                                double cpa = j.get("cpa");
-                                double incoming = j.get("incoming");
+                                double cpa = Utils.convertDouble(j.get("cpa"),0);
+                                double incoming = Utils.convertDouble(j.get("incoming"),0);
 
                                 String sqlAB = "select bidding from ad_campaigns_admob_auto_create where app_name = '"
                                                        + tagName + "' and country_region like '%" + country_code + "%'";
@@ -250,7 +252,7 @@ public class CountryAnalysisReport extends HttpServlet {
                                 JSObject oneP = DB.findOneBySql(sqlP);
                                 double price = 0;
                                 if(oneP != null && oneP.hasObjectData()){
-                                    price = oneP.get("price");
+                                    price = Utils.convertDouble(oneP.get("price"),0);
                                 }
                                 d.addProperty("price", Utils.trimDouble3(price));
                                 d.addProperty("bidding", biddingsStr);

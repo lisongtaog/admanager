@@ -1459,17 +1459,17 @@ public class Query extends HttpServlet {
         double total_cpa = total_installed > 0 ? total_spend / total_installed : 0;
         double total_cvr = total_click > 0 ? total_installed / total_click : 0;
 
-        sql = "select sum(ch.total_spend) as seven_days_total_spend " +
-                "from " + webAdCampaignsTable + " c, " + webAdCampaignsHistoryTable + " ch, " +
-                "(select distinct campaign_id from " + webAdCampaignTagRelTable + " where tag_id = " + tagId + ") rt " +
-                "where rt.campaign_id = ch.campaign_id and c.campaign_id = ch.campaign_id " +
-                "and date between '" + beforeSevenDay + "' and '" + endTime + "' " +
-                "and c.status != 'removed' ";
-        one = DB.findOneBySql(sql);
+//        sql = "select sum(ch.total_spend) as seven_days_total_spend " +
+//                "from " + webAdCampaignsTable + " c, " + webAdCampaignsHistoryTable + " ch, " +
+//                "(select distinct campaign_id from " + webAdCampaignTagRelTable + " where tag_id = " + tagId + ") rt " +
+//                "where rt.campaign_id = ch.campaign_id and c.campaign_id = ch.campaign_id " +
+//                "and date between '" + beforeSevenDay + "' and '" + endTime + "' " +
+//                "and c.status != 'removed' ";
+//        one = DB.findOneBySql(sql);
         double seven_days_total_spend = 0;
-        if(one != null && one.hasObjectData()){
-            seven_days_total_spend = Utils.convertDouble(one.get("seven_days_total_spend"), 0);
-        }
+//        if(one != null && one.hasObjectData()){
+//            seven_days_total_spend = Utils.convertDouble(one.get("seven_days_total_spend"), 0);
+//        }
 
         jsonObject.addProperty("seven_days_total_spend", seven_days_total_spend);
 
