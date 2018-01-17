@@ -188,7 +188,7 @@ public class CountryAnalysisReport extends HttpServlet {
                                 double estRevDevCost = Utils.convertDouble(j.get("est_rev_dev_cost"),0);
                                 double cpa = Utils.convertDouble(j.get("cpa"),0);
                                 double incoming = Utils.convertDouble(j.get("incoming"),0);
-
+                                double cpa_dev_ecpm = (ecpm == 0) ? 0 : (cpa / ecpm);
                                 String sqlAB = "select bidding from ad_campaigns_admob_auto_create where app_name = '"
                                                        + tagName + "' and country_region like '%" + country_code + "%'";
                                 List<JSObject> adwordsBiddingList = DB.findListBySql(sqlAB);
@@ -242,6 +242,7 @@ public class CountryAnalysisReport extends HttpServlet {
                                 d.addProperty("active_users", active_users);
                                 d.addProperty("revenues", Utils.trimDouble3(revenues));
                                 d.addProperty("ecpm", Utils.trimDouble3(ecpm));
+                                d.addProperty("cpa_dev_ecpm", Utils.trimDouble3(cpa_dev_ecpm));
                                 d.addProperty("seven_days_costs", Utils.trimDouble3(seven_days_costs));
                                 d.addProperty("seven_days_incoming", Utils.trimDouble3(seven_days_incoming));
                                 d.addProperty("seven_days_revenues", Utils.trimDouble3(seven_days_revenues));

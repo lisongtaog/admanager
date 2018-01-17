@@ -106,7 +106,7 @@
             <input type="checkbox" name="adnetwork" id="adwordsCheck"/><label for="adwordsCheck">只显示AdWords</label>
             <input type="checkbox" id="countryCheck"/><label for="countryCheck">细分到国家</label>
             <input type="checkbox" name="filtrateCampaign" id="containsNoDataCampaignCheck" checked/><label for="containsNoDataCampaignCheck">包含无数据的系列</label>
-            <input type="checkbox" name="filtrateCampaign" id="onlyQueryNoDataCampaignCheck"/><label for="onlyQueryNoDataCampaignCheck">只查询无数据的系列</label>
+            <%--<input type="checkbox" name="filtrateCampaign" id="onlyQueryNoDataCampaignCheck"/><label for="onlyQueryNoDataCampaignCheck">只查询无数据的系列</label>--%>
 
 
             <div>
@@ -211,7 +211,7 @@
 <script src="jqueryui/jquery-ui.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.4/js/select2.min.js"></script>
 <script src="js/country-name-code-dict.js"></script>
-<script src="js/index.js?t=20171129"></script>
+<script src="js/index.js?t=20171229"></script>
 
 <script>
     var data = <%=array.toString()%>;

@@ -80,13 +80,13 @@ public class Query extends HttpServlet {
                                 if(oneR != null){
                                     campaignsSummary.total_revenue = Utils.convertDouble(oneR.get("revenues"),0);
                                 }
-                                sqlR = "select sum(revenue) as seven_days_total_revenue " +
-                                        "from web_ad_country_analysis_report_history where app_id = '"
-                                        + google_package_id + "' and date BETWEEN '" + beforeSevenDay + "' AND '" + endTime + "'";
-                                oneR = DB.findOneBySql(sqlR);
-                                if(oneR != null){
-                                    campaignsSummary.seven_days_total_revenue = Utils.convertDouble(oneR.get("seven_days_total_revenue"),0);
-                                }
+//                                sqlR = "select sum(revenue) as seven_days_total_revenue " +
+//                                        "from web_ad_country_analysis_report_history where app_id = '"
+//                                        + google_package_id + "' and date BETWEEN '" + beforeSevenDay + "' AND '" + endTime + "'";
+//                                oneR = DB.findOneBySql(sqlR);
+//                                if(oneR != null){
+//                                    campaignsSummary.seven_days_total_revenue = Utils.convertDouble(oneR.get("seven_days_total_revenue"),0);
+//                                }
                             }
                             campaignsSummaryList.add(campaignsSummary);
                         }
@@ -428,13 +428,13 @@ public class Query extends HttpServlet {
                                 if(oneR != null){
                                     total_revenue = Utils.convertDouble(oneR.get("revenues"),0);
                                 }
-                                sqlR = "select sum(revenue) as seven_days_total_revenue " +
-                                        "from web_ad_country_analysis_report_history where app_id = '"
-                                        + google_package_id + "' and date BETWEEN '" + beforeSevenDay + "' AND '" + endTime + "'";
-                                oneR = DB.findOneBySql(sqlR);
-                                if(oneR != null){
-                                    seven_days_total_revenue = Utils.convertDouble(oneR.get("seven_days_total_revenue"),0);
-                                }
+//                                sqlR = "select sum(revenue) as seven_days_total_revenue " +
+//                                        "from web_ad_country_analysis_report_history where app_id = '"
+//                                        + google_package_id + "' and date BETWEEN '" + beforeSevenDay + "' AND '" + endTime + "'";
+//                                oneR = DB.findOneBySql(sqlR);
+//                                if(oneR != null){
+//                                    seven_days_total_revenue = Utils.convertDouble(oneR.get("seven_days_total_revenue"),0);
+//                                }
                             }
                             admob.addProperty("total_revenue",Utils.trimDouble(total_revenue));
                             admob.addProperty("seven_days_total_revenue",Utils.trimDouble(seven_days_total_revenue));
@@ -1319,9 +1319,13 @@ public class Query extends HttpServlet {
             JSObject one = list.get(i);
             double impressions = Utils.convertDouble(one.get("impressions"), 0);
             String status = one.get("status");
+
+            //这里暂时有问题
 //            if(onlyQueryNoDataCampaignCheck && impressions != 0){//只查询无数据，containsNoDataCampaignCheck = false
 //                continue;
 //            }
+
+
             if(!containsNoDataCampaignCheck && impressions == 0){//只查询有数据，containsNoDataCampaignCheck = true
                 continue;
             }

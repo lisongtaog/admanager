@@ -171,6 +171,7 @@
                     "<th>Revenue<span sorterId=\"1039\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th><th>7daysRevenue</th>" +
                     "<th>ECPM<span sorterId=\"1040\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
                     "<th>CPA<span sorterId=\"1041\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
+                    "<th>CPA/ECPM</th>" +
                     "<th>Incoming<span sorterId=\"1042\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th><th>7daysIncoming</th>" +
                     "<th>EstimatedRevenue14<span sorterId=\"1044\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
                     "<th>Revenue14/Cost<span sorterId=\"1045\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
@@ -239,7 +240,7 @@
             tr.append(td_outer_a);
             var keyset = ["costs","seven_days_costs", "purchased_users", "installed",
                 "uninstalled", "uninstalled_rate", "users", "active_users", "revenues","seven_days_revenues",
-                "ecpm","cpa", "incoming","seven_days_incoming", "estimated_revenues","estimated_revenues_dev_cost","price","bidding"];
+                "ecpm","cpa","cpa_dev_ecpm", "incoming","seven_days_incoming", "estimated_revenues","estimated_revenues_dev_cost","price","bidding"];
             for (var j = 0; j < keyset.length; j++) {
                 var td = $('<td></td>');
                 var r = one[keyset[j]];
