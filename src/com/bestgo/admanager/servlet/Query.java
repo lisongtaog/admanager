@@ -1273,8 +1273,8 @@ public class Query extends HttpServlet {
 
                 sql = "select c.campaign_id, c.account_id,short_name, campaign_name,c.status, create_time, c.budget, c.bidding, sum(IFNULL(ch.total_spend,0)) as spend, " +
                         " sum(IFNULL(ch.total_installed,0)) as installed, sum(IFNULL(ch.total_impressions,0)) as impressions, " +
-                        " sum(IFNULL(ch.total_click,0)) as click from web_ad_campaigns c LEFT JOIN web_ad_campaigns_country_history ch " +
-                        " ON c.campaign_id = ch.campaign_id LEFT JOIN web_account_id b on c.account_id = b.account_id " +
+                        " sum(IFNULL(ch.total_click,0)) as click from " + webAdCampaignsTable + " c LEFT JOIN " + webAdCampaignsCountryHistoryTable + " ch " +
+                        " ON c.campaign_id = ch.campaign_id LEFT JOIN " + webAccountIdTable + " b on c.account_id = b.account_id " +
                         "where  country_code= '" + countryCode + "' " +
                         " and date between '" + startTime + "' and '" + endTime + "' " +
                         ((likeCampaignName == null || likeCampaignName == "") ? " " : " and campaign_name like '%" + likeCampaignName +"%' " )  +
