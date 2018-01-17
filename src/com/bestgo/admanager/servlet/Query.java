@@ -1246,13 +1246,22 @@ public class Query extends HttpServlet {
         if (campaignIds != null && campaignIds != "") {
             String sql = "";
             if(countryCode != null && countryCode != ""){
-                sql = "select ch.campaign_id, sum(ch.total_spend) as campaign_spends " +
-                        " from " + webAdCampaignsTable + " c, " + webAdCampaignsCountryHistoryTable + " ch " +
-                        " where c.campaign_id=ch.campaign_id " +
-                        ((likeCampaignName == "" || likeCampaignName == null) ? " " : " and campaign_name like '%" + likeCampaignName +"%' " )  +
-                        " and date between '" + startTime + "' and '" + endTime + "' " +
+//                sql = "select ch.campaign_id, sum(ch.total_spend) as campaign_spends " +
+//                        " from " + webAdCampaignsTable + " c, " + webAdCampaignsCountryHistoryTable + " ch " +
+//                        " where c.campaign_id=ch.campaign_id " +
+//                        ((likeCampaignName == "" || likeCampaignName == null) ? " " : " and campaign_name like '%" + likeCampaignName +"%' " )  +
+//                        " and date between '" + startTime + "' and '" + endTime + "' " +
+//                        " and c.status != 'removed' and c.campaign_id in (" + campaignIds + ")" +
+//                        " group by ch.campaign_id";
+
+                sql = "select c.campaign_id, sum(IFNULL(ch.total_spend,0)) as campaign_spends " +
+                        " from " + webAdCampaignsTable + " c LEFT JOIN " + webAdCampaignsCountryHistoryTable + " ch " +
+                        " on c.campaign_id = ch.campaign_id " +
+                        " where date between '" + startTime + "' and '" + endTime + "' " +
                         " and c.status != 'removed' and c.campaign_id in (" + campaignIds + ")" +
-                        " group by ch.campaign_id";
+                        " group by c.campaign_id" +
+                        ((likeCampaignName == "" || likeCampaignName == null) ? " " : " and campaign_name like '%" + likeCampaignName +"%' " );
+
                 listCampaignSpend4CountryCode = DB.findListBySql(sql);
 
                 for(JSObject j : listCampaignSpend4CountryCode){
@@ -1279,7 +1288,7 @@ public class Query extends HttpServlet {
                         " and date between '" + startTime + "' and '" + endTime + "' " +
                         ((likeCampaignName == null || likeCampaignName == "") ? " " : " and campaign_name like '%" + likeCampaignName +"%' " )  +
                         " and c.status != 'removed' and c.campaign_id in (" + campaignIds + ")" +
-                        " group by c.campaign_id" +
+                        " group by c.campaign_id " +
                         ((totalInstallComparisonValue == "" || totalInstallComparisonValue == null) ? " " : " having installed " + totalInstallComparisonValue);
                 list = DB.findListBySql(sql);
             }else if (countryCheck) {
@@ -1325,9 +1334,9 @@ public class Query extends HttpServlet {
                         " sum(ifnull(ch.total_installed,0)) as installed, sum(ifnull(ch.total_impressions,0)) as impressions, " +
                         " sum(ifnull(ch.total_click,0)) as click from " + webAdCampaignsTable + " c left join " + webAdCampaignsHistoryTable + " ch " +
                         " on c.campaign_id = ch.campaign_id LEFT JOIN " + webAccountIdTable + " b ON c.account_id = b.account_id " +
-                        " where date between '" + startTime + "' and '" + endTime + "' " +
+                        " where c.status != 'removed' and c.campaign_id in (" + campaignIds + ")" +
                         ((likeCampaignName == "" || likeCampaignName == null) ? " " : " and campaign_name like '%" + likeCampaignName +"%' " )  +
-                        " and c.status != 'removed' and c.campaign_id in (" + campaignIds + ")" +
+                        " and date between '" + startTime + "' and '" + endTime + "' " +
                         " group by c.campaign_id " +
                         ((totalInstallComparisonValue == "" || totalInstallComparisonValue == null) ? " " : " having installed " + totalInstallComparisonValue);
                 list = DB.findListBySql(sql);

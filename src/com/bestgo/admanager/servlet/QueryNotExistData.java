@@ -162,10 +162,11 @@ public class QueryNotExistData extends HttpServlet {
             campaignIds = campaignIds.substring(0,campaignIds.length()-1);
         }
         if (!campaignIds.isEmpty()) {
-            String sql = "select campaign_id, a.account_id, short_name, campaign_name, create_time, status, budget, bidding, total_spend, total_installed, total_click, total_impressions, cpa,ctr, " +
-                    "(case when total_click > 0 then total_installed/total_click else 0 end) as cvr " +
-                    " from " + webAdCampaignsTable + " a , "+webAccountIdTable+" b where a.status = '" + FieldStatus + "' and " +
-                    "campaign_id in (" + campaignIds + ") and a.account_id = b.account_id" +
+            String sql = "select campaign_id, a.account_id, short_name, campaign_name, create_time, a.status, budget, bidding, total_spend, " +
+                    " total_installed, total_click, cpa,ctr, " +
+                    " (case when total_click > 0 then total_installed/total_click else 0 end) as cvr " +
+                    "  from " + webAdCampaignsTable + " a LEFT JOIN " + webAccountIdTable + " b ON a.account_id = b.account_id where a.status = '" + FieldStatus + "' and " +
+                    "  campaign_id in (" + campaignIds + ") " +
                     ((likeCampaignName == "" || likeCampaignName == null) ? "" : " and campaign_name like %" + likeCampaignName + "%");
             listAll = DB.findListBySql(sql);
             if(country == "" || country == null){
@@ -250,7 +251,7 @@ public class QueryNotExistData extends HttpServlet {
         jsonObject.add("array", array);
         jsonObject.addProperty("total_spend", total_spend);
         jsonObject.addProperty("total_installed", total_installed);
-        jsonObject.addProperty("total_impressions", total_impressions);
+        jsonObject.addProperty("total_impressions", 0);
         jsonObject.addProperty("total_click", 0);
         jsonObject.addProperty("total_ctr", Utils.trimDouble(total_ctr));
         jsonObject.addProperty("total_cpa", Utils.trimDouble(total_cpa));

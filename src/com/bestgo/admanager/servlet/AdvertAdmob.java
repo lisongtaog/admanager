@@ -64,7 +64,6 @@ public class AdvertAdmob extends HttpServlet {
                     }else{
                         result.message = "广告语描述有重复！";
                     }
-
                 }
 
 
