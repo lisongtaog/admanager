@@ -1258,46 +1258,78 @@ public class Query extends HttpServlet {
                 for(JSObject j : listCampaignSpend4CountryCode){
                     countryCampaignspendMap.put(j.get("campaign_id"),j);
                 }
-                sql = "select campaign_id, a.account_id,short_name, campaign_name, a.status, create_time, budget, bidding, spend, installed, impressions, click" +
-                        " from (" +
-                        "select ch.campaign_id, account_id, campaign_name,c.status, create_time, c.budget, c.bidding, sum(ch.total_spend) as spend, " +
-                        "sum(ch.total_installed) as installed, sum(ch.total_impressions) as impressions " +
-                        ",sum(ch.total_click) as click from " + webAdCampaignsTable + " c, " + webAdCampaignsCountryHistoryTable + " ch " +
-                        "where c.campaign_id=ch.campaign_id and country_code= '" + countryCode + "' " +
-                        ((likeCampaignName == null || likeCampaignName == "") ? " " : " and campaign_name like '%" + likeCampaignName +"%' " )  +
+//                sql = "select campaign_id, a.account_id,short_name, campaign_name, a.status, create_time, budget, bidding, spend, installed, impressions, click" +
+//                        " from (" +
+//                        "select ch.campaign_id, account_id, campaign_name,c.status, create_time, c.budget, c.bidding, sum(ch.total_spend) as spend, " +
+//                        "sum(ch.total_installed) as installed, sum(ch.total_impressions) as impressions " +
+//                        ",sum(ch.total_click) as click from " + webAdCampaignsTable + " c, " + webAdCampaignsCountryHistoryTable + " ch " +
+//                        "where c.campaign_id=ch.campaign_id and country_code= '" + countryCode + "' " +
+//                        ((likeCampaignName == null || likeCampaignName == "") ? " " : " and campaign_name like '%" + likeCampaignName +"%' " )  +
+//                        " and date between '" + startTime + "' and '" + endTime + "' " +
+//                        " and c.status != 'removed' and c.campaign_id in (" + campaignIds + ")" +
+//                        " group by ch.campaign_id " +
+//                        ((totalInstallComparisonValue == "" || totalInstallComparisonValue == null) ? " " : " having installed " + totalInstallComparisonValue)  +
+//                        ") a left join " + webAccountIdTable + " b on a.account_id = b.account_id";
+
+                sql = "select c.campaign_id, c.account_id,short_name, campaign_name,c.status, create_time, c.budget, c.bidding, sum(IFNULL(ch.total_spend,0)) as spend, " +
+                        " sum(IFNULL(ch.total_installed,0)) as installed, sum(IFNULL(ch.total_impressions,0)) as impressions, " +
+                        " sum(IFNULL(ch.total_click,0)) as click from web_ad_campaigns c LEFT JOIN web_ad_campaigns_country_history ch " +
+                        " ON c.campaign_id = ch.campaign_id LEFT JOIN web_account_id b on c.account_id = b.account_id " +
+                        "where  country_code= '" + countryCode + "' " +
                         " and date between '" + startTime + "' and '" + endTime + "' " +
+                        ((likeCampaignName == null || likeCampaignName == "") ? " " : " and campaign_name like '%" + likeCampaignName +"%' " )  +
                         " and c.status != 'removed' and c.campaign_id in (" + campaignIds + ")" +
-                        " group by ch.campaign_id " +
-                        ((totalInstallComparisonValue == "" || totalInstallComparisonValue == null) ? " " : " having installed " + totalInstallComparisonValue)  +
-                        ") a left join " + webAccountIdTable + " b on a.account_id = b.account_id";
+                        " group by c.campaign_id" +
+                        ((totalInstallComparisonValue == "" || totalInstallComparisonValue == null) ? " " : " having installed " + totalInstallComparisonValue);
                 list = DB.findListBySql(sql);
             }else if (countryCheck) {
-                sql = "select campaign_id, country_code, a.account_id,short_name, campaign_name, a.status, create_time, budget, bidding, spend, installed, impressions, click" +
-                        " from (" +
-                        "select ch.campaign_id, country_code, account_id, campaign_name,c.status, create_time, c.budget, c.bidding, sum(ch.total_spend) as spend, " +
-                        "sum(ch.total_installed) as installed, sum(ch.total_impressions) as impressions " +
-                        ",sum(ch.total_click) as click from " + webAdCampaignsTable + " c, " + webAdCampaignsCountryHistoryTable + " ch " +
-                        "where c.campaign_id=ch.campaign_id " +
+//                sql = "select campaign_id, country_code, a.account_id,short_name, campaign_name, a.status, create_time, budget, bidding, spend, installed, impressions, click" +
+//                        " from (" +
+//                        "select ch.campaign_id, country_code, account_id, campaign_name,c.status, create_time, c.budget, c.bidding, sum(ch.total_spend) as spend, " +
+//                        "sum(ch.total_installed) as installed, sum(ch.total_impressions) as impressions " +
+//                        ",sum(ch.total_click) as click from " + webAdCampaignsTable + " c, " + webAdCampaignsCountryHistoryTable + " ch " +
+//                        "where c.campaign_id=ch.campaign_id " +
+//                        ((likeCampaignName == null || likeCampaignName == "") ? " " : " and campaign_name like '%" + likeCampaignName +"%' " )  +
+//                        " and date between '" + startTime + "' and '" + endTime + "' " +
+//                        " and c.status != 'removed' and c.campaign_id in (" + campaignIds + ")" +
+//                        " group by ch.campaign_id, country_code " +
+//                        ((totalInstallComparisonValue == null || totalInstallComparisonValue == "") ? " " : " having installed " + totalInstallComparisonValue)  +
+//                        ") a left join " + webAccountIdTable + " b on a.account_id = b.account_id";
+
+                sql = "select c.campaign_id, country_code, c.account_id, campaign_name,short_name,c.status, create_time, " +
+                        " c.budget, c.bidding, sum(IFNULL(ch.total_spend,0)) as spend, " +
+                        " sum(IFNULL(ch.total_installed,0)) as installed, sum(IFNULL(ch.total_impressions,0)) as impressions, " +
+                        " sum(IFNULL(ch.total_click,0)) as click from " + webAdCampaignsTable + " c LEFT JOIN " + webAdCampaignsCountryHistoryTable + " ch " +
+                        " on c.campaign_id = ch.campaign_id LEFT JOIN " + webAccountIdTable + " b on c.account_id = b.account_id " +
+                        " where date between '" + startTime + "' and '" + endTime + "' " +
                         ((likeCampaignName == null || likeCampaignName == "") ? " " : " and campaign_name like '%" + likeCampaignName +"%' " )  +
-                        " and date between '" + startTime + "' and '" + endTime + "' " +
                         " and c.status != 'removed' and c.campaign_id in (" + campaignIds + ")" +
-                        " group by ch.campaign_id, country_code " +
-                        ((totalInstallComparisonValue == null || totalInstallComparisonValue == "") ? " " : " having installed " + totalInstallComparisonValue)  +
-                        ") a left join " + webAccountIdTable + " b on a.account_id = b.account_id";
+                        " group by c.campaign_id, country_code " +
+                        ((totalInstallComparisonValue == null || totalInstallComparisonValue == "") ? " " : " having installed " + totalInstallComparisonValue);
                 list = DB.findListBySql(sql);
             }else{
-                sql = "select campaign_id, a.account_id,short_name, campaign_name, a.status, create_time, budget, bidding, spend, installed, impressions, click " +
-                        " from (" +
-                        "select c.campaign_id, account_id, campaign_name,c.status, create_time, c.budget, c.bidding, sum(ifnull(ch.total_spend,0)) as spend, " +
-                        "sum(ifnull(ch.total_installed,0)) as installed, sum(ifnull(ch.total_impressions,0)) as impressions " +
-                        ",sum(ifnull(ch.total_click,0)) as click from " + webAdCampaignsTable + " c left join " + webAdCampaignsHistoryTable + " ch " +
-                        "on c.campaign_id=ch.campaign_id where" +
-                        " date between '" + startTime + "' and '" + endTime + "' " +
+//                sql = "select campaign_id, a.account_id,short_name, campaign_name, a.status, create_time, budget, bidding, spend, installed, impressions, click " +
+//                        " from (" +
+//                        "select c.campaign_id, account_id, campaign_name,c.status, create_time, c.budget, c.bidding, sum(ifnull(ch.total_spend,0)) as spend, " +
+//                        "sum(ifnull(ch.total_installed,0)) as installed, sum(ifnull(ch.total_impressions,0)) as impressions " +
+//                        ",sum(ifnull(ch.total_click,0)) as click from " + webAdCampaignsTable + " c left join " + webAdCampaignsHistoryTable + " ch " +
+//                        "on c.campaign_id=ch.campaign_id where" +
+//                        " date between '" + startTime + "' and '" + endTime + "' " +
+//                        ((likeCampaignName == "" || likeCampaignName == null) ? " " : " and campaign_name like '%" + likeCampaignName +"%' " )  +
+//                        " and c.status != 'removed' and c.campaign_id in (" + campaignIds + ")" +
+//                        " group by c.campaign_id " +
+//                        ((totalInstallComparisonValue == "" || totalInstallComparisonValue == null) ? " " : " having installed " + totalInstallComparisonValue)  +
+//                        ") a left join " + webAccountIdTable + " b on a.account_id = b.account_id";
+
+                sql = "select c.campaign_id, c.account_id,short_name, campaign_name,c.status, create_time, c.budget, c.bidding, sum(ifnull(ch.total_spend,0)) as spend, " +
+                        " sum(ifnull(ch.total_installed,0)) as installed, sum(ifnull(ch.total_impressions,0)) as impressions, " +
+                        " sum(ifnull(ch.total_click,0)) as click from " + webAdCampaignsTable + " c left join " + webAdCampaignsHistoryTable + " ch " +
+                        " on c.campaign_id = ch.campaign_id LEFT JOIN " + webAccountIdTable + " b ON c.account_id = b.account_id " +
+                        " where date between '" + startTime + "' and '" + endTime + "' " +
                         ((likeCampaignName == "" || likeCampaignName == null) ? " " : " and campaign_name like '%" + likeCampaignName +"%' " )  +
                         " and c.status != 'removed' and c.campaign_id in (" + campaignIds + ")" +
                         " group by c.campaign_id " +
-                        ((totalInstallComparisonValue == "" || totalInstallComparisonValue == null) ? " " : " having installed " + totalInstallComparisonValue)  +
-                        ") a left join " + webAccountIdTable + " b on a.account_id = b.account_id";
+                        ((totalInstallComparisonValue == "" || totalInstallComparisonValue == null) ? " " : " having installed " + totalInstallComparisonValue);
                 list = DB.findListBySql(sql);
             }
 
