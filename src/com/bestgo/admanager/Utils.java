@@ -201,17 +201,22 @@ public class Utils {
      * @return
      */
     public static List<JSObject> getDiffJSObjectList(List<JSObject> mainList, List<JSObject> compareList,String commonFiled) {
+        if(compareList == null){
+            return mainList;
+        }
+        if(mainList == null){
+            return null;
+        }
         List<JSObject> diff = new ArrayList<>();
         Map<String,JSObject> map = new HashMap<>(mainList.size());
         for (JSObject x : compareList) {
             map.put(x.get(commonFiled), x);
         }
         for (JSObject i : mainList) {
-            String cf = i.get(commonFiled);
-            if(map.get(cf) == null) {
+            String key = i.get(commonFiled);
+            if(!map.containsKey(key)) {
                 diff.add(i);
             }
-
         }
         return diff;
     }

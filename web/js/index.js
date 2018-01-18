@@ -359,11 +359,11 @@ function setData(data) {
             } else if (field == 'spend') {
                 td.text(field_value + " / " + totalSpend);
             } else if(field == 'roi'){
-                if(field_value <0){
+                if(field_value < 0){
                     td.addClass("red");
                 }else if(field_value > 0){
                     td.addClass("blue");
-                }else{
+                }else if(field_value == 0){
                     td.addClass("yellow");
                 }
                 td.text(field_value);

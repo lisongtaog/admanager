@@ -1199,7 +1199,7 @@ public class QueryByMulConditions extends HttpServlet {
         String webAdCampaignsCountryHistoryTable = "web_ad_campaigns_country_history";
         String FieldStatus = "ACTIVE";
         List<JSObject> listAll = new ArrayList<>();
-        List<JSObject> listNoData = new ArrayList<>();
+        List<JSObject> listNoData = null;
         if (admobCheck) {
             adCampaignsTable = "ad_campaigns_admob";
             webAdCampaignTagRelTable = "web_ad_campaign_tag_admob_rel";
@@ -1215,7 +1215,7 @@ public class QueryByMulConditions extends HttpServlet {
 
 
         Set<String> campaignIdSet = new HashSet<>();
-        for(JSObject j : list){
+            for(JSObject j : list){
             campaignIdSet.add(j.get("campaign_id"));
         }
 
@@ -1274,13 +1274,18 @@ public class QueryByMulConditions extends HttpServlet {
                         " and date between '" + startTime + "' and '" + endTime + "' " +
                         " and c.status != 'removed' and c.campaign_id in (" + campaignIds + ")" +
                         " group by ch.campaign_id " +
-                        ((totalInstallComparisonValue == "" || totalInstallComparisonValue == null) ? " " : " having installed " + totalInstallComparisonValue)  +
+                        ((totalInstallComparisonValue == "" || totalInstallComparisonValue == null) ? " having impressions > 0 " : " having installed " + totalInstallComparisonValue)  +
                         ") a left join " + webAccountIdTable + " b on a.account_id = b.account_id";
+
                 list = DB.findListBySql(sql);
                 if(containsNoDataCampaignCheck){
-                    sql = "select c.campaign_id, c.account_id, short_name, c.campaign_name, c.create_time, c.status, budget, c.bidding, total_spend " +
-                            " from " + adCampaignsTable + " a, " + webAdCampaignsTable + " c, " + webAccountIdTable + " b where a.campaign_id = c.campaign_id AND " +
-                            " c.account_id = b.account_id and c.status = '" + FieldStatus + "' and a.country_region = '" + country + "' and app_name = '" + tagName + "' " +
+//                    sql = "select c.campaign_id, c.account_id, short_name, c.campaign_name, c.create_time, c.status, budget, c.bidding, c.total_spend " +
+//                            " from " + adCampaignsTable + " a, " + webAdCampaignsTable + " c, " + webAccountIdTable + " b where a.campaign_id = c.campaign_id " +
+//                            " c.account_id = b.account_id and c.status = '" + FieldStatus + "' and a.country_region = '" + country + "' and app_name = '" + tagName + "' " +
+//                            ((likeCampaignName == "" || likeCampaignName == null) ? " " : " and c.campaign_name like '%" + likeCampaignName +"%' " );
+                    sql = "select c.campaign_id, c.account_id, short_name, c.campaign_name, c.create_time, c.status, budget, c.bidding, c.total_spend " +
+                            " from " + adCampaignsTable + " a, " + webAdCampaignsTable + " c, " + webAccountIdTable + " b where a.campaign_id = c.campaign_id " +
+                            " c.account_id = b.account_id and a.country_region = '" + country + "' and app_name = '" + tagName + "' " +
                             ((likeCampaignName == "" || likeCampaignName == null) ? " " : " and c.campaign_name like '%" + likeCampaignName +"%' " );
                     listAll = DB.findListBySql(sql);
                     if(list != null && list.size() >0){
@@ -1300,7 +1305,7 @@ public class QueryByMulConditions extends HttpServlet {
                         " and date between '" + startTime + "' and '" + endTime + "' " +
                         " and c.status != 'removed' and c.campaign_id in (" + campaignIds + ")" +
                         " group by ch.campaign_id, country_code " +
-                        ((totalInstallComparisonValue == null || totalInstallComparisonValue == "") ? " " : " having installed " + totalInstallComparisonValue)  +
+                        ((totalInstallComparisonValue == null || totalInstallComparisonValue == "") ? "  having impressions > 0 " : " having installed " + totalInstallComparisonValue)  +
                         ") a left join " + webAccountIdTable + " b on a.account_id = b.account_id";
                 list = DB.findListBySql(sql);
             }else{
@@ -1314,14 +1319,18 @@ public class QueryByMulConditions extends HttpServlet {
                         " and date between '" + startTime + "' and '" + endTime + "' " +
                         " and c.status != 'removed' and c.campaign_id in (" + campaignIds + ")" +
                         " group by ch.campaign_id " +
-                        ((totalInstallComparisonValue == "" || totalInstallComparisonValue == null) ? " " : " having installed " + totalInstallComparisonValue)  +
+                        ((totalInstallComparisonValue == "" || totalInstallComparisonValue == null) ? " having impressions > 0 " : " having installed " + totalInstallComparisonValue)  +
                         ") a left join " + webAccountIdTable + " b on a.account_id = b.account_id";
                 list = DB.findListBySql(sql);
                 if(containsNoDataCampaignCheck){
-                    sql = "select campaign_id, a.account_id, short_name, campaign_name, create_time, a.status, budget, bidding, total_spend " +
-                            "  from " + webAdCampaignsTable + " a LEFT JOIN " + webAccountIdTable + " b ON a.account_id = b.account_id where a.status = '" + FieldStatus + "' " +
-                            ((likeCampaignName == "" || likeCampaignName == null) ? " " : " and campaign_name like '%" + likeCampaignName +"%' " )  +
-                            " and campaign_id in (" + campaignIds + ") ";
+//                    sql = "select campaign_id, c.account_id, short_name, campaign_name, create_time, c.status, budget, bidding, c.total_spend " +
+//                            "  from " + webAdCampaignsTable + " c LEFT JOIN " + webAccountIdTable + " b ON c.account_id = b.account_id where c.status = '" + FieldStatus + "'" +
+//                            ((likeCampaignName == "" || likeCampaignName == null) ? " " : " and campaign_name like '%" + likeCampaignName +"%' " )  +
+//                            " and campaign_id in (" + campaignIds + ") ";
+                    sql = "select campaign_id, c.account_id, short_name, campaign_name, create_time, c.status, budget, bidding, c.total_spend " +
+                            "  from " + webAdCampaignsTable + " c LEFT JOIN " + webAccountIdTable + " b ON c.account_id = b.account_id where " +
+                            " campaign_id in (" + campaignIds + ") " +
+                            ((likeCampaignName == "" || likeCampaignName == null) ? " " : " and campaign_name like '%" + likeCampaignName +"%' ");
                     listAll = DB.findListBySql(sql);
                     if(list != null && list.size() >0){
                         listNoData = Utils.getDiffJSObjectList(listAll, list, "campaign_id");
@@ -1480,7 +1489,7 @@ public class QueryByMulConditions extends HttpServlet {
                 d.addProperty("ctr", 0);
                 d.addProperty("cpa", 0);
                 d.addProperty("cvr", 0);
-                d.addProperty("roi", -100000);
+                d.addProperty("roi", "--");
                 if (admobCheck) {
                     d.addProperty("network", "admob");
                 } else {
