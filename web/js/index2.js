@@ -252,7 +252,7 @@ function init() {
         var endTime = $('#inputEndTime').val();
         var adwordsCheck = $('#adwordsCheck').is(':checked');
         var facebookCheck = $('#facebookCheck').is(':checked');
-        $.post('query_by_mul_conditions', {
+        $.post('query', {
             summary: true,
             startTime: startTime,
             endTime: endTime,
@@ -459,7 +459,7 @@ function bindSortOpSummary() {
         var endTime = $('#inputEndTime').val();
         var adwordsCheck = $('#adwordsCheck').is(':checked');
         var facebookCheck = $('#facebookCheck').is(':checked');
-        $.post('query_by_mul_conditions', {
+        $.post('query', {
             startTime: startTime,
             endTime: endTime,
             adwordsCheck: adwordsCheck,
@@ -818,4 +818,3 @@ if(countryRevenueSpendReturn == "false"){
     $('#btnSummary').click();
 }
 
-//四处替换修改query

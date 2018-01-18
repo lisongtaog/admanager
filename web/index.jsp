@@ -105,9 +105,8 @@
             <input type="checkbox" name="adnetwork" id="facebookCheck"/><label for="facebookCheck">只显示Facebook</label>
             <input type="checkbox" name="adnetwork" id="adwordsCheck"/><label for="adwordsCheck">只显示AdWords</label>
             <input type="checkbox" id="countryCheck"/><label for="countryCheck">细分到国家</label>
-            <%--<input type="checkbox" name="filtrateCampaign" id="containsNoDataCampaignCheck"/><label for="containsNoDataCampaignCheck">包含无数据的系列</label>--%>
+            <input type="checkbox" name="filtrateCampaign" id="containsNoDataCampaignCheck"/><label for="containsNoDataCampaignCheck">包含无数据的系列</label>
             <%--<input type="checkbox" name="filtrateCampaign" id="onlyQueryNoDataCampaignCheck"/><label for="onlyQueryNoDataCampaignCheck">只查询无数据的系列</label>--%>
-
 
             <div>
                 <label>花费比例</label><select id="selectCostOp"><option value="1">大于等于</option><option value="2" selected="true">小于等于</option></select>

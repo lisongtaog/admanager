@@ -18,6 +18,9 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.*;
 
+/**
+ * 多条件查询
+ */
 @WebServlet(name = "QueryByMulConditions", urlPatterns = {"/query_by_mul_conditions"}, asyncSupported = true)
 public class QueryByMulConditions extends HttpServlet {
 
@@ -32,7 +35,6 @@ public class QueryByMulConditions extends HttpServlet {
         JsonObject json = new JsonObject();
         String startTime = request.getParameter("startTime");
         String endTime = request.getParameter("endTime");
-        String isSummary = request.getParameter("summary");
         String sorterId = request.getParameter("sorterId");
         String adwordsCheck = request.getParameter("adwordsCheck");
         String facebookCheck = request.getParameter("facebookCheck");
@@ -40,1151 +42,726 @@ public class QueryByMulConditions extends HttpServlet {
         if (sorterId != null && sorterId != "") {
             sorter = Utils.parseInt(sorterId, 0);
         }
-        if ("true".equals(isSummary)) {
-            String beforeSevenDay = DateUtil.addDay(endTime,-6,"yyyy-MM-dd");
-            try {
-                JsonArray arr = new JsonArray();
+        String tag = request.getParameter("tag");
+        String countryCheck = request.getParameter("countryCheck");
+        String containsNoDataCampaignCheck = request.getParameter("containsNoDataCampaignCheck");
+        String onlyQueryNoDataCampaignCheck = request.getParameter("onlyQueryNoDataCampaignCheck");
+        String campaignCreateTime = request.getParameter("campaignCreateTime");
+        String countryCode = request.getParameter("countryCode");
+        String countryName = request.getParameter("countryName");
+
+        String totalInstallComparisonValue = request.getParameter("totalInstallComparisonValue");
+
+        String likeCampaignName = request.getParameter("likeCampaignName");
+        HashMap<String ,String> countryMap = Utils.getCountryMap();
+        try {
+            JSObject tagObject = DB.simpleScan("web_tag")
+                    .select("id", "tag_name")
+                    .where(DB.filter().whereEqualTo("tag_name", tag)).execute();
+            if (tagObject.hasObjectData()) {
+                Long id = tagObject.get("id");
+                JsonObject jsonObject = new JsonObject();
+                if (countryCode != null && countryCode != "") {
+                    countryCheck = "false";
+                }
                 if ("false".equals(adwordsCheck) && "false".equals(facebookCheck)) {
-                    if(sorter > 0){
-                        ArrayList<CampaignsSummary> campaignsSummaryList = new ArrayList<>();
-                        String sqlTag = "select t.id,t.tag_name,google_package_id from web_tag t LEFT JOIN web_facebook_app_ids_rel air ON t.tag_name = air.tag_name";
-                        List<JSObject> tagList = DB.findListBySql(sqlTag);
-                        for (JSObject tagJSObject : tagList) {
-                            CampaignsSummary campaignsSummary = new CampaignsSummary();
-                            long id = tagJSObject.get("id");
-                            campaignsSummary.name = tagJSObject.get("tag_name");
-                            JsonObject admob = fetchOneAppDataSummary(id, startTime, endTime,true,beforeSevenDay);
-                            JsonObject facebook =  fetchOneAppDataSummary(id, startTime, endTime,false,beforeSevenDay);
-                            campaignsSummary.total_impressions = admob.get("total_impressions").getAsDouble() + facebook.get("total_impressions").getAsDouble();
-                            if (campaignsSummary.total_impressions == 0) {
-                                continue;
-                            }
-                            campaignsSummary.total_spend = admob.get("total_spend").getAsDouble() + facebook.get("total_spend").getAsDouble();
-                            campaignsSummary.seven_days_total_spend = admob.get("seven_days_total_spend").getAsDouble() + facebook.get("seven_days_total_spend").getAsDouble();
-                            campaignsSummary.total_installed = admob.get("total_installed").getAsDouble() + facebook.get("total_installed").getAsDouble();
-                            campaignsSummary.total_click = admob.get("total_click").getAsDouble() + facebook.get("total_click").getAsDouble();
-                            campaignsSummary.total_ctr = campaignsSummary.total_impressions > 0 ? campaignsSummary.total_click / campaignsSummary.total_impressions : 0;
-                            campaignsSummary.total_cpa = campaignsSummary.total_installed > 0 ? campaignsSummary.total_spend / campaignsSummary.total_installed : 0;
-                            campaignsSummary.total_cvr = campaignsSummary.total_click > 0 ? campaignsSummary.total_installed / campaignsSummary.total_click : 0;
-                            String google_package_id = tagJSObject.get("google_package_id");
-                            if(google_package_id != null){
-                                String sqlR = "select sum(revenue) as revenues " +
-                                        "from web_ad_country_analysis_report_history where app_id = '"
-                                        + google_package_id + "' and date BETWEEN '" + startTime + "' AND '" + endTime + "'";
-                                JSObject oneR = DB.findOneBySql(sqlR);
-                                if(oneR != null){
-                                    campaignsSummary.total_revenue = Utils.convertDouble(oneR.get("revenues"),0);
-                                }
-//                                sqlR = "select sum(revenue) as seven_days_total_revenue " +
-//                                        "from web_ad_country_analysis_report_history where app_id = '"
-//                                        + google_package_id + "' and date BETWEEN '" + beforeSevenDay + "' AND '" + endTime + "'";
-//                                oneR = DB.findOneBySql(sqlR);
-//                                if(oneR != null){
-//                                    campaignsSummary.seven_days_total_revenue = Utils.convertDouble(oneR.get("seven_days_total_revenue"),0);
-//                                }
-                            }
-                            campaignsSummaryList.add(campaignsSummary);
+                    JsonObject admob = fetchOneAppData(id, tag,startTime, endTime, true, "true".equals(countryCheck), countryCode,likeCampaignName,campaignCreateTime,true,countryMap,totalInstallComparisonValue, "true".equals(containsNoDataCampaignCheck), "true".equals(onlyQueryNoDataCampaignCheck),countryCode);
+                    JsonObject facebook = fetchOneAppData(id, tag,startTime, endTime,false, "true".equals(countryCheck), countryCode,likeCampaignName,campaignCreateTime,true,countryMap,totalInstallComparisonValue, "true".equals(containsNoDataCampaignCheck),"true".equals(onlyQueryNoDataCampaignCheck),countryName);
+                    double total_spend = admob.get("total_spend").getAsDouble() + facebook.get("total_spend").getAsDouble();
+                    double total_installed = admob.get("total_installed").getAsDouble() + facebook.get("total_installed").getAsDouble();
+                    double total_impressions = admob.get("total_impressions").getAsDouble() + facebook.get("total_impressions").getAsDouble();
+                    double total_click = admob.get("total_click").getAsDouble() + facebook.get("total_click").getAsDouble();
+                    double total_ctr = total_impressions > 0 ? total_click / total_impressions : 0;
+                    double total_cpa = total_installed > 0 ? total_spend / total_installed : 0;
+                    double total_cvr = total_click > 0 ? total_installed / total_click : 0;
+
+                    JsonArray array = admob.getAsJsonArray("array");
+                    JsonArray array1 = facebook.getAsJsonArray("array");
+                    array.addAll(array1);
+                    Gson gson = new Gson();
+                    if(sorter > 0 && "false".equals(countryCheck)){
+                        List<Campaigns> campaignsList = gson.fromJson(array, new TypeToken<List<Campaigns>>() {}.getType());
+                        switch (sorter){
+                            case 1:
+                                Collections.sort(campaignsList, new Comparator<Campaigns>() {
+                                    @Override
+                                    public int compare(Campaigns a, Campaigns b) {
+                                        if(a.create_time.compareTo(b.create_time) > 0){
+                                            return 1;
+                                        }else if(a.create_time.compareTo(b.create_time) < 0){
+                                            return -1;
+                                        }else{
+                                            return 0;
+                                        }
+                                    }
+                                });
+                                break;
+                            case 1001:
+                                Collections.sort(campaignsList, new Comparator<Campaigns>() {
+                                    @Override
+                                    public int compare(Campaigns a, Campaigns b) {
+                                        if(a.create_time.compareTo(b.create_time) > 0){
+                                            return -1;
+                                        }else if(a.create_time.compareTo(b.create_time) < 0){
+                                            return 1;
+                                        }else{
+                                            return 0;
+                                        }
+                                    }
+                                });
+                                break;
+                            case 2:
+                                Collections.sort(campaignsList, new Comparator<Campaigns>() {
+                                    @Override
+                                    public int compare(Campaigns a, Campaigns b) {
+                                        if(a.status.compareTo(b.status) > 0){
+                                            return 1;
+                                        }else if(a.status.compareTo(b.status) < 0){
+                                            return -1;
+                                        }else{
+                                            return 0;
+                                        }
+                                    }
+                                });
+                                break;
+                            case 1002:
+                                Collections.sort(campaignsList, new Comparator<Campaigns>() {
+                                    @Override
+                                    public int compare(Campaigns a, Campaigns b) {
+                                        if(a.status.compareTo(b.status) > 0){
+                                            return -1;
+                                        }else if(a.status.compareTo(b.status) < 0){
+                                            return 1;
+                                        }else{
+                                            return 0;
+                                        }
+                                    }
+                                });
+                                break;
+                            case 3:
+                                Collections.sort(campaignsList, new Comparator<Campaigns>() {
+                                    @Override
+                                    public int compare(Campaigns a, Campaigns b) {
+                                        if(a.budget > b.budget){
+                                            return 1;
+                                        }else if(a.budget < b.budget){
+                                            return -1;
+                                        }else{
+                                            return 0;
+                                        }
+                                    }
+                                });
+                                break;
+                            case 1003:
+                                Collections.sort(campaignsList, new Comparator<Campaigns>() {
+                                    @Override
+                                    public int compare(Campaigns a, Campaigns b) {
+                                        if(a.budget > b.budget){
+                                            return -1;
+                                        }else if(a.budget < b.budget){
+                                            return 1;
+                                        }else {
+                                            return 0;
+                                        }
+                                    }
+                                });
+                                break;
+                            case 4:
+                                Collections.sort(campaignsList, new Comparator<Campaigns>() {
+                                    @Override
+                                    public int compare(Campaigns a, Campaigns b) {
+                                        if(a.bidding > b.bidding){
+                                            return 1;
+                                        }else  if(a.bidding < b.bidding){
+                                            return -1;
+                                        }else{
+                                            return 0;
+                                        }
+                                    }
+                                });
+                                break;
+                            case 1004:
+                                Collections.sort(campaignsList, new Comparator<Campaigns>() {
+                                    @Override
+                                    public int compare(Campaigns a, Campaigns b) {
+                                        if(a.bidding > b.bidding){
+                                            return -1;
+                                        }else  if(a.bidding < b.bidding){
+                                            return 1;
+                                        }else{
+                                            return 0;
+                                        }
+                                    }
+                                });
+                                break;
+                            case 5:
+                                Collections.sort(campaignsList, new Comparator<Campaigns>() {
+                                    @Override
+                                    public int compare(Campaigns a, Campaigns b) {
+                                        if(a.spend > b.spend){
+                                            return 1;
+                                        }else if(a.spend < b.spend){
+                                            return -1;
+                                        }else{
+                                            return 0;
+                                        }
+                                    }
+                                });
+                                break;
+                            case 1005:
+                                Collections.sort(campaignsList, new Comparator<Campaigns>() {
+                                    @Override
+                                    public int compare(Campaigns a, Campaigns b) {
+                                        if(a.spend > b.spend){
+                                            return -1;
+                                        }else if(a.spend < b.spend){
+                                            return 1;
+                                        }else{
+                                            return 0;
+                                        }
+                                    }
+                                });
+                                break;
+                            case 6:
+                                Collections.sort(campaignsList, new Comparator<Campaigns>() {
+                                    @Override
+                                    public int compare(Campaigns a, Campaigns b) {
+                                        if(a.installed > b.installed){
+                                            return 1;
+                                        }else if(a.installed < b.installed){
+                                            return -1;
+                                        }else{
+                                            return 0;
+                                        }
+                                    }
+                                });
+                                break;
+                            case 1006:
+                                Collections.sort(campaignsList, new Comparator<Campaigns>() {
+                                    @Override
+                                    public int compare(Campaigns a, Campaigns b) {
+                                        if(a.installed > b.installed){
+                                            return -1;
+                                        }else  if(a.installed < b.installed){
+                                            return 1;
+                                        }else{
+                                            return 0;
+                                        }
+                                    }
+                                });
+                                break;
+                            case 7:
+                                Collections.sort(campaignsList, new Comparator<Campaigns>() {
+                                    @Override
+                                    public int compare(Campaigns a, Campaigns b) {
+                                        if(a.click > b.click){
+                                            return 1;
+                                        }else if(a.click < b.click){
+                                            return -1;
+                                        }else{
+                                            return 0;
+                                        }
+                                    }
+                                });
+                                break;
+                            case 1007:
+                                Collections.sort(campaignsList, new Comparator<Campaigns>() {
+                                    @Override
+                                    public int compare(Campaigns a, Campaigns b) {
+                                        if(a.click > b.click){
+                                            return -1;
+                                        }else if(a.click < b.click){
+                                            return 1;
+                                        }else{
+                                            return 0;
+                                        }
+                                    }
+                                });
+                                break;
+                            case 8:
+                                Collections.sort(campaignsList, new Comparator<Campaigns>() {
+                                    @Override
+                                    public int compare(Campaigns a, Campaigns b) {
+                                        if(a.cpa > b.cpa){
+                                            return 1;
+                                        }else if(a.cpa < b.cpa){
+                                            return -1;
+                                        }else{
+                                            return 0;
+                                        }
+                                    }
+                                });
+                                break;
+                            case 1008:
+                                Collections.sort(campaignsList, new Comparator<Campaigns>() {
+                                    @Override
+                                    public int compare(Campaigns a, Campaigns b) {
+                                        if(a.cpa > b.cpa){
+                                            return -1;
+                                        }else if(a.cpa < b.cpa){
+                                            return 1;
+                                        }else{
+                                            return 0;
+                                        }
+                                    }
+                                });
+                                break;
+                            case 9:
+                                Collections.sort(campaignsList, new Comparator<Campaigns>() {
+                                    @Override
+                                    public int compare(Campaigns a, Campaigns b) {
+                                        if(a.ctr > b.ctr){
+                                            return 1;
+                                        }else if(a.ctr < b.ctr){
+                                            return -1;
+                                        }else{
+                                            return 0;
+                                        }
+                                    }
+                                });
+                                break;
+                            case 1009:
+                                Collections.sort(campaignsList, new Comparator<Campaigns>() {
+                                    @Override
+                                    public int compare(Campaigns a, Campaigns b) {
+                                        if(a.ctr > b.ctr){
+                                            return -1;
+                                        }else if(a.ctr < b.ctr){
+                                            return 1;
+                                        }else{
+                                            return 0;
+                                        }
+                                    }
+                                });
+                                break;
+                            case 10:
+                                Collections.sort(campaignsList, new Comparator<Campaigns>() {
+                                    @Override
+                                    public int compare(Campaigns a, Campaigns b) {
+                                        if(a.cvr > b.cvr){
+                                            return 1;
+                                        }else if(a.cvr < b.cvr){
+                                            return -1;
+                                        }else{
+                                            return 0;
+                                        }
+                                    }
+                                });
+                                break;
+                            case 1010:
+                                Collections.sort(campaignsList, new Comparator<Campaigns>() {
+                                    @Override
+                                    public int compare(Campaigns a, Campaigns b) {
+                                        if(a.cvr > b.cvr){
+                                            return -1;
+                                        }else if(a.cvr < b.cvr){
+                                            return 1;
+                                        }else{
+                                            return 0;
+                                        }
+                                    }
+                                });
+                                break;
+                            case 11:
+                                Collections.sort(campaignsList, new Comparator<Campaigns>() {
+                                    @Override
+                                    public int compare(Campaigns a, Campaigns b) {
+                                        if(a.roi > b.roi){
+                                            return 1;
+                                        }else  if(a.roi < b.roi){
+                                            return -1;
+                                        }else{
+                                            return 0;
+                                        }
+                                    }
+                                });
+                                break;
+                            case 1011:
+                                Collections.sort(campaignsList, new Comparator<Campaigns>() {
+                                    @Override
+                                    public int compare(Campaigns a, Campaigns b) {
+                                        if(a.roi > b.roi){
+                                            return -1;
+                                        }else if(a.roi < b.roi){
+                                            return 1;
+                                        }else{
+                                            return 0;
+                                        }
+                                    }
+                                });
+                                break;
                         }
-                        if(campaignsSummaryList != null && campaignsSummaryList.size() > 0){
-                            switch (sorter){
-                                case 70:
-                                    Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
-                                        @Override
-                                        public int compare(CampaignsSummary a, CampaignsSummary b) {
-                                            if(a.total_spend > b.total_spend){
-                                                return 1;
-                                            }else if(a.total_spend < b.total_spend){
-                                                return -1;
-                                            }else{
-                                                return 0;
-                                            }
+                        JsonArray jsonArray = new JsonArray();
+
+                        for(Campaigns c : campaignsList){
+                            JsonObject j = new JsonObject();
+                            j.addProperty("campaign_id",c.campaign_id);
+                            j.addProperty("short_name",c.short_name);
+                            j.addProperty("account_id",c.account_id);
+                            j.addProperty("campaign_name",c.campaign_name);
+                            j.addProperty("status",c.status);
+                            j.addProperty("create_time",c.create_time);
+                            j.addProperty("country_code",c.country_code);
+                            j.addProperty("budget",c.budget);
+                            j.addProperty("bidding",c.bidding);
+                            j.addProperty("impressions",c.impressions);
+                            j.addProperty("installed",c.installed);
+                            j.addProperty("click",c.click);
+                            j.addProperty("spend",c.spend);
+                            j.addProperty("ctr",c.ctr);
+                            j.addProperty("cpa",c.cpa);
+                            j.addProperty("cvr",c.cvr);
+                            j.addProperty("roi",c.roi);
+                            j.addProperty("campaign_spends",c.campaign_spends);
+                            j.addProperty("network",c.network);
+                            jsonArray.add(j);
+                        }
+                        jsonObject.addProperty("total_spend", Utils.trimDouble(total_spend));
+                        jsonObject.addProperty("total_installed", total_installed);
+                        jsonObject.addProperty("total_impressions", total_impressions);
+                        jsonObject.addProperty("total_click", total_click);
+                        jsonObject.addProperty("total_ctr", Utils.trimDouble(total_ctr));
+                        jsonObject.addProperty("total_cpa", Utils.trimDouble(total_cpa));
+                        jsonObject.addProperty("total_cvr", Utils.trimDouble(total_cvr));
+                        jsonObject.add("array",jsonArray);
+                    }else{
+                        admob.addProperty("total_spend", Utils.trimDouble(total_spend));
+                        admob.addProperty("total_installed", total_installed);
+                        admob.addProperty("total_impressions", total_impressions);
+                        admob.addProperty("total_click", total_click);
+                        admob.addProperty("total_ctr", Utils.trimDouble(total_ctr));
+                        admob.addProperty("total_cpa", Utils.trimDouble(total_cpa));
+                        admob.addProperty("total_cvr", Utils.trimDouble(total_cvr));
+                        jsonObject = admob;
+                    }
+
+
+                } else {
+                    if("true".equals(adwordsCheck)){
+                        jsonObject = fetchOneAppData(id, tag,startTime, endTime, true, "true".equals(countryCheck), countryCode,likeCampaignName,campaignCreateTime,true,countryMap,totalInstallComparisonValue, "true".equals(containsNoDataCampaignCheck),"true".equals(onlyQueryNoDataCampaignCheck),countryCode);
+
+                    }else{
+                        jsonObject = fetchOneAppData(id, tag,startTime, endTime, false, "true".equals(countryCheck), countryCode,likeCampaignName,campaignCreateTime,true,countryMap,totalInstallComparisonValue, "true".equals(containsNoDataCampaignCheck),"true".equals(onlyQueryNoDataCampaignCheck),countryName);
+
+                    }
+                }
+                if ("true".equals(countryCheck)) {
+                    JsonArray array = jsonObject.getAsJsonArray("array");
+                    HashMap<String, CountryRecord> dataSets = new HashMap<>();
+                    for (int i = 0; i < array.size(); i++) {
+                        JsonObject one = array.get(i).getAsJsonObject();
+                        String currCountryName = "";
+                        if (one.get("country_name").isJsonNull()) {
+                            currCountryName = one.get("country_code").getAsString();
+                        } else {
+                            currCountryName = one.get("country_name").getAsString();
+                        }
+                        CountryRecord record = dataSets.get(currCountryName);
+                        if (record == null) {
+                            record = new CountryRecord();
+                            dataSets.put(currCountryName, record);
+                        }
+                        record.impressions += one.get("impressions").getAsDouble();
+                        record.installed += one.get("installed").getAsDouble();
+                        record.click += one.get("click").getAsDouble();
+                        record.spend += one.get("spend").getAsDouble();
+                    }
+                    JsonArray newArr = new JsonArray();
+                    if(sorter > 0){
+                        List<CountryRecord> countryRecordList = new ArrayList<>();
+                        for (String key : dataSets.keySet()) {
+                            String sql = "select price from web_ad_tag_country_price_dict cpd, app_country_code_dict ccd " +
+                                    "where cpd.country_code = ccd.country_code and ccd.country_name = '" + key + "' and tag_name = '" + tag + "'";
+                            JSObject oneR = DB.findOneBySql(sql);
+                            double price = Utils.convertDouble(oneR.get("price"),0);
+                            CountryRecord record = dataSets.get(key);
+                            record.country_name = key;
+                            record.ctr = record.impressions > 0 ? record.click / record.impressions : 0;
+                            record.cpa = record.installed > 0 ? record.spend / record.installed : 0;
+                            record.cvr = record.click > 0 ? record.installed / record.click : 0;
+                            record.roi = (price - record.cpa) * record.installed;
+                            countryRecordList.add(record);
+                        }
+                        switch (sorter){
+                            case 21:
+                                Collections.sort(countryRecordList, new Comparator<CountryRecord>() {
+                                    @Override
+                                    public int compare(CountryRecord a, CountryRecord b) {
+                                        if(a.impressions > b.impressions){
+                                            return 1;
+                                        }else if(a.impressions < b.impressions){
+                                            return -1;
+                                        }else{
+                                            return 0;
                                         }
-                                    });
-                                    break;
-                                case 1070:
-                                    Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
-                                        @Override
-                                        public int compare(CampaignsSummary a, CampaignsSummary b) {
-                                            if(a.total_spend < b.total_spend){
-                                                return 1;
-                                            }else if(a.total_spend > b.total_spend){
-                                                return -1;
-                                            }else{
-                                                return 0;
-                                            }
+                                    }
+                                });
+                                break;
+                            case 1021:
+                                Collections.sort(countryRecordList, new Comparator<CountryRecord>() {
+                                    @Override
+                                    public int compare(CountryRecord a, CountryRecord b) {
+                                        if(a.impressions > b.impressions){
+                                            return -1;
+                                        }else if(a.impressions < b.impressions){
+                                            return 1;
+                                        }else{
+                                            return 0;
                                         }
-                                    });
-                                    break;
-                                case 71:
-                                    Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
-                                        @Override
-                                        public int compare(CampaignsSummary a, CampaignsSummary b) {
-                                            if(a.seven_days_total_spend> b.seven_days_total_spend){
-                                                return 1;
-                                            }else if(a.seven_days_total_spend < b.seven_days_total_spend){
-                                                return -1;
-                                            }else{
-                                                return 0;
-                                            }
+                                    }
+                                });
+                                break;
+                            case 22:
+                                Collections.sort(countryRecordList, new Comparator<CountryRecord>() {
+                                    @Override
+                                    public int compare(CountryRecord a, CountryRecord b) {
+                                        if(a.spend > b.spend){
+                                            return 1;
+                                        }else if(a.spend < b.spend){
+                                            return -1;
+                                        }else{
+                                            return 0;
                                         }
-                                    });
-                                    break;
-                                case 1071:
-                                    Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
-                                        @Override
-                                        public int compare(CampaignsSummary a, CampaignsSummary b) {
-                                            if(a.seven_days_total_spend < b.seven_days_total_spend){
-                                                return 1;
-                                            }else if(a.seven_days_total_spend > b.seven_days_total_spend){
-                                                return -1;
-                                            }else{
-                                                return 0;
-                                            }
+                                    }
+                                });
+                                break;
+                            case 1022:
+                                Collections.sort(countryRecordList, new Comparator<CountryRecord>() {
+                                    @Override
+                                    public int compare(CountryRecord a, CountryRecord b) {
+                                        if(a.spend > b.spend){
+                                            return -1;
+                                        }else if(a.spend < b.spend){
+                                            return 1;
+                                        }else{
+                                            return 0;
                                         }
-                                    });
-                                    break;
-                                case 72:
-                                    Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
-                                        @Override
-                                        public int compare(CampaignsSummary a, CampaignsSummary b) {
-                                            if(a.total_revenue> b.total_revenue){
-                                                return 1;
-                                            }else if(a.total_revenue < b.total_revenue){
-                                                return -1;
-                                            }else{
-                                                return 0;
-                                            }
+                                    }
+                                });
+                                break;
+                            case 23:
+                                Collections.sort(countryRecordList, new Comparator<CountryRecord>() {
+                                    @Override
+                                    public int compare(CountryRecord a, CountryRecord b) {
+                                        if(a.installed > b.installed){
+                                            return 1;
+                                        }else  if(a.installed < b.installed){
+                                            return -1;
+                                        }else{
+                                            return 0;
                                         }
-                                    });
-                                    break;
-                                case 1072:
-                                    Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
-                                        @Override
-                                        public int compare(CampaignsSummary a, CampaignsSummary b) {
-                                            if(a.total_revenue < b.total_revenue){
-                                                return 1;
-                                            }else if(a.total_revenue > b.total_revenue){
-                                                return -1;
-                                            }else{
-                                                return 0;
-                                            }
+                                    }
+                                });
+                                break;
+                            case 1023:
+                                Collections.sort(countryRecordList, new Comparator<CountryRecord>() {
+                                    @Override
+                                    public int compare(CountryRecord a, CountryRecord b) {
+                                        if(a.installed > b.installed){
+                                            return -1;
+                                        }else if(a.installed < b.installed){
+                                            return 1;
+                                        }else{
+                                            return 0;
                                         }
-                                    });
-                                    break;
-                                case 73:
-                                    Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
-                                        @Override
-                                        public int compare(CampaignsSummary a, CampaignsSummary b) {
-                                            if(a.seven_days_total_revenue> b.seven_days_total_revenue){
-                                                return 1;
-                                            }else if(a.seven_days_total_revenue < b.seven_days_total_revenue){
-                                                return -1;
-                                            }else{
-                                                return 0;
-                                            }
+                                    }
+                                });
+                                break;
+                            case 24:
+                                Collections.sort(countryRecordList, new Comparator<CountryRecord>() {
+                                    @Override
+                                    public int compare(CountryRecord a, CountryRecord b) {
+                                        if(a.click > b.click){
+                                            return 1;
+                                        }else if(a.click < b.click){
+                                            return -1;
+                                        }else{
+                                            return 0;
                                         }
-                                    });
-                                    break;
-                                case 1073:
-                                    Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
-                                        @Override
-                                        public int compare(CampaignsSummary a, CampaignsSummary b) {
-                                            if(a.seven_days_total_revenue < b.seven_days_total_revenue){
-                                                return 1;
-                                            }else if(a.seven_days_total_revenue > b.seven_days_total_revenue){
-                                                return -1;
-                                            }else{
-                                                return 0;
-                                            }
+                                    }
+                                });
+                                break;
+                            case 1024:
+                                Collections.sort(countryRecordList, new Comparator<CountryRecord>() {
+                                    @Override
+                                    public int compare(CountryRecord a, CountryRecord b) {
+                                        if(a.click > b.click){
+                                            return -1;
+                                        }else if(a.click < b.click){
+                                            return 1;
+                                        }else{
+                                            return 0;
                                         }
-                                    });
-                                    break;
-                                case 74:
-                                    Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
-                                        @Override
-                                        public int compare(CampaignsSummary a, CampaignsSummary b) {
-                                            if(a.total_installed> b.total_installed){
-                                                return 1;
-                                            }else if(a.total_installed < b.total_installed){
-                                                return -1;
-                                            }else{
-                                                return 0;
-                                            }
+                                    }
+                                });
+                                break;
+                            case 25:
+                                Collections.sort(countryRecordList, new Comparator<CountryRecord>() {
+                                    @Override
+                                    public int compare(CountryRecord a, CountryRecord b) {
+                                        if(a.cpa > b.cpa){
+                                            return 1;
+                                        }else if(a.cpa < b.cpa){
+                                            return -1;
+                                        }else{
+                                            return 0;
                                         }
-                                    });
-                                    break;
-                                case 1074:
-                                    Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
-                                        @Override
-                                        public int compare(CampaignsSummary a, CampaignsSummary b) {
-                                            if(a.total_installed < b.total_installed){
-                                                return 1;
-                                            }else if(a.total_installed > b.total_installed){
-                                                return -1;
-                                            }else{
-                                                return 0;
-                                            }
+                                    }
+                                });
+                                break;
+                            case 1025:
+                                Collections.sort(countryRecordList, new Comparator<CountryRecord>() {
+                                    @Override
+                                    public int compare(CountryRecord a, CountryRecord b) {
+                                        if(a.cpa > b.cpa){
+                                            return -1;
+                                        }else  if(a.cpa < b.cpa){
+                                            return 1;
+                                        }else{
+                                            return 0;
                                         }
-                                    });
-                                    break;
-                                case 75:
-                                    Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
-                                        @Override
-                                        public int compare(CampaignsSummary a, CampaignsSummary b) {
-                                            if(a.total_impressions> b.total_impressions){
-                                                return 1;
-                                            }else if(a.total_impressions < b.total_impressions){
-                                                return -1;
-                                            }else{
-                                                return 0;
-                                            }
+                                    }
+                                });
+                                break;
+                            case 26:
+                                Collections.sort(countryRecordList, new Comparator<CountryRecord>() {
+                                    @Override
+                                    public int compare(CountryRecord a, CountryRecord b) {
+                                        if(a.ctr > b.ctr){
+                                            return 1;
+                                        }else if(a.ctr < b.ctr){
+                                            return -1;
+                                        }else{
+                                            return 0;
                                         }
-                                    });
-                                    break;
-                                case 1075:
-                                    Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
-                                        @Override
-                                        public int compare(CampaignsSummary a, CampaignsSummary b) {
-                                            if(a.total_impressions < b.total_impressions){
-                                                return 1;
-                                            }else if(a.total_impressions > b.total_impressions){
-                                                return -1;
-                                            }else{
-                                                return 0;
-                                            }
+                                    }
+                                });
+                                break;
+                            case 1026:
+                                Collections.sort(countryRecordList, new Comparator<CountryRecord>() {
+                                    @Override
+                                    public int compare(CountryRecord a, CountryRecord b) {
+                                        if(a.ctr > b.ctr){
+                                            return -1;
+                                        }else if(a.ctr < b.ctr){
+                                            return 1;
+                                        }else{
+                                            return 0;
                                         }
-                                    });
-                                    break;
-                                case 76:
-                                    Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
-                                        @Override
-                                        public int compare(CampaignsSummary a, CampaignsSummary b) {
-                                            if(a.total_click> b.total_click){
-                                                return 1;
-                                            }else if(a.total_click < b.total_click){
-                                                return -1;
-                                            }else{
-                                                return 0;
-                                            }
+                                    }
+                                });
+                                break;
+                            case 27:
+                                Collections.sort(countryRecordList, new Comparator<CountryRecord>() {
+                                    @Override
+                                    public int compare(CountryRecord a, CountryRecord b) {
+                                        if(a.cvr > b.cvr){
+                                            return 1;
+                                        }else  if(a.cvr < b.cvr){
+                                            return -1;
+                                        }else{
+                                            return 0;
                                         }
-                                    });
-                                    break;
-                                case 1076:
-                                    Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
-                                        @Override
-                                        public int compare(CampaignsSummary a, CampaignsSummary b) {
-                                            if(a.total_click < b.total_click){
-                                                return 1;
-                                            }else if(a.total_click > b.total_click){
-                                                return -1;
-                                            }else{
-                                                return 0;
-                                            }
+                                    }
+                                });
+                                break;
+                            case 1027:
+                                Collections.sort(countryRecordList, new Comparator<CountryRecord>() {
+                                    @Override
+                                    public int compare(CountryRecord a, CountryRecord b) {
+                                        if(a.cvr > b.cvr){
+                                            return -1;
+                                        }else if(a.cvr < b.cvr){
+                                            return 1;
+                                        }else{
+                                            return 0;
                                         }
-                                    });
-                                    break;
-                                case 77:
-                                    Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
-                                        @Override
-                                        public int compare(CampaignsSummary a, CampaignsSummary b) {
-                                            if(a.total_ctr> b.total_ctr){
-                                                return 1;
-                                            }else if(a.total_ctr < b.total_ctr){
-                                                return -1;
-                                            }else{
-                                                return 0;
-                                            }
+                                    }
+                                });
+                                break;
+                            case 28:
+                                Collections.sort(countryRecordList, new Comparator<CountryRecord>() {
+                                    @Override
+                                    public int compare(CountryRecord a, CountryRecord b) {
+                                        if(a.roi > b.roi){
+                                            return 1;
+                                        }else if(a.roi < b.roi){
+                                            return -1;
+                                        }else{
+                                            return 0;
                                         }
-                                    });
-                                    break;
-                                case 1077:
-                                    Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
-                                        @Override
-                                        public int compare(CampaignsSummary a, CampaignsSummary b) {
-                                            if(a.total_ctr < b.total_ctr){
-                                                return 1;
-                                            }else if(a.total_ctr > b.total_ctr){
-                                                return -1;
-                                            }else{
-                                                return 0;
-                                            }
+                                    }
+                                });
+                                break;
+                            case 1028:
+                                Collections.sort(countryRecordList, new Comparator<CountryRecord>() {
+                                    @Override
+                                    public int compare(CountryRecord a, CountryRecord b) {
+                                        if(a.roi > b.roi){
+                                            return -1;
+                                        }else if(a.roi < b.roi){
+                                            return 1;
+                                        }else{
+                                            return 0;
                                         }
-                                    });
-                                    break;
-                                case 78:
-                                    Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
-                                        @Override
-                                        public int compare(CampaignsSummary a, CampaignsSummary b) {
-                                            if(a.total_cpa> b.total_cpa){
-                                                return 1;
-                                            }else if(a.total_cpa < b.total_cpa){
-                                                return -1;
-                                            }else{
-                                                return 0;
-                                            }
-                                        }
-                                    });
-                                    break;
-                                case 1078:
-                                    Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
-                                        @Override
-                                        public int compare(CampaignsSummary a, CampaignsSummary b) {
-                                            if(a.total_cpa < b.total_cpa){
-                                                return 1;
-                                            }else if(a.total_cpa > b.total_cpa){
-                                                return -1;
-                                            }else{
-                                                return 0;
-                                            }
-                                        }
-                                    });
-                                    break;
-                                case 79:
-                                    Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
-                                        @Override
-                                        public int compare(CampaignsSummary a, CampaignsSummary b) {
-                                            if(a.total_cvr> b.total_cvr){
-                                                return 1;
-                                            }else if(a.total_cvr < b.total_cvr){
-                                                return -1;
-                                            }else{
-                                                return 0;
-                                            }
-                                        }
-                                    });
-                                    break;
-                                case 1079:
-                                    Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
-                                        @Override
-                                        public int compare(CampaignsSummary a, CampaignsSummary b) {
-                                            if(a.total_cvr < b.total_cvr){
-                                                return 1;
-                                            }else if(a.total_cvr > b.total_cvr){
-                                                return -1;
-                                            }else{
-                                                return 0;
-                                            }
-                                        }
-                                    });
-                                    break;
-                            }
-                            for(CampaignsSummary cs : campaignsSummaryList){
-                                JsonObject j = new JsonObject();
-                                j.addProperty("name",cs.name);
-                                j.addProperty("total_spend",cs.total_spend);
-                                j.addProperty("seven_days_total_spend",cs.seven_days_total_spend);
-                                j.addProperty("seven_days_total_revenue",cs.seven_days_total_revenue);
-                                j.addProperty("total_installed",cs.total_installed);
-                                j.addProperty("total_impressions",cs.total_impressions);
-                                j.addProperty("total_click",cs.total_click);
-                                j.addProperty("total_ctr",cs.total_ctr);
-                                j.addProperty("total_cpa",cs.total_cpa);
-                                j.addProperty("total_cvr",cs.total_cvr);
-                                j.addProperty("total_revenue",cs.total_revenue);
-                                arr.add(j);
-                            }
+                                    }
+                                });
+                                break;
+                        }
+                        for(CountryRecord record : countryRecordList){
+                            JsonObject one = new JsonObject();
+                            one.addProperty("country_name", record.country_name);
+                            one.addProperty("impressions", record.impressions);
+                            one.addProperty("installed", record.installed);
+                            one.addProperty("click", record.click);
+                            one.addProperty("spend", Utils.trimDouble(record.spend));
+                            one.addProperty("ctr", Utils.trimDouble(record.ctr));
+                            one.addProperty("cpa", Utils.trimDouble(record.cpa));
+                            one.addProperty("cvr", Utils.trimDouble(record.cvr));
+                            one.addProperty("roi", Utils.trimDouble(record.roi));
+                            newArr.add(one);
                         }
                     }else{
-                        String sqlTag = "select t.id,t.tag_name,google_package_id from web_tag t LEFT JOIN web_facebook_app_ids_rel air ON t.tag_name = air.tag_name ORDER BY t.tag_name";
-                        List<JSObject> tagList = DB.findListBySql(sqlTag);
-                        for (JSObject tagJSObject : tagList) {
-                            long id = tagJSObject.get("id");
-                            String tagName = tagJSObject.get("tag_name");
-                            JsonObject admob = fetchOneAppDataSummary(id, startTime, endTime,true,beforeSevenDay);
-                            JsonObject facebook =  fetchOneAppDataSummary(id, startTime, endTime,false,beforeSevenDay);
-                            double total_impressions = admob.get("total_impressions").getAsDouble() + facebook.get("total_impressions").getAsDouble();
-                            if (total_impressions == 0) {
-                                continue;
-                            }
-                            double total_spend = admob.get("total_spend").getAsDouble() + facebook.get("total_spend").getAsDouble();
-                            double seven_days_total_spend = admob.get("seven_days_total_spend").getAsDouble() + facebook.get("seven_days_total_spend").getAsDouble();
-                            double total_installed = admob.get("total_installed").getAsDouble() + facebook.get("total_installed").getAsDouble();
-                            double total_click = admob.get("total_click").getAsDouble() + facebook.get("total_click").getAsDouble();
-                            double total_ctr = total_impressions > 0 ? total_click / total_impressions : 0;
-                            double total_cpa = total_installed > 0 ? total_spend / total_installed : 0;
-                            double total_cvr = total_click > 0 ? total_installed / total_click : 0;
-                            admob.addProperty("total_spend", Utils.trimDouble(total_spend));
-                            admob.addProperty("seven_days_total_spend", Utils.trimDouble(seven_days_total_spend));
-                            admob.addProperty("total_installed", total_installed);
-                            admob.addProperty("total_impressions", total_impressions);
-                            admob.addProperty("total_click", total_click);
-                            admob.addProperty("total_ctr", Utils.trimDouble(total_ctr));
-                            admob.addProperty("total_cpa", Utils.trimDouble(total_cpa));
-                            admob.addProperty("total_cvr", Utils.trimDouble(total_cvr));
-                            admob.addProperty("name", tagName);
-                            double total_revenue = 0;
-                            double seven_days_total_revenue = 0;
-                            String google_package_id = tagJSObject.get("google_package_id");
-                            if(google_package_id != null){
-                                String sqlR = "select sum(revenue) as revenues " +
-                                        "from web_ad_country_analysis_report_history where app_id = '"
-                                        + google_package_id + "' and date BETWEEN '" + startTime + "' AND '" + endTime + "'";
-                                JSObject oneR = DB.findOneBySql(sqlR);
-                                if(oneR != null){
-                                    total_revenue = Utils.convertDouble(oneR.get("revenues"),0);
-                                }
-//                                sqlR = "select sum(revenue) as seven_days_total_revenue " +
-//                                        "from web_ad_country_analysis_report_history where app_id = '"
-//                                        + google_package_id + "' and date BETWEEN '" + beforeSevenDay + "' AND '" + endTime + "'";
-//                                oneR = DB.findOneBySql(sqlR);
-//                                if(oneR != null){
-//                                    seven_days_total_revenue = Utils.convertDouble(oneR.get("seven_days_total_revenue"),0);
-//                                }
-                            }
-                            admob.addProperty("total_revenue",Utils.trimDouble(total_revenue));
-                            admob.addProperty("seven_days_total_revenue",Utils.trimDouble(seven_days_total_revenue));
-                            arr.add(admob);
+                        for (String key : dataSets.keySet()) {
+                            String sql = "select price from web_ad_tag_country_price_dict cpd, app_country_code_dict ccd " +
+                                    "where cpd.country_code = ccd.country_code and ccd.country_name = '" + key + "' and tag_name = '" + tag + "'";
+                            JSObject oneR = DB.findOneBySql(sql);
+                            double price = Utils.convertDouble(oneR.get("price"),0);
+                            JsonObject one = new JsonObject();
+                            CountryRecord record = dataSets.get(key);
+                            record.ctr = record.impressions > 0 ? record.click / record.impressions : 0;
+                            record.cpa = record.installed > 0 ? record.spend / record.installed : 0;
+                            record.cvr = record.click > 0 ? record.installed / record.click : 0;
+                            record.roi = (price - record.cpa) * record.installed;
+                            one.addProperty("country_name", key);
+                            one.addProperty("impressions", record.impressions);
+                            one.addProperty("installed", record.installed);
+                            one.addProperty("click", record.click);
+                            one.addProperty("spend", Utils.trimDouble(record.spend));
+                            one.addProperty("ctr", Utils.trimDouble(record.ctr));
+                            one.addProperty("cpa", Utils.trimDouble(record.cpa));
+                            one.addProperty("cvr", Utils.trimDouble(record.cvr));
+                            one.addProperty("roi", Utils.trimDouble(record.roi));
+                            newArr.add(one);
                         }
                     }
 
-                } else {
-                    String sqlTag = "select id,tag_name from web_tag ORDER BY tag_name";
-                    List<JSObject> tagList = DB.findListBySql(sqlTag);
-                    for (int i = 0; i < tagList.size(); i++) {
-                        long id = tagList.get(i).get("id");
-                        String tagName = tagList.get(i).get("tag_name");
-                        JsonObject jsonObject =  fetchOneAppDataSummary(id, startTime, endTime,"true".equals(adwordsCheck),beforeSevenDay);
-                        double total_impression = jsonObject.get("total_impressions").getAsDouble();
-                        if (total_impression == 0) {
-                            continue;
-                        }
-                        jsonObject.addProperty("name", tagName);
-                        arr.add(jsonObject);
-                    }
+                    jsonObject.add("array", newArr);
                 }
-                json.add("data", arr);
+                json.add("data", jsonObject);
 
                 json.addProperty("ret", 1);
                 json.addProperty("message", "执行成功");
-            } catch (Exception ex) {
+            } else {
                 json.addProperty("ret", 0);
-                json.addProperty("message", ex.getMessage());
-                Logger logger = Logger.getRootLogger();
-                logger.error(ex.getMessage(), ex);
+                json.addProperty("message", "标签不存在");
             }
-        } else {
-            String tag = request.getParameter("tag");
-            String countryCheck = request.getParameter("countryCheck");
-            String containsNoDataCampaignCheck = request.getParameter("containsNoDataCampaignCheck");
-            String onlyQueryNoDataCampaignCheck = request.getParameter("onlyQueryNoDataCampaignCheck");
-            String campaignCreateTime = request.getParameter("campaignCreateTime");
-            String countryCode = request.getParameter("countryCode");
-            String countryName = request.getParameter("countryName");
-
-            String totalInstallComparisonValue = request.getParameter("totalInstallComparisonValue");
-
-            String likeCampaignName = request.getParameter("likeCampaignName");
-            HashMap<String ,String> countryMap = Utils.getCountryMap();
-            try {
-                JSObject tagObject = DB.simpleScan("web_tag")
-                        .select("id", "tag_name")
-                        .where(DB.filter().whereEqualTo("tag_name", tag)).execute();
-                if (tagObject.hasObjectData()) {
-                    Long id = tagObject.get("id");
-                    JsonObject jsonObject = new JsonObject();
-                    if (countryCode != null && countryCode != "") {
-                        countryCheck = "false";
-                    }
-                    if ("false".equals(adwordsCheck) && "false".equals(facebookCheck)) {
-                        JsonObject admob = fetchOneAppData(id, tag,startTime, endTime, true, "true".equals(countryCheck), countryCode,likeCampaignName,campaignCreateTime,true,countryMap,totalInstallComparisonValue, "true".equals(containsNoDataCampaignCheck), "true".equals(onlyQueryNoDataCampaignCheck),countryCode);
-                        JsonObject facebook = fetchOneAppData(id, tag,startTime, endTime,false, "true".equals(countryCheck), countryCode,likeCampaignName,campaignCreateTime,true,countryMap,totalInstallComparisonValue, "true".equals(containsNoDataCampaignCheck),"true".equals(onlyQueryNoDataCampaignCheck),countryName);
-                        double total_spend = admob.get("total_spend").getAsDouble() + facebook.get("total_spend").getAsDouble();
-                        double total_installed = admob.get("total_installed").getAsDouble() + facebook.get("total_installed").getAsDouble();
-                        double total_impressions = admob.get("total_impressions").getAsDouble() + facebook.get("total_impressions").getAsDouble();
-                        double total_click = admob.get("total_click").getAsDouble() + facebook.get("total_click").getAsDouble();
-                        double total_ctr = total_impressions > 0 ? total_click / total_impressions : 0;
-                        double total_cpa = total_installed > 0 ? total_spend / total_installed : 0;
-                        double total_cvr = total_click > 0 ? total_installed / total_click : 0;
-
-                        JsonArray array = admob.getAsJsonArray("array");
-                        JsonArray array1 = facebook.getAsJsonArray("array");
-                        array.addAll(array1);
-                        Gson gson = new Gson();
-                        if(sorter > 0 && "false".equals(countryCheck)){
-                            List<Campaigns> campaignsList = gson.fromJson(array, new TypeToken<List<Campaigns>>() {}.getType());
-                            switch (sorter){
-                                case 1:
-                                    Collections.sort(campaignsList, new Comparator<Campaigns>() {
-                                        @Override
-                                        public int compare(Campaigns a, Campaigns b) {
-                                            if(a.create_time.compareTo(b.create_time) > 0){
-                                                return 1;
-                                            }else if(a.create_time.compareTo(b.create_time) < 0){
-                                                return -1;
-                                            }else{
-                                                return 0;
-                                            }
-                                        }
-                                    });
-                                    break;
-                                case 1001:
-                                    Collections.sort(campaignsList, new Comparator<Campaigns>() {
-                                        @Override
-                                        public int compare(Campaigns a, Campaigns b) {
-                                            if(a.create_time.compareTo(b.create_time) > 0){
-                                                return -1;
-                                            }else if(a.create_time.compareTo(b.create_time) < 0){
-                                                return 1;
-                                            }else{
-                                                return 0;
-                                            }
-                                        }
-                                    });
-                                    break;
-                                case 2:
-                                    Collections.sort(campaignsList, new Comparator<Campaigns>() {
-                                        @Override
-                                        public int compare(Campaigns a, Campaigns b) {
-                                            if(a.status.compareTo(b.status) > 0){
-                                                return 1;
-                                            }else if(a.status.compareTo(b.status) < 0){
-                                                return -1;
-                                            }else{
-                                                return 0;
-                                            }
-                                        }
-                                    });
-                                    break;
-                                case 1002:
-                                    Collections.sort(campaignsList, new Comparator<Campaigns>() {
-                                        @Override
-                                        public int compare(Campaigns a, Campaigns b) {
-                                            if(a.status.compareTo(b.status) > 0){
-                                                return -1;
-                                            }else if(a.status.compareTo(b.status) < 0){
-                                                return 1;
-                                            }else{
-                                                return 0;
-                                            }
-                                        }
-                                    });
-                                    break;
-                                case 3:
-                                    Collections.sort(campaignsList, new Comparator<Campaigns>() {
-                                        @Override
-                                        public int compare(Campaigns a, Campaigns b) {
-                                            if(a.budget > b.budget){
-                                                return 1;
-                                            }else if(a.budget < b.budget){
-                                                return -1;
-                                            }else{
-                                                return 0;
-                                            }
-                                        }
-                                    });
-                                    break;
-                                case 1003:
-                                    Collections.sort(campaignsList, new Comparator<Campaigns>() {
-                                        @Override
-                                        public int compare(Campaigns a, Campaigns b) {
-                                            if(a.budget > b.budget){
-                                                return -1;
-                                            }else if(a.budget < b.budget){
-                                                return 1;
-                                            }else {
-                                                return 0;
-                                            }
-                                        }
-                                    });
-                                    break;
-                                case 4:
-                                    Collections.sort(campaignsList, new Comparator<Campaigns>() {
-                                        @Override
-                                        public int compare(Campaigns a, Campaigns b) {
-                                            if(a.bidding > b.bidding){
-                                                return 1;
-                                            }else  if(a.bidding < b.bidding){
-                                                return -1;
-                                            }else{
-                                                return 0;
-                                            }
-                                        }
-                                    });
-                                    break;
-                                case 1004:
-                                    Collections.sort(campaignsList, new Comparator<Campaigns>() {
-                                        @Override
-                                        public int compare(Campaigns a, Campaigns b) {
-                                            if(a.bidding > b.bidding){
-                                                return -1;
-                                            }else  if(a.bidding < b.bidding){
-                                                return 1;
-                                            }else{
-                                                return 0;
-                                            }
-                                        }
-                                    });
-                                    break;
-                                case 5:
-                                    Collections.sort(campaignsList, new Comparator<Campaigns>() {
-                                        @Override
-                                        public int compare(Campaigns a, Campaigns b) {
-                                            if(a.spend > b.spend){
-                                                return 1;
-                                            }else if(a.spend < b.spend){
-                                                return -1;
-                                            }else{
-                                                return 0;
-                                            }
-                                        }
-                                    });
-                                    break;
-                                case 1005:
-                                    Collections.sort(campaignsList, new Comparator<Campaigns>() {
-                                        @Override
-                                        public int compare(Campaigns a, Campaigns b) {
-                                            if(a.spend > b.spend){
-                                                return -1;
-                                            }else if(a.spend < b.spend){
-                                                return 1;
-                                            }else{
-                                                return 0;
-                                            }
-                                        }
-                                    });
-                                    break;
-                                case 6:
-                                    Collections.sort(campaignsList, new Comparator<Campaigns>() {
-                                        @Override
-                                        public int compare(Campaigns a, Campaigns b) {
-                                            if(a.installed > b.installed){
-                                                return 1;
-                                            }else if(a.installed < b.installed){
-                                                return -1;
-                                            }else{
-                                                return 0;
-                                            }
-                                        }
-                                    });
-                                    break;
-                                case 1006:
-                                    Collections.sort(campaignsList, new Comparator<Campaigns>() {
-                                        @Override
-                                        public int compare(Campaigns a, Campaigns b) {
-                                            if(a.installed > b.installed){
-                                                return -1;
-                                            }else  if(a.installed < b.installed){
-                                                return 1;
-                                            }else{
-                                                return 0;
-                                            }
-                                        }
-                                    });
-                                    break;
-                                case 7:
-                                    Collections.sort(campaignsList, new Comparator<Campaigns>() {
-                                        @Override
-                                        public int compare(Campaigns a, Campaigns b) {
-                                            if(a.click > b.click){
-                                                return 1;
-                                            }else if(a.click < b.click){
-                                                return -1;
-                                            }else{
-                                                return 0;
-                                            }
-                                        }
-                                    });
-                                    break;
-                                case 1007:
-                                    Collections.sort(campaignsList, new Comparator<Campaigns>() {
-                                        @Override
-                                        public int compare(Campaigns a, Campaigns b) {
-                                            if(a.click > b.click){
-                                                return -1;
-                                            }else if(a.click < b.click){
-                                                return 1;
-                                            }else{
-                                                return 0;
-                                            }
-                                        }
-                                    });
-                                    break;
-                                case 8:
-                                    Collections.sort(campaignsList, new Comparator<Campaigns>() {
-                                        @Override
-                                        public int compare(Campaigns a, Campaigns b) {
-                                            if(a.cpa > b.cpa){
-                                                return 1;
-                                            }else if(a.cpa < b.cpa){
-                                                return -1;
-                                            }else{
-                                                return 0;
-                                            }
-                                        }
-                                    });
-                                    break;
-                                case 1008:
-                                    Collections.sort(campaignsList, new Comparator<Campaigns>() {
-                                        @Override
-                                        public int compare(Campaigns a, Campaigns b) {
-                                            if(a.cpa > b.cpa){
-                                                return -1;
-                                            }else if(a.cpa < b.cpa){
-                                                return 1;
-                                            }else{
-                                                return 0;
-                                            }
-                                        }
-                                    });
-                                    break;
-                                case 9:
-                                    Collections.sort(campaignsList, new Comparator<Campaigns>() {
-                                        @Override
-                                        public int compare(Campaigns a, Campaigns b) {
-                                            if(a.ctr > b.ctr){
-                                                return 1;
-                                            }else if(a.ctr < b.ctr){
-                                                return -1;
-                                            }else{
-                                                return 0;
-                                            }
-                                        }
-                                    });
-                                    break;
-                                case 1009:
-                                    Collections.sort(campaignsList, new Comparator<Campaigns>() {
-                                        @Override
-                                        public int compare(Campaigns a, Campaigns b) {
-                                            if(a.ctr > b.ctr){
-                                                return -1;
-                                            }else if(a.ctr < b.ctr){
-                                                return 1;
-                                            }else{
-                                                return 0;
-                                            }
-                                        }
-                                    });
-                                    break;
-                                case 10:
-                                    Collections.sort(campaignsList, new Comparator<Campaigns>() {
-                                        @Override
-                                        public int compare(Campaigns a, Campaigns b) {
-                                            if(a.cvr > b.cvr){
-                                                return 1;
-                                            }else if(a.cvr < b.cvr){
-                                                return -1;
-                                            }else{
-                                                return 0;
-                                            }
-                                        }
-                                    });
-                                    break;
-                                case 1010:
-                                    Collections.sort(campaignsList, new Comparator<Campaigns>() {
-                                        @Override
-                                        public int compare(Campaigns a, Campaigns b) {
-                                            if(a.cvr > b.cvr){
-                                                return -1;
-                                            }else if(a.cvr < b.cvr){
-                                                return 1;
-                                            }else{
-                                                return 0;
-                                            }
-                                        }
-                                    });
-                                    break;
-                                case 11:
-                                    Collections.sort(campaignsList, new Comparator<Campaigns>() {
-                                        @Override
-                                        public int compare(Campaigns a, Campaigns b) {
-                                            if(a.roi > b.roi){
-                                                return 1;
-                                            }else  if(a.roi < b.roi){
-                                                return -1;
-                                            }else{
-                                                return 0;
-                                            }
-                                        }
-                                    });
-                                    break;
-                                case 1011:
-                                    Collections.sort(campaignsList, new Comparator<Campaigns>() {
-                                        @Override
-                                        public int compare(Campaigns a, Campaigns b) {
-                                            if(a.roi > b.roi){
-                                                return -1;
-                                            }else if(a.roi < b.roi){
-                                                return 1;
-                                            }else{
-                                                return 0;
-                                            }
-                                        }
-                                    });
-                                    break;
-                            }
-                            JsonArray jsonArray = new JsonArray();
-
-                            for(Campaigns c : campaignsList){
-                                JsonObject j = new JsonObject();
-                                j.addProperty("campaign_id",c.campaign_id);
-                                j.addProperty("short_name",c.short_name);
-                                j.addProperty("account_id",c.account_id);
-                                j.addProperty("campaign_name",c.campaign_name);
-                                j.addProperty("status",c.status);
-                                j.addProperty("create_time",c.create_time);
-                                j.addProperty("country_code",c.country_code);
-                                j.addProperty("budget",c.budget);
-                                j.addProperty("bidding",c.bidding);
-                                j.addProperty("impressions",c.impressions);
-                                j.addProperty("installed",c.installed);
-                                j.addProperty("click",c.click);
-                                j.addProperty("spend",c.spend);
-                                j.addProperty("ctr",c.ctr);
-                                j.addProperty("cpa",c.cpa);
-                                j.addProperty("cvr",c.cvr);
-                                j.addProperty("roi",c.roi);
-                                j.addProperty("campaign_spends",c.campaign_spends);
-                                j.addProperty("network",c.network);
-                                jsonArray.add(j);
-                            }
-                            jsonObject.addProperty("total_spend", Utils.trimDouble(total_spend));
-                            jsonObject.addProperty("total_installed", total_installed);
-                            jsonObject.addProperty("total_impressions", total_impressions);
-                            jsonObject.addProperty("total_click", total_click);
-                            jsonObject.addProperty("total_ctr", Utils.trimDouble(total_ctr));
-                            jsonObject.addProperty("total_cpa", Utils.trimDouble(total_cpa));
-                            jsonObject.addProperty("total_cvr", Utils.trimDouble(total_cvr));
-                            jsonObject.add("array",jsonArray);
-                        }else{
-                            admob.addProperty("total_spend", Utils.trimDouble(total_spend));
-                            admob.addProperty("total_installed", total_installed);
-                            admob.addProperty("total_impressions", total_impressions);
-                            admob.addProperty("total_click", total_click);
-                            admob.addProperty("total_ctr", Utils.trimDouble(total_ctr));
-                            admob.addProperty("total_cpa", Utils.trimDouble(total_cpa));
-                            admob.addProperty("total_cvr", Utils.trimDouble(total_cvr));
-                            jsonObject = admob;
-                        }
-
-
-                    } else {
-                        if("true".equals(adwordsCheck)){
-                            jsonObject = fetchOneAppData(id, tag,startTime, endTime, true, "true".equals(countryCheck), countryCode,likeCampaignName,campaignCreateTime,true,countryMap,totalInstallComparisonValue, "true".equals(containsNoDataCampaignCheck),"true".equals(onlyQueryNoDataCampaignCheck),countryCode);
-
-                        }else{
-                            jsonObject = fetchOneAppData(id, tag,startTime, endTime, false, "true".equals(countryCheck), countryCode,likeCampaignName,campaignCreateTime,true,countryMap,totalInstallComparisonValue, "true".equals(containsNoDataCampaignCheck),"true".equals(onlyQueryNoDataCampaignCheck),countryName);
-
-                        }
-                    }
-                    if ("true".equals(countryCheck)) {
-                        JsonArray array = jsonObject.getAsJsonArray("array");
-                        HashMap<String, CountryRecord> dataSets = new HashMap<>();
-                        for (int i = 0; i < array.size(); i++) {
-                            JsonObject one = array.get(i).getAsJsonObject();
-                            String currCountryName = "";
-                            if (one.get("country_name").isJsonNull()) {
-                                currCountryName = one.get("country_code").getAsString();
-                            } else {
-                                currCountryName = one.get("country_name").getAsString();
-                            }
-                            CountryRecord record = dataSets.get(currCountryName);
-                            if (record == null) {
-                                record = new CountryRecord();
-                                dataSets.put(currCountryName, record);
-                            }
-                            record.impressions += one.get("impressions").getAsDouble();
-                            record.installed += one.get("installed").getAsDouble();
-                            record.click += one.get("click").getAsDouble();
-                            record.spend += one.get("spend").getAsDouble();
-                        }
-                        JsonArray newArr = new JsonArray();
-                        if(sorter > 0){
-                            List<CountryRecord> countryRecordList = new ArrayList<>();
-                            for (String key : dataSets.keySet()) {
-                                String sql = "select price from web_ad_tag_country_price_dict cpd, app_country_code_dict ccd " +
-                                        "where cpd.country_code = ccd.country_code and ccd.country_name = '" + key + "' and tag_name = '" + tag + "'";
-                                JSObject oneR = DB.findOneBySql(sql);
-                                double price = Utils.convertDouble(oneR.get("price"),0);
-                                CountryRecord record = dataSets.get(key);
-                                record.country_name = key;
-                                record.ctr = record.impressions > 0 ? record.click / record.impressions : 0;
-                                record.cpa = record.installed > 0 ? record.spend / record.installed : 0;
-                                record.cvr = record.click > 0 ? record.installed / record.click : 0;
-                                record.roi = (price - record.cpa) * record.installed;
-                                countryRecordList.add(record);
-                            }
-                            switch (sorter){
-                                case 21:
-                                    Collections.sort(countryRecordList, new Comparator<CountryRecord>() {
-                                        @Override
-                                        public int compare(CountryRecord a, CountryRecord b) {
-                                            if(a.impressions > b.impressions){
-                                                return 1;
-                                            }else if(a.impressions < b.impressions){
-                                                return -1;
-                                            }else{
-                                                return 0;
-                                            }
-                                        }
-                                    });
-                                    break;
-                                case 1021:
-                                    Collections.sort(countryRecordList, new Comparator<CountryRecord>() {
-                                        @Override
-                                        public int compare(CountryRecord a, CountryRecord b) {
-                                            if(a.impressions > b.impressions){
-                                                return -1;
-                                            }else if(a.impressions < b.impressions){
-                                                return 1;
-                                            }else{
-                                                return 0;
-                                            }
-                                        }
-                                    });
-                                    break;
-                                case 22:
-                                    Collections.sort(countryRecordList, new Comparator<CountryRecord>() {
-                                        @Override
-                                        public int compare(CountryRecord a, CountryRecord b) {
-                                            if(a.spend > b.spend){
-                                                return 1;
-                                            }else if(a.spend < b.spend){
-                                                return -1;
-                                            }else{
-                                                return 0;
-                                            }
-                                        }
-                                    });
-                                    break;
-                                case 1022:
-                                    Collections.sort(countryRecordList, new Comparator<CountryRecord>() {
-                                        @Override
-                                        public int compare(CountryRecord a, CountryRecord b) {
-                                            if(a.spend > b.spend){
-                                                return -1;
-                                            }else if(a.spend < b.spend){
-                                                return 1;
-                                            }else{
-                                                return 0;
-                                            }
-                                        }
-                                    });
-                                    break;
-                                case 23:
-                                    Collections.sort(countryRecordList, new Comparator<CountryRecord>() {
-                                        @Override
-                                        public int compare(CountryRecord a, CountryRecord b) {
-                                            if(a.installed > b.installed){
-                                                return 1;
-                                            }else  if(a.installed < b.installed){
-                                                return -1;
-                                            }else{
-                                                return 0;
-                                            }
-                                        }
-                                    });
-                                    break;
-                                case 1023:
-                                    Collections.sort(countryRecordList, new Comparator<CountryRecord>() {
-                                        @Override
-                                        public int compare(CountryRecord a, CountryRecord b) {
-                                            if(a.installed > b.installed){
-                                                return -1;
-                                            }else if(a.installed < b.installed){
-                                                return 1;
-                                            }else{
-                                                return 0;
-                                            }
-                                        }
-                                    });
-                                    break;
-                                case 24:
-                                    Collections.sort(countryRecordList, new Comparator<CountryRecord>() {
-                                        @Override
-                                        public int compare(CountryRecord a, CountryRecord b) {
-                                            if(a.click > b.click){
-                                                return 1;
-                                            }else if(a.click < b.click){
-                                                return -1;
-                                            }else{
-                                                return 0;
-                                            }
-                                        }
-                                    });
-                                    break;
-                                case 1024:
-                                    Collections.sort(countryRecordList, new Comparator<CountryRecord>() {
-                                        @Override
-                                        public int compare(CountryRecord a, CountryRecord b) {
-                                            if(a.click > b.click){
-                                                return -1;
-                                            }else if(a.click < b.click){
-                                                return 1;
-                                            }else{
-                                                return 0;
-                                            }
-                                        }
-                                    });
-                                    break;
-                                case 25:
-                                    Collections.sort(countryRecordList, new Comparator<CountryRecord>() {
-                                        @Override
-                                        public int compare(CountryRecord a, CountryRecord b) {
-                                            if(a.cpa > b.cpa){
-                                                return 1;
-                                            }else if(a.cpa < b.cpa){
-                                                return -1;
-                                            }else{
-                                                return 0;
-                                            }
-                                        }
-                                    });
-                                    break;
-                                case 1025:
-                                    Collections.sort(countryRecordList, new Comparator<CountryRecord>() {
-                                        @Override
-                                        public int compare(CountryRecord a, CountryRecord b) {
-                                            if(a.cpa > b.cpa){
-                                                return -1;
-                                            }else  if(a.cpa < b.cpa){
-                                                return 1;
-                                            }else{
-                                                return 0;
-                                            }
-                                        }
-                                    });
-                                    break;
-                                case 26:
-                                    Collections.sort(countryRecordList, new Comparator<CountryRecord>() {
-                                        @Override
-                                        public int compare(CountryRecord a, CountryRecord b) {
-                                            if(a.ctr > b.ctr){
-                                                return 1;
-                                            }else if(a.ctr < b.ctr){
-                                                return -1;
-                                            }else{
-                                                return 0;
-                                            }
-                                        }
-                                    });
-                                    break;
-                                case 1026:
-                                    Collections.sort(countryRecordList, new Comparator<CountryRecord>() {
-                                        @Override
-                                        public int compare(CountryRecord a, CountryRecord b) {
-                                            if(a.ctr > b.ctr){
-                                                return -1;
-                                            }else if(a.ctr < b.ctr){
-                                                return 1;
-                                            }else{
-                                                return 0;
-                                            }
-                                        }
-                                    });
-                                    break;
-                                case 27:
-                                    Collections.sort(countryRecordList, new Comparator<CountryRecord>() {
-                                        @Override
-                                        public int compare(CountryRecord a, CountryRecord b) {
-                                            if(a.cvr > b.cvr){
-                                                return 1;
-                                            }else  if(a.cvr < b.cvr){
-                                                return -1;
-                                            }else{
-                                                return 0;
-                                            }
-                                        }
-                                    });
-                                    break;
-                                case 1027:
-                                    Collections.sort(countryRecordList, new Comparator<CountryRecord>() {
-                                        @Override
-                                        public int compare(CountryRecord a, CountryRecord b) {
-                                            if(a.cvr > b.cvr){
-                                                return -1;
-                                            }else if(a.cvr < b.cvr){
-                                                return 1;
-                                            }else{
-                                                return 0;
-                                            }
-                                        }
-                                    });
-                                    break;
-                                case 28:
-                                    Collections.sort(countryRecordList, new Comparator<CountryRecord>() {
-                                        @Override
-                                        public int compare(CountryRecord a, CountryRecord b) {
-                                            if(a.roi > b.roi){
-                                                return 1;
-                                            }else if(a.roi < b.roi){
-                                                return -1;
-                                            }else{
-                                                return 0;
-                                            }
-                                        }
-                                    });
-                                    break;
-                                case 1028:
-                                    Collections.sort(countryRecordList, new Comparator<CountryRecord>() {
-                                        @Override
-                                        public int compare(CountryRecord a, CountryRecord b) {
-                                            if(a.roi > b.roi){
-                                                return -1;
-                                            }else if(a.roi < b.roi){
-                                                return 1;
-                                            }else{
-                                                return 0;
-                                            }
-                                        }
-                                    });
-                                    break;
-                            }
-                            for(CountryRecord record : countryRecordList){
-                                JsonObject one = new JsonObject();
-                                one.addProperty("country_name", record.country_name);
-                                one.addProperty("impressions", record.impressions);
-                                one.addProperty("installed", record.installed);
-                                one.addProperty("click", record.click);
-                                one.addProperty("spend", Utils.trimDouble(record.spend));
-                                one.addProperty("ctr", Utils.trimDouble(record.ctr));
-                                one.addProperty("cpa", Utils.trimDouble(record.cpa));
-                                one.addProperty("cvr", Utils.trimDouble(record.cvr));
-                                one.addProperty("roi", Utils.trimDouble(record.roi));
-                                newArr.add(one);
-                            }
-                        }else{
-                            for (String key : dataSets.keySet()) {
-                                String sql = "select price from web_ad_tag_country_price_dict cpd, app_country_code_dict ccd " +
-                                        "where cpd.country_code = ccd.country_code and ccd.country_name = '" + key + "' and tag_name = '" + tag + "'";
-                                JSObject oneR = DB.findOneBySql(sql);
-                                double price = Utils.convertDouble(oneR.get("price"),0);
-                                JsonObject one = new JsonObject();
-                                CountryRecord record = dataSets.get(key);
-                                record.ctr = record.impressions > 0 ? record.click / record.impressions : 0;
-                                record.cpa = record.installed > 0 ? record.spend / record.installed : 0;
-                                record.cvr = record.click > 0 ? record.installed / record.click : 0;
-                                record.roi = (price - record.cpa) * record.installed;
-                                one.addProperty("country_name", key);
-                                one.addProperty("impressions", record.impressions);
-                                one.addProperty("installed", record.installed);
-                                one.addProperty("click", record.click);
-                                one.addProperty("spend", Utils.trimDouble(record.spend));
-                                one.addProperty("ctr", Utils.trimDouble(record.ctr));
-                                one.addProperty("cpa", Utils.trimDouble(record.cpa));
-                                one.addProperty("cvr", Utils.trimDouble(record.cvr));
-                                one.addProperty("roi", Utils.trimDouble(record.roi));
-                                newArr.add(one);
-                            }
-                        }
-
-                        jsonObject.add("array", newArr);
-                    }
-                    json.add("data", jsonObject);
-
-                    json.addProperty("ret", 1);
-                    json.addProperty("message", "执行成功");
-                } else {
-                    json.addProperty("ret", 0);
-                    json.addProperty("message", "标签不存在");
-                }
-            } catch (Exception ex) {
-                json.addProperty("ret", 0);
-                json.addProperty("message", ex.getMessage());
-                Logger logger = Logger.getRootLogger();
-                logger.error(ex.getMessage(), ex);
-            }
+        } catch (Exception ex) {
+            json.addProperty("ret", 0);
+            json.addProperty("message", ex.getMessage());
+            Logger logger = Logger.getRootLogger();
+            logger.error(ex.getMessage(), ex);
         }
-
         response.getWriter().write(json.toString());
     }
 
@@ -1502,58 +1079,6 @@ public class QueryByMulConditions extends HttpServlet {
         return jsonObject;
     }
 
-    private JsonObject fetchOneAppDataSummary(long tagId, String startTime, String endTime, boolean admobCheck,String beforeSevenDay) throws Exception {
-        String webAdCampaignTagRelTable = "web_ad_campaign_tag_rel";
-        String webAdCampaignsTable = "web_ad_campaigns";
-        String webAdCampaignsHistoryTable = "web_ad_campaigns_history";
-        if (admobCheck) {
-            webAdCampaignTagRelTable = "web_ad_campaign_tag_admob_rel";
-            webAdCampaignsTable = "web_ad_campaigns_admob";
-            webAdCampaignsHistoryTable = "web_ad_campaigns_history_admob";
-        }
-        String sql = "select sum(ch.total_spend) as spend, " +
-                "sum(ch.total_installed) as installed, sum(ch.total_impressions) as impressions " +
-                ",sum(ch.total_click) as click from " + webAdCampaignsTable + " c, " + webAdCampaignsHistoryTable + " ch, " +
-                "(select distinct campaign_id from " + webAdCampaignTagRelTable + " where tag_id = " + tagId + ") rt " +
-                "where rt.campaign_id = ch.campaign_id and c.campaign_id = ch.campaign_id " +
-                "and date between '" + startTime + "' and '" + endTime + "' " +
-                "and c.status != 'removed' ";
-        JSObject one = DB.findOneBySql(sql);
-
-        JsonObject jsonObject = new JsonObject();
-        double total_spend = Utils.convertDouble(one.get("spend"), 0);
-        double total_installed = Utils.convertDouble(one.get("installed"), 0);
-        double total_impressions = Utils.convertDouble(one.get("impressions"), 0);
-        double total_click = Utils.convertDouble(one.get("click"), 0);
-
-        double total_ctr = total_impressions > 0 ? total_click / total_impressions : 0;
-        double total_cpa = total_installed > 0 ? total_spend / total_installed : 0;
-        double total_cvr = total_click > 0 ? total_installed / total_click : 0;
-
-//        sql = "select sum(ch.total_spend) as seven_days_total_spend " +
-//                "from " + webAdCampaignsTable + " c, " + webAdCampaignsHistoryTable + " ch, " +
-//                "(select distinct campaign_id from " + webAdCampaignTagRelTable + " where tag_id = " + tagId + ") rt " +
-//                "where rt.campaign_id = ch.campaign_id and c.campaign_id = ch.campaign_id " +
-//                "and date between '" + beforeSevenDay + "' and '" + endTime + "' " +
-//                "and c.status != 'removed' ";
-//        one = DB.findOneBySql(sql);
-        double seven_days_total_spend = 0;
-//        if(one != null && one.hasObjectData()){
-//            seven_days_total_spend = Utils.convertDouble(one.get("seven_days_total_spend"), 0);
-//        }
-
-        jsonObject.addProperty("seven_days_total_spend", seven_days_total_spend);
-
-        jsonObject.addProperty("total_spend", total_spend);
-        jsonObject.addProperty("total_installed", total_installed);
-        jsonObject.addProperty("total_impressions", total_impressions);
-        jsonObject.addProperty("total_click", total_click);
-        jsonObject.addProperty("total_ctr", Utils.trimDouble(total_ctr));
-        jsonObject.addProperty("total_cpa", Utils.trimDouble(total_cpa));
-        jsonObject.addProperty("total_cvr", Utils.trimDouble(total_cvr));
-        return jsonObject;
-    }
-
     class CountryRecord {
         public String country_name;
         public double impressions;
@@ -1587,18 +1112,4 @@ public class QueryByMulConditions extends HttpServlet {
         public String network;
     }
 
-    class CampaignsSummary {
-        public String name;
-        public double total_spend;
-        public double seven_days_total_spend;
-        public double total_installed;
-        public double total_impressions;
-        public double total_click;
-        public double total_ctr;
-        public double total_cpa;
-        public double total_cvr;
-        public double total_revenue;
-        public double seven_days_total_revenue;
-        public String network;
-    }
 }
