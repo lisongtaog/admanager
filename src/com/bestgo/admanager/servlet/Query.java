@@ -1293,7 +1293,7 @@ public class Query extends HttpServlet {
                         ((likeCampaignName == null || likeCampaignName == "") ? " " : " and campaign_name like '%" + likeCampaignName +"%' " )  +
                         " and c.status != 'removed' and c.campaign_id in (" + campaignIds + ")" +
                         " group by c.campaign_id " +
-                        ((totalInstallComparisonValue == "" || totalInstallComparisonValue == null) ? " having impressions > 0 " : " having installed " + totalInstallComparisonValue);
+                        ((totalInstallComparisonValue == "" || totalInstallComparisonValue == null) ? "" : " having installed " + totalInstallComparisonValue);
                 list = DB.findListBySql(sql);
             }else if (countryCheck) {
 //                sql = "select campaign_id, country_code, a.account_id,short_name, campaign_name, a.status, create_time, budget, bidding, spend, installed, impressions, click" +
@@ -1318,7 +1318,7 @@ public class Query extends HttpServlet {
                         ((likeCampaignName == null || likeCampaignName == "") ? " " : " and campaign_name like '%" + likeCampaignName +"%' " )  +
                         " and c.status != 'removed' and c.campaign_id in (" + campaignIds + ")" +
                         " group by c.campaign_id, country_code " +
-                        ((totalInstallComparisonValue == null || totalInstallComparisonValue == "") ? " having impressions > 0 " : " having installed " + totalInstallComparisonValue);
+                        ((totalInstallComparisonValue == null || totalInstallComparisonValue == "") ? "" : " having installed " + totalInstallComparisonValue);
                 list = DB.findListBySql(sql);
             }else{
 //                sql = "select campaign_id, a.account_id,short_name, campaign_name, a.status, create_time, budget, bidding, spend, installed, impressions, click " +
@@ -1342,24 +1342,8 @@ public class Query extends HttpServlet {
                         ((likeCampaignName == "" || likeCampaignName == null) ? " " : " and campaign_name like '%" + likeCampaignName +"%' " )  +
                         " and date between '" + startTime + "' and '" + endTime + "' " +
                         " group by c.campaign_id " +
-                        ((totalInstallComparisonValue == "" || totalInstallComparisonValue == null) ? " having impressions > 0 " : " having installed " + totalInstallComparisonValue);
+                        ((totalInstallComparisonValue == "" || totalInstallComparisonValue == null) ? "" : " having installed " + totalInstallComparisonValue);
                 list = DB.findListBySql(sql);
-                if(containsNoDataCampaignCheck){
-//                    sql = "select campaign_id, c.account_id, short_name, campaign_name, create_time, c.status, budget, bidding, c.total_spend " +
-//                            "  from " + webAdCampaignsTable + " c LEFT JOIN " + webAccountIdTable + " b ON c.account_id = b.account_id where c.status = '" + FieldStatus + "'" +
-//                            ((likeCampaignName == "" || likeCampaignName == null) ? " " : " and campaign_name like '%" + likeCampaignName +"%' " )  +
-//                            " and campaign_id in (" + campaignIds + ") ";
-                    sql = "select campaign_id, c.account_id, short_name, campaign_name, create_time, c.status, budget, bidding, c.total_spend " +
-                            "  from " + webAdCampaignsTable + " c LEFT JOIN " + webAccountIdTable + " b ON c.account_id = b.account_id where " +
-                            " campaign_id in (" + campaignIds + ") " +
-                            ((likeCampaignName == "" || likeCampaignName == null) ? " " : " and campaign_name like '%" + likeCampaignName +"%' " );
-                    listAll = DB.findListBySql(sql);
-                    if(list != null && list.size() >0){
-                        listNoData = Utils.getDiffJSObjectList(listAll, list, "campaign_id");
-                    }else{
-                        listNoData = listAll;
-                    }
-                }
             }
 
         } else {
@@ -1385,13 +1369,14 @@ public class Query extends HttpServlet {
 //            if(onlyQueryNoDataCampaignCheck && impressions != 0){//只查询无数据，containsNoDataCampaignCheck = false
 //                continue;
 //            }
-//            if(!containsNoDataCampaignCheck && impressions == 0){//只查询有数据，containsNoDataCampaignCheck = true
-//                continue;
-//            }
+//
+            if(!containsNoDataCampaignCheck && impressions == 0){//只查询有数据，containsNoDataCampaignCheck = true
+                continue;
+            }
 
             String campaign_id = one.get("campaign_id");
             double roi = 0;
-            if(hasROI){
+            if(impressions > 0 && hasROI){
                 double priceI = 0;
                 double cpaI = 0;
                 double installedI = 0;
@@ -1468,6 +1453,7 @@ public class Query extends HttpServlet {
             d.addProperty("budget", budget);
             d.addProperty("bidding", bidding);
             d.addProperty("impressions", impressions);
+
             d.addProperty("spend", Utils.trimDouble(spend));
             d.addProperty("campaign_spends", campaign_spends);
             d.addProperty("installed", installed);
@@ -1482,57 +1468,6 @@ public class Query extends HttpServlet {
                 d.addProperty("network", "facebook");
             }
             array.add(d);
-        }
-
-        if(listNoData != null && listNoData.size() > 0){
-            for (JSObject one : list) {
-                String campaign_id = one.get("campaign_id");
-                String short_name = one.get("short_name");
-                String account_id = one.get("account_id");
-                String campaign_name = one.get("campaign_name");
-                String status = one.get("status");
-                String create_time = one.get("create_time").toString();
-                create_time = create_time.substring(0,create_time.length()-5);
-                String country_code = one.get("country_code");
-                double budget = one.get("budget");
-                double bidding = one.get("bidding");
-                double spend = Utils.convertDouble(one.get("spend"), 0);
-
-                JSObject js = countryCampaignspendMap.get(campaign_id);
-                double campaign_spends = 0;
-                if(js != null && js.hasObjectData()){
-                    campaign_spends = Utils.convertDouble(js.get("campaign_spends"), 0);
-                }
-
-                total_spend += spend;
-
-                JsonObject d = new JsonObject();
-                d.addProperty("campaign_id", campaign_id);
-                d.addProperty("short_name", short_name);
-                d.addProperty("account_id", account_id);
-                d.addProperty("campaign_name", campaign_name);
-                d.addProperty("status", status);
-                d.addProperty("create_time", create_time);
-                d.addProperty("country_code", country_code);
-                d.addProperty("country_name", countryMap.get(country_code));
-                d.addProperty("budget", budget);
-                d.addProperty("bidding", bidding);
-                d.addProperty("impressions", 0);
-                d.addProperty("spend", Utils.trimDouble(spend));
-                d.addProperty("campaign_spends", campaign_spends);
-                d.addProperty("installed", 0);
-                d.addProperty("click", 0);
-                d.addProperty("ctr", 0);
-                d.addProperty("cpa", 0);
-                d.addProperty("cvr", 0);
-                d.addProperty("roi", "--");
-                if (admobCheck) {
-                    d.addProperty("network", "admob");
-                } else {
-                    d.addProperty("network", "facebook");
-                }
-                array.add(d);
-            }
         }
         jsonObject.add("array", array);
         jsonObject.addProperty("total_spend", total_spend);

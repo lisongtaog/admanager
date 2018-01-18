@@ -208,14 +208,19 @@ public class Utils {
             return null;
         }
         List<JSObject> diff = new ArrayList<>();
-        Map<String,JSObject> map = new HashMap<>(mainList.size());
+        Map<String,String> map = new HashMap<>(mainList.size());
         for (JSObject x : compareList) {
-            map.put(x.get(commonFiled), x);
+            String key = x.get(commonFiled);
+            if(key != null && key != ""){
+                map.put(key,"compare");
+            }
         }
         for (JSObject i : mainList) {
             String key = i.get(commonFiled);
-            if(!map.containsKey(key)) {
-                diff.add(i);
+            if(key != null && key != ""){
+                if(!"compare".equals(map.get(key))) {
+                    diff.add(i);
+                }
             }
         }
         return diff;

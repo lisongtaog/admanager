@@ -1279,13 +1279,9 @@ public class QueryByMulConditions extends HttpServlet {
 
                 list = DB.findListBySql(sql);
                 if(containsNoDataCampaignCheck){
-//                    sql = "select c.campaign_id, c.account_id, short_name, c.campaign_name, c.create_time, c.status, budget, c.bidding, c.total_spend " +
-//                            " from " + adCampaignsTable + " a, " + webAdCampaignsTable + " c, " + webAccountIdTable + " b where a.campaign_id = c.campaign_id " +
-//                            " c.account_id = b.account_id and c.status = '" + FieldStatus + "' and a.country_region = '" + country + "' and app_name = '" + tagName + "' " +
-//                            ((likeCampaignName == "" || likeCampaignName == null) ? " " : " and c.campaign_name like '%" + likeCampaignName +"%' " );
                     sql = "select c.campaign_id, c.account_id, short_name, c.campaign_name, c.create_time, c.status, budget, c.bidding, c.total_spend " +
                             " from " + adCampaignsTable + " a, " + webAdCampaignsTable + " c, " + webAccountIdTable + " b where a.campaign_id = c.campaign_id " +
-                            " c.account_id = b.account_id and a.country_region = '" + country + "' and app_name = '" + tagName + "' " +
+                            " c.account_id = b.account_id and c.status = '" + FieldStatus + "' and a.country_region = '" + country + "' and app_name = '" + tagName + "' " +
                             ((likeCampaignName == "" || likeCampaignName == null) ? " " : " and c.campaign_name like '%" + likeCampaignName +"%' " );
                     listAll = DB.findListBySql(sql);
                     if(list != null && list.size() >0){
@@ -1323,14 +1319,10 @@ public class QueryByMulConditions extends HttpServlet {
                         ") a left join " + webAccountIdTable + " b on a.account_id = b.account_id";
                 list = DB.findListBySql(sql);
                 if(containsNoDataCampaignCheck){
-//                    sql = "select campaign_id, c.account_id, short_name, campaign_name, create_time, c.status, budget, bidding, c.total_spend " +
-//                            "  from " + webAdCampaignsTable + " c LEFT JOIN " + webAccountIdTable + " b ON c.account_id = b.account_id where c.status = '" + FieldStatus + "'" +
-//                            ((likeCampaignName == "" || likeCampaignName == null) ? " " : " and campaign_name like '%" + likeCampaignName +"%' " )  +
-//                            " and campaign_id in (" + campaignIds + ") ";
                     sql = "select campaign_id, c.account_id, short_name, campaign_name, create_time, c.status, budget, bidding, c.total_spend " +
-                            "  from " + webAdCampaignsTable + " c LEFT JOIN " + webAccountIdTable + " b ON c.account_id = b.account_id where " +
-                            " campaign_id in (" + campaignIds + ") " +
-                            ((likeCampaignName == "" || likeCampaignName == null) ? " " : " and campaign_name like '%" + likeCampaignName +"%' ");
+                            "  from " + webAdCampaignsTable + " c LEFT JOIN " + webAccountIdTable + " b ON c.account_id = b.account_id where c.status = '" + FieldStatus + "'" +
+                            ((likeCampaignName == "" || likeCampaignName == null) ? " " : " and campaign_name like '%" + likeCampaignName +"%' " )  +
+                            " and campaign_id in (" + campaignIds + ") ";
                     listAll = DB.findListBySql(sql);
                     if(list != null && list.size() >0){
                         listNoData = Utils.getDiffJSObjectList(listAll, list, "campaign_id");
@@ -1449,7 +1441,7 @@ public class QueryByMulConditions extends HttpServlet {
         }
 
         if(listNoData != null && listNoData.size() > 0){
-            for (JSObject one : list) {
+            for (JSObject one : listNoData) {
                 String campaign_id = one.get("campaign_id");
                 String short_name = one.get("short_name");
                 String account_id = one.get("account_id");
