@@ -74,7 +74,7 @@
     function targetSearch(q) {
       var accountId = $('#accountId').text().trim();
       var accessToken = $('#accessToken').text().trim();
-      var url = "https://graph.facebook.com/v2.9/act_" + accountId + "/targetingsearch?q=" + encodeURIComponent(q);
+      var url = "https://graph.facebook.com/v2.10/act_" + accountId + "/targetingsearch?q=" + encodeURIComponent(q);
       url += ("&access_token=" + accessToken);
       $.get(url, function(data) {
         $('.table tbody tr').remove();

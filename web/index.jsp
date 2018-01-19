@@ -125,6 +125,12 @@
                 <button id="btnQueryNoData" class="btn btn-default">查询无数据的系列</button>
                 <input type="button" class="btn btn-default" id="btnBatchChangeStatus" value="修改状态监控"/>
             </div>
+
+            <div>
+                <label>出价</label>
+                <input id="inputBatchBidding" class="form-control" style="display: inline; width: auto;" type="text" value="0"/>
+                <button id="btnBatchModifyBidding" class="btn btn-default">批量修改出价</button>
+            </div>
         </div>
     </div>
     <div class="panel panel-default">
@@ -215,7 +221,7 @@
 <script src="jqueryui/jquery-ui.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.4/js/select2.min.js"></script>
 <script src="js/country-name-code-dict.js"></script>
-<script src="js/index.js?t=20180118"></script>
+<script src="js/index.js?t=20180119"></script>
 
 <script>
     var data = <%=array.toString()%>;
