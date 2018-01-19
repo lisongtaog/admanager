@@ -826,6 +826,37 @@ function bindBatchModifyOperation() {
             }
         }, 'json');
     });
+
+    $('#btnBatchModifyBidding').click(function() {
+        var checkbox = $('#result_header input[type=checkbox]');
+        if (checkbox.length <= 0) return;
+
+        var bidding = $('#inputBatchBidding').val();
+        bidding = parseFloat(bidding);
+        if (bidding > 0) {
+            $('#results_body tr').each(function() {
+                var tr = this;
+                var one = tr.changedCampainData;
+                one.bidding = bidding;
+
+                var tds = $(tr).find('td');
+                if (tds.length > 9) {
+                    var td = tds[8];
+                    if ($(td).hasClass('editable')) {
+                        var t = $(td).text();
+                        if (t != bidding) {
+                            $(td).text(bidding);
+                            if (bidding != tr.origCampaignData.bidding / 100) {
+                                $(td).addClass('changed');
+                            } else {
+                                $(td).removeClass('changed');
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    });
 }
 
 function bindQueryZero() {
