@@ -26,8 +26,8 @@ import java.util.*;
 /**
  * 首页的汇总
  */
-@WebServlet(name = "query", urlPatterns = {"/query"}, asyncSupported = true)
-public class Query extends HttpServlet {
+@WebServlet(name = "zmj_Query20180118", urlPatterns = {"/zmj_Query20180118"}, asyncSupported = true)
+public class zmj_Query20180118 extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         doPost(request, response);
     }
@@ -46,7 +46,7 @@ public class Query extends HttpServlet {
         if (sorterId != null && sorterId != "") {
             sorter = Utils.parseInt(sorterId, 0);
         }
-//        String beforeSevenDay = DateUtil.addDay(endTime,-6,"yyyy-MM-dd");
+        String beforeSevenDay = DateUtil.addDay(endTime,-6,"yyyy-MM-dd");
         try {
             JsonArray arr = new JsonArray();
             if ("false".equals(adwordsCheck) && "false".equals(facebookCheck)) {
@@ -58,14 +58,18 @@ public class Query extends HttpServlet {
                         CampaignsSummary campaignsSummary = new CampaignsSummary();
                         long id = tagJSObject.get("id");
                         campaignsSummary.name = tagJSObject.get("tag_name");
-                        JsonObject admob = fetchOneAppDataSummary(id, startTime, endTime,true);
-                        JsonObject facebook =  fetchOneAppDataSummary(id, startTime, endTime,false);
+                        JsonObject admob = fetchOneAppDataSummary(id, startTime, endTime,true,beforeSevenDay);
+                        JsonObject facebook =  fetchOneAppDataSummary(id, startTime, endTime,false,beforeSevenDay);
                         campaignsSummary.total_impressions = admob.get("total_impressions").getAsDouble() + facebook.get("total_impressions").getAsDouble();
                         if (campaignsSummary.total_impressions == 0) {
                             continue;
                         }
+//                        Double sevenDaysTotalSpendDouble = sevenDaysTotalSpendMap.get(id + endTime);
+//                        if(sevenDaysTotalSpendDouble == null){
+//
+//                        }
                         campaignsSummary.total_spend = admob.get("total_spend").getAsDouble() + facebook.get("total_spend").getAsDouble();
-//                        campaignsSummary.seven_days_total_spend = admob.get("seven_days_total_spend").getAsDouble() + facebook.get("seven_days_total_spend").getAsDouble();
+                        campaignsSummary.seven_days_total_spend = admob.get("seven_days_total_spend").getAsDouble() + facebook.get("seven_days_total_spend").getAsDouble();
                         campaignsSummary.total_installed = admob.get("total_installed").getAsDouble() + facebook.get("total_installed").getAsDouble();
                         campaignsSummary.total_click = admob.get("total_click").getAsDouble() + facebook.get("total_click").getAsDouble();
                         campaignsSummary.total_ctr = campaignsSummary.total_impressions > 0 ? campaignsSummary.total_click / campaignsSummary.total_impressions : 0;
@@ -377,8 +381,8 @@ public class Query extends HttpServlet {
                             JsonObject j = new JsonObject();
                             j.addProperty("name",cs.name);
                             j.addProperty("total_spend",cs.total_spend);
-//                            j.addProperty("seven_days_total_spend",cs.seven_days_total_spend);
-//                            j.addProperty("seven_days_total_revenue",cs.seven_days_total_revenue);
+                            j.addProperty("seven_days_total_spend",cs.seven_days_total_spend);
+                            j.addProperty("seven_days_total_revenue",cs.seven_days_total_revenue);
                             j.addProperty("total_installed",cs.total_installed);
                             j.addProperty("total_impressions",cs.total_impressions);
                             j.addProperty("total_click",cs.total_click);
@@ -395,21 +399,21 @@ public class Query extends HttpServlet {
                     for (JSObject tagJSObject : tagList) {
                         long id = tagJSObject.get("id");
                         String tagName = tagJSObject.get("tag_name");
-                        JsonObject admob = fetchOneAppDataSummary(id, startTime, endTime,true);
-                        JsonObject facebook =  fetchOneAppDataSummary(id, startTime, endTime,false);
+                        JsonObject admob = fetchOneAppDataSummary(id, startTime, endTime,true,beforeSevenDay);
+                        JsonObject facebook =  fetchOneAppDataSummary(id, startTime, endTime,false,beforeSevenDay);
                         double total_impressions = admob.get("total_impressions").getAsDouble() + facebook.get("total_impressions").getAsDouble();
                         if (total_impressions == 0) {
                             continue;
                         }
                         double total_spend = admob.get("total_spend").getAsDouble() + facebook.get("total_spend").getAsDouble();
-//                        double seven_days_total_spend = admob.get("seven_days_total_spend").getAsDouble() + facebook.get("seven_days_total_spend").getAsDouble();
+                        double seven_days_total_spend = admob.get("seven_days_total_spend").getAsDouble() + facebook.get("seven_days_total_spend").getAsDouble();
                         double total_installed = admob.get("total_installed").getAsDouble() + facebook.get("total_installed").getAsDouble();
                         double total_click = admob.get("total_click").getAsDouble() + facebook.get("total_click").getAsDouble();
                         double total_ctr = total_impressions > 0 ? total_click / total_impressions : 0;
                         double total_cpa = total_installed > 0 ? total_spend / total_installed : 0;
                         double total_cvr = total_click > 0 ? total_installed / total_click : 0;
                         admob.addProperty("total_spend", Utils.trimDouble(total_spend));
-//                        admob.addProperty("seven_days_total_spend", Utils.trimDouble(seven_days_total_spend));
+                        admob.addProperty("seven_days_total_spend", Utils.trimDouble(seven_days_total_spend));
                         admob.addProperty("total_installed", total_installed);
                         admob.addProperty("total_impressions", total_impressions);
                         admob.addProperty("total_click", total_click);
@@ -418,7 +422,7 @@ public class Query extends HttpServlet {
                         admob.addProperty("total_cvr", Utils.trimDouble(total_cvr));
                         admob.addProperty("name", tagName);
                         double total_revenue = 0;
-//                        double seven_days_total_revenue = 0;
+                        double seven_days_total_revenue = 0;
                         String google_package_id = tagJSObject.get("google_package_id");
                         if(google_package_id != null){
                             String sqlR = "select sum(revenue) as revenues " +
@@ -437,7 +441,7 @@ public class Query extends HttpServlet {
 //                                }
                         }
                         admob.addProperty("total_revenue",Utils.trimDouble(total_revenue));
-//                        admob.addProperty("seven_days_total_revenue",Utils.trimDouble(seven_days_total_revenue));
+                        admob.addProperty("seven_days_total_revenue",Utils.trimDouble(seven_days_total_revenue));
                         arr.add(admob);
                     }
                 }
@@ -448,7 +452,7 @@ public class Query extends HttpServlet {
                 for (int i = 0; i < tagList.size(); i++) {
                     long id = tagList.get(i).get("id");
                     String tagName = tagList.get(i).get("tag_name");
-                    JsonObject jsonObject =  fetchOneAppDataSummary(id, startTime, endTime,"true".equals(adwordsCheck));
+                    JsonObject jsonObject =  fetchOneAppDataSummary(id, startTime, endTime,"true".equals(adwordsCheck),beforeSevenDay);
                     double total_impression = jsonObject.get("total_impressions").getAsDouble();
                     if (total_impression == 0) {
                         continue;
@@ -472,7 +476,7 @@ public class Query extends HttpServlet {
         response.getWriter().write(json.toString());
     }
 
-    private JsonObject fetchOneAppDataSummary(long tagId, String startTime, String endTime, boolean admobCheck) throws Exception {
+    private JsonObject fetchOneAppDataSummary(long tagId, String startTime, String endTime, boolean admobCheck,String beforeSevenDay) throws Exception {
         String webAdCampaignTagRelTable = "web_ad_campaign_tag_rel";
         String webAdCampaignsTable = "web_ad_campaigns";
         String webAdCampaignsHistoryTable = "web_ad_campaigns_history";

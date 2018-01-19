@@ -4,30 +4,112 @@ import com.bestgo.admanager.DateUtil;
 import com.bestgo.admanager.Utils;
 import com.bestgo.common.database.services.DB;
 import com.bestgo.common.database.utils.JSObject;
-import com.facebook.ads.sdk.User;
-import com.google.gson.Gson;
+
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.reflect.TypeToken;
-import com.sun.xml.internal.bind.v2.runtime.unmarshaller.TagName;
 import org.apache.log4j.Logger;
 
-import javax.rmi.CORBA.Util;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.lang.System;
 import java.util.*;
 
 /**
  * 首页的汇总
  */
-@WebServlet(name = "query", urlPatterns = {"/query"}, asyncSupported = true)
-public class Query extends HttpServlet {
+@WebServlet(name = "QuerySummary", urlPatterns = {"/query_summary"}, asyncSupported = true)
+public class QuerySummary extends HttpServlet {
+    private static List<JSObject> tagList;
+    private static Map<String,Double> sevenDaysTotalSpendMap;
+    private static Map<String,Double> sevenDaysTotalSpendAdmobMap;
+    private static Map<String,Double> sevenDaysTotalRevenueMap;
+
+    static{
+        if(tagList == null){
+            tagList = new ArrayList<>();
+        }
+        if(sevenDaysTotalSpendMap == null){
+            sevenDaysTotalSpendMap = new HashMap<>();
+        }
+        if(sevenDaysTotalSpendAdmobMap == null){
+            sevenDaysTotalSpendAdmobMap = new HashMap<>();
+        }
+        if(sevenDaysTotalRevenueMap == null){
+            sevenDaysTotalRevenueMap = new HashMap<>();
+        }
+
+        String sqlTag = "select t.id,t.tag_name,google_package_id from web_tag t LEFT JOIN web_facebook_app_ids_rel air ON t.tag_name = air.tag_name";
+
+        try {
+            tagList = DB.findListBySql(sqlTag);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if(tagList != null && tagList.size() > 0){
+            Calendar calendar = Calendar.getInstance();
+            String now  = String.format("%d-%02d-%02d", calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH));
+            String beforeSevenDay = DateUtil.addDay(now,-6,"yyyy-MM-dd");
+            for(JSObject j : tagList){
+                long tagId = j.get("id");
+                String sql = "select date, sum(ch.total_spend) as spend " +
+                        "from web_ad_campaigns c, web_ad_campaigns_history ch, " +
+                        "(select distinct campaign_id from web_ad_campaign_tag_rel where tag_id = " + tagId + ") rt " +
+                        "where rt.campaign_id = ch.campaign_id and c.campaign_id = ch.campaign_id " +
+                        "and date between '" + beforeSevenDay + "' and '" + now + "' " +
+                        "and c.status != 'removed' GROUP BY date";
+                List<JSObject> list = null;
+                try {
+                    list = DB.findListBySql(sql);
+                    if(list != null && list.size() >0){
+                        for(JSObject s : list){
+                            String date = s.get("date").toString();
+                            double spend = Utils.convertDouble(s.get("spend"),0);
+                            sevenDaysTotalSpendMap.put(tagId + date,spend);
+                        }
+                    }
+
+                    sql = "select date, sum(ch.total_spend) as spend_admob " +
+                            "from web_ad_campaigns_admob c, web_ad_campaigns_history_admob ch, " +
+                            "(select distinct campaign_id from web_ad_campaign_tag_admob_rel where tag_id = " + tagId + ") rt " +
+                            "where rt.campaign_id = ch.campaign_id and c.campaign_id = ch.campaign_id " +
+                            "and date between '" + beforeSevenDay + "' and '" + now + "' " +
+                            "and c.status != 'removed' GROUP BY date";
+                    list = DB.findListBySql(sql);
+                    if(list != null && list.size() >0){
+                        for(JSObject s : list){
+                            String date = s.get("date").toString();
+                            double spend_admob = Utils.convertDouble(s.get("spend_admob"),0);
+                            sevenDaysTotalSpendAdmobMap.put(tagId + date,spend_admob);
+                        }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                String google_package_id = j.get("google_package_id");
+                try {
+                    sql  = "select date, sum(revenue) as revenue " +
+                            "from web_ad_country_analysis_report_history where app_id = '"
+                            + google_package_id + "' and date BETWEEN '" + beforeSevenDay + "' AND '" + now + "' GROUP BY date";
+                    list = DB.findListBySql(sql);
+                    if(list != null && list.size() >0){
+                        for(JSObject s : list){
+                            String date = s.get("date").toString();
+                            double revenue = Utils.convertDouble(s.get("revenue"),0);
+                            sevenDaysTotalRevenueMap.put(tagId + date,revenue);
+                        }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+            }
+        }
+
+    }
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         doPost(request, response);
     }
@@ -46,7 +128,6 @@ public class Query extends HttpServlet {
         if (sorterId != null && sorterId != "") {
             sorter = Utils.parseInt(sorterId, 0);
         }
-//        String beforeSevenDay = DateUtil.addDay(endTime,-6,"yyyy-MM-dd");
         try {
             JsonArray arr = new JsonArray();
             if ("false".equals(adwordsCheck) && "false".equals(facebookCheck)) {
@@ -65,7 +146,7 @@ public class Query extends HttpServlet {
                             continue;
                         }
                         campaignsSummary.total_spend = admob.get("total_spend").getAsDouble() + facebook.get("total_spend").getAsDouble();
-//                        campaignsSummary.seven_days_total_spend = admob.get("seven_days_total_spend").getAsDouble() + facebook.get("seven_days_total_spend").getAsDouble();
+                        campaignsSummary.seven_days_total_spend = admob.get("seven_days_total_spend").getAsDouble() + facebook.get("seven_days_total_spend").getAsDouble();
                         campaignsSummary.total_installed = admob.get("total_installed").getAsDouble() + facebook.get("total_installed").getAsDouble();
                         campaignsSummary.total_click = admob.get("total_click").getAsDouble() + facebook.get("total_click").getAsDouble();
                         campaignsSummary.total_ctr = campaignsSummary.total_impressions > 0 ? campaignsSummary.total_click / campaignsSummary.total_impressions : 0;
@@ -80,13 +161,11 @@ public class Query extends HttpServlet {
                             if(oneR != null){
                                 campaignsSummary.total_revenue = Utils.convertDouble(oneR.get("revenues"),0);
                             }
-//                                sqlR = "select sum(revenue) as seven_days_total_revenue " +
-//                                        "from web_ad_country_analysis_report_history where app_id = '"
-//                                        + google_package_id + "' and date BETWEEN '" + beforeSevenDay + "' AND '" + endTime + "'";
-//                                oneR = DB.findOneBySql(sqlR);
-//                                if(oneR != null){
-//                                    campaignsSummary.seven_days_total_revenue = Utils.convertDouble(oneR.get("seven_days_total_revenue"),0);
-//                                }
+                            campaignsSummary.seven_days_total_revenue = getTotalRevenueByTagAndDate(id,endTime,google_package_id);
+                            for(int i=-1;i>-7;i--){
+                                String currDay = DateUtil.addDay(endTime,i,"yyyy-MM-dd");
+                                campaignsSummary.seven_days_total_revenue += getTotalRevenueByTagAndDate(id,currDay,google_package_id);
+                            }
                         }
                         campaignsSummaryList.add(campaignsSummary);
                     }
@@ -377,8 +456,8 @@ public class Query extends HttpServlet {
                             JsonObject j = new JsonObject();
                             j.addProperty("name",cs.name);
                             j.addProperty("total_spend",cs.total_spend);
-//                            j.addProperty("seven_days_total_spend",cs.seven_days_total_spend);
-//                            j.addProperty("seven_days_total_revenue",cs.seven_days_total_revenue);
+                            j.addProperty("seven_days_total_spend",cs.seven_days_total_spend);
+                            j.addProperty("seven_days_total_revenue",cs.seven_days_total_revenue);
                             j.addProperty("total_installed",cs.total_installed);
                             j.addProperty("total_impressions",cs.total_impressions);
                             j.addProperty("total_click",cs.total_click);
@@ -402,14 +481,14 @@ public class Query extends HttpServlet {
                             continue;
                         }
                         double total_spend = admob.get("total_spend").getAsDouble() + facebook.get("total_spend").getAsDouble();
-//                        double seven_days_total_spend = admob.get("seven_days_total_spend").getAsDouble() + facebook.get("seven_days_total_spend").getAsDouble();
+                        double seven_days_total_spend = admob.get("seven_days_total_spend").getAsDouble() + facebook.get("seven_days_total_spend").getAsDouble();
                         double total_installed = admob.get("total_installed").getAsDouble() + facebook.get("total_installed").getAsDouble();
                         double total_click = admob.get("total_click").getAsDouble() + facebook.get("total_click").getAsDouble();
                         double total_ctr = total_impressions > 0 ? total_click / total_impressions : 0;
                         double total_cpa = total_installed > 0 ? total_spend / total_installed : 0;
                         double total_cvr = total_click > 0 ? total_installed / total_click : 0;
                         admob.addProperty("total_spend", Utils.trimDouble(total_spend));
-//                        admob.addProperty("seven_days_total_spend", Utils.trimDouble(seven_days_total_spend));
+                        admob.addProperty("seven_days_total_spend", Utils.trimDouble(seven_days_total_spend));
                         admob.addProperty("total_installed", total_installed);
                         admob.addProperty("total_impressions", total_impressions);
                         admob.addProperty("total_click", total_click);
@@ -418,7 +497,7 @@ public class Query extends HttpServlet {
                         admob.addProperty("total_cvr", Utils.trimDouble(total_cvr));
                         admob.addProperty("name", tagName);
                         double total_revenue = 0;
-//                        double seven_days_total_revenue = 0;
+                        double seven_days_total_revenue = 0;
                         String google_package_id = tagJSObject.get("google_package_id");
                         if(google_package_id != null){
                             String sqlR = "select sum(revenue) as revenues " +
@@ -428,16 +507,14 @@ public class Query extends HttpServlet {
                             if(oneR != null){
                                 total_revenue = Utils.convertDouble(oneR.get("revenues"),0);
                             }
-//                                sqlR = "select sum(revenue) as seven_days_total_revenue " +
-//                                        "from web_ad_country_analysis_report_history where app_id = '"
-//                                        + google_package_id + "' and date BETWEEN '" + beforeSevenDay + "' AND '" + endTime + "'";
-//                                oneR = DB.findOneBySql(sqlR);
-//                                if(oneR != null){
-//                                    seven_days_total_revenue = Utils.convertDouble(oneR.get("seven_days_total_revenue"),0);
-//                                }
+                            seven_days_total_revenue = getTotalRevenueByTagAndDate(id,endTime,google_package_id);
+                            for(int i=-1;i>-7;i--){
+                                String currDay = DateUtil.addDay(endTime,i,"yyyy-MM-dd");
+                                seven_days_total_revenue += getTotalRevenueByTagAndDate(id,currDay,google_package_id);
+                            }
                         }
                         admob.addProperty("total_revenue",Utils.trimDouble(total_revenue));
-//                        admob.addProperty("seven_days_total_revenue",Utils.trimDouble(seven_days_total_revenue));
+                        admob.addProperty("seven_days_total_revenue",Utils.trimDouble(seven_days_total_revenue));
                         arr.add(admob);
                     }
                 }
@@ -472,6 +549,26 @@ public class Query extends HttpServlet {
         response.getWriter().write(json.toString());
     }
 
+    private Double getTotalRevenueByTagAndDate(long tagId, String currDay,String google_package_id) {
+        Double totalRevenueDouble = sevenDaysTotalRevenueMap.get(tagId + currDay);
+        if(totalRevenueDouble == null){
+            String sql = "select sum(revenue) as total_revenue " +
+                    "from web_ad_country_analysis_report_history where app_id = '"
+                    + google_package_id + "' and date = '" + currDay + "'";
+            JSObject oneR = null;
+            try {
+                oneR = DB.findOneBySql(sql);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            if(oneR != null && oneR.hasObjectData()){
+                totalRevenueDouble = Utils.convertDouble(oneR.get("total_revenue"),0);
+                sevenDaysTotalRevenueMap.put(tagId+currDay,totalRevenueDouble);
+            }
+        }
+        return totalRevenueDouble;
+    }
+
     private JsonObject fetchOneAppDataSummary(long tagId, String startTime, String endTime, boolean admobCheck) throws Exception {
         String webAdCampaignTagRelTable = "web_ad_campaign_tag_rel";
         String webAdCampaignsTable = "web_ad_campaigns";
@@ -500,19 +597,13 @@ public class Query extends HttpServlet {
         double total_cpa = total_installed > 0 ? total_spend / total_installed : 0;
         double total_cvr = total_click > 0 ? total_installed / total_click : 0;
 
-//        sql = "select sum(ch.total_spend) as seven_days_total_spend " +
-//                "from " + webAdCampaignsTable + " c, " + webAdCampaignsHistoryTable + " ch, " +
-//                "(select distinct campaign_id from " + webAdCampaignTagRelTable + " where tag_id = " + tagId + ") rt " +
-//                "where rt.campaign_id = ch.campaign_id and c.campaign_id = ch.campaign_id " +
-//                "and date between '" + beforeSevenDay + "' and '" + endTime + "' " +
-//                "and c.status != 'removed' ";
-//        one = DB.findOneBySql(sql);
-//        double seven_days_total_spend = 0;
-//        if(one != null && one.hasObjectData()){
-//            seven_days_total_spend = Utils.convertDouble(one.get("seven_days_total_spend"), 0);
-//        }
+        double seven_days_total_spend = getTotalSpendByTagAndDate(tagId,endTime,admobCheck);
+        for(int i=-1;i>-7;i--){
+            String currDay = DateUtil.addDay(endTime,i,"yyyy-MM-dd");
+            seven_days_total_spend += getTotalSpendByTagAndDate(tagId,currDay,admobCheck);
+        }
 
-//        jsonObject.addProperty("seven_days_total_spend", seven_days_total_spend);
+        jsonObject.addProperty("seven_days_total_spend", seven_days_total_spend);
 
         jsonObject.addProperty("total_spend", total_spend);
         jsonObject.addProperty("total_installed", total_installed);
@@ -537,5 +628,54 @@ public class Query extends HttpServlet {
         public double total_revenue;
         public double seven_days_total_revenue;
         public String network;
+    }
+
+    private Double getTotalSpendByTagAndDate(long tagId,String date,boolean admobCheck){
+        Double totalSpendDouble = null;
+        if(admobCheck){
+            totalSpendDouble = sevenDaysTotalSpendAdmobMap.get(tagId + date);
+            if(totalSpendDouble == null){
+                String sql = "select sum(ch.total_spend) as spend " +
+                        "from web_ad_campaigns_admob c, web_ad_campaigns_history_admob ch, " +
+                        "(select distinct campaign_id from web_ad_campaign_tag_admob_rel where tag_id = " + tagId + ") rt " +
+                        "where rt.campaign_id = ch.campaign_id and c.campaign_id = ch.campaign_id " +
+                        "and date = '" + date + "' " +
+                        "and c.status != 'removed' ";
+                JSObject one = null;
+                try {
+                    one = DB.findOneBySql(sql);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                if(one != null && one.hasObjectData()){
+                    totalSpendDouble = Utils.convertDouble(one.get("spend"),0);
+                    sevenDaysTotalSpendAdmobMap.put(tagId + date,totalSpendDouble);
+                }
+
+            }
+            return totalSpendDouble;
+        }else{
+            totalSpendDouble = sevenDaysTotalSpendMap.get(tagId + date);
+            if(totalSpendDouble == null){
+                String sql = "select sum(ch.total_spend) as spend " +
+                        "from web_ad_campaigns c, web_ad_campaigns_history ch, " +
+                        "(select distinct campaign_id from web_ad_campaign_tag_rel where tag_id = " + tagId + ") rt " +
+                        "where rt.campaign_id = ch.campaign_id and c.campaign_id = ch.campaign_id " +
+                        "and date = '" + date + "' " +
+                        "and c.status != 'removed' ";
+                JSObject one = null;
+                try {
+                    one = DB.findOneBySql(sql);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                if(one != null && one.hasObjectData()){
+                    totalSpendDouble = Utils.convertDouble(one.get("spend"),0);
+                    sevenDaysTotalSpendMap.put(tagId + date,totalSpendDouble);
+                }
+
+            }
+            return totalSpendDouble;
+        }
     }
 }
