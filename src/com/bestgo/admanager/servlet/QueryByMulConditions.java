@@ -51,6 +51,7 @@ public class QueryByMulConditions extends HttpServlet {
         String countryName = request.getParameter("countryName");
 
         String totalInstallComparisonValue = request.getParameter("totalInstallComparisonValue");
+        String cpaComparisonValue = request.getParameter("cpaComparisonValue");
 
         String likeCampaignName = request.getParameter("likeCampaignName");
         HashMap<String ,String> countryMap = Utils.getCountryMap();
@@ -65,8 +66,8 @@ public class QueryByMulConditions extends HttpServlet {
                     countryCheck = "false";
                 }
                 if ("false".equals(adwordsCheck) && "false".equals(facebookCheck)) {
-                    JsonObject admob = fetchOneAppData(id, tag,startTime, endTime, true, "true".equals(countryCheck), countryCode,likeCampaignName,campaignCreateTime,true,countryMap,totalInstallComparisonValue, "true".equals(containsNoDataCampaignCheck), "true".equals(onlyQueryNoDataCampaignCheck),countryCode);
-                    JsonObject facebook = fetchOneAppData(id, tag,startTime, endTime,false, "true".equals(countryCheck), countryCode,likeCampaignName,campaignCreateTime,true,countryMap,totalInstallComparisonValue, "true".equals(containsNoDataCampaignCheck),"true".equals(onlyQueryNoDataCampaignCheck),countryName);
+                    JsonObject admob = fetchOneAppData(id, tag,startTime, endTime, true, "true".equals(countryCheck), countryCode,likeCampaignName,campaignCreateTime,true,countryMap,totalInstallComparisonValue, "true".equals(containsNoDataCampaignCheck), "true".equals(onlyQueryNoDataCampaignCheck),countryCode,cpaComparisonValue);
+                    JsonObject facebook = fetchOneAppData(id, tag,startTime, endTime,false, "true".equals(countryCheck), countryCode,likeCampaignName,campaignCreateTime,true,countryMap,totalInstallComparisonValue, "true".equals(containsNoDataCampaignCheck),"true".equals(onlyQueryNoDataCampaignCheck),countryName,cpaComparisonValue);
                     double total_spend = admob.get("total_spend").getAsDouble() + facebook.get("total_spend").getAsDouble();
                     double total_installed = admob.get("total_installed").getAsDouble() + facebook.get("total_installed").getAsDouble();
                     double total_impressions = admob.get("total_impressions").getAsDouble() + facebook.get("total_impressions").getAsDouble();
@@ -438,10 +439,10 @@ public class QueryByMulConditions extends HttpServlet {
 
                 } else {
                     if("true".equals(adwordsCheck)){
-                        jsonObject = fetchOneAppData(id, tag,startTime, endTime, true, "true".equals(countryCheck), countryCode,likeCampaignName,campaignCreateTime,true,countryMap,totalInstallComparisonValue, "true".equals(containsNoDataCampaignCheck),"true".equals(onlyQueryNoDataCampaignCheck),countryCode);
+                        jsonObject = fetchOneAppData(id, tag,startTime, endTime, true, "true".equals(countryCheck), countryCode,likeCampaignName,campaignCreateTime,true,countryMap,totalInstallComparisonValue, "true".equals(containsNoDataCampaignCheck),"true".equals(onlyQueryNoDataCampaignCheck),countryCode,cpaComparisonValue);
 
                     }else{
-                        jsonObject = fetchOneAppData(id, tag,startTime, endTime, false, "true".equals(countryCheck), countryCode,likeCampaignName,campaignCreateTime,true,countryMap,totalInstallComparisonValue, "true".equals(containsNoDataCampaignCheck),"true".equals(onlyQueryNoDataCampaignCheck),countryName);
+                        jsonObject = fetchOneAppData(id, tag,startTime, endTime, false, "true".equals(countryCheck), countryCode,likeCampaignName,campaignCreateTime,true,countryMap,totalInstallComparisonValue, "true".equals(containsNoDataCampaignCheck),"true".equals(onlyQueryNoDataCampaignCheck),countryName,cpaComparisonValue);
 
                     }
                 }
@@ -767,7 +768,7 @@ public class QueryByMulConditions extends HttpServlet {
 
 
 
-    private JsonObject fetchOneAppData(long tagId, String tagName, String startTime, String endTime, boolean admobCheck, boolean countryCheck, String countryCode,String likeCampaignName,String campaignCreateTime,boolean hasROI,HashMap<String ,String> countryMap,String totalInstallComparisonValue, boolean containsNoDataCampaignCheck,boolean onlyQueryNoDataCampaignCheck,String country) throws Exception {
+    private JsonObject fetchOneAppData(long tagId, String tagName, String startTime, String endTime, boolean admobCheck, boolean countryCheck, String countryCode,String likeCampaignName,String campaignCreateTime,boolean hasROI,HashMap<String ,String> countryMap,String totalInstallComparisonValue, boolean containsNoDataCampaignCheck,boolean onlyQueryNoDataCampaignCheck,String country,String cpaComparisonValue) throws Exception {
         String webAdCampaignTagRelTable = "web_ad_campaign_tag_rel";
         String webAdCampaignsTable = "web_ad_campaigns";
         String adCampaignsTable = "ad_campaigns";
@@ -827,6 +828,20 @@ public class QueryByMulConditions extends HttpServlet {
         List<JSObject> listCampaignSpend4CountryCode = new ArrayList<>();
         Map<String,JSObject> countryCampaignspendMap = new HashMap<>();
         if (campaignIds != null && campaignIds != "") {
+            String havingField = "";
+            if(totalInstallComparisonValue == "" && cpaComparisonValue == ""){
+                havingField = " having impressions > 0 ";
+            }else{
+                if(totalInstallComparisonValue != "" && cpaComparisonValue == ""){
+                    havingField = " having installed " + totalInstallComparisonValue;
+                }else if(totalInstallComparisonValue == "" && cpaComparisonValue != ""){
+                    havingField = " having cpa " + cpaComparisonValue;
+                }else{
+                    havingField = " having installed " + totalInstallComparisonValue + " and cpa " + cpaComparisonValue;
+                }
+                containsNoDataCampaignCheck = false;
+            }
+
             String sql = "";
             if(countryCode != null && countryCode != ""){
                 sql = "select ch.campaign_id, sum(ch.total_spend) as campaign_spends " +
@@ -844,14 +859,14 @@ public class QueryByMulConditions extends HttpServlet {
                 sql = "select campaign_id, a.account_id,short_name, campaign_name, a.status, create_time, budget, bidding, spend, installed, impressions, click" +
                         " from (" +
                         "select ch.campaign_id, account_id, campaign_name,c.status, create_time, c.budget, c.bidding, sum(ch.total_spend) as spend, " +
-                        "sum(ch.total_installed) as installed, sum(ch.total_impressions) as impressions " +
-                        ",sum(ch.total_click) as click from " + webAdCampaignsTable + " c, " + webAdCampaignsCountryHistoryTable + " ch " +
+                        "sum(ch.total_installed) as installed, sum(ch.total_impressions) as impressions,sum(ch.total_click) as click, " +
+                        "(case when sum(ch.total_installed) > 0 then sum(ch.total_spend) / sum(ch.total_installed) else 0 end) as cpa " +
+                        " from " + webAdCampaignsTable + " c, " + webAdCampaignsCountryHistoryTable + " ch " +
                         "where c.campaign_id=ch.campaign_id and country_code= '" + countryCode + "' " +
-                        ((likeCampaignName == null || likeCampaignName == "") ? " " : " and campaign_name like '%" + likeCampaignName +"%' " )  +
+                        ((likeCampaignName == "" || likeCampaignName == null) ? " " : " and campaign_name like '%" + likeCampaignName +"%' " )  +
                         " and date between '" + startTime + "' and '" + endTime + "' " +
                         " and c.status != 'removed' and c.campaign_id in (" + campaignIds + ")" +
-                        " group by ch.campaign_id " +
-                        ((totalInstallComparisonValue == "" || totalInstallComparisonValue == null) ? " having impressions > 0 " : " having installed " + totalInstallComparisonValue)  +
+                        " group by ch.campaign_id " + havingField +
                         ") a left join " + webAccountIdTable + " b on a.account_id = b.account_id";
 
                 list = DB.findListBySql(sql);
@@ -871,28 +886,28 @@ public class QueryByMulConditions extends HttpServlet {
                 sql = "select campaign_id, country_code, a.account_id,short_name, campaign_name, a.status, create_time, budget, bidding, spend, installed, impressions, click" +
                         " from (" +
                         "select ch.campaign_id, country_code, account_id, campaign_name,c.status, create_time, c.budget, c.bidding, sum(ch.total_spend) as spend, " +
-                        "sum(ch.total_installed) as installed, sum(ch.total_impressions) as impressions " +
-                        ",sum(ch.total_click) as click from " + webAdCampaignsTable + " c, " + webAdCampaignsCountryHistoryTable + " ch " +
+                        "sum(ch.total_installed) as installed, sum(ch.total_impressions) as impressions, " +
+                        "(case when sum(ch.total_installed) > 0 then sum(ch.total_spend) / sum(ch.total_installed) else 0 end) as cpa, " +
+                        " sum(ch.total_click) as click from " + webAdCampaignsTable + " c, " + webAdCampaignsCountryHistoryTable + " ch " +
                         "where c.campaign_id=ch.campaign_id " +
                         ((likeCampaignName == null || likeCampaignName == "") ? " " : " and campaign_name like '%" + likeCampaignName +"%' " )  +
                         " and date between '" + startTime + "' and '" + endTime + "' " +
                         " and c.status != 'removed' and c.campaign_id in (" + campaignIds + ")" +
-                        " group by ch.campaign_id, country_code " +
-                        ((totalInstallComparisonValue == null || totalInstallComparisonValue == "") ? "  having impressions > 0 " : " having installed " + totalInstallComparisonValue)  +
+                        " group by ch.campaign_id, country_code " + havingField +
                         ") a left join " + webAccountIdTable + " b on a.account_id = b.account_id";
                 list = DB.findListBySql(sql);
             }else{
                 sql = "select campaign_id, a.account_id,short_name, campaign_name, a.status, create_time, budget, bidding, spend, installed, impressions, click" +
                         " from (" +
                         "select ch.campaign_id, account_id, campaign_name,c.status, create_time, c.budget, c.bidding, sum(ch.total_spend) as spend, " +
-                        "sum(ch.total_installed) as installed, sum(ch.total_impressions) as impressions " +
-                        ",sum(ch.total_click) as click from " + webAdCampaignsTable + " c, " + webAdCampaignsHistoryTable + " ch " +
+                        "sum(ch.total_installed) as installed, sum(ch.total_impressions) as impressions, " +
+                        "(case when sum(ch.total_installed) > 0 then sum(ch.total_spend) / sum(ch.total_installed) else 0 end) as cpa, " +
+                        " sum(ch.total_click) as click from " + webAdCampaignsTable + " c, " + webAdCampaignsHistoryTable + " ch " +
                         "where c.campaign_id=ch.campaign_id " +
                         ((likeCampaignName == "" || likeCampaignName == null) ? " " : " and campaign_name like '%" + likeCampaignName +"%' " )  +
                         " and date between '" + startTime + "' and '" + endTime + "' " +
                         " and c.status != 'removed' and c.campaign_id in (" + campaignIds + ")" +
-                        " group by ch.campaign_id " +
-                        ((totalInstallComparisonValue == "" || totalInstallComparisonValue == null) ? " having impressions > 0 " : " having installed " + totalInstallComparisonValue)  +
+                        " group by ch.campaign_id "  + havingField +
                         ") a left join " + webAccountIdTable + " b on a.account_id = b.account_id";
                 list = DB.findListBySql(sql);
                 if(containsNoDataCampaignCheck){

@@ -40,6 +40,9 @@
         .yellow{
             color: #ffa17a;
         }
+        .ens{
+            color: #bdf7ff;
+        }
     </style>
 </head>
 <body>
@@ -93,18 +96,22 @@
             <input type="text" id="inputCampaignCreateTime">
             <span>系列名称</span>
             <input type="text" id="inputLikeCampaignName" />
+
             <span>总安装</span>
-            <select id="totalInstallOperator"><option value="1" selected="true">大于等于</option><option value="2">小于等于</option><option value="3">等于</option></select>
-            <input id="inputTotalInstallComparisonValue" class="form-control" style="display: inline; width: auto;" type="text" value="0"/>
+            <select id="totalInstallOperator"><option value="1" selected="true">大于</option><option value="2">小于</option><option value="3">等于</option></select>
+            <input id="inputTotalInstallComparisonValue" class="form-control" style="display: inline; width: auto;" type="text" value="-1"/>
+
+            <span>CPA</span>
+            <select id="cpaOperator"><option value="4" selected="true">大于</option><option value="5">小于</option><option value="6">等于</option></select>
+            <input id="inputCpaComparisonValue" class="form-control" style="display: inline; width: auto;" type="text" value="-1"/>
 
             <button id="btnSearch" class="btn btn-default">条件查找</button><br>
 
             <input type="checkbox" name="adnetwork" id="facebookCheck"/><label for="facebookCheck">只显示Facebook</label>
             <input type="checkbox" name="adnetwork" id="adwordsCheck"/><label for="adwordsCheck">只显示AdWords</label>
-            <input type="checkbox" name="filtrateCampaign" id="countryCheck"/><label for="countryCheck">细分到国家</label>
+            <input type="checkbox" id="countryCheck"/><label for="countryCheck">细分到国家</label>
             <input type="checkbox" name="filtrateCampaign" id="containsNoDataCampaignCheck"/><label for="containsNoDataCampaignCheck">包含无数据的系列</label>
             <%--<input type="checkbox" name="filtrateCampaign" id="onlyQueryNoDataCampaignCheck"/><label for="onlyQueryNoDataCampaignCheck">只查询无数据的系列</label>--%>
-
 
             <div>
                 <label>花费比例</label><select id="selectCostOp"><option value="1">大于等于</option><option value="2" selected="true">小于等于</option></select>
@@ -208,7 +215,7 @@
 <script src="jqueryui/jquery-ui.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.4/js/select2.min.js"></script>
 <script src="js/country-name-code-dict.js"></script>
-<script src="js/index2.js?t=20171220"></script>
+<script src="js/index2.js?t=20180118"></script>
 
 <script>
     var data = <%=array.toString()%>;

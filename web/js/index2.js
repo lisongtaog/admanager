@@ -160,25 +160,40 @@ function init() {
         var facebookCheck = $('#facebookCheck').is(':checked');
         var likeCampaignName = $('#inputLikeCampaignName').val();
         var containsNoDataCampaignCheck = $('#containsNoDataCampaignCheck').is(':checked');
-        var onlyQueryNoDataCampaignCheck = $('#onlyQueryNoDataCampaignCheck').is(':checked');
-        var ex = /^\d+$/;
+        // var onlyQueryNoDataCampaignCheck = $('#onlyQueryNoDataCampaignCheck').is(':checked');
+
+        //非负整数
+        var reg = /^\d+$/;
         var totalInstallComparisonValue = $('#inputTotalInstallComparisonValue').val();
         var totalInstallOperator = $('#totalInstallOperator option:selected').val();
-        if(ex.test(totalInstallComparisonValue)){
-            if(totalInstallComparisonValue == "0" && totalInstallOperator == "1"){
-                totalInstallComparisonValue = "";
-            }else{
-                if(totalInstallOperator == "1"){
-                    totalInstallOperator = " >= ";
-                }else if(totalInstallOperator == "2"){
-                    totalInstallOperator = " <= ";
-                }else {
-                    totalInstallOperator = " = ";
-                }
-                totalInstallComparisonValue = totalInstallOperator + totalInstallComparisonValue;
+        if(reg.test(totalInstallComparisonValue)){
+            if(totalInstallOperator == "1"){
+                totalInstallOperator = " > ";
+            }else if(totalInstallOperator == "2"){
+                totalInstallOperator = " < ";
+            }else {
+                totalInstallOperator = " = ";
             }
+            totalInstallComparisonValue = totalInstallOperator + totalInstallComparisonValue;
         }else{
             totalInstallComparisonValue = "";
+        }
+
+        //非负数（>=0的任意数）
+        reg = /^\d+(\.{0,1}\d+){0,1}$/;
+        var cpaComparisonValue = $('#inputCpaComparisonValue').val();
+        var cpaOperator = $('#cpaOperator option:selected').val();
+        if(reg.test(cpaComparisonValue)){
+            if(cpaOperator == "4"){
+                cpaOperator = " > ";
+            }else if(cpaOperator == "5"){
+                cpaOperator = " < ";
+            }else {
+                cpaOperator = " = ";
+            }
+            cpaComparisonValue = cpaOperator + cpaComparisonValue;
+        }else{
+            cpaComparisonValue = "";
         }
 
         var countryName = $('#inputCountry').val();
@@ -200,34 +215,34 @@ function init() {
             countryCheck: countryCheck,
             facebookCheck: facebookCheck,
             countryCode: countryCode,
-            countryName: countryName,
             likeCampaignName: likeCampaignName,
             campaignCreateTime: campaignCreateTime,
             containsNoDataCampaignCheck: containsNoDataCampaignCheck,
-            onlyQueryNoDataCampaignCheck: onlyQueryNoDataCampaignCheck
-            },function(data){
-                if(data && data.ret == 1){
-                    appQueryData = data.data.array;
-                    if (countryCheck) {
-                        $('#result_header').html("<tr><th>国家</th><th>总展示<span sorterId=\"21\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>总花费<span sorterId=\"22\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>总安装<span sorterId=\"23\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>总点击<span sorterId=\"24\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>CPA<span sorterId=\"25\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>CTR<span sorterId=\"26\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>CVR<span sorterId=\"27\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>ROI<span sorterId=\"28\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th></tr>");
-                    } else if (adwordsCheck) {
-                        $('#result_header').html("<tr><th>系列ID</th><th>账户ID</th><th>账户简称</th><th>系列名称</th><th>创建时间<span sorterId=\"1\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>状态<span sorterId=\"2\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>预算<span sorterId=\"3\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>竞价<span sorterId=\"4\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>总花费<span sorterId=\"5\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>总安装<span sorterId=\"6\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>总点击<span sorterId=\"7\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>CPA<span sorterId=\"8\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>CTR<span sorterId=\"9\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>CVR<span sorterId=\"10\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>ROI<span sorterId=\"11\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th></tr>");
-                    } else {
-                        $('#result_header').html("<tr><th>系列ID</th><th>账户ID</th><th>账户简称</th><th>系列名称</th><th>创建时间<span sorterId=\"1\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>状态<span sorterId=\"2\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>预算<span sorterId=\"3\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>竞价<span sorterId=\"4\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>总花费<span sorterId=\"5\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>总安装<span sorterId=\"6\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>总点击<span sorterId=\"7\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>CPA<span sorterId=\"8\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>CTR<span sorterId=\"9\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>CVR<span sorterId=\"10\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>ROI<span sorterId=\"11\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th></tr>");
-                    }
-                    data = data.data;
-                    setData(data);
-                    bindSortOp();
-                    var str = "总花费: " + data.total_spend + " 总安装: " + data.total_installed +
-                        " 总展示: " + data.total_impressions + " 总点击: " + data.total_click +
-                        " CTR: " + data.total_ctr + " CPA: " + data.total_cpa + " CVR: " + data.total_cvr;
-                    str += "<br/><span class='estimateResult'></span>"
-                    $('#total_result').html(str);
-                    $('#total_result').removeClass("editable");
+            cpaComparisonValue: cpaComparisonValue
+            // onlyQueryNoDataCampaignCheck: onlyQueryNoDataCampaignCheck
+        },function(data){
+            if(data && data.ret == 1){
+                appQueryData = data.data.array;
+                if (countryCheck) {
+                    $('#result_header').html("<tr><th>国家</th><th>总展示<span sorterId=\"21\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>总花费<span sorterId=\"22\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>总安装<span sorterId=\"23\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>总点击<span sorterId=\"24\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>CPA<span sorterId=\"25\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>CTR<span sorterId=\"26\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>CVR<span sorterId=\"27\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>ROI<span sorterId=\"28\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th></tr>");
+                } else if (adwordsCheck) {
+                    $('#result_header').html("<tr><th>系列ID</th><th>账户ID</th><th>账户简称</th><th>系列名称</th><th>创建时间<span sorterId=\"1\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>状态<span sorterId=\"2\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>预算<span sorterId=\"3\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>竞价<span sorterId=\"4\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>总花费<span sorterId=\"5\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>总安装<span sorterId=\"6\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>总点击<span sorterId=\"7\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>CPA<span sorterId=\"8\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>CTR<span sorterId=\"9\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>CVR<span sorterId=\"10\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>ROI<span sorterId=\"11\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th></tr>");
                 } else {
-                    admanager.showCommonDlg("错误", data.message);
+                    $('#result_header').html("<tr><th>系列ID</th><th>账户ID</th><th>账户简称</th><th>系列名称</th><th>创建时间<span sorterId=\"1\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>状态<span sorterId=\"2\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>预算<span sorterId=\"3\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>竞价<span sorterId=\"4\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>总花费<span sorterId=\"5\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>总安装<span sorterId=\"6\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>总点击<span sorterId=\"7\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>CPA<span sorterId=\"8\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>CTR<span sorterId=\"9\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>CVR<span sorterId=\"10\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>ROI<span sorterId=\"11\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th></tr>");
                 }
-            },'json');
+                data = data.data;
+                setData(data);
+                bindSortOp();
+                var str = "总花费: " + data.total_spend + " 总安装: " + data.total_installed +
+                    " 总展示: " + data.total_impressions + " 总点击: " + data.total_click +
+                    " CTR: " + data.total_ctr + " CPA: " + data.total_cpa + " CVR: " + data.total_cvr;
+                str += "<br/><span class='estimateResult'></span>"
+                $('#total_result').html(str);
+                $('#total_result').removeClass("editable");
+            } else {
+                admanager.showCommonDlg("错误", data.message);
+            }
+        },'json');
         countryRevenueSpendReturn = "true";
     });
 
@@ -360,14 +375,14 @@ function setData(data) {
             } else if (field == 'spend') {
                 td.text(field_value + " / " + totalSpend);
             } else if(field == 'roi'){
-                    if(field_value <0){
-                        td.addClass("red");
-                    }else if(field_value > 0){
-                        td.addClass("blue");
-                    }else if(field_value == 0){
-                        td.addClass("yellow");
-                    }
-                    td.text(field_value);
+                if(field_value < 0){
+                    td.addClass("red");
+                }else if(field_value > 0){
+                    td.addClass("blue");
+                }else if(field_value == 0){
+                    td.addClass("yellow");
+                }
+                td.text(field_value);
             }else{
                 td.text(field_value);
             }
@@ -521,8 +536,8 @@ function bindSortOp() {
                 data = data.data;
                 setData(data);
                 var str = "总花费: " + data.total_spend + " 总安装: " + data.total_installed +
-                            " 总展示: " + data.total_impressions + " 总点击: " + data.total_click +
-                            " CTR: " + data.total_ctr + " CPA: " + data.total_cpa + " CVR: " + data.total_cvr;
+                    " 总展示: " + data.total_impressions + " 总点击: " + data.total_click +
+                    " CTR: " + data.total_ctr + " CPA: " + data.total_cpa + " CVR: " + data.total_cvr;
 
                 str += "<br/><span class='estimateResult'></span>"
                 $('#total_result').removeClass("editable");
@@ -678,20 +693,20 @@ function bindBatchModifyOperation() {
             }
             $(currentEle).html('<input class="inputTemp" type="text" width="2" value="' + value + '" />');
             $(".inputTemp", currentEle).focus()
-                // .keyup(function (event) {
-                //     if (event.keyCode == 13) {
-                //         $(currentEle).removeClass('editing');
-                //         $(currentEle).text($(".inputTemp").val().trim());
-                //         if ($(currentEle).text() != currentEle.origValue) {
-                //             $(currentEle).addClass("changed");
-                //         } else {
-                //             $(currentEle).removeClass("changed");
-                //         }
-                //     }
-                // })
+            // .keyup(function (event) {
+            //     if (event.keyCode == 13) {
+            //         $(currentEle).removeClass('editing');
+            //         $(currentEle).text($(".inputTemp").val().trim());
+            //         if ($(currentEle).text() != currentEle.origValue) {
+            //             $(currentEle).addClass("changed");
+            //         } else {
+            //             $(currentEle).removeClass("changed");
+            //         }
+            //     }
+            // })
                 .click(function(e) {
-                e.stopPropagation();
-            });
+                    e.stopPropagation();
+                });
         }
     });
 
@@ -817,4 +832,3 @@ bindBatchModifyOperation();
 if(countryRevenueSpendReturn == "false"){
     $('#btnSummary').click();
 }
-

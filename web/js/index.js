@@ -161,24 +161,39 @@ function init() {
         var likeCampaignName = $('#inputLikeCampaignName').val();
         var containsNoDataCampaignCheck = $('#containsNoDataCampaignCheck').is(':checked');
         // var onlyQueryNoDataCampaignCheck = $('#onlyQueryNoDataCampaignCheck').is(':checked');
-        var ex = /^\d+$/;
+
+        //非负整数
+        var reg = /^\d+$/;
         var totalInstallComparisonValue = $('#inputTotalInstallComparisonValue').val();
         var totalInstallOperator = $('#totalInstallOperator option:selected').val();
-        if(ex.test(totalInstallComparisonValue)){
-            if(totalInstallComparisonValue == "0" && totalInstallOperator == "1"){
-                totalInstallComparisonValue = "";
-            }else{
-                if(totalInstallOperator == "1"){
-                    totalInstallOperator = " >= ";
-                }else if(totalInstallOperator == "2"){
-                    totalInstallOperator = " <= ";
-                }else {
-                    totalInstallOperator = " = ";
-                }
-                totalInstallComparisonValue = totalInstallOperator + totalInstallComparisonValue;
+        if(reg.test(totalInstallComparisonValue)){
+            if(totalInstallOperator == "1"){
+                totalInstallOperator = " > ";
+            }else if(totalInstallOperator == "2"){
+                totalInstallOperator = " < ";
+            }else {
+                totalInstallOperator = " = ";
             }
+            totalInstallComparisonValue = totalInstallOperator + totalInstallComparisonValue;
         }else{
             totalInstallComparisonValue = "";
+        }
+
+        //非负数（>=0的任意数）
+        reg = /^\d+(\.{0,1}\d+){0,1}$/;
+        var cpaComparisonValue = $('#inputCpaComparisonValue').val();
+        var cpaOperator = $('#cpaOperator option:selected').val();
+        if(reg.test(cpaComparisonValue)){
+            if(cpaOperator == "4"){
+                cpaOperator = " > ";
+            }else if(cpaOperator == "5"){
+                cpaOperator = " < ";
+            }else {
+                cpaOperator = " = ";
+            }
+            cpaComparisonValue = cpaOperator + cpaComparisonValue;
+        }else{
+            cpaComparisonValue = "";
         }
 
         var countryName = $('#inputCountry').val();
@@ -202,7 +217,8 @@ function init() {
             countryCode: countryCode,
             likeCampaignName: likeCampaignName,
             campaignCreateTime: campaignCreateTime,
-            containsNoDataCampaignCheck: containsNoDataCampaignCheck
+            containsNoDataCampaignCheck: containsNoDataCampaignCheck,
+            cpaComparisonValue: cpaComparisonValue
             // onlyQueryNoDataCampaignCheck: onlyQueryNoDataCampaignCheck
             },function(data){
                 if(data && data.ret == 1){
