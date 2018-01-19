@@ -1073,7 +1073,7 @@ public class QueryByMulConditions extends HttpServlet {
                 d.addProperty("ctr", 0);
                 d.addProperty("cpa", 0);
                 d.addProperty("cvr", 0);
-                d.addProperty("roi", "--");
+                d.addProperty("roi", -100000);
                 if (admobCheck) {
                     d.addProperty("network", "admob");
                 } else {

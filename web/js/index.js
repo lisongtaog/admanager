@@ -83,12 +83,52 @@ function init() {
     });
 
     $("#btnQueryNoData").click(function(){
-        var query = $("#inputSearch").val();
         var startTime = $('#inputStartTime').val();
         var endTime = $('#inputEndTime').val();
-        var adwordsCheck = $('#adwordsCheck').is(':checked');
-        var facebookCheck = $('#facebookCheck').is(':checked');
+        var query = $("#inputSearch").val();
+        var campaignCreateTime = $('#inputCampaignCreateTime').val();
         var countryCode = '';
+        var adwordsCheck = $('#adwordsCheck').is(':checked');
+        var countryCheck = $('#countryCheck').is(':checked');
+        var facebookCheck = $('#facebookCheck').is(':checked');
+        var likeCampaignName = $('#inputLikeCampaignName').val();
+        var containsNoDataCampaignCheck = $('#containsNoDataCampaignCheck').is(':checked');
+        // var onlyQueryNoDataCampaignCheck = $('#onlyQueryNoDataCampaignCheck').is(':checked');
+
+        //非负整数
+        var reg = /^\d+$/;
+        var totalInstallComparisonValue = $('#inputTotalInstallComparisonValue').val();
+        var totalInstallOperator = $('#totalInstallOperator option:selected').val();
+        if(reg.test(totalInstallComparisonValue)){
+            if(totalInstallOperator == "1"){
+                totalInstallOperator = " > ";
+            }else if(totalInstallOperator == "2"){
+                totalInstallOperator = " < ";
+            }else {
+                totalInstallOperator = " = ";
+            }
+            totalInstallComparisonValue = totalInstallOperator + totalInstallComparisonValue;
+        }else{
+            totalInstallComparisonValue = "";
+        }
+
+        //非负数（>=0的任意数）
+        reg = /^\d+(\.{0,1}\d+){0,1}$/;
+        var cpaComparisonValue = $('#inputCpaComparisonValue').val();
+        var cpaOperator = $('#cpaOperator option:selected').val();
+        if(reg.test(cpaComparisonValue)){
+            if(cpaOperator == "4"){
+                cpaOperator = " > ";
+            }else if(cpaOperator == "5"){
+                cpaOperator = " < ";
+            }else {
+                cpaOperator = " = ";
+            }
+            cpaComparisonValue = cpaOperator + cpaComparisonValue;
+        }else{
+            cpaComparisonValue = "";
+        }
+
         var countryName = $('#inputCountry').val();
         if(countryName != ""){
             for (var i = 0; i < regionList.length; i++) {
@@ -98,39 +138,20 @@ function init() {
                 }
             }
         }
-        var likeCampaignName = $('#inputLikeCampaignName').val();
-
-        var ex = /^\d+$/;
-        var totalInstallComparisonValue = $('#inputTotalInstallComparisonValue').val();
-        var totalInstallOperator = $('#totalInstallOperator option:selected').val();
-        if(ex.test(totalInstallComparisonValue)){
-            if(totalInstallComparisonValue == "0" && totalInstallOperator == "1"){
-                totalInstallComparisonValue = "";
-            }else{
-                if(totalInstallOperator == "1"){
-                    totalInstallOperator = " >= ";
-                }else if(totalInstallOperator == "2"){
-                    totalInstallOperator = " <= ";
-                }else {
-                    totalInstallOperator = " = ";
-                }
-                totalInstallComparisonValue = totalInstallOperator + totalInstallComparisonValue;
-            }
-        }else{
-            totalInstallComparisonValue = "";
-        }
-        var campaignCreateTime = $('#inputCampaignCreateTime').val();
         $.post('query_not_exist_data', {
             tag: query,
             startTime: startTime,
             endTime: endTime,
+            totalInstallComparisonValue: totalInstallComparisonValue,
             adwordsCheck: adwordsCheck,
+            countryCheck: countryCheck,
             facebookCheck: facebookCheck,
             countryCode: countryCode,
-            countryName: countryName,
             likeCampaignName: likeCampaignName,
             campaignCreateTime: campaignCreateTime,
-            totalInstallComparisonValue: totalInstallComparisonValue
+            containsNoDataCampaignCheck: containsNoDataCampaignCheck,
+            cpaComparisonValue: cpaComparisonValue
+            // onlyQueryNoDataCampaignCheck: onlyQueryNoDataCampaignCheck
         },function(data){
             if(data && data.ret == 1){
                 appQueryData = data.data.array;
@@ -375,14 +396,19 @@ function setData(data) {
             } else if (field == 'spend') {
                 td.text(field_value + " / " + totalSpend);
             } else if(field == 'roi'){
-                if(field_value < 0){
-                    td.addClass("red");
-                }else if(field_value > 0){
-                    td.addClass("blue");
-                }else if(field_value == 0){
-                    td.addClass("yellow");
+                if(field_value == -100000){
+                    td.text("--");
+                }else{
+                    if(field_value < 0){
+                        td.addClass("red");
+                    }else if(field_value > 0){
+                        td.addClass("blue");
+                    }else if(field_value == 0){
+                        td.addClass("yellow");
+                    }
+                    td.text(field_value);
                 }
-                td.text(field_value);
+
             }else{
                 td.text(field_value);
             }
@@ -505,19 +531,59 @@ function bindSortOp() {
             $(this).addClass("glyphicon-arrow-up");
         }
 
-        var query = $("#inputSearch").val();
         var startTime = $('#inputStartTime').val();
         var endTime = $('#inputEndTime').val();
-        var countryName = $('#inputCountry').val();
+        var query = $("#inputSearch").val();
+        var campaignCreateTime = $('#inputCampaignCreateTime').val();
         var countryCode = '';
         var adwordsCheck = $('#adwordsCheck').is(':checked');
         var countryCheck = $('#countryCheck').is(':checked');
         var facebookCheck = $('#facebookCheck').is(':checked');
-        var  likeCampaignName = $("#inputQueryByCampaignNameText").val();
-        for (var i = 0; i < regionList.length; i++) {
-            if (countryName == regionList[i].name) {
-                countryCode = regionList[i].country_code;
-                break;
+        var likeCampaignName = $('#inputLikeCampaignName').val();
+        var containsNoDataCampaignCheck = $('#containsNoDataCampaignCheck').is(':checked');
+        // var onlyQueryNoDataCampaignCheck = $('#onlyQueryNoDataCampaignCheck').is(':checked');
+
+        //非负整数
+        var reg = /^\d+$/;
+        var totalInstallComparisonValue = $('#inputTotalInstallComparisonValue').val();
+        var totalInstallOperator = $('#totalInstallOperator option:selected').val();
+        if(reg.test(totalInstallComparisonValue)){
+            if(totalInstallOperator == "1"){
+                totalInstallOperator = " > ";
+            }else if(totalInstallOperator == "2"){
+                totalInstallOperator = " < ";
+            }else {
+                totalInstallOperator = " = ";
+            }
+            totalInstallComparisonValue = totalInstallOperator + totalInstallComparisonValue;
+        }else{
+            totalInstallComparisonValue = "";
+        }
+
+        //非负数（>=0的任意数）
+        reg = /^\d+(\.{0,1}\d+){0,1}$/;
+        var cpaComparisonValue = $('#inputCpaComparisonValue').val();
+        var cpaOperator = $('#cpaOperator option:selected').val();
+        if(reg.test(cpaComparisonValue)){
+            if(cpaOperator == "4"){
+                cpaOperator = " > ";
+            }else if(cpaOperator == "5"){
+                cpaOperator = " < ";
+            }else {
+                cpaOperator = " = ";
+            }
+            cpaComparisonValue = cpaOperator + cpaComparisonValue;
+        }else{
+            cpaComparisonValue = "";
+        }
+
+        var countryName = $('#inputCountry').val();
+        if(countryName != ""){
+            for (var i = 0; i < regionList.length; i++) {
+                if (countryName == regionList[i].name) {
+                    countryCode = regionList[i].country_code;
+                    break;
+                }
             }
         }
 
@@ -530,7 +596,11 @@ function bindSortOp() {
             facebookCheck: facebookCheck,
             countryCode: countryCode,
             sorterId: sorterId,
-            likeCampaignName: likeCampaignName
+            likeCampaignName: likeCampaignName,
+            campaignCreateTime: campaignCreateTime,
+            cpaComparisonValue: cpaComparisonValue,
+            totalInstallComparisonValue: totalInstallComparisonValue,
+            containsNoDataCampaignCheck: containsNoDataCampaignCheck
         }, function (data) {
             if (data && data.ret == 1) {
                 data = data.data;
