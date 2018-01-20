@@ -93,17 +93,21 @@
             <span>国家</span>
             <input id="inputCountry" class="form-control" style="display: inline; width: auto;" type="text"/>
             <span>系列创建时间</span>
-            <input type="text" id="inputCampaignCreateTime">
+            <input type="text" id="inputCampaignCreateTime"  placeholder="ChinaTime">
             <span>系列名称</span>
             <input type="text" id="inputLikeCampaignName" />
 
             <span>总安装</span>
             <select id="totalInstallOperator"><option value="1" selected="true">大于</option><option value="2">小于</option><option value="3">等于</option></select>
-            <input id="inputTotalInstallComparisonValue" class="form-control" style="display: inline; width: auto;" type="text" value="-1"/>
+            <input id="inputTotalInstallComparisonValue" class="form-control" style="display: inline; width: auto;" type="text"/>
 
             <span>CPA</span>
             <select id="cpaOperator"><option value="4" selected="true">大于</option><option value="5">小于</option><option value="6">等于</option></select>
-            <input id="inputCpaComparisonValue" class="form-control" style="display: inline; width: auto;" type="text" value="-1"/>
+            <input id="inputCpaComparisonValue" class="form-control" style="display: inline; width: auto;" type="text" />
+
+            <span>竞价等于</span>
+            <%--<select id="biddingOperator"><option value="7" selected="true">大于</option><option value="8">小于</option><option value="9"  selected="true">等于</option></select>--%>
+            <input id="inputBiddingComparisonValue" class="form-control" style="display: inline; width: auto;" type="text" />
 
             <button id="btnSearch" class="btn btn-default">条件查找</button><br>
 

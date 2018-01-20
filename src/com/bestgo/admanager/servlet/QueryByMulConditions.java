@@ -45,13 +45,18 @@ public class QueryByMulConditions extends HttpServlet {
         String tag = request.getParameter("tag");
         String countryCheck = request.getParameter("countryCheck");
         String containsNoDataCampaignCheck = request.getParameter("containsNoDataCampaignCheck");
-        String onlyQueryNoDataCampaignCheck = request.getParameter("onlyQueryNoDataCampaignCheck");
+//        String onlyQueryNoDataCampaignCheck = request.getParameter("onlyQueryNoDataCampaignCheck");
         String campaignCreateTime = request.getParameter("campaignCreateTime");
         String countryCode = request.getParameter("countryCode");
         String countryName = request.getParameter("countryName");
 
         String totalInstallComparisonValue = request.getParameter("totalInstallComparisonValue");
+        String totalInstallOperator = request.getParameter("totalInstallOperator");
+
         String cpaComparisonValue = request.getParameter("cpaComparisonValue");
+        String cpaOperator = request.getParameter("cpaOperator");
+
+        String biddingComparisonValue = request.getParameter("biddingComparisonValue");
 
         String likeCampaignName = request.getParameter("likeCampaignName");
         HashMap<String ,String> countryMap = Utils.getCountryMap();
@@ -66,8 +71,8 @@ public class QueryByMulConditions extends HttpServlet {
                     countryCheck = "false";
                 }
                 if ("false".equals(adwordsCheck) && "false".equals(facebookCheck)) {
-                    JsonObject admob = fetchOneAppData(id, tag,startTime, endTime, true, "true".equals(countryCheck), countryCode,likeCampaignName,campaignCreateTime,true,countryMap,totalInstallComparisonValue, "true".equals(containsNoDataCampaignCheck), "true".equals(onlyQueryNoDataCampaignCheck),countryCode,cpaComparisonValue);
-                    JsonObject facebook = fetchOneAppData(id, tag,startTime, endTime,false, "true".equals(countryCheck), countryCode,likeCampaignName,campaignCreateTime,true,countryMap,totalInstallComparisonValue, "true".equals(containsNoDataCampaignCheck),"true".equals(onlyQueryNoDataCampaignCheck),countryName,cpaComparisonValue);
+                    JsonObject admob = fetchOneAppData(id, tag,startTime, endTime, true, "true".equals(countryCheck), countryCode,likeCampaignName,campaignCreateTime,true,countryMap,totalInstallComparisonValue, "true".equals(containsNoDataCampaignCheck),countryCode,cpaComparisonValue,biddingComparisonValue,totalInstallOperator,cpaOperator);
+                    JsonObject facebook = fetchOneAppData(id, tag,startTime, endTime,false, "true".equals(countryCheck), countryCode,likeCampaignName,campaignCreateTime,true,countryMap,totalInstallComparisonValue, "true".equals(containsNoDataCampaignCheck),countryName,cpaComparisonValue,biddingComparisonValue,totalInstallOperator,cpaOperator);
                     double total_spend = admob.get("total_spend").getAsDouble() + facebook.get("total_spend").getAsDouble();
                     double total_installed = admob.get("total_installed").getAsDouble() + facebook.get("total_installed").getAsDouble();
                     double total_impressions = admob.get("total_impressions").getAsDouble() + facebook.get("total_impressions").getAsDouble();
@@ -439,10 +444,10 @@ public class QueryByMulConditions extends HttpServlet {
 
                 } else {
                     if("true".equals(adwordsCheck)){
-                        jsonObject = fetchOneAppData(id, tag,startTime, endTime, true, "true".equals(countryCheck), countryCode,likeCampaignName,campaignCreateTime,true,countryMap,totalInstallComparisonValue, "true".equals(containsNoDataCampaignCheck),"true".equals(onlyQueryNoDataCampaignCheck),countryCode,cpaComparisonValue);
+                        jsonObject = fetchOneAppData(id, tag,startTime, endTime, true, "true".equals(countryCheck), countryCode,likeCampaignName,campaignCreateTime,true,countryMap,totalInstallComparisonValue, "true".equals(containsNoDataCampaignCheck),countryCode,cpaComparisonValue,biddingComparisonValue,totalInstallOperator,cpaOperator);
 
                     }else{
-                        jsonObject = fetchOneAppData(id, tag,startTime, endTime, false, "true".equals(countryCheck), countryCode,likeCampaignName,campaignCreateTime,true,countryMap,totalInstallComparisonValue, "true".equals(containsNoDataCampaignCheck),"true".equals(onlyQueryNoDataCampaignCheck),countryName,cpaComparisonValue);
+                        jsonObject = fetchOneAppData(id, tag,startTime, endTime, false, "true".equals(countryCheck), countryCode,likeCampaignName,campaignCreateTime,true,countryMap,totalInstallComparisonValue, "true".equals(containsNoDataCampaignCheck),countryName,cpaComparisonValue,biddingComparisonValue,totalInstallOperator,cpaOperator);
 
                     }
                 }
@@ -768,7 +773,7 @@ public class QueryByMulConditions extends HttpServlet {
 
 
 
-    private JsonObject fetchOneAppData(long tagId, String tagName, String startTime, String endTime, boolean admobCheck, boolean countryCheck, String countryCode,String likeCampaignName,String campaignCreateTime,boolean hasROI,HashMap<String ,String> countryMap,String totalInstallComparisonValue, boolean containsNoDataCampaignCheck,boolean onlyQueryNoDataCampaignCheck,String country,String cpaComparisonValue) throws Exception {
+    private JsonObject fetchOneAppData(long tagId, String tagName, String startTime, String endTime, boolean admobCheck, boolean countryCheck, String countryCode,String likeCampaignName,String campaignCreateTime,boolean hasROI,HashMap<String ,String> countryMap,String totalInstallComparisonValue, boolean containsNoDataCampaignCheck,String country,String cpaComparisonValue,String biddingComparisonValue,String totalInstallOperator,String cpaOperator) throws Exception {
         String webAdCampaignTagRelTable = "web_ad_campaign_tag_rel";
         String webAdCampaignsTable = "web_ad_campaigns";
         String adCampaignsTable = "ad_campaigns";
@@ -833,13 +838,13 @@ public class QueryByMulConditions extends HttpServlet {
                 havingField = " having impressions > 0 ";
             }else{
                 if(totalInstallComparisonValue != "" && cpaComparisonValue == ""){
-                    havingField = " having installed " + totalInstallComparisonValue;
+                    havingField = " having installed " + totalInstallOperator + " " + totalInstallComparisonValue;
                 }else if(totalInstallComparisonValue == "" && cpaComparisonValue != ""){
-                    havingField = " having cpa " + cpaComparisonValue;
+                    havingField = " having cpa " + cpaOperator + " " + cpaComparisonValue;
                 }else{
-                    havingField = " having installed " + totalInstallComparisonValue + " and cpa " + cpaComparisonValue;
+                    havingField = " having installed " + totalInstallOperator + " " + totalInstallComparisonValue + " and cpa " + cpaOperator + " " + cpaComparisonValue;
                 }
-                containsNoDataCampaignCheck = false;
+
             }
 
             String sql = "";
@@ -938,6 +943,13 @@ public class QueryByMulConditions extends HttpServlet {
 
         if(list != null && list.size() > 0){
             for (JSObject one : list) {
+                double bidding = one.get("bidding");
+                if(biddingComparisonValue != ""){
+                    double v = Double.parseDouble(biddingComparisonValue);
+                    if(bidding != v){
+                        continue;
+                    }
+                }
                 String campaign_id = one.get("campaign_id");
                 double roi = 0;
                 if(hasROI){
@@ -980,7 +992,6 @@ public class QueryByMulConditions extends HttpServlet {
                 create_time = create_time.substring(0,create_time.length()-5);
                 String country_code = one.get("country_code");
                 double budget = one.get("budget");
-                double bidding = one.get("bidding");
                 double spend = Utils.convertDouble(one.get("spend"), 0);
                 double installed = Utils.convertDouble(one.get("installed"), 0);
                 double impressions = Utils.convertDouble(one.get("impressions"), 0);
@@ -1034,6 +1045,13 @@ public class QueryByMulConditions extends HttpServlet {
 
         if(listNoData != null && listNoData.size() > 0){
             for (JSObject one : listNoData) {
+                double bidding = one.get("bidding");
+                if(biddingComparisonValue != ""){
+                    double v = Double.parseDouble(biddingComparisonValue);
+                    if(bidding != v){
+                        continue;
+                    }
+                }
                 String campaign_id = one.get("campaign_id");
                 String short_name = one.get("short_name");
                 String account_id = one.get("account_id");
@@ -1043,7 +1061,6 @@ public class QueryByMulConditions extends HttpServlet {
                 create_time = create_time.substring(0,create_time.length()-5);
                 String country_code = one.get("country_code");
                 double budget = one.get("budget");
-                double bidding = one.get("bidding");
                 double spend = Utils.convertDouble(one.get("spend"), 0);
 
                 JSObject js = countryCampaignspendMap.get(campaign_id);

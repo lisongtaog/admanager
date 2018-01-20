@@ -188,16 +188,23 @@ function init() {
         var totalInstallComparisonValue = $('#inputTotalInstallComparisonValue').val();
         var totalInstallOperator = $('#totalInstallOperator option:selected').val();
         if(reg.test(totalInstallComparisonValue)){
-            if(totalInstallOperator == "1"){
+            if(totalInstallComparisonValue == "0" && totalInstallOperator == "2"){
+                totalInstallComparisonValue = "";
+                totalInstallOperator = "";
+            }else if(totalInstallOperator == "1"){
                 totalInstallOperator = " > ";
+                containsNoDataCampaignCheck = false;
             }else if(totalInstallOperator == "2"){
                 totalInstallOperator = " < ";
             }else {
                 totalInstallOperator = " = ";
+                if(totalInstallComparisonValue > 0){
+                    containsNoDataCampaignCheck = false;
+                }
             }
-            totalInstallComparisonValue = totalInstallOperator + totalInstallComparisonValue;
         }else{
             totalInstallComparisonValue = "";
+            totalInstallOperator = "";
         }
 
         //非负数（>=0的任意数）
@@ -205,16 +212,28 @@ function init() {
         var cpaComparisonValue = $('#inputCpaComparisonValue').val();
         var cpaOperator = $('#cpaOperator option:selected').val();
         if(reg.test(cpaComparisonValue)){
-            if(cpaOperator == "4"){
+            if(cpaComparisonValue == "0" && cpaOperator == "5"){
+                cpaComparisonValue = "";
+                cpaOperator = "";
+            }else if(cpaOperator == "4"){
                 cpaOperator = " > ";
+                containsNoDataCampaignCheck = false;
             }else if(cpaOperator == "5"){
                 cpaOperator = " < ";
             }else {
                 cpaOperator = " = ";
+                if(cpaComparisonValue > 0){
+                    containsNoDataCampaignCheck = false;
+                }
             }
-            cpaComparisonValue = cpaOperator + cpaComparisonValue;
         }else{
             cpaComparisonValue = "";
+            cpaOperator = "";
+        }
+
+        var biddingComparisonValue = $('#inputBiddingComparisonValue').val();
+        if(!reg.test(biddingComparisonValue)){
+            biddingComparisonValue = "";
         }
 
         var countryName = $('#inputCountry').val();
@@ -231,16 +250,18 @@ function init() {
             tag: query,
             startTime: startTime,
             endTime: endTime,
-            totalInstallComparisonValue: totalInstallComparisonValue,
             adwordsCheck: adwordsCheck,
             countryCheck: countryCheck,
             facebookCheck: facebookCheck,
             countryCode: countryCode,
             likeCampaignName: likeCampaignName,
             campaignCreateTime: campaignCreateTime,
+            cpaComparisonValue: cpaComparisonValue,
+            totalInstallComparisonValue: totalInstallComparisonValue,
             containsNoDataCampaignCheck: containsNoDataCampaignCheck,
-            cpaComparisonValue: cpaComparisonValue
-            // onlyQueryNoDataCampaignCheck: onlyQueryNoDataCampaignCheck
+            biddingComparisonValue: biddingComparisonValue,
+            totalInstallOperator: totalInstallOperator,
+            cpaOperator: cpaOperator
             },function(data){
                 if(data && data.ret == 1){
                     appQueryData = data.data.array;
@@ -548,16 +569,23 @@ function bindSortOp() {
         var totalInstallComparisonValue = $('#inputTotalInstallComparisonValue').val();
         var totalInstallOperator = $('#totalInstallOperator option:selected').val();
         if(reg.test(totalInstallComparisonValue)){
-            if(totalInstallOperator == "1"){
+            if(totalInstallComparisonValue == "0" && totalInstallOperator == "2"){
+                totalInstallComparisonValue = "";
+                totalInstallOperator = "";
+            }else if(totalInstallOperator == "1"){
                 totalInstallOperator = " > ";
+                containsNoDataCampaignCheck = false;
             }else if(totalInstallOperator == "2"){
                 totalInstallOperator = " < ";
             }else {
                 totalInstallOperator = " = ";
+                if(totalInstallComparisonValue > 0){
+                    containsNoDataCampaignCheck = false;
+                }
             }
-            totalInstallComparisonValue = totalInstallOperator + totalInstallComparisonValue;
         }else{
             totalInstallComparisonValue = "";
+            totalInstallOperator = "";
         }
 
         //非负数（>=0的任意数）
@@ -565,16 +593,28 @@ function bindSortOp() {
         var cpaComparisonValue = $('#inputCpaComparisonValue').val();
         var cpaOperator = $('#cpaOperator option:selected').val();
         if(reg.test(cpaComparisonValue)){
-            if(cpaOperator == "4"){
+            if(cpaComparisonValue == "0" && cpaOperator == "5"){
+                cpaComparisonValue = "";
+                cpaOperator = "";
+            }else if(cpaOperator == "4"){
                 cpaOperator = " > ";
+                containsNoDataCampaignCheck = false;
             }else if(cpaOperator == "5"){
                 cpaOperator = " < ";
             }else {
                 cpaOperator = " = ";
+                if(cpaComparisonValue > 0){
+                    containsNoDataCampaignCheck = false;
+                }
             }
-            cpaComparisonValue = cpaOperator + cpaComparisonValue;
         }else{
             cpaComparisonValue = "";
+            cpaOperator = "";
+        }
+
+        var biddingComparisonValue = $('#inputBiddingComparisonValue').val();
+        if(!reg.test(biddingComparisonValue)){
+            biddingComparisonValue = "";
         }
 
         var countryName = $('#inputCountry').val();
@@ -600,7 +640,10 @@ function bindSortOp() {
             campaignCreateTime: campaignCreateTime,
             cpaComparisonValue: cpaComparisonValue,
             totalInstallComparisonValue: totalInstallComparisonValue,
-            containsNoDataCampaignCheck: containsNoDataCampaignCheck
+            containsNoDataCampaignCheck: containsNoDataCampaignCheck,
+            biddingComparisonValue: biddingComparisonValue,
+            totalInstallOperator: totalInstallOperator,
+            cpaOperator: cpaOperator
         }, function (data) {
             if (data && data.ret == 1) {
                 data = data.data;
