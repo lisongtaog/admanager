@@ -325,138 +325,13 @@ function init() {
 
 
                 data = data.data;
-                setDataSummaryNoSort(data);
+                setDataSummary(data);
                 bindSortOpSummary();
             } else {
                 admanager.showCommonDlg("错误", data.message);
             }
         }, 'json');
     });
-}
-function setDataSummaryNoSort(data) {
-    var total_spend = 0;
-    var seven_days_total_spend = 0;
-    var total_revenue = 0;
-    var seven_days_total_revenue = 0;
-    var total_installed = 0;
-    var total_impressions = 0;
-    var total_click = 0;
-
-    var curr_total_spend = 0;
-    var curr_seven_days_total_spend = 0;
-    var curr_total_revenue = 0;
-    var curr_seven_days_total_revenue = 0;
-    var curr_total_installed = 0;
-    var curr_total_impressions = 0;
-    var curr_total_click = 0;
-    var curr_total_ctr = 0;
-    var curr_total_cpa = 0;
-    var curr_total_cvr = 0;
-    var keyset = ["name", "total_spend","seven_days_total_spend", "total_revenue", "seven_days_total_revenue","total_installed", "total_impressions", "total_click",
-        "total_ctr", "total_cpa", "total_cvr"];
-    var category_name = "";
-    $('#results_body > tr').remove();
-    for (var i = 0; i < data.length; i++) {
-        var one = data[i];
-        var curr_category_name = one['category_name'];
-        if(i == 0){
-            category_name = curr_category_name;
-        }
-
-        total_spend += one['total_spend'];
-        seven_days_total_spend += one['seven_days_total_spend'];
-        total_revenue += one['total_revenue'];
-        seven_days_total_revenue += one['seven_days_total_revenue'];
-        total_installed += one['total_installed'];
-        total_impressions += one['total_impressions'];
-        total_click += one['total_click'];
-        if(curr_category_name != category_name){
-            if(category_name != ""){
-                curr_total_ctr = curr_total_impressions > 0 ? curr_total_click / curr_total_impressions : 0;
-                curr_total_cpa = curr_total_installed > 0 ? curr_total_spend / curr_total_installed : 0;
-                curr_total_cvr = curr_total_click > 0 ? curr_total_installed / curr_total_click : 0;
-                var curr_str = " 总花费: " + curr_total_spend +" 七天总花费: " + curr_seven_days_total_spend + "  总营收: " + curr_total_revenue + "  七天总营收: " + curr_seven_days_total_revenue + " 总安装: " + curr_total_installed +
-                    " 总展示: " + curr_total_impressions + "总点击: " + curr_total_click +
-                    " CTR: " + curr_total_ctr.toFixed(3) + " CPA: " + curr_total_cpa.toFixed(3) + " CVR: " + curr_total_cvr.toFixed(3);
-                var first_tr = $('<tr></tr>');
-                var first_td = $('<td style="color: #ff615d;"></td>');
-                first_td.text(category_name);
-                first_tr.append(first_td);
-                var second_td = $('<td colspan="10" style="color: #9eb9ff;"></td>');
-                second_td.text(curr_str);
-                first_tr.append(second_td);
-                $('#results_body').append(first_tr);
-                var last_tr = $('<tr><td colspan="11"></td></tr>');
-                $('#results_body').append(last_tr);
-                $('#results_body').append("<tr><th>应用名称</th><th>总花费</th><th>7天总花费</th>" +
-                    "<th>总营收</th><th>七天总营收</th>" +
-                    "<th>总安装</th><th>总展示</th>" +
-                    "<th>总点击</th><th>CTR</th>" +
-                    "<th>CPA</th><th>CVR</th></tr>");
-            }else{
-                var last_tr = $('<tr><td colspan="11"></td></tr>');
-                $('#results_body').append(last_tr);
-            }
-
-            curr_total_spend = 0;
-            curr_total_revenue = 0;
-            curr_total_installed = 0;
-            curr_total_impressions = 0;
-            curr_total_click = 0;
-            curr_seven_days_total_revenue = 0;
-            curr_seven_days_total_spend = 0;
-            category_name = curr_category_name;
-        }
-        if(curr_category_name != ""){
-            curr_total_spend += one['total_spend'];
-            curr_seven_days_total_spend += one['seven_days_total_spend'];
-            curr_total_revenue += one['total_revenue'];
-            curr_seven_days_total_revenue += one['seven_days_total_revenue'];
-            curr_total_installed += one['total_installed'];
-            curr_total_impressions += one['total_impressions'];
-            curr_total_click += one['total_click'];
-        }
-
-        var tr = $('<tr></tr>');
-        for (var j = 0; j < keyset.length; j++) {
-            var td = $('<td></td>');
-            td.text(one[keyset[j]]);
-            tr.append(td);
-        }
-        $('#results_body').append(tr);
-        if(i == (data.length -1)){
-            curr_total_ctr = curr_total_impressions > 0 ? curr_total_click / curr_total_impressions : 0;
-            curr_total_cpa = curr_total_installed > 0 ? curr_total_spend / curr_total_installed : 0;
-            curr_total_cvr = curr_total_click > 0 ? curr_total_installed / curr_total_click : 0;
-            var curr_str = " 总花费: " + curr_total_spend +" 七天总花费: " + curr_seven_days_total_spend + "  总营收: " + curr_total_revenue + "  七天总营收: " + curr_seven_days_total_revenue + " 总安装: " + curr_total_installed +
-                " 总展示: " + curr_total_impressions + "总点击: " + curr_total_click +
-                " CTR: " + curr_total_ctr.toFixed(3) + " CPA: " + curr_total_cpa.toFixed(3) + " CVR: " + curr_total_cvr.toFixed(3);
-            var first_tr = $('<tr></tr>');
-            var first_td = $('<td style="color: #ff615d;"></td>');
-            first_td.text(category_name);
-            first_tr.append(first_td);
-            var second_td = $('<td colspan="10" style="color: #9eb9ff;"></td>');
-            second_td.text(curr_str);
-            first_tr.append(second_td);
-            $('#results_body').append(first_tr);
-        }
-    }
-    var total_ctr = total_impressions > 0 ? total_click / total_impressions : 0;
-    var total_cpa = total_installed > 0 ? total_spend / total_installed : 0;
-    var total_cvr = total_click > 0 ? total_installed / total_click : 0;
-    if(adwordsCheck || facebookCheck){
-        var str = "总花费: " + total_spend + " 总安装: " + total_installed +
-            " 总展示: " + total_impressions + " 总点击: " + total_click +
-            " CTR: " + total_ctr + " CPA: " + total_cpa + " CVR: " + total_cvr;
-        $('#total_result').text(str);
-    }else{
-        var str = "总花费: " + total_spend +"七天总花费: " + seven_days_total_spend +  "  总营收: " + total_revenue +"7天总营收: " + seven_days_total_revenue +  " 总安装: " + total_installed +
-            " 总展示: " + total_impressions + " 总点击: " + total_click +
-            " CTR: " + total_ctr + " CPA: " + total_cpa + " CVR: " + total_cvr;
-        $('#total_result').text(str);
-    }
-
-    $('#total_result').removeClass("editable");
 }
 
 function setDataSummary(data) {
