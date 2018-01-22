@@ -117,6 +117,18 @@
                             <input class="form-control" id="inputTagName" placeholder="标签名称" autocomplete="off">
                         </div>
                     </div>
+                    <div class="form-group">
+                        <label for="inputMaxBidding" class="col-sm-2 control-label">最大出价</label>
+                        <div class="col-sm-10">
+                            <input class="form-control" id="inputMaxBidding" placeholder="最大出价" autocomplete="off">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="inputTagCategoryId" class="col-sm-2 control-label">标签类型ID</label>
+                        <div class="col-sm-10">
+                            <input class="form-control" id="inputTagCategoryId" placeholder="标签类型ID" autocomplete="off">
+                        </div>
+                    </div>
                 </form>
                 <p id="delete_message">确认要删除吗?</p>
             </div>
@@ -148,10 +160,14 @@
 
     $("#new_tag_dlg .btn-primary").click(function() {
         var tagName = $("#inputTagName").val();
+        var maxBidding = $("#inputMaxBidding").val();
+        var tagCategoryId = $("#inputTagCategoryId").val();
 
         if (modifyType == 'new') {
             $.post('tags/create', {
-                name: tagName
+                name: tagName,
+                maxBidding: maxBidding,
+                tagCategoryId: tagCategoryId
             }, function(data) {
                 if (data && data.ret == 1) {
                     $("#new_tag_dlg").modal("hide");
@@ -163,7 +179,9 @@
         } else if (modifyType == 'update') {
             $.post('tags/update', {
                 id: id,
-                name: tagName
+                name: tagName,
+                maxBidding: maxBidding,
+                tagCategoryId: tagCategoryId
             }, function(data) {
                 if (data && data.ret == 1) {
                     $("#new_tag_dlg").modal("hide");
@@ -229,7 +247,11 @@
             var tds = $(this).parents("tr").find('td');
             id = $(tds.get(0)).text();
             var tagName = $(tds.get(1)).text();
+            var maxBidding = $(tds.get(2)).text();
+            var tagCategoryId = $(tds.get(3)).text();
             $("#inputTagName").val(tagName);
+            $("#inputMaxBidding").val(maxBidding);
+            $("#inputTagCategoryId").val(tagCategoryId);
 
             $("#new_tag_dlg").modal("show");
         });
@@ -244,7 +266,11 @@
             var tds = $(this).parents("tr").find('td');
             id = $(tds.get(0)).text();
             var tagName = $(tds.get(1)).text();
+            var maxBidding = $(tds.get(2)).text();
+            var tagCategoryId = $(tds.get(3)).text();
             $("#inputTagName").val(tagName);
+            $("#inputMaxBidding").val(maxBidding);
+            $("#inputTagCategoryId").val(tagCategoryId);
 
             $("#new_tag_dlg").modal("show");
         });

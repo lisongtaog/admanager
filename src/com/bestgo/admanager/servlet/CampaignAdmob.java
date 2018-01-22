@@ -171,23 +171,23 @@ public class CampaignAdmob extends HttpServlet {
                                     .put("tag_name", appName)
                                     .put("image_path", imageAbsolutePath)
                                     .executeReturnId();
-                            if(genId > 0){
-                                try {
-                                    String[] split = region.split(",");
-                                    for(String country_code : split){
-                                        DB.insert("web_ad_campaign_operation_log")
-                                                .put("operation_date", now)
-                                                .put("app_name",appName)
-                                                .put("country_code", country_code)
-                                                .put("campaign_name",campaignName)
-                                                .put("enabled",1)
-                                                .put("bidding",bidding)
-                                                .execute();
-                                    }
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                }
-                            }
+//                            if(genId > 0){
+//                                try {
+//                                    String[] split = region.split(",");
+//                                    for(String country_code : split){
+//                                        DB.insert("web_ad_campaign_operation_log")
+//                                                .put("operation_date", now)
+//                                                .put("app_name",appName)
+//                                                .put("country_code", country_code)
+//                                                .put("campaign_name",campaignName)
+//                                                .put("enabled",1)
+//                                                .put("bidding",bidding)
+//                                                .execute();
+//                                    }
+//                                } catch (Exception e) {
+//                                    e.printStackTrace();
+//                                }
+//                            }
                         }
                     }
 

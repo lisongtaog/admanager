@@ -36,10 +36,17 @@ public class Tags extends HttpServlet {
         if (path != null) {
             if (path.startsWith("/create")) {
                 String tagName = request.getParameter("name");
+                String maxBiddingStr = request.getParameter("maxBidding");
+                String tagCategoryIdStr = request.getParameter("tagCategoryId");
 
-                result = createNewTag(tagName);
-                json.addProperty("ret", result.result ? 1 : 0);
-                json.addProperty("message", result.message);
+                if(!tagName.isEmpty() && tagCategoryIdStr.matches("[0-9]{1,}") && (maxBiddingStr.matches("^\\d+(\\.\\d+)?$") || maxBiddingStr == "")){
+                    result = createNewTag(tagName,maxBiddingStr,tagCategoryIdStr);
+                    json.addProperty("ret", result.result ? 1 : 0);
+                    json.addProperty("message", result.message);
+                }else{
+                    json.addProperty("ret", 0);
+                    json.addProperty("message", "创建失败，请注意输入格式");
+                }
             } else if (path.startsWith("/delete")) {
                 String tagName = request.getParameter("name");
                 result = deleteTag(tagName);
@@ -47,10 +54,22 @@ public class Tags extends HttpServlet {
                 json.addProperty("message", result.message);
             } else if (path.startsWith("/update")) {
                 String tagName = request.getParameter("name");
-                int id = Utils.parseInt(request.getParameter("id"), 0);
-                result = updateTag(id, tagName);
-                json.addProperty("ret", result.result ? 1 : 0);
-                json.addProperty("message", result.message);
+                String maxBiddingStr = request.getParameter("maxBidding");
+                String idStr = request.getParameter("id");
+                String tagCategoryIdStr = request.getParameter("tagCategoryId");
+
+                if(!tagName.isEmpty() && tagCategoryIdStr.matches("[0-9]{1,}") && (maxBiddingStr.matches("^\\d+(\\.\\d+)?$") || maxBiddingStr == "")){
+                    if(maxBiddingStr == ""){
+                        maxBiddingStr = "NULL";
+                    }
+                    result = updateTag(idStr, tagName,maxBiddingStr,tagCategoryIdStr);
+                    json.addProperty("ret", result.result ? 1 : 0);
+                    json.addProperty("message", result.message);
+                }else{
+                    json.addProperty("ret", 0);
+                    json.addProperty("message", "更新失败，请注意输入格式");
+                }
+
             } else if (path.startsWith("/query")) {
                 String word = request.getParameter("word");
                 if (word != null) {
@@ -227,19 +246,36 @@ public class Tags extends HttpServlet {
         return ret;
     }
 
-    private OperationResult createNewTag(String name) {
+    private OperationResult createNewTag(String tagName, String maxBiddingStr, String tagCategoryIdStr) {
         OperationResult ret = new OperationResult();
 
         try {
-            JSObject one = DB.simpleScan("web_tag").select("tag_name").where(DB.filter().whereEqualTo("tag_name", name)).execute();
+            JSObject one = DB.simpleScan("web_tag").select("tag_name").where(DB.filter().whereEqualTo("tag_name", tagName)).execute();
             if (one.get("tag_name") != null) {
                 ret.result = false;
                 ret.message = "已经存在这个标签了";
             } else {
-                DB.insert("web_tag").put("tag_name", name).execute();
-
-                ret.result = true;
-                ret.message = "创建成功";
+                String sql = "select id from web_ad_tag_category where id = " + tagCategoryIdStr;
+                one = DB.findOneBySql(sql);
+                if(one != null && one.hasObjectData()){
+                    if(maxBiddingStr == ""){
+                        DB.insert("web_tag")
+                                .put("tag_name", tagName)
+                                .put("tag_category_id",tagCategoryIdStr)
+                                .execute();
+                    }else{
+                        DB.insert("web_tag")
+                                .put("tag_name", tagName)
+                                .put("max_bidding",maxBiddingStr)
+                                .put("tag_category_id",tagCategoryIdStr)
+                                .execute();
+                    }
+                    ret.result = true;
+                    ret.message = "创建成功";
+                }else{
+                    ret.result = false;
+                    ret.message = "创建失败，不存在此标签类型ID";
+                }
             }
         } catch (Exception e) {
             ret.result = false;
@@ -251,20 +287,30 @@ public class Tags extends HttpServlet {
         return ret;
     }
 
-    private OperationResult updateTag(int id, String name) {
+    private OperationResult updateTag(String idStr, String tagName, String maxBiddingStr, String tagCategoryIdStr) {
         OperationResult ret = new OperationResult();
 
         try {
-            JSObject one = DB.simpleScan("web_tag").select("tag_name").where(DB.filter().whereEqualTo("tag_name", name)).execute();
-            if (one.get("tag_name") != null) {
+            JSObject one = DB.simpleScan("web_tag").select("id").where(DB.filter().whereEqualTo("tag_name", tagName)).execute();
+            long query_id = -1;
+            if(one != null && one.hasObjectData()){
+                query_id = one.get("id");
+            }
+            if (query_id != -1 && !(query_id + "").equals(idStr) ) {
                 ret.result = false;
-                ret.message = "已经存在这个标签了";
+                ret.message = "其他位置已经存在这个标签了";
             } else {
-                DB.update("web_tag").put("tag_name", name)
-                        .where(DB.filter().whereEqualTo("id", id)).execute();
-
-                ret.result = true;
-                ret.message = "修改成功";
+                String sql = "select id from web_ad_tag_category where id = " + tagCategoryIdStr;
+                one = DB.findOneBySql(sql);
+                if(one != null && one.hasObjectData()){
+                    sql = "UPDATE web_tag set tag_name = '" + tagName + "',max_bidding = " + maxBiddingStr + ",tag_category_id = " + tagCategoryIdStr + " WHERE id = " + idStr;
+                    DB.updateBySql(sql);
+                    ret.result = true;
+                    ret.message = "修改成功";
+                }else{
+                    ret.result = false;
+                    ret.message = "更新失败，不存在此标签类型ID";
+                }
             }
         } catch (Exception e) {
             ret.result = false;

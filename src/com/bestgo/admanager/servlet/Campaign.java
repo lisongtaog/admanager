@@ -94,34 +94,34 @@ public class Campaign extends HttpServlet {
                     result.message = "bidding超过了0.5,   " + bidding;
                 }
 
-                File imagesPath = null;
-                File videosPath = null;
-                if(!imagePath.isEmpty()){
-                    JSObject record = DB.simpleScan("web_system_config").select("config_value").where(DB.filter().whereEqualTo("config_key", "fb_image_path")).execute();
-                    String imageRoot = null;
-                    if (record.hasObjectData()) {
-                        imageRoot = record.get("config_value");
-                    }
-                    imagesPath = new File(imageRoot + File.separatorChar + imagePath);
-                    if (!imagesPath.exists()) {
-                        result.result = false;
-                        result.message = "图片路径不存在";
-                    }
-                }else if(!videoPath.isEmpty()){
-                    JSObject record = DB.simpleScan("web_system_config").select("config_value").where(DB.filter().whereEqualTo("config_key", "fb_video_path")).execute();
-                    String videoRoot = null;
-                    if (record.hasObjectData()) {
-                        videoRoot = record.get("config_value");
-                    }
-                    videosPath = new File(videoRoot + File.separatorChar + videoPath);
-                    if (!videosPath.exists()) {
-                        result.result = false;
-                        result.message = "视频路径不存在";
-                    }
-                }else {
-                    result.result = false;
-                    result.message = "图片或视频路径二选一，不能为空！";
-                }
+//                File imagesPath = null;
+//                File videosPath = null;
+//                if(!imagePath.isEmpty()){
+//                    JSObject record = DB.simpleScan("web_system_config").select("config_value").where(DB.filter().whereEqualTo("config_key", "fb_image_path")).execute();
+//                    String imageRoot = null;
+//                    if (record.hasObjectData()) {
+//                        imageRoot = record.get("config_value");
+//                    }
+//                    imagesPath = new File(imageRoot + File.separatorChar + imagePath);
+//                    if (!imagesPath.exists()) {
+//                        result.result = false;
+//                        result.message = "图片路径不存在";
+//                    }
+//                }else if(!videoPath.isEmpty()){
+//                    JSObject record = DB.simpleScan("web_system_config").select("config_value").where(DB.filter().whereEqualTo("config_key", "fb_video_path")).execute();
+//                    String videoRoot = null;
+//                    if (record.hasObjectData()) {
+//                        videoRoot = record.get("config_value");
+//                    }
+//                    videosPath = new File(videoRoot + File.separatorChar + videoPath);
+//                    if (!videosPath.exists()) {
+//                        result.result = false;
+//                        result.message = "视频路径不存在";
+//                    }
+//                }else {
+//                    result.result = false;
+//                    result.message = "图片或视频路径二选一，不能为空！";
+//                }
 
 
                 if (result.result) {
@@ -134,11 +134,11 @@ public class Campaign extends HttpServlet {
                     int createCountInt = Integer.parseInt(createCount);
                     Collection<File> uploadImages = null;
                     Collection<File> uploadVideos = null;
-                    if(imagesPath != null){
-                        uploadImages = FileUtils.listFiles(imagesPath, null, false);
-                    }else if(videosPath != null){
-                        uploadVideos = FileUtils.listFiles(videosPath, null, false);
-                    }
+//                    if(imagesPath != null){
+//                        uploadImages = FileUtils.listFiles(imagesPath, null, false);
+//                    }else if(videosPath != null){
+//                        uploadVideos = FileUtils.listFiles(videosPath, null, false);
+//                    }
 
                     for(int j=0,len = accountNameArr.length;j<len;j++){
                         for(int i=0;i<createCountInt;i++){
@@ -174,65 +174,69 @@ public class Campaign extends HttpServlet {
                                     .put("user_devices", userDevice)
                                     .put("user_os", userOs)
                                     .executeReturnId();
-
-                            if(uploadImages != null){
-                                for (File file : uploadImages) {
-                                    String fileName = file.getAbsolutePath().toLowerCase();
-                                    if (fileName.endsWith("gif") || fileName.endsWith("jpg") || fileName.endsWith("jpeg") || fileName.endsWith("png")) {
-                                        String sql = "insert into ad_ads set parent_id=" + genId + ", image_file_path='" + file.getAbsolutePath() + "'";
-                                        DB.updateBySql(sql);
-                                    }
-                                }
-                            }else if(uploadVideos != null){
-                                String video_file_path = null;
-                                String thumbnail_image_file_path = null;
-                                for (File file : uploadVideos) {
-                                    String fileAbsolutePath = file.getAbsolutePath();
-                                    String fileName = fileAbsolutePath.toLowerCase();
-//                                    String xxx = file.getAbsolutePath().replaceAll("\\\\","/");
-                                    if (fileName.endsWith("mp4") || fileName.endsWith("mov")) {
-                                        video_file_path = fileAbsolutePath;
-                                    }else if (fileName.endsWith("jpg") || fileName.endsWith("jpeg") || fileName.endsWith("png") || fileName.endsWith("gif")) {
-                                        thumbnail_image_file_path = fileAbsolutePath;
-                                    }
-                                }
-                                if(video_file_path != null && thumbnail_image_file_path != null){
-                                    String sql = "insert into ad_ads set parent_id = '"+genId+"', video_file_path = '"+video_file_path+"', thumbnail_image_file_path = '"+thumbnail_image_file_path+"'";
-                                    DB.updateBySql(sql);
-                                }
-                            }
-
-
                             if(genId >0){
-                                try {
-                                    String[] split = region.split(",");
-                                    String countryNamesStr = "";
-                                    for(int k=0,ee=split.length;k<ee;k++){
-                                        countryNamesStr += "'" + split[k] + "',";
-                                    }
-                                    if(countryNamesStr != null && countryNamesStr.length()>0){
-                                        countryNamesStr = countryNamesStr.substring(0,countryNamesStr.length()-1);
-                                    }
-                                    String sql = "select country_code from app_country_code_dict where country_name in ("+countryNamesStr+")";
-                                    List<JSObject> countryCodeJSObjectList = DB.findListBySql(sql);
-                                    for(JSObject m: countryCodeJSObjectList){
-                                        String countryCodeStr = m.get("country_code");
-                                        DB.insert("web_ad_campaign_operation_log")
-                                                .put("operation_date", now)
-                                                .put("app_name",appName)
-                                                .put("country_code", countryCodeStr)
-                                                .put("campaign_name",campaignName)
-                                                .put("enabled",1)
-                                                .put("bidding",bidding)
-                                                .execute();
-                                    }
-
-
-
-                                } catch (Exception e) {
-                                    e.printStackTrace();
+                                boolean flag = false;
+//                                if(uploadImages != null){
+//                                    for (File file : uploadImages) {
+//                                        String fileName = file.getAbsolutePath().toLowerCase();
+//                                        if (fileName.endsWith("gif") || fileName.endsWith("jpg") || fileName.endsWith("jpeg") || fileName.endsWith("png")) {
+//                                            String sql = "insert into ad_ads set parent_id=" + genId + ", image_file_path='" + file.getAbsolutePath() + "'";
+//                                            flag = DB.updateBySql(sql);
+//                                        }
+//                                    }
+//                                }else if(uploadVideos != null){
+//                                    String video_file_path = null;
+//                                    String thumbnail_image_file_path = null;
+//                                    for (File file : uploadVideos) {
+//                                        String fileAbsolutePath = file.getAbsolutePath();
+//                                        String fileName = fileAbsolutePath.toLowerCase();
+////                                    String xxx = file.getAbsolutePath().replaceAll("\\\\","/");
+//                                        if (fileName.endsWith("mp4") || fileName.endsWith("mov")) {
+//                                            video_file_path = fileAbsolutePath;
+//                                        }else if (fileName.endsWith("jpg") || fileName.endsWith("jpeg") || fileName.endsWith("png") || fileName.endsWith("gif")) {
+//                                            thumbnail_image_file_path = fileAbsolutePath;
+//                                        }
+//                                    }
+//                                    if(video_file_path != null && thumbnail_image_file_path != null){
+//                                        String sql = "insert into ad_ads set parent_id = '"+genId+"', video_file_path = '"+video_file_path+"', thumbnail_image_file_path = '"+thumbnail_image_file_path+"'";
+//                                        flag = DB.updateBySql(sql);
+//                                    }
+//                                }
+                                if(!flag){
+                                    DB.delete("ad_campaigns").where(DB.filter().whereEqualTo("campaign_name", campaignName)).execute();
                                 }
                             }
+
+//                            if(genId >0){
+//                                try {
+//                                    String[] split = region.split(",");
+//                                    String countryNamesStr = "";
+//                                    for(int k=0,ee=split.length;k<ee;k++){
+//                                        countryNamesStr += "'" + split[k] + "',";
+//                                    }
+//                                    if(countryNamesStr != null && countryNamesStr.length()>0){
+//                                        countryNamesStr = countryNamesStr.substring(0,countryNamesStr.length()-1);
+//                                    }
+//                                    String sql = "select country_code from app_country_code_dict where country_name in ("+countryNamesStr+")";
+//                                    List<JSObject> countryCodeJSObjectList = DB.findListBySql(sql);
+//                                    for(JSObject m: countryCodeJSObjectList){
+//                                        String countryCodeStr = m.get("country_code");
+//                                        DB.insert("web_ad_campaign_operation_log")
+//                                                .put("operation_date", now)
+//                                                .put("app_name",appName)
+//                                                .put("country_code", countryCodeStr)
+//                                                .put("campaign_name",campaignName)
+//                                                .put("enabled",1)
+//                                                .put("bidding",bidding)
+//                                                .execute();
+//                                    }
+//
+//
+//
+//                                } catch (Exception e) {
+//                                    e.printStackTrace();
+//                                }
+//                            }
 
                         }
                     }
