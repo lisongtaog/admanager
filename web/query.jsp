@@ -34,6 +34,7 @@
       <li role="presentation" class="active"><a href="#">查询</a></li>
       <li role="presentation"><a href="system.jsp">系统管理</a></li>
       <li role="presentation"><a href="advert_insert.jsp">广告存储</a></li>
+      <li role="presentation"><a href="summary.jsp">七天汇总</a></li>
     </ul>
 
     <%

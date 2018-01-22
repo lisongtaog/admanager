@@ -56,6 +56,7 @@
         <li role="presentation"><a href="query.jsp">查询</a></li>
         <li role="presentation"><a href="system.jsp">系统管理</a></li>
         <li role="presentation"><a href="advert_insert.jsp">广告存储</a></li>
+        <li role="presentation"><a href="summary.jsp">七天汇总</a></li>
         <li role="presentation"><a href="advert_conversions_insert.jsp">转化录入</a></li>
     </ul>
 

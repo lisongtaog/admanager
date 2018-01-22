@@ -70,6 +70,7 @@
         <li role="presentation"><a href="system.jsp">系统管理</a></li>
         <li role="presentation"><a href="advert_insert.jsp">广告存储</a></li>
         <li role="presentation"><a href="country_revenue_spend.jsp">国家收支</a></li>
+        <li role="presentation"><a href="summary.jsp">七天汇总</a></li>
     </ul>
 
     <div class="panel panel-default" style="margin-top: 10px">

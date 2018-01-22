@@ -67,7 +67,7 @@
         <li role="presentation"><a href="system.jsp">系统管理</a></li>
         <li role="presentation" ><a href="advert_insert.jsp">广告存储</a></li>
         <li role="presentation" class="active"><a href="#">国家收支</a></li>
-        <li role="presentation"><a href="temp_index.jsp">临时用的</a></li>
+        <li role="presentation"><a href="summary.jsp">七天汇总</a></li>
     </ul>
 
     <div class="panel panel-default" style="margin-top: 10px">

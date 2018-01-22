@@ -4,7 +4,6 @@ import com.bestgo.admanager.DateUtil;
 import com.bestgo.admanager.Utils;
 import com.bestgo.common.database.services.DB;
 import com.bestgo.common.database.utils.JSObject;
-
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import org.apache.log4j.Logger;
@@ -20,8 +19,8 @@ import java.util.*;
 /**
  * 首页的汇总
  */
-@WebServlet(name = "QuerySummary", urlPatterns = {"/query_summary"}, asyncSupported = true)
-public class QuerySummary extends HttpServlet {
+@WebServlet(name = "QuerySummaryOld", urlPatterns = {"/query_summary_old"}, asyncSupported = true)
+public class QuerySummaryOld extends HttpServlet {
     private static List<JSObject> tagList;
     private static Map<String,Double> sevenDaysTotalSpendMap;
     private static Map<String,Double> sevenDaysTotalSpendAdmobMap;
@@ -455,27 +454,25 @@ public class QuerySummary extends HttpServlet {
                         for(CampaignsSummary cs : campaignsSummaryList){
                             JsonObject j = new JsonObject();
                             j.addProperty("name",cs.name);
-                            j.addProperty("total_spend",Utils.trimDouble(cs.total_spend));
-                            j.addProperty("seven_days_total_spend",Utils.trimDouble(cs.seven_days_total_spend));
-                            j.addProperty("seven_days_total_revenue",Utils.trimDouble(cs.seven_days_total_revenue));
-                            j.addProperty("total_installed",Utils.trimDouble(cs.total_installed));
-                            j.addProperty("total_impressions",Utils.trimDouble(cs.total_impressions));
-                            j.addProperty("total_click",Utils.trimDouble(cs.total_click));
-                            j.addProperty("total_ctr",Utils.trimDouble(cs.total_ctr));
-                            j.addProperty("total_cpa",Utils.trimDouble(cs.total_cpa));
-                            j.addProperty("total_cvr",Utils.trimDouble(cs.total_cvr));
-                            j.addProperty("total_revenue",Utils.trimDouble(cs.total_revenue));
+                            j.addProperty("total_spend",cs.total_spend);
+                            j.addProperty("seven_days_total_spend",cs.seven_days_total_spend);
+                            j.addProperty("seven_days_total_revenue",cs.seven_days_total_revenue);
+                            j.addProperty("total_installed",cs.total_installed);
+                            j.addProperty("total_impressions",cs.total_impressions);
+                            j.addProperty("total_click",cs.total_click);
+                            j.addProperty("total_ctr",cs.total_ctr);
+                            j.addProperty("total_cpa",cs.total_cpa);
+                            j.addProperty("total_cvr",cs.total_cvr);
+                            j.addProperty("total_revenue",cs.total_revenue);
                             arr.add(j);
                         }
                     }
                 }else{
-                    String sqlTag = "select t.id,t.tag_name,google_package_id,category_name from web_tag t LEFT JOIN web_ad_tag_category tc ON t.tag_category_id = tc.id " +
-                            " LEFT JOIN web_facebook_app_ids_rel air ON t.tag_name = air.tag_name ORDER BY t.tag_category_id,t.id";
+                    String sqlTag = "select t.id,t.tag_name,google_package_id from web_tag t LEFT JOIN web_facebook_app_ids_rel air ON t.tag_name = air.tag_name ORDER BY t.tag_name";
                     List<JSObject> tagList = DB.findListBySql(sqlTag);
                     for (JSObject tagJSObject : tagList) {
                         long id = tagJSObject.get("id");
                         String tagName = tagJSObject.get("tag_name");
-                        String categoryName = tagJSObject.get("category_name");
                         JsonObject admob = fetchOneAppDataSummary(id, startTime, endTime,true);
                         JsonObject facebook =  fetchOneAppDataSummary(id, startTime, endTime,false);
                         double total_impressions = admob.get("total_impressions").getAsDouble() + facebook.get("total_impressions").getAsDouble();
@@ -516,7 +513,6 @@ public class QuerySummary extends HttpServlet {
                             }
                         }
                         admob.addProperty("total_revenue",Utils.trimDouble(total_revenue));
-                        admob.addProperty("category_name",categoryName);
                         admob.addProperty("seven_days_total_revenue",Utils.trimDouble(seven_days_total_revenue));
                         arr.add(admob);
                     }
