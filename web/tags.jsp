@@ -47,7 +47,7 @@
 
         <table class="table">
             <thead>
-            <tr><th>序号</th><th>标签</th><th>操作</th></tr>
+            <tr><th>标签ID</th><th>标签名称</th><th>最大出价</th><th>标签类型ID</th><th>标签类型名称</th><th>操作</th></tr>
             </thead>
             <tbody>
 
@@ -72,6 +72,9 @@
             <tr>
                 <td><%=one.get("id")%></td>
                 <td><%=one.get("tag_name")%></td>
+                <td><%=one.get("max_bidding")%></td>
+                <td><%=one.get("tag_category_id")%></td>
+                <td><%=one.get("category_name")%></td>
                 <td><a class="link_modify" href="#">修改</a><a class="link_delete" href="#">删除</a></td>
             </tr>
             <% } %>

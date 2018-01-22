@@ -119,10 +119,10 @@ public class QuerySummaryNew extends HttpServlet {
         if (!Utils.isAdmin(request, response)) return;
 
         JsonObject json = new JsonObject();
-        String startTime = request.getParameter("startTime");
-//        startTime = "2017-12-16";
-        String endTime = request.getParameter("endTime");
-//        endTime = "2017-12-16";
+//        String startTime = request.getParameter("startTime");
+        String startTime = "2017-12-16";
+//        String endTime = request.getParameter("endTime");
+        String endTime = "2017-12-16";
         String sorterId = request.getParameter("sorterId");
         String adwordsCheck = request.getParameter("adwordsCheck");
         String facebookCheck = request.getParameter("facebookCheck");

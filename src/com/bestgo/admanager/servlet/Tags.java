@@ -188,7 +188,9 @@ public class Tags extends HttpServlet {
     public static List<JSObject> fetchData(int index, int size) {
         List<JSObject> list = new ArrayList<>();
         try {
-            return DB.scan("web_tag").select("id", "tag_name").limit(size).start(index * size).orderByAsc("id").execute();
+            String sql = "select t.id,t.tag_name,t.max_bidding,t.tag_category_id,tc.category_name from web_tag t LEFT JOIN web_ad_tag_category tc ON t.tag_category_id = tc.id LIMIT "+(index * size)+","+size;
+            return DB.findListBySql(sql);
+//            return DB.scan("web_tag").select("id", "tag_name","max_bidding","tag_category_id").limit(size).start(index * size).orderByAsc("id").execute();
         } catch (Exception ex) {
             Logger logger = Logger.getRootLogger();
             logger.error(ex.getMessage(), ex);
