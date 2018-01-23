@@ -822,7 +822,7 @@ $('#selectAppAdmob').change(function () {
     });
     if (languageAdmob != null && languageAdmob.length > 0) {
 
-        $.post("campaign/selectAdmobMessage", {
+        $.post("campaign_admob/selectAdmobMessage", {
             appNameAdmob: appNameAdmob,
             languageAdmob: languageAdmob.join(",")
         }, function (data) {

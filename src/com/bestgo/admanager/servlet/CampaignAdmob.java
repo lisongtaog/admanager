@@ -352,6 +352,28 @@ public class CampaignAdmob extends HttpServlet {
 
             json.addProperty("ret", 1);
             json.add("data", array);
+        }else if (path.startsWith("/selectAdmobMessage")) {
+            String appNameAdmob = request.getParameter("appNameAdmob");
+            String languageAdmob = request.getParameter("languageAdmob");
+            try {
+                String sql = "select message1,message2,message3,message4 from web_ad_descript_dict_admob where app_name = '" + appNameAdmob + "' and language = '" + languageAdmob +"' limit 1";
+                JSObject messages = new JSObject();
+                try {
+                    messages = DB.findOneBySql(sql);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                json.addProperty("message1",(String)(messages.get("message1")));
+                json.addProperty("message2",(String)(messages.get("message2")));
+                json.addProperty("message3",(String)(messages.get("message3")));
+                json.addProperty("message4",(String)(messages.get("message4")));
+                json.addProperty("languageAdmob", languageAdmob);
+                json.addProperty("ret", 1);
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
         response.getWriter().write(json.toString());
