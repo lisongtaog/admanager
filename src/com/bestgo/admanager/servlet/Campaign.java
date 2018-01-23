@@ -61,86 +61,77 @@ public class Campaign extends HttpServlet {
 
             OperationResult result = new OperationResult();
             try {
-                result.result = true;
-
-                if (createCount.isEmpty()) {
-                    result.result = false;
-                    result.message = "创建数量不能为空";
-                }
-
-                if (title.isEmpty()) {
-                    result.result = false;
-                    result.message = "标题不能为空";
-                }
-                if (message.isEmpty()) {
-                    result.result = false;
-                    result.message = "广告语不能为空";
-                }
-                if (campaignName.isEmpty()) {
-                    result.result = false;
-                    result.message = "广告系列名称不能为空";
-                }
-                if (bugdet.isEmpty()) {
-                    result.result = false;
-                    result.message = "预算不能为空";
-                }
-                if (bidding.isEmpty()) {
-                    result.result = false;
-                    result.message = "出价不能为空";
-                }
-                double dBidding = Utils.parseDouble(bidding, 0);
-                if (dBidding >= 0.5) {
-                    result.result = false;
-                    result.message = "bidding超过了0.5,   " + bidding;
-                }
-
+                result.result = false;
                 File imagesPath = null;
                 File videosPath = null;
-                if(!imagePath.isEmpty()){
-                    JSObject record = DB.simpleScan("web_system_config").select("config_value").where(DB.filter().whereEqualTo("config_key", "fb_image_path")).execute();
-                    String imageRoot = null;
-                    if (record.hasObjectData()) {
-                        imageRoot = record.get("config_value");
+                Collection<File> uploadImages = null;
+                Collection<File> uploadVideos = null;
+                if (createCount.isEmpty()) {
+                    result.message = "创建数量不能为空";
+                } else if (title.isEmpty()) {
+                    result.message = "标题不能为空";
+                } else if (message.isEmpty()) {
+                    result.message = "广告语不能为空";
+                } else if (campaignName.isEmpty()) {
+                    result.message = "广告系列名称不能为空";
+                } else if (bugdet.isEmpty()) {
+                    result.message = "预算不能为空";
+                } else if (bidding.isEmpty()) {
+                    result.message = "出价不能为空";
+                } else {
+                    double dBidding = Utils.parseDouble(bidding, 0);
+                    if (dBidding >= 0.5) {
+                        result.message = "bidding超过了0.5,   " + bidding;
+                    }else{
+                        if(!imagePath.isEmpty()){
+                            JSObject record = DB.simpleScan("web_system_config").select("config_value").where(DB.filter().whereEqualTo("config_key", "fb_image_path")).execute();
+                            String imageRoot = null;
+                            if (record.hasObjectData()) {
+                                imageRoot = record.get("config_value");
+                            }
+                            imagesPath = new File(imageRoot + File.separatorChar + imagePath);
+                            if (imagesPath.exists()) {
+                                uploadImages = FileUtils.listFiles(imagesPath, null, false);
+                                if(uploadImages != null && uploadImages.size() == 1){
+                                    result.result = true;
+                                }else{
+                                    result.message = "创建失败，每个系列必须而且只能上传一张图片";
+                                }
+                            }else{
+                                result.message = "图片路径不存在";
+                            }
+                        }else if(!videoPath.isEmpty()){
+                            JSObject record = DB.simpleScan("web_system_config").select("config_value").where(DB.filter().whereEqualTo("config_key", "fb_video_path")).execute();
+                            String videoRoot = null;
+                            if (record.hasObjectData()) {
+                                videoRoot = record.get("config_value");
+                            }
+                            videosPath = new File(videoRoot + File.separatorChar + videoPath);
+                            if (videosPath.exists()) {
+                                uploadVideos = FileUtils.listFiles(videosPath, null, false);
+                                if(uploadVideos != null && uploadVideos.size() == 2){
+                                    result.result = true;
+                                }else{
+                                    result.message = "创建失败，每个系列必须而且只能上传一个视频和一个缩略图";
+                                }
+                            }else{
+                                result.message = "视频路径不存在";
+                            }
+                        }else {
+                            result.message = "图片或视频路径二选一，不能为空！";
+                        }
                     }
-                    imagesPath = new File(imageRoot + File.separatorChar + imagePath);
-                    if (!imagesPath.exists()) {
-                        result.result = false;
-                        result.message = "图片路径不存在";
-                    }
-                }else if(!videoPath.isEmpty()){
-                    JSObject record = DB.simpleScan("web_system_config").select("config_value").where(DB.filter().whereEqualTo("config_key", "fb_video_path")).execute();
-                    String videoRoot = null;
-                    if (record.hasObjectData()) {
-                        videoRoot = record.get("config_value");
-                    }
-                    videosPath = new File(videoRoot + File.separatorChar + videoPath);
-                    if (!videosPath.exists()) {
-                        result.result = false;
-                        result.message = "视频路径不存在";
-                    }
-                }else {
-                    result.result = false;
-                    result.message = "图片或视频路径二选一，不能为空！";
                 }
 
-
                 if (result.result) {
-
                     Calendar calendar = Calendar.getInstance();
                     String campaignNameOld = campaignName + "_";
                     String[] accountNameArr = accountName.split(",");
                     String accountNameArrStr = accountName.replace(",", "");
                     String[] accountIdArr = accountId.split(",");
                     int createCountInt = Integer.parseInt(createCount);
-                    Collection<File> uploadImages = null;
-                    Collection<File> uploadVideos = null;
-                    if(imagesPath != null){
-                        uploadImages = FileUtils.listFiles(imagesPath, null, false);
-                    }else if(videosPath != null){
-                        uploadVideos = FileUtils.listFiles(videosPath, null, false);
-                    }
 
-                    for(int j=0,len = accountNameArr.length;j<len;j++){
+                    for(int j=0,len=accountNameArr.length;j<len;j++){
                         for(int i=0;i<createCountInt;i++){
                             String now  = String.format("%d-%02d-%02d %02d:%02d:%02d", calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH),
                                     calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), calendar.get(Calendar.SECOND));
@@ -241,7 +232,6 @@ public class Campaign extends HttpServlet {
 
                         }
                     }
-                    result.result = true;
                 }
             } catch (Exception ex) {
                 result.message = ex.getMessage();
