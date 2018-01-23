@@ -374,6 +374,26 @@ public class CampaignAdmob extends HttpServlet {
             } catch (Exception e) {
                 e.printStackTrace();
             }
+        }else if (path.startsWith("/selectMaxBiddingByAppName")) {
+            String appName = request.getParameter("appName");
+            try {
+                String sql = "select max_bidding from web_tag where tag_name = '" + appName + "'";
+                JSObject j = null;
+                try {
+                    j = DB.findOneBySql(sql);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                if(j != null && j.hasObjectData()){
+                    double maxBidding = Utils.convertDouble(j.get("max_bidding"),0);
+                    if(maxBidding != 0){
+                        json.addProperty("max_bidding",maxBidding);
+                        json.addProperty("ret", 1);
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
         response.getWriter().write(json.toString());

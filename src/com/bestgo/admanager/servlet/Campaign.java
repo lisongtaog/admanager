@@ -663,7 +663,7 @@ public class Campaign extends HttpServlet {
         } else if (path.startsWith("/batch_change")) {
             try {
                 String data = request.getParameter("data");
-                String  appName = request.getParameter("appName");
+//                String  appName = request.getParameter("appName");
 
                 JsonParser parser = new JsonParser();
                 Gson gson = new Gson();
@@ -672,24 +672,24 @@ public class Campaign extends HttpServlet {
 
                 for (int i = 0; i < array.size(); i++) {
                     BatchChangeItem item = gson.fromJson(array.get(i), BatchChangeItem.class);
-                    String sql = "";
+//                    String sql = "";
 
 
                     JSObject record = DB.simpleScan("web_ad_batch_change_campaigns")
                             .select("id").where(DB.filter().whereEqualTo("campaign_id", item.campaignId))
                             .and(DB.filter().whereEqualTo("success", 0)).execute();
 
-                    String sqlNetwork = "";
-                    String sqlCountry = "";
-                    if("admob".equals(item.network)){
-                        sqlNetwork = "select campaign_name,budget,bidding from web_ad_campaigns_admob where campaign_id = '"+item.campaignId+"'";
-                        sqlCountry = "select DISTINCT country_code from web_ad_campaigns_country_history_admob where campaign_id = '"+item.campaignId+"'";
-                    }else if("facebook".equals(item.network)){
-                        sqlNetwork = "select campaign_name,budget,bidding from web_ad_campaigns where campaign_id = '"+item.campaignId+"'";
-                        sqlCountry = "select DISTINCT country_code from web_ad_campaigns_country_history where campaign_id = '"+item.campaignId+"'";
-                    }
-                    JSObject one = DB.findOneBySql(sqlNetwork);
-                    List<JSObject> countryJSObjectList = DB.findListBySql(sqlCountry);
+//                    String sqlNetwork = "";
+//                    String sqlCountry = "";
+//                    if("admob".equals(item.network)){
+//                        sqlNetwork = "select campaign_name,budget,bidding from web_ad_campaigns_admob where campaign_id = '"+item.campaignId+"'";
+//                        sqlCountry = "select DISTINCT country_code from web_ad_campaigns_country_history_admob where campaign_id = '"+item.campaignId+"'";
+//                    }else if("facebook".equals(item.network)){
+//                        sqlNetwork = "select campaign_name,budget,bidding from web_ad_campaigns where campaign_id = '"+item.campaignId+"'";
+//                        sqlCountry = "select DISTINCT country_code from web_ad_campaigns_country_history where campaign_id = '"+item.campaignId+"'";
+//                    }
+//                    JSObject one = DB.findOneBySql(sqlNetwork);
+//                    List<JSObject> countryJSObjectList = DB.findListBySql(sqlCountry);
                     int enabled = -1;
                     if (item.enabled != null) {
                         enabled = item.enabled ? 1 : 0;
@@ -724,38 +724,38 @@ public class Campaign extends HttpServlet {
                                 .execute();
                     }
 
-                    String budgetStr = "";
-                    String biddingStr = "";
-                    if(record.hasObjectData()){
-                        double bugdet = one.get("budget");
-                        bugdet = bugdet / 100;
-                        double bidding = one.get("bidding");
-                        bidding = bidding / 100;
-                        if(bugdet  < item.budget){
-                            budgetStr = "预算上升；";
-                        }
-                        if(bugdet > item.budget){
-                            budgetStr = "预算下降；";
-                        }
-                        if(bidding < item.bidding){
-                            biddingStr = "竞价上升；";
-                        }
-                        if(bidding > item.bidding){
-                            biddingStr = "竞价下降；";
-                        }
-                        for(JSObject js : countryJSObjectList){
-                            DB.insert("web_ad_campaign_operation_log")
-                                    .put("operation_date", now)
-                                    .put("app_name",appName)
-                                    .put("country_code",js.get("country_code"))
-                                    .put("campaign_id",item.campaignId)
-                                    .put("campaign_name", one.get("campaign_name"))
-                                    .put("enabled",enabled)
-                                    .put("details_text",budgetStr + biddingStr)
-                                    .execute();
-                        }
+//                    String budgetStr = "";
+//                    String biddingStr = "";
+//                    if(record.hasObjectData()){
+//                        double bugdet = one.get("budget");
+//                        bugdet = bugdet / 100;
+//                        double bidding = one.get("bidding");
+//                        bidding = bidding / 100;
+//                        if(bugdet  < item.budget){
+//                            budgetStr = "预算上升；";
+//                        }
+//                        if(bugdet > item.budget){
+//                            budgetStr = "预算下降；";
+//                        }
+//                        if(bidding < item.bidding){
+//                            biddingStr = "竞价上升；";
+//                        }
+//                        if(bidding > item.bidding){
+//                            biddingStr = "竞价下降；";
+//                        }
+//                        for(JSObject js : countryJSObjectList){
+//                            DB.insert("web_ad_campaign_operation_log")
+//                                    .put("operation_date", now)
+//                                    .put("app_name",appName)
+//                                    .put("country_code",js.get("country_code"))
+//                                    .put("campaign_id",item.campaignId)
+//                                    .put("campaign_name", one.get("campaign_name"))
+//                                    .put("enabled",enabled)
+//                                    .put("details_text",budgetStr + biddingStr)
+//                                    .execute();
+//                        }
 
-                    }
+//                    }
                 }
                 json.addProperty("ret", 1);
             } catch (Exception ex) {
@@ -783,6 +783,26 @@ public class Campaign extends HttpServlet {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
+        }else if (path.startsWith("/selectMaxBiddingByAppName")) {
+            String appName = request.getParameter("appName");
+            try {
+                String sql = "select max_bidding from web_tag where tag_name = '" + appName + "'";
+                JSObject j = null;
+                try {
+                    j = DB.findOneBySql(sql);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                if(j != null && j.hasObjectData()){
+                    double maxBidding = Utils.convertDouble(j.get("max_bidding"),0);
+                    if(maxBidding != 0){
+                        json.addProperty("max_bidding",maxBidding);
+                        json.addProperty("ret", 1);
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }else if (path.startsWith("/selectTitleMessageByRegion")) {
             String region = request.getParameter("region");
             String appName = request.getParameter("appName");

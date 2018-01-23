@@ -791,7 +791,6 @@ $('#selectApp').change(function () {
     var language = $('#selectLanguage').val();
 
     if (language != null && language.length > 0) {
-
         $.post("campaign/selectFacebookMessage", {
             appName: appName,
             language: language
@@ -808,6 +807,17 @@ $('#selectApp').change(function () {
         $('#inputTitle').val("");
         $('#inputMessage').val("");
     }
+
+    $.post("campaign/selectMaxBiddingByAppName", {
+        appName: appName
+    }, function (data) {
+        if (data && data.ret == 1) {
+            $('#inputBidding')[0].placeholder = "最大出价："+data.max_bidding;
+        } else {
+            $('#inputBidding')[0].placeholder = "还未设置最大出价";
+        }
+    }, "json");
+
     return false;
 });
 
@@ -857,6 +867,16 @@ $('#selectAppAdmob').change(function () {
             admanager.showCommonDlg("错误", data.message);
         }
     }, 'json');
+
+    $.post("campaign_admob/selectMaxBiddingByAppName", {
+        appName: appNameAdmob
+    }, function (data) {
+        if (data && data.ret == 1) {
+            $('#inputBiddingAdmob')[0].placeholder = "最大出价："+data.max_bidding;
+        } else {
+            $('#inputBiddingAdmob')[0].placeholder = "还未设置最大出价";
+        }
+    }, "json");
 
     return false;
 });
