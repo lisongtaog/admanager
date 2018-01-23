@@ -28,6 +28,26 @@ import java.util.*;
 
 @WebServlet(name = "Campaign", urlPatterns = "/campaign/*")
 public class Campaign extends HttpServlet {
+    public static Map<String,Double> tagMaxBiddingRelationMap;
+    static {
+        if(tagMaxBiddingRelationMap == null){
+            tagMaxBiddingRelationMap = new HashMap<>();
+        }
+        String sql = "select tag_name,max_bidding from web_tag";
+        List<JSObject> list = null;
+        try {
+            list = DB.findListBySql(sql);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if(list != null && list.size() > 0){
+            for(JSObject j : list){
+                String currTagName = j.get("tag_name");
+                double currMaxBidding = Utils.convertDouble(j.get("max_bidding"),0);
+                tagMaxBiddingRelationMap.put(currTagName,currMaxBidding);
+            }
+        }
+    }
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         if (!Utils.isAdmin(request, response)) return;
 
@@ -80,8 +100,9 @@ public class Campaign extends HttpServlet {
                     result.message = "出价不能为空";
                 } else {
                     double dBidding = Utils.parseDouble(bidding, 0);
-                    if (dBidding >= 0.5) {
-                        result.message = "bidding超过了0.5,   " + bidding;
+                    Double maxBiddingDouble = tagMaxBiddingRelationMap.get(appName);
+                    if (maxBiddingDouble != 0 && dBidding > maxBiddingDouble) {
+                        result.message = "bidding超过了本应用的最大出价,   " + bidding + " > " + maxBiddingDouble;
                     }else{
                         if(!imagePath.isEmpty()){
                             JSObject record = DB.simpleScan("web_system_config").select("config_value").where(DB.filter().whereEqualTo("config_key", "fb_image_path")).execute();
@@ -182,9 +203,9 @@ public class Campaign extends HttpServlet {
                                         String fileAbsolutePath = file.getAbsolutePath();
                                         String fileName = fileAbsolutePath.toLowerCase();
 //                                    String xxx = file.getAbsolutePath().replaceAll("\\\\","/");
-                                        if (fileName.endsWith("mp4") || fileName.endsWith("mov")) {
+                                        if (fileName.endsWith("mp4") || fileName.endsWith("mov") || fileName.endsWith("gif")) {
                                             video_file_path = fileAbsolutePath;
-                                        }else if (fileName.endsWith("jpg") || fileName.endsWith("jpeg") || fileName.endsWith("png") || fileName.endsWith("gif")) {
+                                        }else if (fileName.endsWith("jpg") || fileName.endsWith("jpeg") || fileName.endsWith("png")) {
                                             thumbnail_image_file_path = fileAbsolutePath;
                                         }
                                     }
@@ -775,23 +796,10 @@ public class Campaign extends HttpServlet {
                 }
         }else if (path.startsWith("/selectMaxBiddingByAppName")) {
             String appName = request.getParameter("appName");
-            try {
-                String sql = "select max_bidding from web_tag where tag_name = '" + appName + "'";
-                JSObject j = null;
-                try {
-                    j = DB.findOneBySql(sql);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                if(j != null && j.hasObjectData()){
-                    double maxBidding = Utils.convertDouble(j.get("max_bidding"),0);
-                    if(maxBidding != 0){
-                        json.addProperty("max_bidding",maxBidding);
-                        json.addProperty("ret", 1);
-                    }
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
+            Double maxBiddingDouble = tagMaxBiddingRelationMap.get(appName);
+            if(maxBiddingDouble != 0){
+                json.addProperty("max_bidding",maxBiddingDouble);
+                json.addProperty("ret", 1);
             }
         }else if (path.startsWith("/selectTitleMessageByRegion")) {
             String region = request.getParameter("region");

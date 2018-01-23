@@ -21,6 +21,26 @@ import java.util.*;
 
 @WebServlet(name = "CampaignAdMob", urlPatterns = "/campaign_admob/*")
 public class CampaignAdmob extends HttpServlet {
+    public static Map<String,Double> tagMaxBiddingRelationMap;
+    static {
+        if(tagMaxBiddingRelationMap == null){
+            tagMaxBiddingRelationMap = new HashMap<>();
+        }
+        String sql = "select tag_name,max_bidding from web_tag";
+        List<JSObject> list = null;
+        try {
+            list = DB.findListBySql(sql);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if(list != null && list.size() > 0){
+            for(JSObject j : list){
+                String currTagName = j.get("tag_name");
+                double currMaxBidding = Utils.convertDouble(j.get("max_bidding"),0);
+                tagMaxBiddingRelationMap.put(currTagName,currMaxBidding);
+            }
+        }
+    }
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         if (!Utils.isAdmin(request, response)) return;
 
@@ -52,147 +72,114 @@ public class CampaignAdmob extends HttpServlet {
             OperationResult result = new OperationResult();
             try {
 
-                result.result = true;
-
+                result.result = false;
                 if (createCount.isEmpty()) {
-                    result.result = false;
                     result.message = "创建数量不能为空";
-                }
-                if (message1.isEmpty()) {
-                    result.result = false;
+                } else if (message1.isEmpty()) {
                     result.message = "广告语1不能为空";
-                }
-                if (message2.isEmpty()) {
-                    result.result = false;
+                } else if (message2.isEmpty()) {
                     result.message = "广告语2不能为空";
-                }
-                if (message3.isEmpty()) {
-                    result.result = false;
+                } else if (message3.isEmpty()) {
                     result.message = "广告语3不能为空";
-                }
-                if (message4.isEmpty()) {
-                    result.result = false;
+                } else if (message4.isEmpty()) {
                     result.message = "广告语4不能为空";
-                }
-                if (campaignName.isEmpty()) {
-                    result.result = false;
+                } else if (campaignName.isEmpty()) {
                     result.message = "广告系列名称不能为空";
-                }
-                if (bugdet.isEmpty()) {
-                    result.result = false;
+                } else if (bugdet.isEmpty()) {
                     result.message = "预算不能为空";
-                }
-                if (bidding.isEmpty()) {
-                    result.result = false;
+                } else if (bidding.isEmpty()) {
                     result.message = "出价不能为空";
-                }
-                double dBidding = Utils.parseDouble(bidding, 0);
-                if (dBidding >= 0.5) {
-                    result.result = false;
-                    result.message = "bidding超过了0.5,   " + bidding;
-                }
-                JSObject record = DB.simpleScan("web_system_config").select("config_value").where(DB.filter().whereEqualTo("config_key", "admob_image_path")).execute();
-                String imageRoot = null;
-                if (record.hasObjectData()) {
-                    imageRoot = record.get("config_value");
-                }
-
-//                String ss = imageRoot + File.separatorChar + imagePath;
-//                ss = ss.replaceAll("\\\\","/");
-//                File imagesPath = new File(ss);
-
-
-                File imagesPath = new File(imageRoot + File.separatorChar + imagePath);
-                if (!imagesPath.exists()) {
-                    result.result = false;
-                    result.message = "图片路径不存在";
-                }
-                if (result.result) {
-                    String imageAbsolutePath = imagesPath.getAbsolutePath();
-//                    imageAbsolutePath = imageAbsolutePath.replaceAll("\\\\","/");
-                    Calendar calendar = Calendar.getInstance();
-                    String campaignNameOld = "";
-
-                    String[] countrys = region.split(",");
-                    String countrysStr = "";
-                    for(int i=0,len=countrys.length;i<len;i++){
-                        countrysStr += "'" + countrys[i] + "',";
-                    }
-                    String countryListStr = "";
-                    if(countrysStr.length() >0){
-                        countrysStr = countrysStr.substring(0,countrysStr.length()-1);
-                        String sqlCountry = "select country_name from app_country_code_dict where country_code in ("+countrysStr+")";
-                        List<JSObject> countryList = DB.findListBySql(sqlCountry);
-
-                        for(JSObject j : countryList){
-                            countryListStr += j.get("country_name") + ",";
-                        }
-                    }
-                    if (countryListStr.length() > 30) {
-                        countryListStr = countryListStr.substring(0, 30);
-                    }
-                    if(countryListStr != null && countryListStr.length()>0){
-                        campaignNameOld = campaignName.replace(region,countryListStr)+"_";
+                } else {
+                    double dBidding = Utils.parseDouble(bidding, 0);
+                    Double maxBiddingDouble = tagMaxBiddingRelationMap.get(appName);
+                    if (maxBiddingDouble != 0 && dBidding > maxBiddingDouble) {
+                        result.message = "bidding超过了本应用的最大出价,   " + bidding + " > " + maxBiddingDouble;
                     }else{
-                        campaignNameOld = campaignName + "_";
-                    }
+                        JSObject record = DB.simpleScan("web_system_config").select("config_value").where(DB.filter().whereEqualTo("config_key", "admob_image_path")).execute();
+                        String imageRoot = "";
+                        if (record.hasObjectData()) {
+                            imageRoot = record.get("config_value");
+                        }
 
-                    String[] accountNameArr = accountName.split(",");
-                    String[] accountIdArr = accountId.split(",");
-                    int createCountInt = Integer.parseInt(createCount);
-                    Random random = new Random();
-                    for(int j=0,len = accountNameArr.length;j<len;j++){
-                        for(int i=0;i<createCountInt;i++){
-                            String now  = String.format("%d-%02d-%02d %02d:%02d:%02d", calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH),
-                                    calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), calendar.get(Calendar.SECOND));
-                            String r = String.valueOf(random.nextInt());
-                            String s = String.valueOf(System.currentTimeMillis());
-                            campaignName = campaignNameOld + accountNameArr[j] + "_"+ r  + "_"+ s + "_" + i;
-                            if (campaignName.length() > 100) {
-                                campaignName = campaignName.substring(0, 100);
+                        File imagesPath = new File(imageRoot + File.separatorChar + imagePath);
+                        if (imagesPath.exists()) {
+                            result.result = true;
+                        } else{
+                            result.result = false;
+                            result.message = "图片路径不存在";
+                        }
+                        if (result.result) {
+                            String imageAbsolutePath = imagesPath.getAbsolutePath();
+                            Calendar calendar = Calendar.getInstance();
+                            String campaignNameOld = "";
+
+                            String[] countrys = region.split(",");
+                            String countrysStr = "";
+                            for(int i=0,len=countrys.length;i<len;i++){
+                                countrysStr += "'" + countrys[i] + "',";
                             }
-                            long genId = DB.insert("ad_campaigns_admob")
-                                    .put("account_id", accountIdArr[j])
-                                    .put("campaign_name", campaignName)
-                                    .put("app_id", gpPackageId)
-                                    .put("country_region", region)
-                                    .put("language", language)
-                                    .put("conversion_id", conversionId)
-                                    .put("excluded_region", excludedRegion)
-                                    .put("create_time", now)
-                                    .put("bugdet", bugdet)
-                                    .put("bidding", bidding)
-                                    .put("max_cpa", maxCPA)
-                                    .put("message1", message1)
-                                    .put("message2", message2)
-                                    .put("message3", message3)
-                                    .put("message4", message4)
-                                    .put("app_name", appName)
-                                    .put("tag_name", appName)
-                                    .put("image_path", imageAbsolutePath)
-                                    .executeReturnId();
-//                            if(genId > 0){
-//                                try {
-//                                    String[] split = region.split(",");
-//                                    for(String country_code : split){
-//                                        DB.insert("web_ad_campaign_operation_log")
-//                                                .put("operation_date", now)
-//                                                .put("app_name",appName)
-//                                                .put("country_code", country_code)
-//                                                .put("campaign_name",campaignName)
-//                                                .put("enabled",1)
-//                                                .put("bidding",bidding)
-//                                                .execute();
-//                                    }
-//                                } catch (Exception e) {
-//                                    e.printStackTrace();
-//                                }
-//                            }
+                            String countryListStr = "";
+                            if(countrysStr.length() >0){
+                                countrysStr = countrysStr.substring(0,countrysStr.length()-1);
+                                String sqlCountry = "select country_name from app_country_code_dict where country_code in ("+countrysStr+")";
+                                List<JSObject> countryList = DB.findListBySql(sqlCountry);
+
+                                for(JSObject j : countryList){
+                                    countryListStr += j.get("country_name") + ",";
+                                }
+                            }
+                            if (countryListStr.length() > 30) {
+                                countryListStr = countryListStr.substring(0, 30);
+                            }
+                            if(countryListStr != null && countryListStr.length()>0){
+                                campaignNameOld = campaignName.replace(region,countryListStr)+"_";
+                            }else{
+                                campaignNameOld = campaignName + "_";
+                            }
+
+                            String[] accountNameArr = accountName.split(",");
+                            String[] accountIdArr = accountId.split(",");
+                            int createCountInt = Integer.parseInt(createCount);
+                            Random random = new Random();
+                            for(int j=0,len = accountNameArr.length;j<len;j++){
+                                for(int i=0;i<createCountInt;i++){
+                                    String now  = String.format("%d-%02d-%02d %02d:%02d:%02d", calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH),
+                                            calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), calendar.get(Calendar.SECOND));
+                                    String r = String.valueOf(random.nextInt());
+                                    String s = String.valueOf(System.currentTimeMillis());
+                                    campaignName = campaignNameOld + accountNameArr[j] + "_"+ r  + "_"+ s + "_" + i;
+                                    if (campaignName.length() > 100) {
+                                        campaignName = campaignName.substring(0, 100);
+                                    }
+                                    long genId = DB.insert("ad_campaigns_admob")
+                                            .put("account_id", accountIdArr[j])
+                                            .put("campaign_name", campaignName)
+                                            .put("app_id", gpPackageId)
+                                            .put("country_region", region)
+                                            .put("language", language)
+                                            .put("conversion_id", conversionId)
+                                            .put("excluded_region", excludedRegion)
+                                            .put("create_time", now)
+                                            .put("bugdet", bugdet)
+                                            .put("bidding", bidding)
+                                            .put("max_cpa", maxCPA)
+                                            .put("message1", message1)
+                                            .put("message2", message2)
+                                            .put("message3", message3)
+                                            .put("message4", message4)
+                                            .put("app_name", appName)
+                                            .put("tag_name", appName)
+                                            .put("image_path", imageAbsolutePath)
+                                            .executeReturnId();
+                                }
+                            }
+
+                            result.result = true;
                         }
                     }
 
-                    result.result = true;
                 }
+
             } catch (Exception ex) {
                 result.message = ex.getMessage();
                 result.result = false;

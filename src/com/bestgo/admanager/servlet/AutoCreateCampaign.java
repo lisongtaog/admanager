@@ -298,9 +298,10 @@ public class AutoCreateCampaign extends HttpServlet {
                 result.message = "出价不能为空";
             } else {
                 double dBidding = Utils.parseDouble(bidding, 0);
-                if (dBidding >= 0.5) {
-                    result.message = "bidding超过了0.5,   " + bidding;
-                }else{
+                Double maxBiddingDouble = Campaign.tagMaxBiddingRelationMap.get(appName);
+                if (maxBiddingDouble != 0 && dBidding > maxBiddingDouble) {
+                    result.message = "bidding超过了本应用的最大出价,   " + bidding + " > " + maxBiddingDouble;
+                } else{
                     if(!imagePath.isEmpty()){
                         JSObject record = DB.simpleScan("web_system_config").select("config_value").where(DB.filter().whereEqualTo("config_key", "fb_image_path")).execute();
                         String imageRoot = null;
@@ -610,65 +611,50 @@ public class AutoCreateCampaign extends HttpServlet {
             String explodeCountry = request.getParameter("explodeCountry");
             String explodeBidding = request.getParameter("explodeBidding");
 
-            result.result = true;
-            JSObject record = DB.simpleScan("web_system_config").select("config_value").where(DB.filter().whereEqualTo("config_key", "admob_image_path")).execute();
-            String imageRoot = null;
-            if (record.hasObjectData()) {
-                imageRoot = record.get("config_value");
-            }
-
-            result.result = true;
-
+            result.result = false;
             if (createCount.isEmpty()) {
-                result.result = false;
                 result.message = "创建数量不能为空";
-            }
-            if (message1.isEmpty()) {
-                result.result = false;
+            } else if (message1.isEmpty()) {
                 result.message = "广告语1不能为空";
-            }
-            if (message2.isEmpty()) {
-                result.result = false;
+            } else if (message2.isEmpty()) {
                 result.message = "广告语2不能为空";
-            }
-            if (message3.isEmpty()) {
-                result.result = false;
+            } else if (message3.isEmpty()) {
                 result.message = "广告语3不能为空";
-            }
-            if (message4.isEmpty()) {
-                result.result = false;
+            } else if (message4.isEmpty()) {
                 result.message = "广告语4不能为空";
-            }
-            if (campaignName.isEmpty()) {
-                result.result = false;
+            } else if (campaignName.isEmpty()) {
                 result.message = "广告系列名称不能为空";
-            }
-            if (bugdet.isEmpty()) {
-                result.result = false;
+            } else if (bugdet.isEmpty()) {
                 result.message = "预算不能为空";
-            }
-            if (bidding.isEmpty()) {
-                result.result = false;
+            } else if (bidding.isEmpty()) {
                 result.message = "出价不能为空";
-            }
-            double dBidding = Utils.parseDouble(bidding, 0);
-            if (dBidding >= 0.5) {
-                result.result = false;
-                result.message = "bidding超过了0.5,   " + bidding;
-            }
-            String s = String.valueOf(System.currentTimeMillis());
-            campaignName = campaignName+"_"+s.substring(s.length() - 6, s.length());
-            if (campaignName.length() > 100) {
-                campaignName = campaignName.substring(0, 100);
-            }
-            File imagesPath = new File(imageRoot + File.separatorChar + imagePath);
-            if (!imagesPath.exists()) {
-                result.result = false;
-                result.message = "图片路径不存在";
+            } else {
+                double dBidding = Utils.parseDouble(bidding, 0);
+                Double maxBiddingDouble = CampaignAdmob.tagMaxBiddingRelationMap.get(appName);
+                if (maxBiddingDouble != 0 && dBidding > maxBiddingDouble) {
+                    result.message = "bidding超过了本应用的最大出价,   " + bidding + " > " + maxBiddingDouble;
+                }else{
+                    JSObject record = DB.simpleScan("web_system_config").select("config_value").where(DB.filter().whereEqualTo("config_key", "admob_image_path")).execute();
+                    String imageRoot = "";
+                    if (record.hasObjectData()) {
+                        imageRoot = record.get("config_value");
+                    }
+                    File imagesPath = new File(imageRoot + File.separatorChar + imagePath);
+                    if (imagesPath.exists()) {
+                        result.result = true;
+                    }else{
+                        result.message = "图片路径不存在";
+                    }
+                }
             }
 
             if (result.result) {
-
+                String s = String.valueOf(System.currentTimeMillis());
+                campaignName = campaignName+"_"+s.substring(s.length() - 6, s.length());
+                if (campaignName.length() > 100) {
+                    campaignName = campaignName.substring(0, 100);
+                }
+                if (maxCPA == null) maxCPA = "";
                 long recordId = DB.insert("ad_campaigns_admob_auto_create")
                         .put("app_name", appName)
                         .put("create_count", Utils.parseInt(createCount, 0))

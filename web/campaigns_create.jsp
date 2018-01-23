@@ -224,7 +224,7 @@
         <div class="form-group">
             <label for="inputBidding" class="col-sm-2 control-label">出价</label>
             <div class="col-sm-8">
-                <input class="form-control" id="inputBidding" type="text" placeholder=""/>
+                <input class="form-control" id="inputBidding" type="text" />
             </div>
 
             <div class="col-sm-2">
