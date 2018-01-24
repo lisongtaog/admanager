@@ -37,7 +37,7 @@ public class CampaignAdmob extends HttpServlet {
             for(JSObject j : list){
                 String currTagName = j.get("tag_name");
                 double currMaxBidding = Utils.convertDouble(j.get("max_bidding"),0);
-                tagMaxBiddingRelationMap.put(currTagName,currMaxBidding);
+                tagMaxBiddingRelationMap.put(currTagName.toLowerCase(),currMaxBidding);
             }
         }
     }
@@ -91,7 +91,7 @@ public class CampaignAdmob extends HttpServlet {
                     result.message = "出价不能为空";
                 } else {
                     double dBidding = Utils.parseDouble(bidding, 0);
-                    Double maxBiddingDouble = tagMaxBiddingRelationMap.get(appName);
+                    Double maxBiddingDouble = tagMaxBiddingRelationMap.get(appName.toLowerCase());
                     if (maxBiddingDouble != 0 && dBidding > maxBiddingDouble) {
                         result.message = "bidding超过了本应用的最大出价,   " + bidding + " > " + maxBiddingDouble;
                     }else{

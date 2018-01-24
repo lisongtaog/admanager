@@ -107,7 +107,7 @@
 
       <table class="table" id="tableFBAppRel">
         <thead>
-        <tr><th>ID</th><th>标签</th><th>广告账号</th><th>FB应用ID</th><th>FB主页ID</th><th>应用包名</th><th>操作</th></tr>
+        <tr><th>ID</th><th>标签</th><th>广告账号</th><th>FB应用ID</th><th>FB主页ID</th><th>应用包名</th><th>Firebase工程ID</th><th>操作</th></tr>
         </thead>
         <tbody>
         <%
@@ -135,6 +135,7 @@
           <td><%=one.get("fb_app_id")%></td>
           <td><%=one.get("page_id")%></td>
           <td><%=one.get("google_package_id")%></td>
+          <td><%=one.get("firebase_project_id")%></td>
           <td><a class="link_modify" href="#">修改</a><a class="link_delete" href="#">删除</a></td>
         </tr>
         <% } %>
@@ -214,6 +215,12 @@
                   <input type="text" class="form-control" id="inputGPPackageId" placeholder="应用包名" autocomplete="off">
                 </div>
               </div>
+              <div class="form-group">
+                <label for="inputFirebaseProjectId" class="col-sm-2 control-label">Firebase工程ID</label>
+                <div class="col-sm-10">
+                  <input type="text" class="form-control" id="inputFirebaseProjectId" placeholder="Firebase工程ID" autocomplete="off">
+                </div>
+              </div>
             </form>
             <p id="delete_rel_message">确认要删除吗?</p>
           </div>
@@ -244,12 +251,14 @@
         var fbAppId = $(tds.get(3)).text();
         var fbPageId = $(tds.get(4)).text();
         var gpPackageId = $(tds.get(5)).text();
+        var firebaseProjectId = $(tds.get(6)).text();
 
         $('#inputTagName').val(tagName);
         $('#inputAccountId').val(accountId);
         $('#inputFBAppId').val(fbAppId);
         $('#inputPageId').val(fbPageId);
         $('#inputGPPackageId').val(gpPackageId);
+        $('#inputFirebaseProjectId').val(firebaseProjectId);
 
         modifyType = 'update';
         $('#delete_rel_message').hide();
@@ -357,6 +366,9 @@
           td = $('<td></td>');
           td.text(one.google_package_id);
           tr.append(td);
+            td = $('<td></td>');
+            td.text(one.firebase_project_id);
+            tr.append(td);
           td = $('<td><a class="link_modify" href="#">修改</a>&nbsp;&nbsp;<a class="link_delete" href="#">删除</a></td>');
           tr.append(td);
           $('#tableFBAppRel tbody').append(tr);
@@ -378,13 +390,14 @@
           var fbAppId = $('#inputFBAppId').val();
           var pageId = $('#inputPageId').val();
           var gpPackageId = $('#inputGPPackageId').val();
-
+          var firebaseProjectId = $('#inputFirebaseProjectId').val();
           $.post('system/fb_app_id_rel/create', {
             tagName: tagName,
             accountId: accountId,
             fbAppId: fbAppId,
-            pageId: pageId,
-            gpPackageId: gpPackageId,
+              pageId: pageId,
+              gpPackageId: gpPackageId,
+              firebaseProjectId: firebaseProjectId
           }, function(data) {
             if (data && data.ret == 1) {
               $("#new_fb_app_rel_dlg").modal("hide");
@@ -399,7 +412,7 @@
           var fbAppId = $('#inputFBAppId').val();
           var pageId = $('#inputPageId').val();
           var gpPackageId = $('#inputGPPackageId').val();
-
+          var firebaseProjectId = $('#inputFirebaseProjectId').val();
           $.post('system/fb_app_id_rel/update', {
             id: id,
             tagName: tagName,
@@ -407,6 +420,7 @@
             fbAppId: fbAppId,
             pageId: pageId,
             gpPackageId: gpPackageId,
+              firebaseProjectId: firebaseProjectId
           }, function(data) {
             if (data && data.ret == 1) {
               $("#new_fb_app_rel_dlg").modal("hide");

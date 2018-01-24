@@ -376,16 +376,16 @@ public class Query extends HttpServlet {
                         for(CampaignsSummary cs : campaignsSummaryList){
                             JsonObject j = new JsonObject();
                             j.addProperty("name",cs.name);
-                            j.addProperty("total_spend",cs.total_spend);
+                            j.addProperty("total_spend",Utils.trimDouble(cs.total_spend,0));
 //                            j.addProperty("seven_days_total_spend",cs.seven_days_total_spend);
 //                            j.addProperty("seven_days_total_revenue",cs.seven_days_total_revenue);
                             j.addProperty("total_installed",cs.total_installed);
                             j.addProperty("total_impressions",cs.total_impressions);
                             j.addProperty("total_click",cs.total_click);
-                            j.addProperty("total_ctr",cs.total_ctr);
-                            j.addProperty("total_cpa",cs.total_cpa);
-                            j.addProperty("total_cvr",cs.total_cvr);
-                            j.addProperty("total_revenue",cs.total_revenue);
+                            j.addProperty("total_ctr",Utils.trimDouble(cs.total_ctr,3));
+                            j.addProperty("total_cpa",Utils.trimDouble(cs.total_cpa,3));
+                            j.addProperty("total_cvr",Utils.trimDouble(cs.total_cvr,3));
+                            j.addProperty("total_revenue",Utils.trimDouble(cs.total_revenue,0));
                             arr.add(j);
                         }
                     }
@@ -514,7 +514,7 @@ public class Query extends HttpServlet {
 
 //        jsonObject.addProperty("seven_days_total_spend", seven_days_total_spend);
 
-        jsonObject.addProperty("total_spend", total_spend);
+        jsonObject.addProperty("total_spend", Utils.trimDouble(total_spend,0));
         jsonObject.addProperty("total_installed", total_installed);
         jsonObject.addProperty("total_impressions", total_impressions);
         jsonObject.addProperty("total_click", total_click);

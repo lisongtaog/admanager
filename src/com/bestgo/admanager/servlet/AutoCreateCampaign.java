@@ -298,7 +298,7 @@ public class AutoCreateCampaign extends HttpServlet {
                 result.message = "出价不能为空";
             } else {
                 double dBidding = Utils.parseDouble(bidding, 0);
-                Double maxBiddingDouble = Campaign.tagMaxBiddingRelationMap.get(appName);
+                Double maxBiddingDouble = Campaign.tagMaxBiddingRelationMap.get(appName.toLowerCase());
                 if (maxBiddingDouble != 0 && dBidding > maxBiddingDouble) {
                     result.message = "bidding超过了本应用的最大出价,   " + bidding + " > " + maxBiddingDouble;
                 } else{
@@ -630,7 +630,7 @@ public class AutoCreateCampaign extends HttpServlet {
                 result.message = "出价不能为空";
             } else {
                 double dBidding = Utils.parseDouble(bidding, 0);
-                Double maxBiddingDouble = CampaignAdmob.tagMaxBiddingRelationMap.get(appName);
+                Double maxBiddingDouble = CampaignAdmob.tagMaxBiddingRelationMap.get(appName.toLowerCase());
                 if (maxBiddingDouble != 0 && dBidding > maxBiddingDouble) {
                     result.message = "bidding超过了本应用的最大出价,   " + bidding + " > " + maxBiddingDouble;
                 }else{

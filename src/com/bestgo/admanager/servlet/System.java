@@ -177,7 +177,7 @@ public class System extends HttpServlet {
     public static List<JSObject> fetchFacebookAppRelationData(int index, int size) {
         List<JSObject> list = new ArrayList<>();
         try {
-            return DB.scan("web_facebook_app_ids_rel").select("id", "tag_name", "account_id", "fb_app_id", "page_id", "google_package_id")
+            return DB.scan("web_facebook_app_ids_rel").select("id", "tag_name", "account_id", "fb_app_id", "page_id", "google_package_id","firebase_project_id")
                     .limit(size).start(index * size).orderByAsc("id").execute();
         } catch (Exception ex) {
             Logger logger = Logger.getRootLogger();
