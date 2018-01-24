@@ -235,9 +235,9 @@ public class QueryZero extends HttpServlet {
                 d.addProperty("spend", spend);
                 d.addProperty("installed", installed);
                 d.addProperty("click", click);
-                d.addProperty("ctr", Utils.trimDouble(ctr));
-                d.addProperty("cpa", Utils.trimDouble(cpa));
-                d.addProperty("cvr", Utils.trimDouble(cvr));
+                d.addProperty("ctr", Utils.trimDouble(ctr,4));
+                d.addProperty("cpa", Utils.trimDouble(cpa,4));
+                d.addProperty("cvr", Utils.trimDouble(cvr,4));
                 if (network.equals("admob")) {
                     d.addProperty("network", "admob");
                 } else {
@@ -253,9 +253,9 @@ public class QueryZero extends HttpServlet {
         jsonObject.addProperty("total_installed", total_installed);
         jsonObject.addProperty("total_impressions", total_impressions);
         jsonObject.addProperty("total_click", total_click);
-        jsonObject.addProperty("total_ctr", Utils.trimDouble(total_ctr));
-        jsonObject.addProperty("total_cpa", Utils.trimDouble(total_cpa));
-        jsonObject.addProperty("total_cvr", Utils.trimDouble(total_cvr));
+        jsonObject.addProperty("total_ctr", Utils.trimDouble(total_ctr,4));
+        jsonObject.addProperty("total_cpa", Utils.trimDouble(total_cpa,4));
+        jsonObject.addProperty("total_cvr", Utils.trimDouble(total_cvr,4));
         return jsonObject;
     }
 }

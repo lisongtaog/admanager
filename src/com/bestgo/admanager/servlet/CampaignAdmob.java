@@ -256,7 +256,7 @@ public class CampaignAdmob extends HttpServlet {
                         } else if (value instanceof Long) {
                             one.addProperty(key, (Long)value);
                         } else if (value instanceof Double) {
-                            one.addProperty(key, Utils.trimDouble((Double)value));
+                            one.addProperty(key, Utils.trimDouble((Double)value,0));
                         } else {
                             one.addProperty(key, value.toString());
                         }
@@ -272,7 +272,7 @@ public class CampaignAdmob extends HttpServlet {
                     double installed = Utils.convertDouble(one.get("total_installed").getAsDouble(), 0);
                     double click = Utils.convertDouble(one.get("total_click").getAsDouble(), 0);
                     double cvr = click > 0 ? installed / click : 0;
-                    one.addProperty("cvr", Utils.trimDouble(cvr));
+                    one.addProperty("cvr", Utils.trimDouble(cvr,0));
                     one.addProperty("tagStr", tagStr);
                     array.add(one);
                 }
@@ -318,7 +318,7 @@ public class CampaignAdmob extends HttpServlet {
                             } else if (value instanceof Long) {
                                 one.addProperty(key, (Long)value);
                             } else if (value instanceof Double) {
-                                one.addProperty(key, Utils.trimDouble((Double)value));
+                                one.addProperty(key, Utils.trimDouble((Double)value,0));
                             } else {
                                 one.addProperty(key, value.toString());
                             }
@@ -326,7 +326,7 @@ public class CampaignAdmob extends HttpServlet {
                         double installed = Utils.convertDouble(one.get("total_installed").getAsDouble(), 0);
                         double click = Utils.convertDouble(one.get("total_click").getAsDouble(), 0);
                         double cvr = click > 0 ? installed / click : 0;
-                        one.addProperty("cvr", Utils.trimDouble(cvr));
+                        one.addProperty("cvr", Utils.trimDouble(cvr,0));
                         //one.addProperty("tagStr", "");
                         array.add(one);
 

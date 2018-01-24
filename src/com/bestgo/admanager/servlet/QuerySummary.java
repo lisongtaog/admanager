@@ -488,14 +488,14 @@ public class QuerySummary extends HttpServlet {
                         double total_ctr = total_impressions > 0 ? total_click / total_impressions : 0;
                         double total_cpa = total_installed > 0 ? total_spend / total_installed : 0;
                         double total_cvr = total_click > 0 ? total_installed / total_click : 0;
-                        admob.addProperty("total_spend", Utils.trimDouble(total_spend));
-                        admob.addProperty("seven_days_total_spend", Utils.trimDouble(seven_days_total_spend));
+                        admob.addProperty("total_spend", Utils.trimDouble(total_spend,0));
+                        admob.addProperty("seven_days_total_spend", Utils.trimDouble(seven_days_total_spend,0));
                         admob.addProperty("total_installed", total_installed);
                         admob.addProperty("total_impressions", total_impressions);
                         admob.addProperty("total_click", total_click);
-                        admob.addProperty("total_ctr", Utils.trimDouble(total_ctr));
-                        admob.addProperty("total_cpa", Utils.trimDouble(total_cpa));
-                        admob.addProperty("total_cvr", Utils.trimDouble(total_cvr));
+                        admob.addProperty("total_ctr", Utils.trimDouble(total_ctr,0));
+                        admob.addProperty("total_cpa", Utils.trimDouble(total_cpa,0));
+                        admob.addProperty("total_cvr", Utils.trimDouble(total_cvr,0));
                         admob.addProperty("name", tagName);
                         double total_revenue = 0;
                         double seven_days_total_revenue = 0;
@@ -514,8 +514,8 @@ public class QuerySummary extends HttpServlet {
                                 seven_days_total_revenue += getTotalRevenueByTagAndDate(id,currDay,google_package_id);
                             }
                         }
-                        admob.addProperty("total_revenue",Utils.trimDouble(total_revenue));
-                        admob.addProperty("seven_days_total_revenue",Utils.trimDouble(seven_days_total_revenue));
+                        admob.addProperty("total_revenue",Utils.trimDouble(total_revenue,0));
+                        admob.addProperty("seven_days_total_revenue",Utils.trimDouble(seven_days_total_revenue,0));
                         arr.add(admob);
                     }
                 }
@@ -610,9 +610,9 @@ public class QuerySummary extends HttpServlet {
         jsonObject.addProperty("total_installed", total_installed);
         jsonObject.addProperty("total_impressions", total_impressions);
         jsonObject.addProperty("total_click", total_click);
-        jsonObject.addProperty("total_ctr", Utils.trimDouble(total_ctr));
-        jsonObject.addProperty("total_cpa", Utils.trimDouble(total_cpa));
-        jsonObject.addProperty("total_cvr", Utils.trimDouble(total_cvr));
+        jsonObject.addProperty("total_ctr", Utils.trimDouble(total_ctr,0));
+        jsonObject.addProperty("total_cpa", Utils.trimDouble(total_cpa,0));
+        jsonObject.addProperty("total_cvr", Utils.trimDouble(total_cvr,0));
         return jsonObject;
     }
 

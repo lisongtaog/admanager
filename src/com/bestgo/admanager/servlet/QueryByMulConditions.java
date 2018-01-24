@@ -422,22 +422,22 @@ public class QueryByMulConditions extends HttpServlet {
                             j.addProperty("network",c.network);
                             jsonArray.add(j);
                         }
-                        jsonObject.addProperty("total_spend", Utils.trimDouble(total_spend));
+                        jsonObject.addProperty("total_spend", Utils.trimDouble(total_spend,0));
                         jsonObject.addProperty("total_installed", total_installed);
                         jsonObject.addProperty("total_impressions", total_impressions);
                         jsonObject.addProperty("total_click", total_click);
-                        jsonObject.addProperty("total_ctr", Utils.trimDouble(total_ctr));
-                        jsonObject.addProperty("total_cpa", Utils.trimDouble(total_cpa));
-                        jsonObject.addProperty("total_cvr", Utils.trimDouble(total_cvr));
+                        jsonObject.addProperty("total_ctr", Utils.trimDouble(total_ctr,0));
+                        jsonObject.addProperty("total_cpa", Utils.trimDouble(total_cpa,0));
+                        jsonObject.addProperty("total_cvr", Utils.trimDouble(total_cvr,0));
                         jsonObject.add("array",jsonArray);
                     }else{
-                        admob.addProperty("total_spend", Utils.trimDouble(total_spend));
+                        admob.addProperty("total_spend", Utils.trimDouble(total_spend,0));
                         admob.addProperty("total_installed", total_installed);
                         admob.addProperty("total_impressions", total_impressions);
                         admob.addProperty("total_click", total_click);
-                        admob.addProperty("total_ctr", Utils.trimDouble(total_ctr));
-                        admob.addProperty("total_cpa", Utils.trimDouble(total_cpa));
-                        admob.addProperty("total_cvr", Utils.trimDouble(total_cvr));
+                        admob.addProperty("total_ctr", Utils.trimDouble(total_ctr,0));
+                        admob.addProperty("total_cpa", Utils.trimDouble(total_cpa,0));
+                        admob.addProperty("total_cvr", Utils.trimDouble(total_cvr,0));
                         jsonObject = admob;
                     }
 
@@ -720,11 +720,11 @@ public class QueryByMulConditions extends HttpServlet {
                             one.addProperty("impressions", record.impressions);
                             one.addProperty("installed", record.installed);
                             one.addProperty("click", record.click);
-                            one.addProperty("spend", Utils.trimDouble(record.spend));
-                            one.addProperty("ctr", Utils.trimDouble(record.ctr));
-                            one.addProperty("cpa", Utils.trimDouble(record.cpa));
-                            one.addProperty("cvr", Utils.trimDouble(record.cvr));
-                            one.addProperty("roi", Utils.trimDouble(record.roi));
+                            one.addProperty("spend", Utils.trimDouble(record.spend,0));
+                            one.addProperty("ctr", Utils.trimDouble(record.ctr,0));
+                            one.addProperty("cpa", Utils.trimDouble(record.cpa,0));
+                            one.addProperty("cvr", Utils.trimDouble(record.cvr,0));
+                            one.addProperty("roi", Utils.trimDouble(record.roi,0));
                             newArr.add(one);
                         }
                     }else{
@@ -743,11 +743,11 @@ public class QueryByMulConditions extends HttpServlet {
                             one.addProperty("impressions", record.impressions);
                             one.addProperty("installed", record.installed);
                             one.addProperty("click", record.click);
-                            one.addProperty("spend", Utils.trimDouble(record.spend));
-                            one.addProperty("ctr", Utils.trimDouble(record.ctr));
-                            one.addProperty("cpa", Utils.trimDouble(record.cpa));
-                            one.addProperty("cvr", Utils.trimDouble(record.cvr));
-                            one.addProperty("roi", Utils.trimDouble(record.roi));
+                            one.addProperty("spend", Utils.trimDouble(record.spend,0));
+                            one.addProperty("ctr", Utils.trimDouble(record.ctr,0));
+                            one.addProperty("cpa", Utils.trimDouble(record.cpa,0));
+                            one.addProperty("cvr", Utils.trimDouble(record.cvr,0));
+                            one.addProperty("roi", Utils.trimDouble(record.roi,0));
                             newArr.add(one);
                         }
                     }
@@ -1026,14 +1026,14 @@ public class QueryByMulConditions extends HttpServlet {
                 d.addProperty("budget", budget);
                 d.addProperty("bidding", bidding);
                 d.addProperty("impressions", impressions);
-                d.addProperty("spend", Utils.trimDouble(spend));
+                d.addProperty("spend", Utils.trimDouble(spend,0));
                 d.addProperty("campaign_spends", campaign_spends);
                 d.addProperty("installed", installed);
                 d.addProperty("click", click);
-                d.addProperty("ctr", Utils.trimDouble(ctr));
-                d.addProperty("cpa", Utils.trimDouble(cpa));
-                d.addProperty("cvr", Utils.trimDouble(cvr));
-                d.addProperty("roi", Utils.trimDouble(roi));
+                d.addProperty("ctr", Utils.trimDouble(ctr,0));
+                d.addProperty("cpa", Utils.trimDouble(cpa,0));
+                d.addProperty("cvr", Utils.trimDouble(cvr,0));
+                d.addProperty("roi", Utils.trimDouble(roi,0));
                 if (admobCheck) {
                     d.addProperty("network", "admob");
                 } else {
@@ -1083,7 +1083,7 @@ public class QueryByMulConditions extends HttpServlet {
                 d.addProperty("budget", budget);
                 d.addProperty("bidding", bidding);
                 d.addProperty("impressions", 0);
-                d.addProperty("spend", Utils.trimDouble(spend));
+                d.addProperty("spend", Utils.trimDouble(spend,0));
                 d.addProperty("campaign_spends", campaign_spends);
                 d.addProperty("installed", 0);
                 d.addProperty("click", 0);
@@ -1105,9 +1105,9 @@ public class QueryByMulConditions extends HttpServlet {
         jsonObject.addProperty("total_installed", total_installed);
         jsonObject.addProperty("total_impressions", total_impressions);
         jsonObject.addProperty("total_click", total_click);
-        jsonObject.addProperty("total_ctr", Utils.trimDouble(total_ctr));
-        jsonObject.addProperty("total_cpa", Utils.trimDouble(total_cpa));
-        jsonObject.addProperty("total_cvr", Utils.trimDouble(total_cvr));
+        jsonObject.addProperty("total_ctr", Utils.trimDouble(total_ctr,0));
+        jsonObject.addProperty("total_cpa", Utils.trimDouble(total_cpa,0));
+        jsonObject.addProperty("total_cvr", Utils.trimDouble(total_cvr,0));
         return jsonObject;
     }
 

@@ -61,9 +61,9 @@ public class TempQuery extends HttpServlet {
                         admob.addProperty("total_installed", total_installed);
                         admob.addProperty("total_impressions", total_impressions);
                         admob.addProperty("total_click", total_click);
-                        admob.addProperty("total_ctr", Utils.trimDouble(total_ctr));
-                        admob.addProperty("total_cpa", Utils.trimDouble(total_cpa));
-                        admob.addProperty("total_cvr", Utils.trimDouble(total_cvr));
+                        admob.addProperty("total_ctr", Utils.trimDouble(total_ctr,0));
+                        admob.addProperty("total_cpa", Utils.trimDouble(total_cpa,0));
+                        admob.addProperty("total_cvr", Utils.trimDouble(total_cvr,0));
                         admob.addProperty("name", tagName);
                         arr.add(admob);
                     }
@@ -112,9 +112,9 @@ public class TempQuery extends HttpServlet {
                         admob.addProperty("total_installed", total_installed);
                         admob.addProperty("total_impressions", total_impressions);
                         admob.addProperty("total_click", total_click);
-                        admob.addProperty("total_ctr", Utils.trimDouble(total_ctr));
-                        admob.addProperty("total_cpa", Utils.trimDouble(total_cpa));
-                        admob.addProperty("total_cvr", Utils.trimDouble(total_cvr));
+                        admob.addProperty("total_ctr", Utils.trimDouble(total_ctr,0));
+                        admob.addProperty("total_cpa", Utils.trimDouble(total_cpa,0));
+                        admob.addProperty("total_cvr", Utils.trimDouble(total_cvr,0));
                         JsonArray array = admob.getAsJsonArray("array");
                         JsonArray array1 = facebook.getAsJsonArray("array");
                         for (int i = 0; i < array1.size(); i++) {
@@ -155,10 +155,10 @@ public class TempQuery extends HttpServlet {
                             one.addProperty("impressions", dataSets.get(key).impressions);
                             one.addProperty("installed", dataSets.get(key).installed);
                             one.addProperty("click", dataSets.get(key).click);
-                            one.addProperty("spend", Utils.trimDouble(dataSets.get(key).spend));
-                            one.addProperty("ctr", Utils.trimDouble(dataSets.get(key).ctr));
-                            one.addProperty("cpa", Utils.trimDouble(dataSets.get(key).cpa));
-                            one.addProperty("cvr", Utils.trimDouble(dataSets.get(key).cvr));
+                            one.addProperty("spend", Utils.trimDouble(dataSets.get(key).spend,0));
+                            one.addProperty("ctr", Utils.trimDouble(dataSets.get(key).ctr,0));
+                            one.addProperty("cpa", Utils.trimDouble(dataSets.get(key).cpa,0));
+                            one.addProperty("cvr", Utils.trimDouble(dataSets.get(key).cvr,0));
                             newArr.add(one);
                         }
                         jsonObject.add("array", newArr);
@@ -352,9 +352,9 @@ public class TempQuery extends HttpServlet {
             d.addProperty("spend", spend);
             d.addProperty("installed", installed);
             d.addProperty("click", click);
-            d.addProperty("ctr", Utils.trimDouble(ctr));
-            d.addProperty("cpa", Utils.trimDouble(cpa));
-            d.addProperty("cvr", Utils.trimDouble(cvr));
+            d.addProperty("ctr", Utils.trimDouble(ctr,0));
+            d.addProperty("cpa", Utils.trimDouble(cpa,0));
+            d.addProperty("cvr", Utils.trimDouble(cvr,0));
             array.add(d);
         }
         jsonObject.add("array", array);
@@ -362,9 +362,9 @@ public class TempQuery extends HttpServlet {
         jsonObject.addProperty("total_installed", total_installed);
         jsonObject.addProperty("total_impressions", total_impressions);
         jsonObject.addProperty("total_click", total_click);
-        jsonObject.addProperty("total_ctr", Utils.trimDouble(total_ctr));
-        jsonObject.addProperty("total_cpa", Utils.trimDouble(total_cpa));
-        jsonObject.addProperty("total_cvr", Utils.trimDouble(total_cvr));
+        jsonObject.addProperty("total_ctr", Utils.trimDouble(total_ctr,0));
+        jsonObject.addProperty("total_cpa", Utils.trimDouble(total_cpa,0));
+        jsonObject.addProperty("total_cvr", Utils.trimDouble(total_cvr,0));
         return jsonObject;
     }
 }

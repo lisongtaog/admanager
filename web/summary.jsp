@@ -225,7 +225,7 @@
 <script src="jqueryui/jquery-ui.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.4/js/select2.min.js"></script>
 <script src="js/country-name-code-dict.js"></script>
-<script src="js/summary.js?t=20180120"></script>
+<script src="js/summary.js?t=20180123"></script>
 
 <script>
     var data = <%=array.toString()%>;

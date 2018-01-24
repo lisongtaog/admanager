@@ -233,31 +233,31 @@ public class CountryAnalysisReport extends HttpServlet {
 
                                 JsonObject d = new JsonObject();
                                 d.addProperty("country_name", countryName);
-                                d.addProperty("costs", Utils.trimDouble3(costs));
+                                d.addProperty("costs", Utils.trimDouble(costs,0));
                                 d.addProperty("purchased_users", purchased_users);
                                 d.addProperty("installed", installed);
                                 d.addProperty("uninstalled", uninstalled);
-                                d.addProperty("uninstalled_rate", Utils.trimDouble3(uninstalledRate));
+                                d.addProperty("uninstalled_rate", Utils.trimDouble(uninstalledRate,0));
                                 d.addProperty("users", users);
                                 d.addProperty("active_users", active_users);
-                                d.addProperty("revenues", Utils.trimDouble3(revenues));
-                                d.addProperty("ecpm", Utils.trimDouble3(ecpm));
-                                d.addProperty("cpa_dev_ecpm", Utils.trimDouble3(cpa_dev_ecpm));
-                                d.addProperty("seven_days_costs", Utils.trimDouble3(seven_days_costs));
-                                d.addProperty("seven_days_incoming", Utils.trimDouble3(seven_days_incoming));
-                                d.addProperty("seven_days_revenues", Utils.trimDouble3(seven_days_revenues));
-                                d.addProperty("incoming", Utils.trimDouble3(incoming));
-                                d.addProperty("estimated_revenues", Utils.trimDouble3(estimated_revenues));
-                                d.addProperty("estimated_revenues_dev_cost", Utils.trimDouble3(estRevDevCost));
+                                d.addProperty("revenues", Utils.trimDouble(revenues,0));
+                                d.addProperty("ecpm", Utils.trimDouble(ecpm,0));
+                                d.addProperty("cpa_dev_ecpm", Utils.trimDouble(cpa_dev_ecpm,0));
+                                d.addProperty("seven_days_costs", Utils.trimDouble(seven_days_costs,0));
+                                d.addProperty("seven_days_incoming", Utils.trimDouble(seven_days_incoming,0));
+                                d.addProperty("seven_days_revenues", Utils.trimDouble(seven_days_revenues,0));
+                                d.addProperty("incoming", Utils.trimDouble(incoming,0));
+                                d.addProperty("estimated_revenues", Utils.trimDouble(estimated_revenues,0));
+                                d.addProperty("estimated_revenues_dev_cost", Utils.trimDouble(estRevDevCost,0));
                                 String sqlP = "select price from web_ad_country_analysis_report_price where app_id = '"+google_package_id+"' and country_code = '"+country_code+"'";
                                 JSObject oneP = DB.findOneBySql(sqlP);
                                 double price = 0;
                                 if(oneP != null && oneP.hasObjectData()){
                                     price = Utils.convertDouble(oneP.get("price"),0);
                                 }
-                                d.addProperty("price", Utils.trimDouble3(price));
+                                d.addProperty("price", Utils.trimDouble(price,0));
                                 d.addProperty("bidding", biddingsStr);
-                                d.addProperty("cpa", Utils.trimDouble3(cpa));
+                                d.addProperty("cpa", Utils.trimDouble(cpa,0));
                                 jsonArray.add(d);
                             }
 
@@ -266,12 +266,12 @@ public class CountryAnalysisReport extends HttpServlet {
                         double total_cpa = total_puserchaed_user != 0 ? total_cost / total_puserchaed_user : 0;
                         jsonObject.add("array", jsonArray);
 
-                        jsonObject.addProperty("total_cost", Utils.trimDouble3(total_cost));
-                        jsonObject.addProperty("total_puserchaed_user", Utils.trimDouble3(total_puserchaed_user));
-                        jsonObject.addProperty("total_cpa", Utils.trimDouble3(total_cpa));
-                        jsonObject.addProperty("total_revenue", Utils.trimDouble3(total_revenue));
-                        jsonObject.addProperty("total_es14", Utils.trimDouble3(total_es14));
-                        jsonObject.addProperty("es14_dev_cost", Utils.trimDouble3(es14_dev_cost));
+                        jsonObject.addProperty("total_cost", Utils.trimDouble(total_cost,0));
+                        jsonObject.addProperty("total_puserchaed_user", Utils.trimDouble(total_puserchaed_user,0));
+                        jsonObject.addProperty("total_cpa", Utils.trimDouble(total_cpa,0));
+                        jsonObject.addProperty("total_revenue", Utils.trimDouble(total_revenue,0));
+                        jsonObject.addProperty("total_es14", Utils.trimDouble(total_es14,0));
+                        jsonObject.addProperty("es14_dev_cost", Utils.trimDouble(es14_dev_cost,0));
                         jsonObject.addProperty("ret", 1);
 
                     }

@@ -70,7 +70,7 @@ public class AutoCreateCampaign extends HttpServlet {
                                 } else if (value instanceof Long) {
                                     one.addProperty(key, (Long) value);
                                 } else if (value instanceof Double) {
-                                    one.addProperty(key, Utils.trimDouble((Double) value));
+                                    one.addProperty(key, Utils.trimDouble((Double) value,4));
                                 } else {
                                     one.addProperty(key, value.toString());
                                 }
@@ -98,7 +98,7 @@ public class AutoCreateCampaign extends HttpServlet {
                             } else if (value instanceof Long) {
                                 jsonObject.addProperty(key, (Long) value);
                             } else if (value instanceof Double) {
-                                jsonObject.addProperty(key, Utils.trimDouble((Double) value));
+                                jsonObject.addProperty(key, Utils.trimDouble((Double) value,4));
                             } else {
                                 jsonObject.addProperty(key, value.toString());
                             }
@@ -143,7 +143,7 @@ public class AutoCreateCampaign extends HttpServlet {
                                 } else if (value instanceof Long) {
                                     one.addProperty(key, (Long) value);
                                 } else if (value instanceof Double) {
-                                    one.addProperty(key, Utils.trimDouble((Double) value));
+                                    one.addProperty(key, Utils.trimDouble((Double) value,4));
                                 } else {
                                     one.addProperty(key, value.toString());
                                 }
@@ -171,7 +171,7 @@ public class AutoCreateCampaign extends HttpServlet {
                             } else if (value instanceof Long) {
                                 jsonObject.addProperty(key, (Long) value);
                             } else if (value instanceof Double) {
-                                jsonObject.addProperty(key, Utils.trimDouble((Double) value));
+                                jsonObject.addProperty(key, Utils.trimDouble((Double) value,4));
                             } else {
                                 jsonObject.addProperty(key, value.toString());
                             }

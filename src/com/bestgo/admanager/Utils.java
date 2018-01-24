@@ -78,23 +78,19 @@ public class Utils {
         return defaultValue;
     }
 
-    public static double trimDouble(double value) {
-        return Double.parseDouble(String.format("%.4f", value));
-    }
-
 
     /**
-     * double类型的数据保留三位小数
+     * double类型的数据保留n位小数
      * @param value
      * @return
      */
-    public static double trimDouble3(double value) {
-        return Double.parseDouble(String.format("%.3f", value));
+    public static double trimDouble(double value,int n) {
+        return Double.parseDouble(String.format("%." + n + "f", value));
     }
 
     public static String getAccessToken() {
         try {
-            JSObject jsObject = DB.simpleScan("ad_app_config").select("access_token").execute();
+            JSObject jsObject = DB.simpleScan("ad_app_confg").select("access_token").execute();
             return jsObject.get("access_token");
         } catch (Exception e) {
             e.printStackTrace();

@@ -405,14 +405,14 @@ public class zmj_Query_4 extends HttpServlet {
                         double total_ctr = total_impressions > 0 ? total_click / total_impressions : 0;
                         double total_cpa = total_installed > 0 ? total_spend / total_installed : 0;
                         double total_cvr = total_click > 0 ? total_installed / total_click : 0;
-                        admob.addProperty("total_spend", Utils.trimDouble(total_spend));
+                        admob.addProperty("total_spend", Utils.trimDouble(total_spend,4));
 //                        admob.addProperty("seven_days_total_spend", Utils.trimDouble(seven_days_total_spend));
-                        admob.addProperty("total_installed", Utils.trimDouble(total_installed));
-                        admob.addProperty("total_impressions", Utils.trimDouble(total_impressions));
-                        admob.addProperty("total_click", Utils.trimDouble(total_click));
-                        admob.addProperty("total_ctr", Utils.trimDouble(total_ctr));
-                        admob.addProperty("total_cpa", Utils.trimDouble(total_cpa));
-                        admob.addProperty("total_cvr", Utils.trimDouble(total_cvr));
+                        admob.addProperty("total_installed", Utils.trimDouble(total_installed,4));
+                        admob.addProperty("total_impressions", Utils.trimDouble(total_impressions,4));
+                        admob.addProperty("total_click", Utils.trimDouble(total_click,4));
+                        admob.addProperty("total_ctr", Utils.trimDouble(total_ctr,4));
+                        admob.addProperty("total_cpa", Utils.trimDouble(total_cpa,4));
+                        admob.addProperty("total_cvr", Utils.trimDouble(total_cvr,4));
                         admob.addProperty("name", tagName);
                         double total_revenue = 0;
 //                        double seven_days_total_revenue = 0;
@@ -433,7 +433,7 @@ public class zmj_Query_4 extends HttpServlet {
 //                                    seven_days_total_revenue = Utils.convertDouble(oneR.get("seven_days_total_revenue"),0);
 //                                }
                         }
-                        admob.addProperty("total_revenue",Utils.trimDouble(total_revenue));
+                        admob.addProperty("total_revenue",Utils.trimDouble(total_revenue,4));
                         admob.addProperty("category_name",categoryName);
 //                        admob.addProperty("seven_days_total_revenue",Utils.trimDouble(seven_days_total_revenue));
                         arr.add(admob);
@@ -516,9 +516,9 @@ public class zmj_Query_4 extends HttpServlet {
         jsonObject.addProperty("total_installed", total_installed);
         jsonObject.addProperty("total_impressions", total_impressions);
         jsonObject.addProperty("total_click", total_click);
-        jsonObject.addProperty("total_ctr", Utils.trimDouble(total_ctr));
-        jsonObject.addProperty("total_cpa", Utils.trimDouble(total_cpa));
-        jsonObject.addProperty("total_cvr", Utils.trimDouble(total_cvr));
+        jsonObject.addProperty("total_ctr", Utils.trimDouble(total_ctr,4));
+        jsonObject.addProperty("total_cpa", Utils.trimDouble(total_cpa,4));
+        jsonObject.addProperty("total_cvr", Utils.trimDouble(total_cvr,4));
         return jsonObject;
     }
 
