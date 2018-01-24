@@ -413,9 +413,9 @@ public class Query extends HttpServlet {
                         admob.addProperty("total_installed", total_installed);
                         admob.addProperty("total_impressions", total_impressions);
                         admob.addProperty("total_click", total_click);
-                        admob.addProperty("total_ctr", Utils.trimDouble(total_ctr,0));
-                        admob.addProperty("total_cpa", Utils.trimDouble(total_cpa,0));
-                        admob.addProperty("total_cvr", Utils.trimDouble(total_cvr,0));
+                        admob.addProperty("total_ctr", Utils.trimDouble(total_ctr,3));
+                        admob.addProperty("total_cpa", Utils.trimDouble(total_cpa,3));
+                        admob.addProperty("total_cvr", Utils.trimDouble(total_cvr,3));
                         admob.addProperty("name", tagName);
                         double total_revenue = 0;
 //                        double seven_days_total_revenue = 0;
@@ -518,9 +518,9 @@ public class Query extends HttpServlet {
         jsonObject.addProperty("total_installed", total_installed);
         jsonObject.addProperty("total_impressions", total_impressions);
         jsonObject.addProperty("total_click", total_click);
-        jsonObject.addProperty("total_ctr", Utils.trimDouble(total_ctr,0));
-        jsonObject.addProperty("total_cpa", Utils.trimDouble(total_cpa,0));
-        jsonObject.addProperty("total_cvr", Utils.trimDouble(total_cvr,0));
+        jsonObject.addProperty("total_ctr", Utils.trimDouble(total_ctr,3));
+        jsonObject.addProperty("total_cpa", Utils.trimDouble(total_cpa,3));
+        jsonObject.addProperty("total_cvr", Utils.trimDouble(total_cvr,3));
         return jsonObject;
     }
 

@@ -319,6 +319,7 @@ function init() {
             if (data && data.ret == 1) {
                 $('#result_header').html("<tr><th>应用名称</th><th>总花费<span sorterId=\"70\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>7天总花费<span sorterId=\"71\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
                     "<th>总营收<span sorterId=\"72\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>7天总营收<span sorterId=\"73\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
+                    "<th>7天总营收/7天总花费</th>" +
                     "<th>总安装<span sorterId=\"74\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>总展示<span sorterId=\"75\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
                     "<th>总点击<span sorterId=\"76\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>CTR<span sorterId=\"77\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
                     "<th>CPA<span sorterId=\"78\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>CVR<span sorterId=\"79\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th></tr>");
@@ -343,7 +344,7 @@ function setDataSummary(data) {
     var total_ctr = 0;
     var total_cpa = 0;
     var total_cvr = 0;
-    var keyset = ["name", "total_spend","seven_days_total_spend", "total_revenue", "seven_days_total_revenue","total_installed", "total_impressions", "total_click",
+    var keyset = ["name", "total_spend","seven_days_total_spend", "total_revenue", "seven_days_total_revenue","seven_days_total_revenue_dev_seven_days_total_spend","total_installed", "total_impressions", "total_click",
         "total_ctr", "total_cpa", "total_cvr"];
 
     $('#results_body > tr').remove();
@@ -355,6 +356,7 @@ function setDataSummary(data) {
             td.text(one[keyset[j]]);
             tr.append(td);
         }
+
         total_spend += one['total_spend'];
         total_revenue += one['total_revenue'];
         total_installed += one['total_installed'];

@@ -65,9 +65,9 @@ public class QueryNotExistData extends HttpServlet {
                     admob.addProperty("total_installed", total_installed);
                     admob.addProperty("total_impressions", total_impressions);
                     admob.addProperty("total_click", total_click);
-                    admob.addProperty("total_ctr", Utils.trimDouble(total_ctr,0));
-                    admob.addProperty("total_cpa", Utils.trimDouble(total_cpa,0));
-                    admob.addProperty("total_cvr", Utils.trimDouble(total_cvr,0));
+                    admob.addProperty("total_ctr", Utils.trimDouble(total_ctr,3));
+                    admob.addProperty("total_cpa", Utils.trimDouble(total_cpa,3));
+                    admob.addProperty("total_cvr", Utils.trimDouble(total_cvr,3));
                     JsonArray array = admob.getAsJsonArray("array");
                     JsonArray array1 = facebook.getAsJsonArray("array");
                     for (int i = 0; i < array1.size(); i++) {
@@ -235,8 +235,8 @@ public class QueryNotExistData extends HttpServlet {
             d.addProperty("spend", spend);
             d.addProperty("installed", installed);
             d.addProperty("click", click);
-            d.addProperty("cpa", Utils.trimDouble(cpa,0));
-            d.addProperty("cvr", Utils.trimDouble(cvr,0));
+            d.addProperty("cpa", Utils.trimDouble(cpa,3));
+            d.addProperty("cvr", Utils.trimDouble(cvr,3));
             if (admobCheck) {
                 d.addProperty("network", "admob");
             } else {
@@ -253,9 +253,9 @@ public class QueryNotExistData extends HttpServlet {
         jsonObject.addProperty("total_installed", total_installed);
         jsonObject.addProperty("total_impressions", 0);
         jsonObject.addProperty("total_click", 0);
-        jsonObject.addProperty("total_ctr", Utils.trimDouble(total_ctr,0));
-        jsonObject.addProperty("total_cpa", Utils.trimDouble(total_cpa,0));
-        jsonObject.addProperty("total_cvr", Utils.trimDouble(total_cvr,0));
+        jsonObject.addProperty("total_ctr", Utils.trimDouble(total_ctr,3));
+        jsonObject.addProperty("total_cpa", Utils.trimDouble(total_cpa,3));
+        jsonObject.addProperty("total_cvr", Utils.trimDouble(total_cvr,3));
         return jsonObject;
     }
 }
