@@ -7,6 +7,7 @@ import com.bestgo.common.database.services.DB;
 import com.bestgo.common.database.utils.JSObject;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.sun.xml.internal.bind.v2.runtime.unmarshaller.TagName;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 
@@ -19,10 +20,7 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.System;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by jikai on 12/10/17.
@@ -298,8 +296,8 @@ public class AutoCreateCampaign extends HttpServlet {
                 result.message = "出价不能为空";
             } else {
                 double dBidding = Utils.parseDouble(bidding, 0);
-                Double maxBiddingDouble = Campaign.tagMaxBiddingRelationMap.get(appName.toLowerCase());
-                if (maxBiddingDouble != 0 && dBidding > maxBiddingDouble) {
+                Double maxBiddingDouble = Campaign.tagMaxBiddingRelationMap.get(appName);
+                if (maxBiddingDouble != null && maxBiddingDouble != 0 && dBidding > maxBiddingDouble) {
                     result.message = "bidding超过了本应用的最大出价,   " + bidding + " > " + maxBiddingDouble;
                 } else{
                     if(!imagePath.isEmpty()){
@@ -630,8 +628,8 @@ public class AutoCreateCampaign extends HttpServlet {
                 result.message = "出价不能为空";
             } else {
                 double dBidding = Utils.parseDouble(bidding, 0);
-                Double maxBiddingDouble = CampaignAdmob.tagMaxBiddingRelationMap.get(appName.toLowerCase());
-                if (maxBiddingDouble != 0 && dBidding > maxBiddingDouble) {
+                Double maxBiddingDouble = CampaignAdmob.tagMaxBiddingRelationMap.get(appName);
+                if (maxBiddingDouble != null && maxBiddingDouble != 0 && dBidding > maxBiddingDouble) {
                     result.message = "bidding超过了本应用的最大出价,   " + bidding + " > " + maxBiddingDouble;
                 }else{
                     JSObject record = DB.simpleScan("web_system_config").select("config_value").where(DB.filter().whereEqualTo("config_key", "admob_image_path")).execute();

@@ -44,7 +44,7 @@ public class Campaign extends HttpServlet {
             for(JSObject j : list){
                 String currTagName = j.get("tag_name");
                 double currMaxBidding = Utils.convertDouble(j.get("max_bidding"),0);
-                tagMaxBiddingRelationMap.put(currTagName.toLowerCase(),currMaxBidding);
+                tagMaxBiddingRelationMap.put(currTagName,currMaxBidding);
             }
         }
     }
@@ -100,8 +100,15 @@ public class Campaign extends HttpServlet {
                     result.message = "出价不能为空";
                 } else {
                     double dBidding = Utils.parseDouble(bidding, 0);
-                    Double maxBiddingDouble = tagMaxBiddingRelationMap.get(appName.toLowerCase());
-                    if (maxBiddingDouble != 0 && dBidding > maxBiddingDouble) {
+                    Double maxBiddingDouble = tagMaxBiddingRelationMap.get(appName);
+                    if(maxBiddingDouble == null){
+                        JSObject one = DB.findOneBySql("select max_bidding from web_tag where tag_name = '" + appName + "'");
+                        if(one != null && one.hasObjectData()){
+                            maxBiddingDouble = Utils.convertDouble(one.get("max_bidding"),0);
+                            tagMaxBiddingRelationMap.put(appName,maxBiddingDouble);
+                        }
+                    }
+                    if (maxBiddingDouble != null && maxBiddingDouble != 0 && dBidding > maxBiddingDouble) {
                         result.message = "bidding超过了本应用的最大出价,   " + bidding + " > " + maxBiddingDouble;
                     }else{
                         if(!imagePath.isEmpty()){
@@ -797,7 +804,7 @@ public class Campaign extends HttpServlet {
         }else if (path.startsWith("/selectMaxBiddingByAppName")) {
             String appName = request.getParameter("appName");
             Double maxBiddingDouble = tagMaxBiddingRelationMap.get(appName);
-            if(maxBiddingDouble != 0){
+            if(maxBiddingDouble != null){
                 json.addProperty("max_bidding",maxBiddingDouble);
                 json.addProperty("ret", 1);
             }
