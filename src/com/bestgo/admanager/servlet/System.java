@@ -47,7 +47,8 @@ public class System extends HttpServlet {
                 if (pageId != null) pageId = pageId.trim();
                 String gpPackageId = request.getParameter("gpPackageId");
                 if (gpPackageId != null) gpPackageId = gpPackageId.trim();
-
+                String firebaseProjectId = request.getParameter("firebaseProjectId");
+                if (gpPackageId != null) gpPackageId = gpPackageId.trim();
                 switch (path) {
                     case "/fb_app_id_rel/create": {
                         if (!tagName.isEmpty()) {
@@ -60,7 +61,7 @@ public class System extends HttpServlet {
                                 ex.printStackTrace();
                             }
                         }
-                        OperationResult result = createNewFacebookAppRelation(tagName, accountId, fbAppId, pageId, gpPackageId);
+                        OperationResult result = createNewFacebookAppRelation(tagName, accountId, fbAppId, pageId, gpPackageId,firebaseProjectId);
                         json.addProperty("ret", result.result ? 1 : 0);
                         json.addProperty("message", result.message);
                     }
@@ -76,7 +77,7 @@ public class System extends HttpServlet {
                                 ex.printStackTrace();
                             }
                         }
-                        OperationResult result = updateFacebookAppRelation(id, tagName, accountId, fbAppId, pageId, gpPackageId);
+                        OperationResult result = updateFacebookAppRelation(id, tagName, accountId, fbAppId, pageId, gpPackageId,firebaseProjectId);
                         json.addProperty("ret", result.result ? 1 : 0);
                         json.addProperty("message", result.message);
                     }
@@ -100,6 +101,7 @@ public class System extends HttpServlet {
                                 one.addProperty("fb_app_id", (String)data.get(i).get("fb_app_id"));
                                 one.addProperty("page_id", (String)data.get(i).get("page_id"));
                                 one.addProperty("google_package_id", (String)data.get(i).get("google_package_id"));
+                                one.addProperty("firebase_project_id", (String)data.get(i).get("firebase_project_id"));
                                 one.addProperty("id", (long)data.get(i).get("id"));
                                 array.add(one);
                             }
@@ -119,6 +121,7 @@ public class System extends HttpServlet {
                                 one.addProperty("fb_app_id", (String)data.get(i).get("fb_app_id"));
                                 one.addProperty("page_id", (String)data.get(i).get("page_id"));
                                 one.addProperty("google_package_id", (String)data.get(i).get("google_package_id"));
+                                one.addProperty("firebase_project_id", (String)data.get(i).get("firebase_project_id"));
                                 one.addProperty("id", (long)data.get(i).get("id"));
                                 array.add(one);
                             }
@@ -164,7 +167,7 @@ public class System extends HttpServlet {
     public static List<JSObject> fetchFacebookAppRelationData(String word) {
         List<JSObject> list = new ArrayList<>();
         try {
-            return DB.scan("web_facebook_app_ids_rel").select("id", "tag_name", "account_id", "fb_app_id", "page_id", "google_package_id")
+            return DB.scan("web_facebook_app_ids_rel").select("id", "tag_name", "account_id", "fb_app_id", "page_id", "google_package_id","firebase_project_id")
                     .where(DB.filter().whereLikeTo("tag_name", "%" + word + "%")).orderByAsc("tag_name").execute();
 //                  .where(DB.filter().whereLikeTo("tag_name", "%" + word + "%")).orderByAsc("id").execute();
         } catch (Exception ex) {
@@ -215,7 +218,7 @@ public class System extends HttpServlet {
         return ret;
     }
 
-    private OperationResult createNewFacebookAppRelation(String tagName, String accountId, String fbAppId, String pageId, String gpPackageId) {
+    private OperationResult createNewFacebookAppRelation(String tagName, String accountId, String fbAppId, String pageId, String gpPackageId,String firebaseProjectId) {
         OperationResult ret = new OperationResult();
 
         try {
@@ -230,6 +233,7 @@ public class System extends HttpServlet {
                         .put("fb_app_id", fbAppId)
                         .put("page_id", pageId)
                         .put("google_package_id", gpPackageId)
+                        .put("firebase_project_id", firebaseProjectId)
                         .execute();
 
                 ret.result = true;
@@ -245,7 +249,7 @@ public class System extends HttpServlet {
         return ret;
     }
 
-    private OperationResult updateFacebookAppRelation(int id, String tagName, String accountId, String fbAppId, String pageId, String gpPackageId) {
+    private OperationResult updateFacebookAppRelation(int id, String tagName, String accountId, String fbAppId, String pageId, String gpPackageId,String firebaseProjectId) {
         OperationResult ret = new OperationResult();
 
         try {
@@ -255,6 +259,7 @@ public class System extends HttpServlet {
                     .put("fb_app_id", fbAppId)
                     .put("page_id", pageId)
                     .put("google_package_id", gpPackageId)
+                    .put("firebase_project_id", firebaseProjectId)
                     .where(DB.filter().whereEqualTo("id", id)).execute();
 
             ret.result = true;
