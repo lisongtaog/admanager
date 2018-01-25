@@ -45,14 +45,14 @@ public class AdvertAdmob extends HttpServlet {
                 result.result = false;
                 if (language == "") {
                     result.message = "【语言】不能为空";
-                }else if (message1.isEmpty() || message1.length() > 25) {
-                    result.message = "【广告语1】不能为空，且长度不能超过25个字符！";
-                }else if (message2.isEmpty() || message2.length() > 25) {
-                    result.message = "【广告语2】不能为空，且长度不能超过25个字符！";
-                }else if (message3.isEmpty() || message3.length() > 25) {
-                    result.message = "【广告语3】不能为空，且长度不能超过25个字符！";
-                }else if (message4.isEmpty() || message4.length() > 25) {
-                    result.message = "【广告语4】不能为空，且长度不能超过25个字符！";
+                }else if (message1.isEmpty() || message1.getBytes().length > 25) {
+                    result.message = "【广告语1】不能为空，且长度不能超过25个字节！";
+                }else if (message2.isEmpty() || message2.getBytes().length > 25) {
+                    result.message = "【广告语2】不能为空，且长度不能超过25个字节！";
+                }else if (message3.isEmpty() || message3.getBytes().length > 25) {
+                    result.message = "【广告语3】不能为空，且长度不能超过25个字节！";
+                }else if (message4.isEmpty() || message4.getBytes().length > 25) {
+                    result.message = "【广告语4】不能为空，且长度不能超过25个字节！";
                 }else {
                     Set<String> messageSet = new HashSet<>();
                     messageSet.add(message1);

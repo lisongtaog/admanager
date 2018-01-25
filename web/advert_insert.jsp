@@ -6,7 +6,7 @@
 
 <html>
 <head>
-    <title>创建广告</title>
+    <title>广告存储</title>
     <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css"/>
     <link rel="stylesheet" href="bootstrap/css/bootstrap-theme.min.css"/>
     <link rel="stylesheet" href="css/core.css"/>
