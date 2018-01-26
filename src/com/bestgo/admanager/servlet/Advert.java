@@ -75,19 +75,30 @@ public class Advert extends HttpServlet {
             }
             json.addProperty("ret", result.result ? 1 : 0);
             json.addProperty("message", result.message);
-        } else if (path.startsWith("/queryBeforeInsertion")) {
+        } else if (path.startsWith("/query_before_insertion")) {
             String appName = request.getParameter("appName");
             String language = request.getParameter("language");
             List<JSObject> list =null;
             try {
-                if(appName != null && language != null){
-                    String sql = "select title,message from web_ad_descript_dict where app_name = '" + appName + "' and language = '" + language + "' limit 1";
-                    JSObject one  = DB.findOneBySql(sql);
-                    String title = one.get("title");
-                    String message = one.get("message");
+                if(appName != "" && language != ""){
+                    String sql = "select group_id,title,message from web_ad_descript_dict where app_name = '" + appName + "' and language = '" + language + "'";
+                    list = DB.findListBySql(sql);
+
+                }
+                if(list != null && list.size()>0){
+                    JsonArray array = new JsonArray();
+                    for(JSObject one: list){
+                        JsonObject j = new JsonObject();
+                        String title = one.get("title");
+                        String message = one.get("message");
+                        String groupId = one.get("group_id");
+                        j.addProperty("title", title);
+                        j.addProperty("group_id", groupId);
+                        j.addProperty("message", message);
+                        array.add(j);
+                    }
+                    json.add("array",array);
                     json.addProperty("ret", 1);
-                    json.addProperty("title", title);
-                    json.addProperty("message", message);
                 }
 
             } catch (Exception e) {
