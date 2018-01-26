@@ -808,11 +808,13 @@ public class Campaign extends HttpServlet {
                 json.addProperty("max_bidding",maxBiddingDouble);
                 json.addProperty("ret", 1);
             }
-        }else if (path.startsWith("/selectTitleMessageByRegion")) {
+        }else if (path.startsWith("/get_title_message_by_app_and_region_and_group_id")) {
             String region = request.getParameter("region");
             String appName = request.getParameter("appName");
-            String language = "";
-            if (region != null) {
+            String advertGroupId = request.getParameter("advertGroupId");
+            String language;
+
+            if (region != null && region.length()>0) {
                 Map<String, String> regionLanguageRelMap = Config.getRegionLanguageRelMap();
                 String[] regionArray = region.split(",");
                 Set<String> languageSet = new HashSet<>();
@@ -826,7 +828,7 @@ public class Campaign extends HttpServlet {
                 }else{
                     language = "English";
                 }
-                String sql = "select title,message from web_ad_descript_dict where app_name = '" + appName + "' and language = '" + language +"' limit 1";
+                String sql = "select title,message from web_ad_descript_dict where app_name = '" + appName + "' and language = '" + language +"' and group_id = " + advertGroupId;
 
                 JSObject titleMessage = new JSObject();
                 try {

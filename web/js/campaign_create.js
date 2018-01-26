@@ -788,25 +788,25 @@ init();
 $('#selectApp').change(function () {
     var appName = $('#selectApp').val();
     $('#inputImagePath').val(appName + "/");
-    var language = $('#selectLanguage').val();
+    // var language = $('#selectLanguage').val();
 
-    if (language != null && language.length > 0) {
-        $.post("campaign/selectFacebookMessage", {
-            appName: appName,
-            language: language
-        }, function (data) {
-            if (data && data.ret == 1) {
-                $('#inputTitle').val(data.title);
-                $('#inputMessage').val(data.message);
-            } else {
-                $('#inputTitle').val("");
-                $('#inputMessage').val("");
-            }
-        }, "json");
-    } else {
-        $('#inputTitle').val("");
-        $('#inputMessage').val("");
-    }
+    // if (language != null && language.length > 0) {
+    //     $.post("campaign/selectFacebookMessage", {
+    //         appName: appName,
+    //         language: language
+    //     }, function (data) {
+    //         if (data && data.ret == 1) {
+    //             $('#inputTitle').val(data.title);
+    //             $('#inputMessage').val(data.message);
+    //         } else {
+    //             $('#inputTitle').val("");
+    //             $('#inputMessage').val("");
+    //         }
+    //     }, "json");
+    // } else {
+    //     $('#inputTitle').val("");
+    //     $('#inputMessage').val("");
+    // }
 
     $.post("campaign/selectMaxBiddingByAppName", {
         appName: appName
@@ -825,36 +825,36 @@ $('#selectApp').change(function () {
 $('#selectAppAdmob').change(function () {
     var appNameAdmob = $('#selectAppAdmob').val();
     $('#inputImagePathAdmob').val(appNameAdmob + "/");
-    var selectOptions = $('#selectLanguageAdmob option:selected');
-    var languageAdmob = [];
-    selectOptions.each(function () {
-        languageAdmob.push($(this).text())
-    });
-    if (languageAdmob != null && languageAdmob.length > 0) {
-
-        $.post("campaign_admob/selectAdmobMessage", {
-            appNameAdmob: appNameAdmob,
-            languageAdmob: languageAdmob.join(",")
-        }, function (data) {
-            if (data && data.ret == 1) {
-                $("#inputMessage1").val(data.message1);
-                $("#inputMessage2").val(data.message2);
-                $("#inputMessage3").val(data.message3);
-                $("#inputMessage4").val(data.message4);
-            } else {
-                $("#inputMessage1").val("");
-                $("#inputMessage2").val("");
-                $("#inputMessage3").val("");
-                $("#inputMessage4").val("");
-                admanager.showCommonDlg("提示", "数据为空！");
-            }
-        }, "json");
-    } else {
-        $("#inputMessage1").val("");
-        $("#inputMessage2").val("");
-        $("#inputMessage3").val("");
-        $("#inputMessage4").val("");
-    }
+    // var selectOptions = $('#selectLanguageAdmob option:selected');
+    // var languageAdmob = [];
+    // selectOptions.each(function () {
+    //     languageAdmob.push($(this).text())
+    // });
+    // if (languageAdmob != null && languageAdmob.length > 0) {
+    //
+    //     $.post("campaign_admob/selectAdmobMessage", {
+    //         appNameAdmob: appNameAdmob,
+    //         languageAdmob: languageAdmob.join(",")
+    //     }, function (data) {
+    //         if (data && data.ret == 1) {
+    //             $("#inputMessage1").val(data.message1);
+    //             $("#inputMessage2").val(data.message2);
+    //             $("#inputMessage3").val(data.message3);
+    //             $("#inputMessage4").val(data.message4);
+    //         } else {
+    //             $("#inputMessage1").val("");
+    //             $("#inputMessage2").val("");
+    //             $("#inputMessage3").val("");
+    //             $("#inputMessage4").val("");
+    //             admanager.showCommonDlg("提示", "数据为空！");
+    //         }
+    //     }, "json");
+    // } else {
+    //     $("#inputMessage1").val("");
+    //     $("#inputMessage2").val("");
+    //     $("#inputMessage3").val("");
+    //     $("#inputMessage4").val("");
+    // }
     $.post('advert_conversion_admob/query_advert_conversion_by_app_name', {appName: appNameAdmob}, function (result) {
         if (result && result.ret == 1) {
             var incidentList = result.data;
@@ -882,7 +882,7 @@ $('#selectAppAdmob').change(function () {
 });
 
 
-$('#selectRegion').change(function () {
+$('#selectRegion,#selectAdvertGroupId').change(function () {
     if (isAutoCreate && !firstInitForm) {
         firstInitForm = true;
         return;
@@ -890,30 +890,21 @@ $('#selectRegion').change(function () {
     var region = $('#selectRegion').val();
     if (region != null && region.length > 0) {
         var appName = $('#selectApp').val();
-        $.post("campaign/selectTitleMessageByRegion", {
+        var advertGroupId = $('#selectAdvertGroupId').val();
+        $.post("campaign/get_title_message_by_app_and_region_and_group_id", {
             appName: appName,
-            region: region.join(",")
+            region: region.join(","),
+            advertGroupId: advertGroupId
         }, function (data) {
             if (data && data.ret == 1) {
-                if (data.language != null) {
-                    $("#selectLanguage").val(data.language);
-                } else {
-                    $("#selectLanguage").val("null");
-                }
-                if ($("#selectLanguage option").text().indexOf(data.language) == -1) {
-                    $("#selectLanguage").val("null");
-                }
                 $("#inputTitle").val(data.title);
                 $("#inputMessage").val(data.message);
             } else {
-                $("#selectLanguage").val("null");
                 $("#inputTitle").val("");
                 $("#inputMessage").val("");
-                admanager.showCommonDlg("提示", "数据为空！");
             }
         }, "json");
     } else {
-        $("#selectLanguage").val("null");
         $("#inputTitle").val("");
         $("#inputMessage").val("");
     }

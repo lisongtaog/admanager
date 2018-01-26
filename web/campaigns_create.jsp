@@ -237,6 +237,7 @@
                 <input class="form-control" id="inputMaxCpa" />
             </div>
         </div>
+        <label>广告语组合：</label><select id="selectAdvertGroupId"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select>
         <div class="form-group">
             <label for="inputTitle" class="col-sm-2 control-label">广告标题</label>
             <div class="col-sm-10">

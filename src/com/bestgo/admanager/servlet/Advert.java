@@ -27,48 +27,62 @@ public class Advert extends HttpServlet {
         String path = request.getPathInfo();
         JsonObject json = new JsonObject();
 
-        if (path.startsWith("/saveAdvertFacebook")) {
+        if (path.startsWith("/save_advert_facebook")) {
             String appName = request.getParameter("appName");
             String language = request.getParameter("language");
-            String title = request.getParameter("title");
-            String message = request.getParameter("message");
-            String existData = request.getParameter("existData");
-            List<JSObject> list = new ArrayList<>();
-            String sql = "select title,message from web_ad_descript_dict where app_name='" + appName + "' and language = '" + language + "'";
-            list = fetchData(sql);
+            String[] titleArr = new String[4];
+            String[] messageArr = new String[4];
+            titleArr[0] = request.getParameter("title11");
+            messageArr[0] = request.getParameter("message11");
+            titleArr[1] = request.getParameter("title22");
+            messageArr[1] = request.getParameter("message22");
+            titleArr[2] = request.getParameter("title33");
+            messageArr[2] = request.getParameter("message33");
+            titleArr[3] = request.getParameter("title44");
+            messageArr[3] = request.getParameter("message44");
+            String sql = "select group_id from web_ad_descript_dict where app_name='" + appName + "' and language = '" + language + "'";
+            List<JSObject> list = fetchData(sql);
             OperationResult result = new OperationResult();
             try {
-                result.result = true;
-
-                if (title.isEmpty()) {
-                    result.result = false;
-                    result.message = "标题不能为空";
-                }
-                if (message.isEmpty()) {
-                    result.result = false;
-                    result.message = "广告语不能为空";
-                }
-
-                if (result.result) {
-                    if(list != null && list.size() > 0){
-                        DB.update("web_ad_descript_dict")
-                                .put("title", title)
-                                .put("message", message)
-                                .where(DB.filter().whereEqualTo("app_name", appName))
-                                .and(DB.filter().whereEqualTo("language", language))
-                                .execute();
-                        json.addProperty("existData","true");
-                    }else{
+                if(list != null && list.size() > 0){
+                    HashSet<Integer> set = new HashSet<>();
+                    for(JSObject j : list){
+                        Integer i = j.get("group_id");
+                        set.add(i);
+                    }
+                    for(int i=1;i<=4;i++){
+                        if(set.contains(i)){
+                            DB.update("web_ad_descript_dict")
+                                    .put("title", titleArr[i-1])
+                                    .put("message", messageArr[i-1])
+                                    .where(DB.filter().whereEqualTo("app_name", appName))
+                                    .and(DB.filter().whereEqualTo("language", language))
+                                    .and(DB.filter().whereEqualTo("group_id", i))
+                                    .execute();
+                        }else{
+                            DB.insert("web_ad_descript_dict")
+                                    .put("language", language)
+                                    .put("title", titleArr[i-1])
+                                    .put("message", messageArr[i-1])
+                                    .put("group_id", i)
+                                    .put("app_name", appName)
+                                    .execute();
+                        }
+                    }
+                    json.addProperty("existData","true");
+                }else{
+                    for(int i=1;i<=4;i++){
                         DB.insert("web_ad_descript_dict")
                                 .put("language", language)
-                                .put("title", title)
-                                .put("message", message)
+                                .put("title", titleArr[i-1])
+                                .put("message", messageArr[i-1])
+                                .put("group_id", i)
                                 .put("app_name", appName)
                                 .execute();
-                        json.addProperty("existData","false");
                     }
-                    result.result = true;
+                    json.addProperty("existData","false");
                 }
+                result.result = true;
             } catch (Exception ex) {
                 result.message = ex.getMessage();
                 result.result = false;
@@ -91,7 +105,7 @@ public class Advert extends HttpServlet {
                         JsonObject j = new JsonObject();
                         String title = one.get("title");
                         String message = one.get("message");
-                        String groupId = one.get("group_id");
+                        int groupId = one.get("group_id");
                         j.addProperty("title", title);
                         j.addProperty("group_id", groupId);
                         j.addProperty("message", message);

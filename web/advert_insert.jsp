@@ -368,13 +368,37 @@
 
     init();
 
+    getBLen = function(str) {
+        if (str == null) return 0;
+        if (typeof str != "string"){
+            str += "";
+        }
+        return str.replace(/[^\x00-\xff]/g,"01").length;
+    }
+
     $('#btnInsertAdmob').click(function() {
         var appName = $('#selectAppAdmob').val();
         var language = $('#selectLanguageAdmob').val();
         var message1 = $('#inputMessage1').val();
+        if(getBLen(message1) > 25){
+            alert("广告语【1】不能超过25个字符");
+            return false;
+        }
         var message2 = $('#inputMessage2').val();
+        if(getBLen(message2) > 25){
+            alert("广告语【2】不能超过25个字符");
+            return false;
+        }
         var message3 = $('#inputMessage3').val();
+        if(getBLen(message3) > 25){
+            alert("广告语【3】不能超过25个字符");
+            return false;
+        }
         var message4 = $('#inputMessage4').val();
+        if(getBLen(message4) > 25){
+            alert("广告语【4】不能超过25个字符");
+            return false;
+        }
         $.post("advert_admob/saveAdvertAdmob", {
             appName: appName,
             language: language,
@@ -401,15 +425,25 @@
     $('#btnInsert').click(function () {
         var appName = $('#selectApp').val();
         var language = $('#selectLanguage').val();
-        var title = $('#inputTitle').val();
-        var message = $('#inputMessage').val();
-        var existData = $("#existData").val();
-        $.post("advert/saveAdvertFacebook", {
+        var title11 = $('#inputTitle11').val();
+        var message11 = $('#inputMessage11').val();
+        var title22 = $('#inputTitle22').val();
+        var message22 = $('#inputMessage22').val();
+        var title33 = $('#inputTitle33').val();
+        var message33 = $('#inputMessage33').val();
+        var title44 = $('#inputTitle44').val();
+        var message44 = $('#inputMessage44').val();
+        $.post("advert/save_advert_facebook", {
             appName: appName,
             language: language,
-            title: title,
-            message: message,
-            existData: existData
+            title11: title11,
+            message11: message11,
+            title22: title22,
+            message22: message22,
+            title33: title33,
+            message33: message33,
+            title44: title44,
+            message44: message44
         }, function (data) {
             if (data && data.ret == 1) {
                 if(data.existData == "true"){
@@ -435,18 +469,19 @@
                 if (data && data.ret == 1) {
                     var arr = data.array;
                     for(var i =0;i< arr.length;i++){
-                        if(arr['group_id'] == 1){
-                            $('#inputTitle11').val(data.title);
-                            $('#inputMessage11').val(data.message);
-                        }else if(arr['group_id'] == 2){
-                            $('#inputTitle22').val(data.title);
-                            $('#inputMessage22').val(data.message);
-                        } if(arr['group_id'] == 3){
-                            $('#inputTitle33').val(data.title);
-                            $('#inputMessage33').val(data.message);
-                        } if(arr['group_id'] == 4){
-                            $('#inputTitle44').val(data.title);
-                            $('#inputMessage44').val(data.message);
+                        var one = arr[i];
+                        if(one['group_id'] == 1){
+                            $('#inputTitle11').val(one['title']);
+                            $('#inputMessage11').val(one['message']);
+                        }else if(one['group_id'] == 2){
+                            $('#inputTitle22').val(one['title']);
+                            $('#inputMessage22').val(one['message']);
+                        } if(one['group_id'] == 3){
+                            $('#inputTitle33').val(one['title']);
+                            $('#inputMessage33').val(one['message']);
+                        } if(one['group_id'] == 4){
+                            $('#inputTitle44').val(one['title']);
+                            $('#inputMessage44').val(one['message']);
                         }
 
                     }
