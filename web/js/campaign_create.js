@@ -912,7 +912,7 @@ $('#selectRegion,#selectAdvertGroupId').change(function () {
     return false;
 });
 
-$('#selectRegionAdmob').change(function () {
+$('#selectRegionAdmob,#selectAdvertGroupIdAdmob').change(function () {
     if (isAutoCreate && !firstInitForm) {
         firstInitForm = true;
         return;
@@ -924,9 +924,11 @@ $('#selectRegionAdmob').change(function () {
     });
     if (regionAdmob != null && regionAdmob.length > 0) {
         var appNameAdmob = $('#selectAppAdmob').val();
-        $.post("campaign_admob/selectMessagesByRegionAdmob", {
+        var advertGroupId = $('#selectAdvertGroupIdAdmob').val();
+        $.post("campaign_admob/select_messages_by_app_and_region_and_group_id", {
             appNameAdmob: appNameAdmob,
-            regionAdmob: regionAdmob.join(",")
+            regionAdmob: regionAdmob.join(","),
+            advertGroupId: advertGroupId
         }, function (data) {
             if (data && data.ret == 1) {
                 $("#inputMessage1").val(data.message1);
@@ -938,7 +940,6 @@ $('#selectRegionAdmob').change(function () {
                 $("#inputMessage2").val("");
                 $("#inputMessage3").val("");
                 $("#inputMessage4").val("");
-                admanager.showCommonDlg("提示", "数据为空！");
             }
         }, "json");
     } else {

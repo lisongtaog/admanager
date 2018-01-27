@@ -4,6 +4,7 @@ import com.bestgo.admanager.OperationResult;
 import com.bestgo.admanager.Utils;
 import com.bestgo.common.database.services.DB;
 import com.bestgo.common.database.utils.JSObject;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import org.apache.log4j.Logger;
 
@@ -26,93 +27,112 @@ public class AdvertAdmob extends HttpServlet {
         String path = request.getPathInfo();
         JsonObject json = new JsonObject();
 
-        if (path.startsWith("/saveAdvertAdmob")) {
+        if (path.startsWith("/save_advert_admob")) {
             String appName = request.getParameter("appName");
             String language = request.getParameter("language");
-            String message1 = request.getParameter("message1");
-            message1 = message1.trim();
-            String message2 = request.getParameter("message2");
-            message2 = message2.trim();
-            String message3 = request.getParameter("message3");
-            message3 = message3.trim();
-            String message4 = request.getParameter("message4");
-            message4 = message4.trim();
+            String[] message1Arr = new String[4];
+            String[] message2Arr = new String[4];
+            String[] message3Arr = new String[4];
+            String[] message4Arr = new String[4];
+            message1Arr[0] = request.getParameter("message11");
+            message2Arr[0] = request.getParameter("message12");
+            message3Arr[0] = request.getParameter("message13");
+            message4Arr[0] = request.getParameter("message14");
+            message1Arr[1] = request.getParameter("message21");
+            message2Arr[1] = request.getParameter("message22");
+            message3Arr[1] = request.getParameter("message23");
+            message4Arr[1] = request.getParameter("message24");
+            message1Arr[2] = request.getParameter("message31");
+            message2Arr[2] = request.getParameter("message32");
+            message3Arr[2] = request.getParameter("message33");
+            message4Arr[2] = request.getParameter("message34");
+            message1Arr[3] = request.getParameter("message41");
+            message2Arr[3] = request.getParameter("message42");
+            message3Arr[3] = request.getParameter("message43");
+            message4Arr[3] = request.getParameter("message44");
             List<JSObject> list = new ArrayList<>();
-            String sql = "select message1,message2,message3,message4 from web_ad_descript_dict_admob where app_name='" + appName + "' and language = '" + language + "'";
+            String sql = "select group_id,message1,message2,message3,message4 from web_ad_descript_dict_admob where app_name='" + appName + "' and language = '" + language + "'";
             list = fetchData(sql);
             OperationResult result = new OperationResult();
             try {
-                result.result = false;
-                if (language == "") {
-                    result.message = "【语言】不能为空";
-                }else if (message1.isEmpty()) {
-                    result.message = "【广告语1】不能为空！";
-                }else if (message2.isEmpty()) {
-                    result.message = "【广告语2】不能为空！";
-                }else if (message3.isEmpty()) {
-                    result.message = "【广告语3】不能为空！";
-                }else if (message4.isEmpty()) {
-                    result.message = "【广告语4】不能为空！";
-                }else {
-                    Set<String> messageSet = new HashSet<>();
-                    messageSet.add(message1);
-                    messageSet.add(message2);
-                    messageSet.add(message3);
-                    messageSet.add(message4);
-                    if(messageSet.size() == 4){
-                        result.result = true;
-                    }else{
-                        result.message = "广告语描述有重复！";
+                if(list != null && list.size() > 0){
+                    HashSet<Integer> set = new HashSet<>();
+                    for(JSObject j : list){
+                        Integer i = j.get("group_id");
+                        set.add(i);
                     }
-                }
-
-
-                if (result.result) {
-                    if(list != null && list.size() > 0 ){
-                        DB.update("web_ad_descript_dict_admob")
-                                .put("message1", message1)
-                                .put("message2", message2)
-                                .put("message3", message3)
-                                .put("message4", message4)
-                                .where(DB.filter().whereEqualTo("app_name", appName))
-                                .and(DB.filter().whereEqualTo("language", language))
-                                .execute();
-                        json.addProperty("existDataAdmob","true");
-                    }else{
-                        DB.insert("web_ad_descript_dict_admob")
+                    for(int i=1;i<=4;i++){
+                        if(set.contains(i)){
+                            DB.update("web_ad_descript_dict_admob")
+                                    .put("message1", message1Arr[i-1])
+                                    .put("message2", message2Arr[i-1])
+                                    .put("message3", message3Arr[i-1])
+                                    .put("message4", message4Arr[i-1])
+                                    .where(DB.filter().whereEqualTo("app_name", appName))
+                                    .and(DB.filter().whereEqualTo("language", language))
+                                    .and(DB.filter().whereEqualTo("group_id", i))
+                                    .execute();
+                        }else{
+                            DB.insert("web_ad_descript_dict_admob")
+                                    .put("language", language)
+                                    .put("message1", message1Arr[i-1])
+                                    .put("message2", message2Arr[i-1])
+                                    .put("message3", message3Arr[i-1])
+                                    .put("message4", message4Arr[i-1])
+                                    .put("group_id", i)
+                                    .put("app_name", appName)
+                                    .execute();
+                        }
+                    }
+                    json.addProperty("existData","true");
+                }else{
+                    for(int i=1;i<=4;i++){
+                        DB.insert("web_ad_descript_dict")
                                 .put("language", language)
-                                .put("message1", message1)
-                                .put("message2", message2)
-                                .put("message3", message3)
-                                .put("message4", message4)
+                                .put("message1", message1Arr[i-1])
+                                .put("message2", message2Arr[i-1])
+                                .put("message3", message3Arr[i-1])
+                                .put("message4", message4Arr[i-1])
+                                .put("group_id", i)
                                 .put("app_name", appName)
                                 .execute();
-                        json.addProperty("existDataAdmob","false");
                     }
+                    json.addProperty("existData","false");
                 }
+                result.result = true;
             } catch (Exception ex) {
                 result.message = ex.getMessage();
                 result.result = false;
             }
             json.addProperty("ret", result.result ? 1 : 0);
             json.addProperty("message", result.message);
-        } else if (path.startsWith("/queryBeforeAdmobInsertion")) {
+        } else if (path.startsWith("/query_before_admob_insert")) {
             String appNameAdmob = request.getParameter("appNameAdmob");
             String languageAdmob = request.getParameter("languageAdmob");
             List<JSObject> list =null;
             try {
                 if(appNameAdmob != null && languageAdmob != null){
-                    String sql = "select message1,message2,message3,message4 from web_ad_descript_dict_admob where app_name = '" + appNameAdmob + "' and language = '" + languageAdmob + "' limit 1";
-                    JSObject two  = DB.findOneBySql(sql);
-                    String message1 = two.get("message1");
-                    String message2 = two.get("message2");
-                    String message3 = two.get("message3");
-                    String message4 = two.get("message4");
-                    json.addProperty("message1", message1);
-                    json.addProperty("message2", message2);
-                    json.addProperty("message3", message3);
-                    json.addProperty("message4", message4);
-                    json.addProperty("ret", 1);
+                    String sql = "select group_id,message1,message2,message3,message4 from web_ad_descript_dict_admob where app_name = '" + appNameAdmob + "' and language = '" + languageAdmob + "'";
+                    list = DB.findListBySql(sql);
+                    if(list != null && list.size()>0){
+                        JsonArray array = new JsonArray();
+                        for(JSObject two: list){
+                            JsonObject j = new JsonObject();
+                            String message1 = two.get("message1");
+                            String message2 = two.get("message2");
+                            String message3 = two.get("message3");
+                            String message4 = two.get("message4");
+                            int groupId = two.get("group_id");
+                            j.addProperty("message1", message1);
+                            j.addProperty("message2", message2);
+                            j.addProperty("message3", message3);
+                            j.addProperty("message4", message4);
+                            j.addProperty("group_id", groupId);
+                            array.add(j);
+                        }
+                        json.add("array",array);
+                        json.addProperty("ret", 1);
+                    }
                 }
 
             } catch (Exception e) {

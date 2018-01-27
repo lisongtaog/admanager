@@ -183,7 +183,7 @@
     <form class="form-horizontal" action="#" id="formAdmob">
 
         <div class="form-group">
-            <label for="selectApp" class="col-sm-2 control-label">应用</label>
+            <label for="selectAppAdmob" class="col-sm-2 control-label">应用</label>
             <div class="col-sm-10">
                 <select class="form-control" id="selectAppAdmob">
 
@@ -192,36 +192,132 @@
         </div>
 
         <div class="form-group">
-            <label for="selectLanguage" class="col-sm-2 control-label">语言</label>
+            <label for="selectLanguageAdmob" class="col-sm-2 control-label">语言</label>
             <div class="col-sm-10">
                 <select class="form-control" id="selectLanguageAdmob">
                 </select>
             </div>
         </div>
 
+        <div class="form-group">
+            <label for="inputGroupOneAdmob10" class="col-sm-2 control-label">组合</label>
+            <div class="col-sm-4">
+                <input type="text" value="1" readonly id="inputGroupOneAdmob10" style="width: 10px;">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="inputMessageAdmob11" class="col-sm-2 control-label">广告语1</label>
+            <div class="col-sm-10">
+                <input class="form-control" id="inputMessageAdmob11" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="inputMessageAdmob12" class="col-sm-2 control-label">广告语2</label>
+            <div class="col-sm-10">
+                <input class="form-control" id="inputMessageAdmob12" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="inputMessageAdmob13" class="col-sm-2 control-label">广告语3</label>
+            <div class="col-sm-10">
+                <input class="form-control" id="inputMessageAdmob13" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="inputMessageAdmob14" class="col-sm-2 control-label">广告语4</label>
+            <div class="col-sm-10">
+                <input class="form-control" id="inputMessageAdmob14" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="inputGroupOneAdmob20" class="col-sm-2 control-label">组合</label>
+            <div class="col-sm-4">
+                <input type="text" value="2" readonly id="inputGroupOneAdmob20" style="width: 20px;">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="inputMessageAdmob21" class="col-sm-2 control-label">广告语1</label>
+            <div class="col-sm-10">
+                <input class="form-control" id="inputMessageAdmob21" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="inputMessageAdmob22" class="col-sm-2 control-label">广告语2</label>
+            <div class="col-sm-10">
+                <input class="form-control" id="inputMessageAdmob22" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="inputMessageAdmob23" class="col-sm-2 control-label">广告语3</label>
+            <div class="col-sm-10">
+                <input class="form-control" id="inputMessageAdmob23" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="inputMessageAdmob24" class="col-sm-2 control-label">广告语4</label>
+            <div class="col-sm-10">
+                <input class="form-control" id="inputMessageAdmob24" />
+            </div>
+        </div>
 
         <div class="form-group">
-            <label for="inputMessage1" class="col-sm-2 control-label">广告语1</label>
-            <div class="col-sm-10">
-                <input class="form-control" id="inputMessage1" />
+            <label for="inputGroupOneAdmob30" class="col-sm-2 control-label">组合</label>
+            <div class="col-sm-4">
+                <input type="text" value="3" readonly id="inputGroupOneAdmob30" style="width: 30px;">
             </div>
         </div>
         <div class="form-group">
-            <label for="inputMessage2" class="col-sm-2 control-label">广告语2</label>
+            <label for="inputMessageAdmob31" class="col-sm-2 control-label">广告语1</label>
             <div class="col-sm-10">
-                <input class="form-control" id="inputMessage2" />
+                <input class="form-control" id="inputMessageAdmob31" />
             </div>
         </div>
         <div class="form-group">
-            <label for="inputMessage3" class="col-sm-2 control-label">广告语3</label>
+            <label for="inputMessageAdmob32" class="col-sm-2 control-label">广告语2</label>
             <div class="col-sm-10">
-                <input class="form-control" id="inputMessage3" />
+                <input class="form-control" id="inputMessageAdmob32" />
             </div>
         </div>
         <div class="form-group">
-            <label for="inputMessage4" class="col-sm-2 control-label">广告语4</label>
+            <label for="inputMessageAdmob33" class="col-sm-2 control-label">广告语3</label>
             <div class="col-sm-10">
-                <input class="form-control" id="inputMessage4" />
+                <input class="form-control" id="inputMessageAdmob33" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="inputMessageAdmob34" class="col-sm-2 control-label">广告语4</label>
+            <div class="col-sm-10">
+                <input class="form-control" id="inputMessageAdmob34" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="inputGroupOneAdmob40" class="col-sm-2 control-label">组合</label>
+            <div class="col-sm-4">
+                <input type="text" value="4" readonly id="inputGroupOneAdmob40" style="width: 40px;">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="inputMessageAdmob41" class="col-sm-2 control-label">广告语1</label>
+            <div class="col-sm-10">
+                <input class="form-control" id="inputMessageAdmob41" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="inputMessageAdmob42" class="col-sm-2 control-label">广告语2</label>
+            <div class="col-sm-10">
+                <input class="form-control" id="inputMessageAdmob42" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="inputMessageAdmob43" class="col-sm-2 control-label">广告语3</label>
+            <div class="col-sm-10">
+                <input class="form-control" id="inputMessageAdmob43" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="inputMessageAdmob44" class="col-sm-2 control-label">广告语4</label>
+            <div class="col-sm-10">
+                <input class="form-control" id="inputMessageAdmob44" />
             </div>
         </div>
 
@@ -379,36 +475,109 @@
     $('#btnInsertAdmob').click(function() {
         var appName = $('#selectAppAdmob').val();
         var language = $('#selectLanguageAdmob').val();
-        var message1 = $('#inputMessage1').val();
-        if(getBLen(message1) > 25){
+        var message11 = $('#inputMessageAdmob11').val();
+        if(getBLen(message11) > 25){
             alert("广告语【1】不能超过25个字符");
             return false;
         }
-        var message2 = $('#inputMessage2').val();
-        if(getBLen(message2) > 25){
-            alert("广告语【2】不能超过25个字符");
+        var message12 = $('#inputMessageAdmob12').val();
+        if(getBLen(message12) > 25){
+            alert("广告语【1】不能超过25个字符");
             return false;
         }
-        var message3 = $('#inputMessage3').val();
-        if(getBLen(message3) > 25){
-            alert("广告语【3】不能超过25个字符");
+        var message13 = $('#inputMessageAdmob13').val();
+        if(getBLen(message13) > 25){
+            alert("广告语【1】不能超过25个字符");
             return false;
         }
-        var message4 = $('#inputMessage4').val();
-        if(getBLen(message4) > 25){
-            alert("广告语【4】不能超过25个字符");
+        var message14 = $('#inputMessageAdmob14').val();
+        if(getBLen(message14) > 25){
+            alert("广告语【1】不能超过25个字符");
             return false;
         }
-        $.post("advert_admob/saveAdvertAdmob", {
+        var message21 = $('#inputMessageAdmob21').val();
+        if(getBLen(message21) > 25){
+            alert("广告语【1】不能超过25个字符");
+            return false;
+        }
+        var message22 = $('#inputMessageAdmob22').val();
+        if(getBLen(message22) > 25){
+            alert("广告语【1】不能超过25个字符");
+            return false;
+        }
+        var message23 = $('#inputMessageAdmob23').val();
+        if(getBLen(message23) > 25){
+            alert("广告语【1】不能超过25个字符");
+            return false;
+        }
+        var message24 = $('#inputMessageAdmob24').val();
+        if(getBLen(message24) > 25){
+            alert("广告语【1】不能超过25个字符");
+            return false;
+        }
+        var message31 = $('#inputMessageAdmob31').val();
+        if(getBLen(message31) > 25){
+            alert("广告语【1】不能超过25个字符");
+            return false;
+        }
+        var message32 = $('#inputMessageAdmob32').val();
+        if(getBLen(message32) > 25){
+            alert("广告语【1】不能超过25个字符");
+            return false;
+        }
+        var message33 = $('#inputMessageAdmob33').val();
+        if(getBLen(message33) > 25){
+            alert("广告语【1】不能超过25个字符");
+            return false;
+        }
+        var message34 = $('#inputMessageAdmob34').val();
+        if(getBLen(message34) > 25){
+            alert("广告语【1】不能超过25个字符");
+            return false;
+        }
+        var message41 = $('#inputMessageAdmob41').val();
+        if(getBLen(message41) > 25){
+            alert("广告语【1】不能超过25个字符");
+            return false;
+        }
+        var message42 = $('#inputMessageAdmob42').val();
+        if(getBLen(message42) > 25){
+            alert("广告语【1】不能超过25个字符");
+            return false;
+        }
+        var message43 = $('#inputMessageAdmob43').val();
+        if(getBLen(message43) > 25){
+            alert("广告语【1】不能超过25个字符");
+            return false;
+        }
+        var message44 = $('#inputMessageAdmob44').val();
+        if(getBLen(message44) > 25){
+            alert("广告语【1】不能超过25个字符");
+            return false;
+        }
+
+        $.post("advert_admob/save_advert_admob", {
             appName: appName,
             language: language,
-            message1: message1,
-            message2: message2,
-            message3: message3,
-            message4: message4
+            message11: message11,
+            message12: message12,
+            message13: message13,
+            message14: message14,
+            message21: message21,
+            message22: message22,
+            message23: message23,
+            message24: message24,
+            message31: message31,
+            message32: message32,
+            message33: message33,
+            message34: message34,
+            message41: message41,
+            message42: message42,
+            message43: message43,
+            message44: message44
         }, function (data) {
             if (data && data.ret == 1) {
-                if(data.existDataAdmob == "true"){
+                if(data.existData == "true"){
                     admanager.showCommonDlg("提示", "更新记录成功");
                 }else{
                     admanager.showCommonDlg("提示", "添加记录成功");
@@ -476,10 +645,10 @@
                         }else if(one['group_id'] == 2){
                             $('#inputTitle22').val(one['title']);
                             $('#inputMessage22').val(one['message']);
-                        } if(one['group_id'] == 3){
+                        }else if(one['group_id'] == 3){
                             $('#inputTitle33').val(one['title']);
                             $('#inputMessage33').val(one['message']);
-                        } if(one['group_id'] == 4){
+                        }else if(one['group_id'] == 4){
                             $('#inputTitle44').val(one['title']);
                             $('#inputMessage44').val(one['message']);
                         }
@@ -513,27 +682,73 @@
         var appNameAdmob = $("#selectAppAdmob").val();
         var languageAdmob = $("#selectLanguageAdmob").val();
         if(languageAdmob != null &&  languageAdmob.length > 0){
-            $.post("advert_admob/queryBeforeAdmobInsertion", {
+            $.post("advert_admob/query_before_admob_insert", {
                 appNameAdmob: appNameAdmob,
                 languageAdmob: languageAdmob
             }, function (data) {
                 if (data && data.ret == 1) {
-                    $('#inputMessage1').val(data.message1);
-                    $('#inputMessage2').val(data.message2);
-                    $('#inputMessage3').val(data.message3);
-                    $('#inputMessage4').val(data.message4);
+                    var arr = data.array;
+                    for(var i =0;i< arr.length;i++){
+                        var one = arr[i];
+                        if(one['group_id'] == 1){
+                            $('#inputMessageAdmob11').val(one['message1']);
+                            $('#inputMessageAdmob12').val(one['message2']);
+                            $('#inputMessageAdmob13').val(one['message3']);
+                            $('#inputMessageAdmob14').val(one['message4']);
+                        } else if(one['group_id'] == 2){
+                            $('#inputMessageAdmob21').val(one['message1']);
+                            $('#inputMessageAdmob22').val(one['message2']);
+                            $('#inputMessageAdmob23').val(one['message3']);
+                            $('#inputMessageAdmob24').val(one['message4']);
+                        }else if(one['group_id'] == 3){
+                            $('#inputMessageAdmob31').val(one['message1']);
+                            $('#inputMessageAdmob32').val(one['message2']);
+                            $('#inputMessageAdmob33').val(one['message3']);
+                            $('#inputMessageAdmob34').val(one['message4']);
+                        }else if(one['group_id'] == 4){
+                            $('#inputMessageAdmob41').val(one['message1']);
+                            $('#inputMessageAdmob42').val(one['message2']);
+                            $('#inputMessageAdmob43').val(one['message3']);
+                            $('#inputMessageAdmob44').val(one['message4']);
+                        }
+                    }
+
                 } else {
-                    $('#inputMessage1').val("");
-                    $('#inputMessage2').val("");
-                    $('#inputMessage3').val("");
-                    $('#inputMessage4').val("");
+                    $('#inputMessageAdmob11').val("");
+                    $('#inputMessageAdmob12').val("");
+                    $('#inputMessageAdmob13').val("");
+                    $('#inputMessageAdmob14').val("");
+                    $('#inputMessageAdmob21').val("");
+                    $('#inputMessageAdmob22').val("");
+                    $('#inputMessageAdmob23').val("");
+                    $('#inputMessageAdmob24').val("");
+                    $('#inputMessageAdmob31').val("");
+                    $('#inputMessageAdmob32').val("");
+                    $('#inputMessageAdmob33').val("");
+                    $('#inputMessageAdmob34').val("");
+                    $('#inputMessageAdmob41').val("");
+                    $('#inputMessageAdmob42').val("");
+                    $('#inputMessageAdmob43').val("");
+                    $('#inputMessageAdmob44').val("");
                 }
             }, "json");
         }else{
-            $('#inputMessage1').val("");
-            $('#inputMessage2').val("");
-            $('#inputMessage3').val("");
-            $('#inputMessage4').val("");
+            $('#inputMessageAdmob11').val("");
+            $('#inputMessageAdmob12').val("");
+            $('#inputMessageAdmob13').val("");
+            $('#inputMessageAdmob14').val("");
+            $('#inputMessageAdmob21').val("");
+            $('#inputMessageAdmob22').val("");
+            $('#inputMessageAdmob23').val("");
+            $('#inputMessageAdmob24').val("");
+            $('#inputMessageAdmob31').val("");
+            $('#inputMessageAdmob32').val("");
+            $('#inputMessageAdmob33').val("");
+            $('#inputMessageAdmob34').val("");
+            $('#inputMessageAdmob41').val("");
+            $('#inputMessageAdmob42').val("");
+            $('#inputMessageAdmob43').val("");
+            $('#inputMessageAdmob44').val("");
         }
         return false;
     });

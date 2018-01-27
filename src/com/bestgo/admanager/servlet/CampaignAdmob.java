@@ -213,9 +213,10 @@ public class CampaignAdmob extends HttpServlet {
             OperationResult result = updateCampaign(id, tags);
             json.addProperty("ret", result.result ? 1 : 0);
             json.addProperty("message", result.message);
-        } else if (path.startsWith("/selectMessagesByRegionAdmob")) {
+        } else if (path.startsWith("/select_messages_by_app_and_region_and_group_id")) {
             String region = request.getParameter("regionAdmob");
             String appName = request.getParameter("appNameAdmob");
+            String advertGroupId = request.getParameter("advertGroupId");
             if (region != null) {
                 Map<String, String> regionLanguageAdmobRelMap = Config.getRegionLanguageRelMap();
                 String languageAdmob = "";
@@ -230,20 +231,21 @@ public class CampaignAdmob extends HttpServlet {
                 }else{
                     languageAdmob = "English";
                 }
-                String  sql = "select message1,message2,message3,message4 from web_ad_descript_dict_admob where app_name = '" + appName + "' and language = '" + languageAdmob +"' limit 1";
+                String  sql = "select message1,message2,message3,message4 from web_ad_descript_dict_admob where app_name = '" + appName + "' and language = '" + languageAdmob +"' and group_id = "+advertGroupId;
 
-                JSObject messages = new JSObject();
+                JSObject messages = null;
                 try {
                     messages = DB.findOneBySql(sql);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-
-                json.addProperty("message1",(String)(messages.get("message1")));
-                json.addProperty("message2",(String)(messages.get("message2")));
-                json.addProperty("message3",(String)(messages.get("message3")));
-                json.addProperty("message4",(String)(messages.get("message4")));
-                json.addProperty("ret", 1);
+                if(messages != null && messages.hasObjectData()){
+                    json.addProperty("message1",(String)(messages.get("message1")));
+                    json.addProperty("message2",(String)(messages.get("message2")));
+                    json.addProperty("message3",(String)(messages.get("message3")));
+                    json.addProperty("message4",(String)(messages.get("message4")));
+                    json.addProperty("ret", 1);
+                }
             }
         }else if (path.startsWith("/query")) {
             String word = request.getParameter("word");

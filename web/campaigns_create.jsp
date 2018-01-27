@@ -365,6 +365,7 @@
                 <input class="form-control" id="inputMaxCpaAdmob" />
             </div>
         </div>
+        <label>广告语组合：</label><select id="selectAdvertGroupIdAdmob"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select>
         <div class="form-group">
             <label for="inputMessage" class="col-sm-2 control-label">广告语1</label>
             <div class="col-sm-10">
