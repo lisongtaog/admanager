@@ -87,7 +87,7 @@ public class AdvertAdmob extends HttpServlet {
                     json.addProperty("existData","true");
                 }else{
                     for(int i=1;i<=4;i++){
-                        DB.insert("web_ad_descript_dict")
+                        DB.insert("web_ad_descript_dict_admob")
                                 .put("language", language)
                                 .put("message1", message1Arr[i-1])
                                 .put("message2", message2Arr[i-1])
