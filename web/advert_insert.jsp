@@ -476,85 +476,21 @@
         var appName = $('#selectAppAdmob').val();
         var language = $('#selectLanguageAdmob').val();
         var message11 = $('#inputMessageAdmob11').val();
-        if(getBLen(message11) > 25){
-            alert("广告语【1】不能超过25个字符");
-            return false;
-        }
         var message12 = $('#inputMessageAdmob12').val();
-        if(getBLen(message12) > 25){
-            alert("广告语【1】不能超过25个字符");
-            return false;
-        }
         var message13 = $('#inputMessageAdmob13').val();
-        if(getBLen(message13) > 25){
-            alert("广告语【1】不能超过25个字符");
-            return false;
-        }
         var message14 = $('#inputMessageAdmob14').val();
-        if(getBLen(message14) > 25){
-            alert("广告语【1】不能超过25个字符");
-            return false;
-        }
         var message21 = $('#inputMessageAdmob21').val();
-        if(getBLen(message21) > 25){
-            alert("广告语【1】不能超过25个字符");
-            return false;
-        }
         var message22 = $('#inputMessageAdmob22').val();
-        if(getBLen(message22) > 25){
-            alert("广告语【1】不能超过25个字符");
-            return false;
-        }
         var message23 = $('#inputMessageAdmob23').val();
-        if(getBLen(message23) > 25){
-            alert("广告语【1】不能超过25个字符");
-            return false;
-        }
         var message24 = $('#inputMessageAdmob24').val();
-        if(getBLen(message24) > 25){
-            alert("广告语【1】不能超过25个字符");
-            return false;
-        }
         var message31 = $('#inputMessageAdmob31').val();
-        if(getBLen(message31) > 25){
-            alert("广告语【1】不能超过25个字符");
-            return false;
-        }
         var message32 = $('#inputMessageAdmob32').val();
-        if(getBLen(message32) > 25){
-            alert("广告语【1】不能超过25个字符");
-            return false;
-        }
         var message33 = $('#inputMessageAdmob33').val();
-        if(getBLen(message33) > 25){
-            alert("广告语【1】不能超过25个字符");
-            return false;
-        }
         var message34 = $('#inputMessageAdmob34').val();
-        if(getBLen(message34) > 25){
-            alert("广告语【1】不能超过25个字符");
-            return false;
-        }
         var message41 = $('#inputMessageAdmob41').val();
-        if(getBLen(message41) > 25){
-            alert("广告语【1】不能超过25个字符");
-            return false;
-        }
         var message42 = $('#inputMessageAdmob42').val();
-        if(getBLen(message42) > 25){
-            alert("广告语【1】不能超过25个字符");
-            return false;
-        }
         var message43 = $('#inputMessageAdmob43').val();
-        if(getBLen(message43) > 25){
-            alert("广告语【1】不能超过25个字符");
-            return false;
-        }
         var message44 = $('#inputMessageAdmob44').val();
-        if(getBLen(message44) > 25){
-            alert("广告语【1】不能超过25个字符");
-            return false;
-        }
 
         $.post("advert_admob/save_advert_admob", {
             appName: appName,

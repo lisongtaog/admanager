@@ -28,6 +28,8 @@ public class AdvertAdmob extends HttpServlet {
         JsonObject json = new JsonObject();
 
         if (path.startsWith("/save_advert_admob")) {
+            OperationResult result = new OperationResult();
+            result.result = true;
             String appName = request.getParameter("appName");
             String language = request.getParameter("language");
             String[] message1Arr = new String[4];
@@ -50,29 +52,114 @@ public class AdvertAdmob extends HttpServlet {
             message2Arr[3] = request.getParameter("message42");
             message3Arr[3] = request.getParameter("message43");
             message4Arr[3] = request.getParameter("message44");
-            List<JSObject> list = new ArrayList<>();
-            String sql = "select group_id,message1,message2,message3,message4 from web_ad_descript_dict_admob where app_name='" + appName + "' and language = '" + language + "'";
-            list = fetchData(sql);
-            OperationResult result = new OperationResult();
-            try {
-                if(list != null && list.size() > 0){
-                    HashSet<Integer> set = new HashSet<>();
-                    for(JSObject j : list){
-                        Integer i = j.get("group_id");
-                        set.add(i);
+            for(String m1 : message1Arr){
+                if(m1 != null){
+                   if("Chinese".equals(language) || "Japanese".equals(language) || "Korean".equals(language)){
+                        if(m1.length() > 12){
+                            result.message = language + "在message1中不能超过12个字符！";
+                            result.result = false;
+                            break;
+                        }
+                    }else  if(m1.getBytes("iso8859-1").length > 25){
+                       result.message = "message1不能超过25个字符！";
+                       result.result = false;
+                       break;
+                   }
+                }
+
+            }
+            if(result.result){
+                for(String m2 : message2Arr){
+                    if(m2 != null){
+                       if("Chinese".equals(language) || "Japanese".equals(language) || "Korean".equals(language)){
+                            if(m2.length() > 12){
+                                result.message = language + "在message2中不能超过12个字符！";
+                                result.result = false;
+                                break;
+                            }
+                        }else if(m2.getBytes("iso8859-1").length > 25){
+                           result.message = "message2不能超过25个字符！";
+                           result.result = false;
+                           break;
+                       }
                     }
-                    for(int i=1;i<=4;i++){
-                        if(set.contains(i)){
-                            DB.update("web_ad_descript_dict_admob")
-                                    .put("message1", message1Arr[i-1])
-                                    .put("message2", message2Arr[i-1])
-                                    .put("message3", message3Arr[i-1])
-                                    .put("message4", message4Arr[i-1])
-                                    .where(DB.filter().whereEqualTo("app_name", appName))
-                                    .and(DB.filter().whereEqualTo("language", language))
-                                    .and(DB.filter().whereEqualTo("group_id", i))
-                                    .execute();
-                        }else{
+
+                }
+            }
+            if(result.result){
+                for(String m3 : message3Arr){
+                    if(m3 != null){
+                        if("Chinese".equals(language) || "Japanese".equals(language) || "Korean".equals(language)){
+                            if(m3.length() > 12){
+                                result.message = language + "在message3中不能超过12个字符！";
+                                result.result = false;
+                                break;
+                            }
+                        } else if(m3.getBytes("iso8859-1").length > 25){
+                            result.message = "message3不能超过25个字符！";
+                            result.result = false;
+                            break;
+                        }
+                    }
+
+                }
+            }
+            if(result.result){
+                for(String m4 : message4Arr){
+                    if(m4 != null){
+                        if("Chinese".equals(language) || "Japanese".equals(language) || "Korean".equals(language)){
+                            if(m4.length() > 12){
+                                result.message = language + "在message4中不能超过12个字符！";
+                                result.result = false;
+                                break;
+                            }
+                        }else if(m4.getBytes("iso8859-1").length > 25){
+                            result.message = "message4不能超过25个字符！";
+                            result.result = false;
+                            break;
+                        }
+                    }
+
+                }
+            }
+            if(result.result){
+                List<JSObject> list = new ArrayList<>();
+                String sql = "select group_id,message1,message2,message3,message4 from web_ad_descript_dict_admob where app_name='" + appName + "' and language = '" + language + "'";
+                list = fetchData(sql);
+
+                try {
+                    if(list != null && list.size() > 0){
+                        HashSet<Integer> set = new HashSet<>();
+                        for(JSObject j : list){
+                            Integer i = j.get("group_id");
+                            set.add(i);
+                        }
+                        for(int i=1;i<=4;i++){
+                            if(set.contains(i)){
+                                DB.update("web_ad_descript_dict_admob")
+                                        .put("message1", message1Arr[i-1])
+                                        .put("message2", message2Arr[i-1])
+                                        .put("message3", message3Arr[i-1])
+                                        .put("message4", message4Arr[i-1])
+                                        .where(DB.filter().whereEqualTo("app_name", appName))
+                                        .and(DB.filter().whereEqualTo("language", language))
+                                        .and(DB.filter().whereEqualTo("group_id", i))
+                                        .execute();
+                            }else{
+                                DB.insert("web_ad_descript_dict_admob")
+                                        .put("language", language)
+                                        .put("message1", message1Arr[i-1])
+                                        .put("message2", message2Arr[i-1])
+                                        .put("message3", message3Arr[i-1])
+                                        .put("message4", message4Arr[i-1])
+                                        .put("group_id", i)
+                                        .put("app_name", appName)
+                                        .execute();
+                            }
+                        }
+                        json.addProperty("existData","true");
+                    }else{
+                        for(int i=1;i<=4;i++){
                             DB.insert("web_ad_descript_dict_admob")
                                     .put("language", language)
                                     .put("message1", message1Arr[i-1])
@@ -83,27 +170,15 @@ public class AdvertAdmob extends HttpServlet {
                                     .put("app_name", appName)
                                     .execute();
                         }
+                        json.addProperty("existData","false");
                     }
-                    json.addProperty("existData","true");
-                }else{
-                    for(int i=1;i<=4;i++){
-                        DB.insert("web_ad_descript_dict_admob")
-                                .put("language", language)
-                                .put("message1", message1Arr[i-1])
-                                .put("message2", message2Arr[i-1])
-                                .put("message3", message3Arr[i-1])
-                                .put("message4", message4Arr[i-1])
-                                .put("group_id", i)
-                                .put("app_name", appName)
-                                .execute();
-                    }
-                    json.addProperty("existData","false");
+                    result.result = true;
+                } catch (Exception ex) {
+                    result.message = ex.getMessage();
+                    result.result = false;
                 }
-                result.result = true;
-            } catch (Exception ex) {
-                result.message = ex.getMessage();
-                result.result = false;
             }
+
             json.addProperty("ret", result.result ? 1 : 0);
             json.addProperty("message", result.message);
         } else if (path.startsWith("/query_before_admob_insert")) {
