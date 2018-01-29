@@ -40,6 +40,9 @@ function generateFacebookCampaignName(params) {
     var appName = $('#selectApp').val();
     dims.push(appName);
 
+    var advert_group_id = $('#selectAdvertGroupId').val();
+    dims.push("Group" + advert_group_id);
+
     var region = $('#selectRegion').val();
     var countryAlisa = $('#selectRegion')[0].countryAlisa;
     if (countryAlisa) {
@@ -90,6 +93,7 @@ function generateFacebookCampaignName(params) {
         dims.push(imagePath);
     }
 
+
     if (params.bidding) {
         dims.push(params.bidding);
     }
@@ -104,6 +108,9 @@ function generateAdmobCampaignName(params) {
     var dims = [];
     var now = new Date();
     dims.push($('#selectAppAdmob').val());
+
+    var advert_group_id = $('#selectAdvertGroupIdAdmob').val();
+    dims.push("Group" + advert_group_id);
 
     var region = $('#selectRegionAdmob option:selected').text();
     var countryAlisa = $('#selectRegionAdmob')[0].countryAlisa;
