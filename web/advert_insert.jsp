@@ -564,6 +564,14 @@
     });
 
     $('#selectApp,#selectLanguage').change(function () {
+        $('#inputTitle11').val("");
+        $('#inputMessage11').val("");
+        $('#inputTitle22').val("");
+        $('#inputMessage22').val("");
+        $('#inputTitle33').val("");
+        $('#inputMessage33').val("");
+        $('#inputTitle44').val("");
+        $('#inputMessage44').val("");
         var appName = $("#selectApp").val();
         var language = $("#selectLanguage").val();
         if(language != null &&  language.length > 0){
@@ -615,6 +623,22 @@
     });
 
     $('#selectAppAdmob,#selectLanguageAdmob').change(function () {
+        $('#inputMessageAdmob11').val("");
+        $('#inputMessageAdmob12').val("");
+        $('#inputMessageAdmob13').val("");
+        $('#inputMessageAdmob14').val("");
+        $('#inputMessageAdmob21').val("");
+        $('#inputMessageAdmob22').val("");
+        $('#inputMessageAdmob23').val("");
+        $('#inputMessageAdmob24').val("");
+        $('#inputMessageAdmob31').val("");
+        $('#inputMessageAdmob32').val("");
+        $('#inputMessageAdmob33').val("");
+        $('#inputMessageAdmob34').val("");
+        $('#inputMessageAdmob41').val("");
+        $('#inputMessageAdmob42').val("");
+        $('#inputMessageAdmob43').val("");
+        $('#inputMessageAdmob44').val("");
         var appNameAdmob = $("#selectAppAdmob").val();
         var languageAdmob = $("#selectLanguageAdmob").val();
         if(languageAdmob != null &&  languageAdmob.length > 0){
