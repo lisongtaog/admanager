@@ -33,9 +33,14 @@
     </div>
 
     <div class="panel panel-default">
+      <div>
+        💚💜💙💖<input id="btnSetZero" type="button" value="置零" style="color: #2b542c">💚💜💙💖<input id="btnDelete" type="button" value="删除" style="color: #c08b5f">
+        💚💜💙💖<input type="text" id="inputLikeLastErrorMessage" /><input id="btnFiltrateError" type="button" value="模糊筛选" style="color: #4385c0">💚💜💙💖
+      </div>
       <table class="table">
         <thead>
-        <tr><th>网络</th><th>序号</th><th>系列名称</th><th>失败次数</th><th>错误信息</th></tr>
+        <tr><th>☆</th><th>网络</th><th>序号</th><th>系列名称</th><th>失败次数</th><th>错误信息</th></tr>
+        <tr><th><input type="checkbox" id="allChk"/></th><th>全选</th><th></th><th></th><th></th><th></th></tr>
         </thead>
         <tbody>
         </tbody>
@@ -64,6 +69,9 @@
             var one = data.data[i];
             var tr = $('<tr></tr>');
             var td = $('<td></td>');
+            td.html("<input name='subChk' value= '" + one.id + "-"+ one.network + "' type='checkbox'/>");
+            tr.append(td);
+            td = $('<td></td>');
             td.text(one.network);
             tr.append(td);
             td = $('<td></td>');
@@ -89,6 +97,91 @@
     }, 1000 * 60);
 
     fetchData();
+
+    $("#btnFiltrateError").click(function(){
+        var likeLastErrorMessage = $("#inputLikeLastErrorMessage").val();
+        if(likeLastErrorMessage == ""){
+            $(".table tbody tr").each(function() {
+                var last_error_message = $(this).children('td').eq(5).html();
+                if(last_error_message == ""){
+                    $(this).show();
+                }else{
+                    $(this).hide();
+                }
+            });
+        }else{
+            $(".table tbody tr").each(function() {
+                var last_error_message = $(this).children('td').eq(5).html();
+                if(last_error_message == ""){
+                    $(this).hide();
+                }else if(last_error_message.indexOf(likeLastErrorMessage) == -1){
+                    $(this).hide();
+                }else{
+                    $(this).show();
+                }
+            });
+        }
+
+    });
+
+    $("#btnSetZero").click(function(){
+        // 判断是否至少选择一项
+        var checkedNum = $("input[name='subChk']:checked").length;
+        if(checkedNum == 0) {
+            alert("请选择至少一项！");
+            return;
+        }
+        // 批量选择
+        if(confirm("确定要修改所选系列？")) {
+            var checkedList = new Array();
+            $("input[name='subChk']:checked").each(function() {
+                checkedList.push($(this).val());
+            });
+            $.ajax({
+                type: "POST",
+                url: "create_campaign_operator/modified_failed_count_of_campaign",
+                data: {'modifiedms':checkedList.toString()},
+                success: function(result) {
+                    if (result && result.ret == 1) {
+                        fetchData();
+                    }
+                }
+            });
+        }
+    });
+
+    $("#btnDelete").click(function(){
+        // 判断是否至少选择一项
+        var checkedNum = $("input[name='subChk']:checked").length;
+        if(checkedNum == 0) {
+            alert("请选择至少一项！");
+            return;
+        }
+        // 批量选择
+        if(confirm("确定要删除所选系列？")) {
+            var checkedList = new Array();
+            $("input[name='subChk']:checked").each(function() {
+                checkedList.push($(this).val());
+            });
+            $.ajax({
+                type: "POST",
+                url: "create_campaign_operator/delete_error_message_of_campaign",
+                data: {'delitems':checkedList.toString()},
+                success: function(result) {
+                    if (result && result.ret == 1) {
+//                        $("input[name='subChk']:checked").remove();
+                        fetchData();
+                    }
+                }
+            });
+        }
+    });
+
+    // 全选
+    $("#allChk").click(function() {
+        $("input[name='subChk']").prop("checked",this.checked);
+        $("input[name='subChk']:hidden").prop("checked",false);
+    });
   </script>
   </body>
 </html>

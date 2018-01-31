@@ -225,6 +225,8 @@ public class Campaign extends HttpServlet {
                                     DB.delete("ad_campaigns").where(DB.filter().whereEqualTo("campaign_name", campaignName)).execute();
                                     System.out.println("由于Media导致第"+(i+1)+"个系列创建失败,名为["+campaignName + "]的系列已经被删除！");
                                 }
+                            } else {
+
                             }
 
 //                            if(genId >0){

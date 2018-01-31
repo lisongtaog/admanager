@@ -182,7 +182,6 @@
     });
 
     // 全选
-    // 全选
     $("#allChk").click(function() {
         $("input[name='subChk']").prop("checked",this.checked);
         $("input[name='subChk']:hidden").prop("checked",false);

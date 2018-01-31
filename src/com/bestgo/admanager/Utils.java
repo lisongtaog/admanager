@@ -90,7 +90,7 @@ public class Utils {
 
     public static String getAccessToken() {
         try {
-            JSObject jsObject = DB.simpleScan("ad_app_confg").select("access_token").execute();
+            JSObject jsObject = DB.simpleScan("ad_app_config").select("access_token").execute();
             return jsObject.get("access_token");
         } catch (Exception e) {
             e.printStackTrace();

@@ -14,7 +14,7 @@ import java.io.IOException;
 /**
  * Author: mengjun
  * Date: 2018/1/31 15:22
- * Desc: 针对web_ad_batch_change_campaigns表进行的一系列操作
+ * Desc: 针对批量修改页面进行的一系列操作
  */
 @WebServlet(name = "BatchChangeCampaignOperator", urlPatterns = "/batch_change_campaign_operator/*")
 public class BatchChangeCampaignOperator extends HttpServlet {
