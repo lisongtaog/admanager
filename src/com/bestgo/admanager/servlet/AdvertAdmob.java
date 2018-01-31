@@ -55,8 +55,17 @@ public class AdvertAdmob extends HttpServlet {
             for(String m1 : message1Arr){
                 if(m1 != null){
                    if("Chinese".equals(language) || "Japanese".equals(language) || "Korean".equals(language)){
-                        if(m1.length() > 12){
-                            result.message = language + "在message1中不能超过12个字符！";
+                       String[] sub = m1.split("");
+                       int num = 0;
+                       for(String s : sub){
+                           if(" ".equals(s) || ".".equals(s) || "!".equals(s) || ",".equals(s)){
+                               num++;
+                           }else{
+                               num +=2;
+                           }
+                       }
+                        if(num > 25){
+                            result.message = language + "在message1中不能超过25个字符！";
                             result.result = false;
                             break;
                         }
@@ -72,11 +81,20 @@ public class AdvertAdmob extends HttpServlet {
                 for(String m2 : message2Arr){
                     if(m2 != null){
                        if("Chinese".equals(language) || "Japanese".equals(language) || "Korean".equals(language)){
-                            if(m2.length() > 12){
-                                result.message = language + "在message2中不能超过12个字符！";
-                                result.result = false;
-                                break;
-                            }
+                           String[] sub = m2.split("");
+                           int num = 0;
+                           for(String s : sub){
+                               if(" ".equals(s) || ".".equals(s) || "!".equals(s) || ",".equals(s)){
+                                   num++;
+                               }else{
+                                   num +=2;
+                               }
+                           }
+                           if(num > 25){
+                               result.message = language + "在message2中不能超过25个字符！";
+                               result.result = false;
+                               break;
+                           }
                         }else if(m2.getBytes("iso8859-1").length > 25){
                            result.message = "message2不能超过25个字符！";
                            result.result = false;
@@ -90,8 +108,17 @@ public class AdvertAdmob extends HttpServlet {
                 for(String m3 : message3Arr){
                     if(m3 != null){
                         if("Chinese".equals(language) || "Japanese".equals(language) || "Korean".equals(language)){
-                            if(m3.length() > 12){
-                                result.message = language + "在message3中不能超过12个字符！";
+                            String[] sub = m3.split("");
+                            int num = 0;
+                            for(String s : sub){
+                                if(" ".equals(s) || ".".equals(s) || "!".equals(s) || ",".equals(s)){
+                                    num++;
+                                }else{
+                                    num +=2;
+                                }
+                            }
+                            if(num > 25){
+                                result.message = language + "在message3中不能超过25个字符！";
                                 result.result = false;
                                 break;
                             }
@@ -108,8 +135,17 @@ public class AdvertAdmob extends HttpServlet {
                 for(String m4 : message4Arr){
                     if(m4 != null){
                         if("Chinese".equals(language) || "Japanese".equals(language) || "Korean".equals(language)){
-                            if(m4.length() > 12){
-                                result.message = language + "在message4中不能超过12个字符！";
+                            String[] sub = m4.split("");
+                            int num = 0;
+                            for(String s : sub){
+                                if(" ".equals(s) || ".".equals(s) || "!".equals(s) || ",".equals(s)){
+                                    num++;
+                                }else{
+                                    num +=2;
+                                }
+                            }
+                            if(num > 25){
+                                result.message = language + "在message4中不能超过25个字符！";
                                 result.result = false;
                                 break;
                             }

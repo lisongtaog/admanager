@@ -71,8 +71,8 @@ public class QueryByMulConditions extends HttpServlet {
                     countryCheck = "false";
                 }
                 if ("false".equals(adwordsCheck) && "false".equals(facebookCheck)) {
-                    JsonObject admob = fetchOneAppData(id, tag,startTime, endTime, true, "true".equals(countryCheck), countryCode,likeCampaignName,campaignCreateTime,true,countryMap,totalInstallComparisonValue, "true".equals(containsNoDataCampaignCheck),countryCode,cpaComparisonValue,biddingComparisonValue,totalInstallOperator,cpaOperator);
-                    JsonObject facebook = fetchOneAppData(id, tag,startTime, endTime,false, "true".equals(countryCheck), countryCode,likeCampaignName,campaignCreateTime,true,countryMap,totalInstallComparisonValue, "true".equals(containsNoDataCampaignCheck),countryName,cpaComparisonValue,biddingComparisonValue,totalInstallOperator,cpaOperator);
+                    JsonObject admob = fetchOneAppData(id, tag,startTime, endTime, true, "true".equals(countryCheck), countryCode,likeCampaignName,campaignCreateTime,countryMap,totalInstallComparisonValue, "true".equals(containsNoDataCampaignCheck),countryCode,cpaComparisonValue,biddingComparisonValue,totalInstallOperator,cpaOperator);
+                    JsonObject facebook = fetchOneAppData(id, tag,startTime, endTime,false, "true".equals(countryCheck), countryCode,likeCampaignName,campaignCreateTime,countryMap,totalInstallComparisonValue, "true".equals(containsNoDataCampaignCheck),countryName,cpaComparisonValue,biddingComparisonValue,totalInstallOperator,cpaOperator);
                     double total_spend = admob.get("total_spend").getAsDouble() + facebook.get("total_spend").getAsDouble();
                     double total_installed = admob.get("total_installed").getAsDouble() + facebook.get("total_installed").getAsDouble();
                     double total_impressions = admob.get("total_impressions").getAsDouble() + facebook.get("total_impressions").getAsDouble();
@@ -372,9 +372,9 @@ public class QueryByMulConditions extends HttpServlet {
                                 Collections.sort(campaignsList, new Comparator<Campaigns>() {
                                     @Override
                                     public int compare(Campaigns a, Campaigns b) {
-                                        if(a.roi > b.roi){
+                                        if(a.un_rate > b.un_rate){
                                             return 1;
-                                        }else  if(a.roi < b.roi){
+                                        }else  if(a.un_rate < b.un_rate){
                                             return -1;
                                         }else{
                                             return 0;
@@ -386,9 +386,9 @@ public class QueryByMulConditions extends HttpServlet {
                                 Collections.sort(campaignsList, new Comparator<Campaigns>() {
                                     @Override
                                     public int compare(Campaigns a, Campaigns b) {
-                                        if(a.roi > b.roi){
+                                        if(a.un_rate > b.un_rate){
                                             return -1;
-                                        }else if(a.roi < b.roi){
+                                        }else if(a.un_rate < b.un_rate){
                                             return 1;
                                         }else{
                                             return 0;
@@ -417,7 +417,7 @@ public class QueryByMulConditions extends HttpServlet {
                             j.addProperty("ctr",c.ctr);
                             j.addProperty("cpa",c.cpa);
                             j.addProperty("cvr",c.cvr);
-                            j.addProperty("roi",c.roi);
+                            j.addProperty("un_rate",c.un_rate);
                             j.addProperty("campaign_spends",c.campaign_spends);
                             j.addProperty("network",c.network);
                             jsonArray.add(j);
@@ -444,10 +444,10 @@ public class QueryByMulConditions extends HttpServlet {
 
                 } else {
                     if("true".equals(adwordsCheck)){
-                        jsonObject = fetchOneAppData(id, tag,startTime, endTime, true, "true".equals(countryCheck), countryCode,likeCampaignName,campaignCreateTime,true,countryMap,totalInstallComparisonValue, "true".equals(containsNoDataCampaignCheck),countryCode,cpaComparisonValue,biddingComparisonValue,totalInstallOperator,cpaOperator);
+                        jsonObject = fetchOneAppData(id, tag,startTime, endTime, true, "true".equals(countryCheck), countryCode,likeCampaignName,campaignCreateTime,countryMap,totalInstallComparisonValue, "true".equals(containsNoDataCampaignCheck),countryCode,cpaComparisonValue,biddingComparisonValue,totalInstallOperator,cpaOperator);
 
                     }else{
-                        jsonObject = fetchOneAppData(id, tag,startTime, endTime, false, "true".equals(countryCheck), countryCode,likeCampaignName,campaignCreateTime,true,countryMap,totalInstallComparisonValue, "true".equals(containsNoDataCampaignCheck),countryName,cpaComparisonValue,biddingComparisonValue,totalInstallOperator,cpaOperator);
+                        jsonObject = fetchOneAppData(id, tag,startTime, endTime, false, "true".equals(countryCheck), countryCode,likeCampaignName,campaignCreateTime,countryMap,totalInstallComparisonValue, "true".equals(containsNoDataCampaignCheck),countryName,cpaComparisonValue,biddingComparisonValue,totalInstallOperator,cpaOperator);
 
                     }
                 }
@@ -476,16 +476,11 @@ public class QueryByMulConditions extends HttpServlet {
                     if(sorter > 0){
                         List<CountryRecord> countryRecordList = new ArrayList<>();
                         for (String key : dataSets.keySet()) {
-                            String sql = "select price from web_ad_tag_country_price_dict cpd, app_country_code_dict ccd " +
-                                    "where cpd.country_code = ccd.country_code and ccd.country_name = '" + key + "' and tag_name = '" + tag + "'";
-                            JSObject oneR = DB.findOneBySql(sql);
-                            double price = Utils.convertDouble(oneR.get("price"),0);
                             CountryRecord record = dataSets.get(key);
                             record.country_name = key;
                             record.ctr = record.impressions > 0 ? record.click / record.impressions : 0;
                             record.cpa = record.installed > 0 ? record.spend / record.installed : 0;
                             record.cvr = record.click > 0 ? record.installed / record.click : 0;
-                            record.roi = (price - record.cpa) * record.installed;
                             countryRecordList.add(record);
                         }
                         switch (sorter){
@@ -689,9 +684,9 @@ public class QueryByMulConditions extends HttpServlet {
                                 Collections.sort(countryRecordList, new Comparator<CountryRecord>() {
                                     @Override
                                     public int compare(CountryRecord a, CountryRecord b) {
-                                        if(a.roi > b.roi){
+                                        if(a.un_rate > b.un_rate){
                                             return 1;
-                                        }else if(a.roi < b.roi){
+                                        }else if(a.un_rate < b.un_rate){
                                             return -1;
                                         }else{
                                             return 0;
@@ -703,9 +698,9 @@ public class QueryByMulConditions extends HttpServlet {
                                 Collections.sort(countryRecordList, new Comparator<CountryRecord>() {
                                     @Override
                                     public int compare(CountryRecord a, CountryRecord b) {
-                                        if(a.roi > b.roi){
+                                        if(a.un_rate > b.un_rate){
                                             return -1;
-                                        }else if(a.roi < b.roi){
+                                        }else if(a.un_rate < b.un_rate){
                                             return 1;
                                         }else{
                                             return 0;
@@ -724,21 +719,16 @@ public class QueryByMulConditions extends HttpServlet {
                             one.addProperty("ctr", Utils.trimDouble(record.ctr,3));
                             one.addProperty("cpa", Utils.trimDouble(record.cpa,3));
                             one.addProperty("cvr", Utils.trimDouble(record.cvr,3));
-                            one.addProperty("roi", Utils.trimDouble(record.roi,3));
+                            one.addProperty("un_rate", Utils.trimDouble(record.un_rate,3));
                             newArr.add(one);
                         }
                     }else{
                         for (String key : dataSets.keySet()) {
-                            String sql = "select price from web_ad_tag_country_price_dict cpd, app_country_code_dict ccd " +
-                                    "where cpd.country_code = ccd.country_code and ccd.country_name = '" + key + "' and tag_name = '" + tag + "'";
-                            JSObject oneR = DB.findOneBySql(sql);
-                            double price = Utils.convertDouble(oneR.get("price"),0);
                             JsonObject one = new JsonObject();
                             CountryRecord record = dataSets.get(key);
                             record.ctr = record.impressions > 0 ? record.click / record.impressions : 0;
                             record.cpa = record.installed > 0 ? record.spend / record.installed : 0;
                             record.cvr = record.click > 0 ? record.installed / record.click : 0;
-                            record.roi = (price - record.cpa) * record.installed;
                             one.addProperty("country_name", key);
                             one.addProperty("impressions", record.impressions);
                             one.addProperty("installed", record.installed);
@@ -747,7 +737,7 @@ public class QueryByMulConditions extends HttpServlet {
                             one.addProperty("ctr", Utils.trimDouble(record.ctr,3));
                             one.addProperty("cpa", Utils.trimDouble(record.cpa,3));
                             one.addProperty("cvr", Utils.trimDouble(record.cvr,3));
-                            one.addProperty("roi", Utils.trimDouble(record.roi,3));
+                            one.addProperty("un_rate", Utils.trimDouble(record.un_rate,3));
                             newArr.add(one);
                         }
                     }
@@ -773,7 +763,7 @@ public class QueryByMulConditions extends HttpServlet {
 
 
 
-    private JsonObject fetchOneAppData(long tagId, String tagName, String startTime, String endTime, boolean admobCheck, boolean countryCheck, String countryCode,String likeCampaignName,String campaignCreateTime,boolean hasROI,HashMap<String ,String> countryMap,String totalInstallComparisonValue, boolean containsNoDataCampaignCheck,String country,String cpaComparisonValue,String biddingComparisonValue,String totalInstallOperator,String cpaOperator) throws Exception {
+    private JsonObject fetchOneAppData(long tagId, String tagName, String startTime, String endTime, boolean admobCheck, boolean countryCheck, String countryCode,String likeCampaignName,String campaignCreateTime,HashMap<String ,String> countryMap,String totalInstallComparisonValue, boolean containsNoDataCampaignCheck,String country,String cpaComparisonValue,String biddingComparisonValue,String totalInstallOperator,String cpaOperator) throws Exception {
         String webAdCampaignTagRelTable = "web_ad_campaign_tag_rel";
         String webAdCampaignsTable = "web_ad_campaigns";
         String adCampaignsTable = "ad_campaigns";
@@ -950,39 +940,25 @@ public class QueryByMulConditions extends HttpServlet {
                         continue;
                     }
                 }
-                String campaign_id = one.get("campaign_id");
-                double roi = 0;
-                if(hasROI){
-                    double priceI = 0;
-                    double cpaI = 0;
-                    double installedI = 0;
-                    if(countryCode != null && countryCode.length()>0){
-                        String sql = "select price from web_ad_tag_country_price_dict where tag_name = '" + tagName + "' and country_code = '" + countryCode + "'";
-                        JSObject oneI = DB.findOneBySql(sql);
-                        if(one.hasObjectData()){
-                            priceI = Utils.convertDouble(oneI.get("price"),0);
-                            String sqlT = "select sum(total_installed) installed, sum(cpa) cpa from " + webAdCampaignsCountryHistoryTable + " where campaign_id = '" + campaign_id + "' " +
-                                    "and country_code = '"+countryCode+"' and date between '"+startTime+"' and '"+endTime+"'";
-                            JSObject twoI = DB.findOneBySql(sqlT);
-                            cpaI = Utils.convertDouble(twoI.get("cpa"),0);
-                            installedI = Utils.convertDouble(twoI.get("installed"),0);
-                            roi = ( priceI - cpaI ) * installedI;
-                        }
-                    }else{
-                        String sql = "select cch.country_code, sum(cpa) cpa, sum(total_installed) installed, price " +
-                                "from " + webAdCampaignsCountryHistoryTable + " cch,web_ad_tag_country_price_dict cpd " +
-                                "where cch.country_code = cpd.country_code and campaign_id = '"+campaign_id+"' and tag_name = '"
-                                + tagName + "' and date between '"+startTime+"' and '"+endTime+"' group by cch.country_code";
-
-                        List<JSObject> listM = DB.findListBySql(sql);
-                        for(JSObject j : listM){
-                            cpaI = Utils.convertDouble(j.get("cpa"),0);
-                            installedI = Utils.convertDouble(j.get("installed"),0);
-                            priceI = Utils.convertDouble(j.get("price"),0);
-                            roi += (priceI - cpaI)*installedI;
+                String campaignId = one.get("campaign_id");
+                double unRate = 0;
+                if(admobCheck){
+                    String sqlQuery = "select COUNT(id) as uninstall_count from ad_campaign_user_date_admob_rel where campaign_id = '" + campaignId + "' and uninstall_date is NOT NULL";
+                    JSObject oneQ = DB.findOneBySql(sqlQuery);
+                    if(oneQ != null && oneQ.hasObjectData()){
+                        long uninstallCount = oneQ.get("uninstall_count");
+                        if(uninstallCount != 0){
+                            sqlQuery = "select COUNT(id) as install_count from ad_campaign_user_date_admob_rel where campaign_id = '" + campaignId + "'";
+                            oneQ = DB.findOneBySql(sqlQuery);
+                            if(oneQ != null && oneQ.hasObjectData()){
+                                long installCount = oneQ.get("install_count");
+                                unRate = uninstallCount / installCount;
+                            }
                         }
                     }
                 }
+
+
 
                 String short_name = one.get("short_name");
                 String account_id = one.get("account_id");
@@ -1000,7 +976,7 @@ public class QueryByMulConditions extends HttpServlet {
                 double cpa = installed > 0 ? spend / installed : 0;
                 double cvr = click > 0 ? installed / click : 0;
 
-                JSObject js = countryCampaignspendMap.get(campaign_id);
+                JSObject js = countryCampaignspendMap.get(campaignId);
                 double campaign_spends = 0;
                 if(js != null && js.hasObjectData()){
                     campaign_spends = Utils.convertDouble(js.get("campaign_spends"), 0);
@@ -1015,7 +991,7 @@ public class QueryByMulConditions extends HttpServlet {
 
 
                 JsonObject d = new JsonObject();
-                d.addProperty("campaign_id", campaign_id);
+                d.addProperty("campaign_id", campaignId);
                 d.addProperty("short_name", short_name);
                 d.addProperty("account_id", account_id);
                 d.addProperty("campaign_name", campaign_name);
@@ -1033,7 +1009,7 @@ public class QueryByMulConditions extends HttpServlet {
                 d.addProperty("ctr", Utils.trimDouble(ctr,3));
                 d.addProperty("cpa", Utils.trimDouble(cpa,3));
                 d.addProperty("cvr", Utils.trimDouble(cvr,3));
-                d.addProperty("roi", Utils.trimDouble(roi,3));
+                d.addProperty("un_rate", Utils.trimDouble(unRate,3));
                 if (admobCheck) {
                     d.addProperty("network", "admob");
                 } else {
@@ -1090,7 +1066,7 @@ public class QueryByMulConditions extends HttpServlet {
                 d.addProperty("ctr", 0);
                 d.addProperty("cpa", 0);
                 d.addProperty("cvr", 0);
-                d.addProperty("roi", -100000);
+                d.addProperty("un_rate", -100000);
                 if (admobCheck) {
                     d.addProperty("network", "admob");
                 } else {
@@ -1120,7 +1096,7 @@ public class QueryByMulConditions extends HttpServlet {
         public double ctr;
         public double cpa;
         public double cvr;
-        public double roi;
+        public double un_rate;
     }
     class Campaigns {
         public String campaign_id;
@@ -1139,7 +1115,7 @@ public class QueryByMulConditions extends HttpServlet {
         public double ctr;
         public double cpa;
         public double cvr;
-        public double roi;
+        public double un_rate;
         public double campaign_spends;
         public String network;
     }

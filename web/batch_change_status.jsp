@@ -8,7 +8,20 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css" />
 <link rel="stylesheet" href="bootstrap/css/bootstrap-theme.min.css" />
-
+<style>
+  .red {
+    color: red;
+  }
+  .blue {
+    color: #0f0;
+  }
+  .green{
+    color: green;
+  }
+  .ens{
+    color: #bdf7ff;
+  }
+</style>
 <html>
   <head>
     <title>批量修改状态</title>
@@ -30,9 +43,13 @@
     </div>
 
     <div class="panel panel-default">
+      <div>
+        💚💜💙💖<input id="btnSetZero" type="button" value="置零" style="color: #2b542c">💚💜💙💖<input id="btnDelete" type="button" value="删除" style="color: #c08b5f">
+        💚💜💙💖<input type="text" id="inputLikeLastErrorMessage" /><input id="btnFiltrateError" type="button" value="模糊筛选" style="color: #4385c0">💚💜💙💖
+      </div>
       <table class="table">
         <thead>
-        <tr><th>网络</th><th>序号</th><th>系列名称</th><th>失败次数</th><th>错误信息</th></tr>
+        <tr><th>☆</th><th>网络</th><th>序号</th><th>系列名称</th><th>失败次数</th><th>错误信息</th></tr>
         </thead>
         <tbody>
         </tbody>
@@ -54,6 +71,9 @@
             var one = data.data[i];
             var tr = $('<tr></tr>');
             var td = $('<td></td>');
+            td.html("<input name='subChk' value= '" + one.id + "' type='checkbox'/>");
+            tr.append(td);
+            td = $('<td></td>');
             td.text(one.network);
             tr.append(td);
             td = $('<td></td>');
@@ -74,11 +94,79 @@
       }, 'json');
     }
 
+
     setInterval(function() {
       fetchData();
     }, 1000 * 60);
 
     fetchData();
+
+    $("#btnFiltrateError").click(function(){
+        var likeLastErrorMessage = $("#inputLikeLastErrorMessage").val();
+        $(".table tbody tr").each(function() {
+            var last_error_message = $(this).children('td').eq(5).html();
+            if(last_error_message == ""){
+                $(this).hide();
+            }else{
+                if(last_error_message.indexOf(likeLastErrorMessage) == -1){
+                    $(this).hide();
+                }
+            }
+        });
+    });
+
+    $("#btnSetZero").click(function(){
+        // 判断是否至少选择一项
+        var checkedNum = $("input[name='subChk']:checked").length;
+        if(checkedNum == 0) {
+            alert("请选择至少一项！");
+            return;
+        }
+        // 批量选择
+        if(confirm("确定要修改所选系列？")) {
+            var checkedList = new Array();
+            $("input[name='subChk']:checked").each(function() {
+                checkedList.push($(this).val());
+            });
+            $.ajax({
+                type: "POST",
+                url: "batch_change_campaign_operator/modified_failed_count_of_batch_change_status",
+                data: {'modifiedms':checkedList.toString()},
+                success: function(result) {
+                    if (result && result.ret == 1) {
+                        fetchData();
+                    }
+                }
+            });
+        }
+    });
+
+    $("#btnDelete").click(function(){
+        // 判断是否至少选择一项
+        var checkedNum = $("input[name='subChk']:checked").length;
+        if(checkedNum == 0) {
+            alert("请选择至少一项！");
+            return;
+        }
+        // 批量选择
+        if(confirm("确定要删除所选系列？")) {
+            var checkedList = new Array();
+            $("input[name='subChk']:checked").each(function() {
+                checkedList.push($(this).val());
+            });
+            $.ajax({
+                type: "POST",
+                url: "batch_change_campaign_operator/delete_error_message_of_batch_change_status",
+                data: {'delitems':checkedList.toString()},
+                success: function(result) {
+                    if (result && result.ret == 1) {
+//                        $("input[name='subChk']:checked").remove();
+                        fetchData();
+                    }
+                }
+            });
+        }
+    });
   </script>
   </body>
 </html>

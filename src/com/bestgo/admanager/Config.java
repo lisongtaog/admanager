@@ -62,7 +62,7 @@ public class Config {
         //台湾
         regionLanguageRelMap.put("Taiwan, China","Traditional");
         regionLanguageRelMap.put("Taiwan","Traditional");
-        
+
         regionLanguageRelMap.put("Afghanistan","Pashto");
         regionLanguageRelMap.put("Andorra","Catalan");
         regionLanguageRelMap.put("Austria","German");
