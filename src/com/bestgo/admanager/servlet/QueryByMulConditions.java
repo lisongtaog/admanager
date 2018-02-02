@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.lang.System;
 import java.util.*;
 
 /**
@@ -952,7 +953,7 @@ public class QueryByMulConditions extends HttpServlet {
                             oneQ = DB.findOneBySql(sqlQuery);
                             if(oneQ != null && oneQ.hasObjectData()){
                                 long installCount = oneQ.get("install_count");
-                                unRate = uninstallCount / installCount;
+                                unRate = installCount == 0 ? 0 : ((double)uninstallCount / installCount);
                             }
                         }
                     }
