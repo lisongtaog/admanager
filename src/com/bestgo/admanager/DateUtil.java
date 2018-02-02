@@ -102,4 +102,39 @@ public class DateUtil {
         }
     }
 
+    /**
+     * 计算两个日期间隔天数，比如2018-01-01与2018-01-03间隔2天
+     * 如果要是算从起始日期算的第几天的话，还要+1
+     * @param startDateStr
+     * @param endDateStr
+     * @return
+     */
+    public static Integer getIntervalBetweenTwoDates(String startDateStr, String endDateStr,String format) {
+        if (startDateStr != null && endDateStr != null) {
+            SimpleDateFormat sf = new SimpleDateFormat(format);
+            Date start = null;
+            try {
+                start = sf.parse(startDateStr);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            Date end = null;
+            try {
+                end = sf.parse(endDateStr);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            if (start != null && end != null) {
+                Calendar cal = Calendar.getInstance();
+                cal.setTime(start);
+                long time1 = cal.getTimeInMillis();
+                cal.setTime(end);
+                long time2 = cal.getTimeInMillis();
+                long between_days = (time2 - time1) / (1000 * 3600 * 24);
+                return Integer.parseInt(String.valueOf(between_days));
+            }
+        }
+        return null;
+    }
+
 }

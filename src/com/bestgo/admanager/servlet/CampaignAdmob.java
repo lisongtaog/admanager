@@ -178,6 +178,14 @@ public class CampaignAdmob extends HttpServlet {
                                             .put("tag_name", appName)
                                             .put("image_path", imageAbsolutePath)
                                             .executeReturnId();
+                                    if(genId <= 0){
+                                        Logger logger = Logger.getRootLogger();
+                                        logger.debug("app_id=" + gpPackageId + ", account_id=" +  accountIdArr[j] + ", country_region=" + region +
+                                                ", excluded_region="+  excludedRegion +    ", create_time=" +  now +   ", language=" + language +
+                                                ", campaign_name="+ campaignName + ", conversion_id="+ conversionId + ", bugdet="+ bugdet +
+                                                ", bidding="+ bidding + ", bugdet="+ bugdet + ", bidding="+ bidding + ", message1="+ message1 + ", message2="+ message2
+                                                + ", message3="+ message3 + ", message4="+ message4 +", app_name="+ appName + ", image_path="+imageAbsolutePath);
+                                    }
                                 }
                             }
 

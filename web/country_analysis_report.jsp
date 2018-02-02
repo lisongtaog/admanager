@@ -106,6 +106,7 @@
             <th>ActiveUser</th>
             <th>Revenue</th>
             <th>ECPM</th>
+            <th>PI</th>
             <th>CPA</th>
             <th>ACpa</th>
             <th>Incoming</th>
@@ -170,7 +171,7 @@
                     "<th>UninstalledRate</th><th>TotalUser<span sorterId=\"1037\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
                     "<th>ActiveUser<span sorterId=\"1038\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
                     "<th>Revenue<span sorterId=\"1039\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th><th>7daysRevenue</th>" +
-                    "<th>ECPM<span sorterId=\"1040\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
+                    "<th>PI</th><th>ECPM<span sorterId=\"1040\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
                     "<th>CPA<span sorterId=\"1041\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
                     "<th>ACpa</th><th>CPA/ECPM</th>" +
                     "<th>Incoming<span sorterId=\"1042\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th><th>7daysIncoming</th>" +
@@ -240,7 +241,7 @@
             td_outer_a.text(one['country_name']);
             tr.append(td_outer_a);
             var keyset = ["costs","seven_days_costs", "purchased_users", "installed",
-                "uninstalled", "uninstalled_rate", "users", "active_users", "revenues","seven_days_revenues",
+                "uninstalled", "uninstalled_rate", "users", "active_users", "revenues","seven_days_revenues","pi",
                 "ecpm","cpa","a_cpa","cpa_dev_ecpm", "incoming","seven_days_incoming", "estimated_revenues","estimated_revenues_dev_cost","price","bidding"];
             for (var j = 0; j < keyset.length; j++) {
                 var td = $('<td></td>');

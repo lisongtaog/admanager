@@ -226,7 +226,12 @@ public class Campaign extends HttpServlet {
                                     System.out.println("由于Media导致第"+(i+1)+"个系列创建失败,名为["+campaignName + "]的系列已经被删除！");
                                 }
                             } else {
-
+                                Logger logger = Logger.getRootLogger();
+                                logger.debug("facebook_app_id=" + appId + ", account_id=" +  accountIdArr[j] + ", country_region=" + region +
+                                        ", excluded_region="+  excludedRegion +    ", create_time=" +  now +   ", language=" + language +
+                                        ", campaign_name="+ campaignName + ", page_id="+ pageId + ", bugdet="+ bugdet +
+                                        ", bidding="+ bidding + ", bugdet="+ bugdet + ", bidding="+ bidding + ", title="+ title + ", message="+ message +
+                                        ", app_name="+ appName + ", age="+ age +", gender="+ gender + ", user_devices="+ userDevice + ", detail_target="+interest);
                             }
 
 //                            if(genId >0){

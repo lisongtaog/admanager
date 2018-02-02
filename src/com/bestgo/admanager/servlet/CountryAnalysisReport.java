@@ -153,6 +153,7 @@ public class CountryAnalysisReport extends HttpServlet {
                             if(j != null && j.hasObjectData()){
                                 String country_code = j.get("country_code");
 
+
                                 //计算七天的总花费、总营收、总盈利
                                 sql = "select sum(cost) as seven_days_costs, sum(revenue) as seven_days_revenues " +
                                         "from web_ad_country_analysis_report_history where app_id = '"+google_package_id+"' " +
@@ -168,14 +169,17 @@ public class CountryAnalysisReport extends HttpServlet {
                                 }
 
                                 //计算ACpa
-                                sql = "select purchased_user,total_installed " +
+                                sql = "select purchased_user,total_installed,active_user " +
                                         " from web_ad_country_analysis_report_history where app_id = '"+google_package_id+"' " +
                                         " and country_code = '" + country_code + "' and date = '" + beforeThreeDays + "'";
                                 oneC = DB.findOneBySql(sql);
                                 double natural_value = 0;
+                                double before_three_days_active_user = 0;
+                                double before_three_days_purchased_user = 0;
                                 if(oneC != null && oneC.hasObjectData()){
-                                    double before_three_days_purchased_user = Utils.convertDouble(oneC.get("purchased_user"),0);
+                                    before_three_days_purchased_user = Utils.convertDouble(oneC.get("purchased_user"),0);
                                     double before_three_days_total_install = Utils.convertDouble(oneC.get("total_installed"),0);
+                                    before_three_days_active_user = Utils.convertDouble(oneC.get("active_user"),0);
                                     natural_value = before_three_days_total_install - before_three_days_purchased_user;
                                 }
                                 sql = "select cost,purchased_user " +
@@ -191,6 +195,18 @@ public class CountryAnalysisReport extends HttpServlet {
                                 double a_cpa = 0;
                                 double left_today_purchased_user = today_purchased_user + natural_value;
                                 a_cpa = left_today_purchased_user == 0 ? 0 : today_cost / left_today_purchased_user;
+
+                                //PI（人均展示次数）= Revenue *1000 / ECPM / 预估的今天日活
+                                //预估的日活=PurchasedUser_Today+ActiveUser_3dayago-PurchasedUser_3dayago
+                                double revenues = Utils.convertDouble(j.get("revenues"),0);
+                                //    double ecpm = impressions == 0 ? 0 : Utils.trimDouble3(revenues * 1000 / impressions );
+                                double ecpm = Utils.convertDouble(j.get("ecpm"),0);
+                                double left_today_active_user = today_purchased_user + before_three_days_active_user - before_three_days_purchased_user;
+                                double pi = 0;
+                                if(ecpm != 0 && left_today_active_user != 0){
+                                    pi = revenues * 1000 / ecpm / left_today_active_user;
+                                }
+
 
                                 sql = "select country_name from app_country_code_dict where country_code = '" + country_code + "'";
                                 oneC = DB.findOneBySql(sql);
@@ -210,10 +226,9 @@ public class CountryAnalysisReport extends HttpServlet {
 
                                 double users = Utils.convertDouble(j.get("users"),0);
                                 double active_users = Utils.convertDouble(j.get("active_users"),0);
-                                double revenues = Utils.convertDouble(j.get("revenues"),0);
+
                                 double estimated_revenues = Utils.convertDouble(j.get("estimated_revenues"),0);
-//                                double ecpm = impressions == 0 ? 0 : Utils.trimDouble3(revenues * 1000 / impressions );
-                                double ecpm = Utils.convertDouble(j.get("ecpm"),0);
+
                                 double estRevDevCost = Utils.convertDouble(j.get("est_rev_dev_cost"),0);
                                 double cpa = Utils.convertDouble(j.get("cpa"),0);
                                 double incoming = Utils.convertDouble(j.get("incoming"),0);
@@ -270,6 +285,7 @@ public class CountryAnalysisReport extends HttpServlet {
                                 d.addProperty("users", users);
                                 d.addProperty("active_users", active_users);
                                 d.addProperty("revenues", Utils.trimDouble(revenues,0));
+                                d.addProperty("pi", Utils.trimDouble(pi,3));
                                 d.addProperty("ecpm", Utils.trimDouble(ecpm,3));
                                 d.addProperty("cpa_dev_ecpm", Utils.trimDouble(cpa_dev_ecpm,3));
                                 d.addProperty("seven_days_costs", Utils.trimDouble(seven_days_costs,0));
