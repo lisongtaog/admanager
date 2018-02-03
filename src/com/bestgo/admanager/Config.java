@@ -211,7 +211,7 @@ public class Config {
         regionLanguageRelMap.put("Mauritius","English");
         regionLanguageRelMap.put("Turkey","Turkish");
         regionLanguageRelMap.put("Mexico","Spanish");
-        regionLanguageRelMap.put("Malaysia","Malagasy");
+        regionLanguageRelMap.put("Malaysia","Malay");
         regionLanguageRelMap.put("Kazakhstan","Russian");
         regionLanguageRelMap.put("Panama","Spanish");
         regionLanguageRelMap.put("Lebanon","Arabic");

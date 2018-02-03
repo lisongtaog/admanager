@@ -66,6 +66,7 @@
         <li role="presentation"><a href="campaigns_create.jsp">创建广告</a></li>
         <li role="presentation"><a href="campaigns_update_daily_log.jsp">日更记录</a></li>
         <li role="presentation"><a href="country_analysis_report.jsp">分析报告</a></li>
+        <li role="presentation"><a href="country_active_user_report.jsp">活跃用户报告</a></li>
         <li role="presentation"><a href="adaccounts.jsp">广告账号管理</a></li>
         <li role="presentation"><a href="adaccounts_admob.jsp">广告账号管理(AdMob)</a></li>
         <li role="presentation"><a href="campaigns.jsp">广告系列管理</a></li>
