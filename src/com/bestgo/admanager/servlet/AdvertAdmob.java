@@ -52,7 +52,9 @@ public class AdvertAdmob extends HttpServlet {
             message2Arr[3] = request.getParameter("message42");
             message3Arr[3] = request.getParameter("message43");
             message4Arr[3] = request.getParameter("message44");
-            for(String m1 : message1Arr){
+
+            for(int i=0;i<4;i++){
+                String m1 = message1Arr[i];
                 if(m1 != null){
                    if("Chinese".equals(language) || "Japanese".equals(language) || "Korean".equals(language)){
                        String[] sub = m1.split("");
@@ -65,12 +67,12 @@ public class AdvertAdmob extends HttpServlet {
                            }
                        }
                         if(num > 25){
-                            result.message = language + "在message1中不能超过25个字符！";
+                            result.message = "组合【"+(i+1)+"】的广告语1中不能超过25个字符！";
                             result.result = false;
                             break;
                         }
                     }else  if(m1.getBytes("iso8859-1").length > 25){
-                       result.message = "message1不能超过25个字符！";
+                       result.message = "组合【"+(i+1)+"】的广告语1中不能超过25个字符！";
                        result.result = false;
                        break;
                    }
@@ -78,7 +80,8 @@ public class AdvertAdmob extends HttpServlet {
 
             }
             if(result.result){
-                for(String m2 : message2Arr){
+                for(int i = 0;i<4;i++){
+                    String m2 = message2Arr[i];
                     if(m2 != null){
                        if("Chinese".equals(language) || "Japanese".equals(language) || "Korean".equals(language)){
                            String[] sub = m2.split("");
@@ -91,12 +94,12 @@ public class AdvertAdmob extends HttpServlet {
                                }
                            }
                            if(num > 25){
-                               result.message = language + "在message2中不能超过25个字符！";
+                               result.message = "组合【"+(i+1)+"】的广告语2中不能超过25个字符！";
                                result.result = false;
                                break;
                            }
                         }else if(m2.getBytes("iso8859-1").length > 25){
-                           result.message = "message2不能超过25个字符！";
+                           result.message = "组合【"+(i+1)+"】的广告语2中不能超过25个字符！";
                            result.result = false;
                            break;
                        }
@@ -105,7 +108,8 @@ public class AdvertAdmob extends HttpServlet {
                 }
             }
             if(result.result){
-                for(String m3 : message3Arr){
+                for(int i=0;i<4;i++){
+                    String m3 = message3Arr[i];
                     if(m3 != null){
                         if("Chinese".equals(language) || "Japanese".equals(language) || "Korean".equals(language)){
                             String[] sub = m3.split("");
@@ -118,12 +122,12 @@ public class AdvertAdmob extends HttpServlet {
                                 }
                             }
                             if(num > 25){
-                                result.message = language + "在message3中不能超过25个字符！";
+                                result.message = "组合【"+(i+1)+"】的广告语3中不能超过25个字符！";
                                 result.result = false;
                                 break;
                             }
                         } else if(m3.getBytes("iso8859-1").length > 25){
-                            result.message = "message3不能超过25个字符！";
+                            result.message = "组合【"+(i+1)+"】的广告语3中不能超过25个字符！";
                             result.result = false;
                             break;
                         }
@@ -132,7 +136,8 @@ public class AdvertAdmob extends HttpServlet {
                 }
             }
             if(result.result){
-                for(String m4 : message4Arr){
+                for(int i=0;i<4;i++){
+                    String m4 = message4Arr[i];
                     if(m4 != null){
                         if("Chinese".equals(language) || "Japanese".equals(language) || "Korean".equals(language)){
                             String[] sub = m4.split("");
@@ -145,12 +150,12 @@ public class AdvertAdmob extends HttpServlet {
                                 }
                             }
                             if(num > 25){
-                                result.message = language + "在message4中不能超过25个字符！";
+                                result.message = "组合【"+(i+1)+"】的广告语4中不能超过25个字符！";
                                 result.result = false;
                                 break;
                             }
                         }else if(m4.getBytes("iso8859-1").length > 25){
-                            result.message = "message4不能超过25个字符！";
+                            result.message = "组合【"+(i+1)+"】的广告语4中不能超过25个字符！";
                             result.result = false;
                             break;
                         }
