@@ -109,7 +109,6 @@
 <script src="js/bootstrap-datetimepicker.js"></script>
 <script src="jqueryui/jquery-ui.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.4/js/select2.min.js"></script>
-<script src="js/country-name-code-dict.js"></script>
 
 <script>
     var data = <%=array.toString()%>;
@@ -138,7 +137,7 @@
         for (var i = 0; i < data.length; i++) {
             var one = data[i];
             var tr = $('<tr></tr>');
-            var keyset = ["country_code", "avg_7_day_active", "avg_14_day_active", "avg_30_day_active", "avg_60_day_active"];
+            var keyset = ["country_name", "avg_7_day_active", "avg_14_day_active", "avg_30_day_active", "avg_60_day_active"];
             for (var j = 0; j < keyset.length; j++) {
                 var td = $('<td></td>');
                 var field = keyset[j];

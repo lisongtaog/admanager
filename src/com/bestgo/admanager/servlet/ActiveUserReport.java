@@ -13,7 +13,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Author: mengjun
@@ -22,6 +24,30 @@ import java.util.List;
  */
 @WebServlet(name = "ActiveUserReport", urlPatterns = {"/active_user_report/*"})
 public class ActiveUserReport extends HttpServlet {
+    private static Map<String,String> countryCodeMap;
+    static{
+        if(countryCodeMap == null){
+            countryCodeMap = new HashMap<>();
+        }
+        String sql = "select country_code,country_name from app_country_code_dict";
+        List<JSObject> list = null;
+        try {
+            list = DB.findListBySql(sql);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if(list != null){
+            for(JSObject j : list){
+                if(j != null){
+                    String countryCode = j.get("country_code");
+                    String countryName = j.get("country_name");
+                    if(countryCode != null && countryName != null){
+                        countryCodeMap.put(countryCode,countryName);
+                    }
+                }
+            }
+        }
+    }
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         if (!Utils.isAdmin(request, response)) return;
 
@@ -40,15 +66,26 @@ public class ActiveUserReport extends HttpServlet {
                 for (JSObject j : list) {
                     JsonObject jo = new JsonObject();
                     String countryCode = j.get("country_code");
+                    String countryName = countryCodeMap.get(countryCode);
+                    if(countryName == null){
+                        sql = "select country_name from app_country_code_dict where country_code = '" + countryCode + "'";
+                        JSObject one = DB.findOneBySql(sql);
+                        if(one != null && one.hasObjectData()){
+                            countryName = one.get("country_name");
+                        }else{
+                            countryName = "--";
+                        }
+                        countryCodeMap.put(countryCode,countryName);
+                    }
                     double avg_7_day_active = Utils.convertDouble(j.get("avg_7_day_active"), 0);
                     double avg_14_day_active = Utils.convertDouble(j.get("avg_14_day_active"), 0);
                     double avg_30_day_active = Utils.convertDouble(j.get("avg_30_day_active"), 0);
                     double avg_60_day_active = Utils.convertDouble(j.get("avg_60_day_active"), 0);
-                    jo.addProperty("country_code", countryCode);
-                    jo.addProperty("avg_7_day_active", avg_7_day_active);
-                    jo.addProperty("avg_14_day_active", avg_14_day_active);
-                    jo.addProperty("avg_30_day_active", avg_30_day_active);
-                    jo.addProperty("avg_60_day_active", avg_60_day_active);
+                    jo.addProperty("country_name", countryName);
+                    jo.addProperty("avg_7_day_active", Utils.trimDouble(avg_7_day_active,3));
+                    jo.addProperty("avg_14_day_active", Utils.trimDouble(avg_14_day_active,3));
+                    jo.addProperty("avg_30_day_active", Utils.trimDouble(avg_30_day_active,3));
+                    jo.addProperty("avg_60_day_active", Utils.trimDouble(avg_60_day_active,3));
                     jsonArray.add(jo);
                 }
 
