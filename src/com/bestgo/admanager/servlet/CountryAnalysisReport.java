@@ -13,9 +13,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.math.BigDecimal;
-import java.text.DecimalFormat;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -196,18 +193,23 @@ public class CountryAnalysisReport extends HttpServlet {
                                 double left_today_purchased_user = today_purchased_user + natural_value;
                                 a_cpa = left_today_purchased_user == 0 ? 0 : today_cost / left_today_purchased_user;
 
-                                //PI（人均展示次数）= Revenue *1000 / ECPM / 预估的今天日活
+                                //PI（人均展示次数）= 有效的UnitID的展示次数之和 / 预估的今天日活
                                 //预估的日活=PurchasedUser_Today+ActiveUser_3dayago-PurchasedUser_3dayago
+                                double pi = 0;
+                                sql = "select sum(impression) as daily_impression from ad_app_unit_daily_report where app_id = '" + google_package_id + "' and is_valid = 1 and country_code = '" + country_code + "'";
+                                oneC = DB.findOneBySql(sql);
+                                if(oneC != null && oneC.hasObjectData()){
+                                    double dailyImpression = Utils.convertDouble(oneC.get("daily_impression"),0);
+                                    double left_today_active_user = today_purchased_user + before_three_days_active_user - before_three_days_purchased_user;
+                                    if(left_today_active_user != 0){
+                                        pi = dailyImpression / left_today_active_user;
+                                    }
+
+                                }
+
                                 double revenues = Utils.convertDouble(j.get("revenues"),0);
                                 //    double ecpm = impressions == 0 ? 0 : Utils.trimDouble3(revenues * 1000 / impressions );
                                 double ecpm = Utils.convertDouble(j.get("ecpm"),0);
-                                double left_today_active_user = today_purchased_user + before_three_days_active_user - before_three_days_purchased_user;
-                                double pi = 0;
-                                if(ecpm != 0 && left_today_active_user != 0){
-                                    pi = revenues * 1000 / ecpm / left_today_active_user;
-                                }
-
-
                                 sql = "select country_name from app_country_code_dict where country_code = '" + country_code + "'";
                                 oneC = DB.findOneBySql(sql);
                                 String countryName = "";
