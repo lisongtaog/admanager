@@ -109,7 +109,7 @@
                 <td><fmt:formatNumber value='<%=one.get("ctr")%>' pattern="0.0000"/> </td>
                 <td><fmt:formatNumber value="<%=cvr%>" pattern="0.0000"/> </td>
                 <td><%=tagStr%></td>
-                <td><a class="link_modify" href="javascript:void(0)">修改</a></td>
+                <td><a class="link_modify" href="javascript:void(0)"><span class="glyphicon glyphicon-pencil"></span></a></td>
             </tr>
             <% } %>
 
