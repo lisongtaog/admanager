@@ -196,7 +196,8 @@ public class CountryAnalysisReport extends HttpServlet {
                                 //PI（人均展示次数）= 有效的UnitID的展示次数之和 / 预估的今天日活
                                 //预估的日活=PurchasedUser_Today+ActiveUser_3dayago-PurchasedUser_3dayago
                                 double pi = 0;
-                                sql = "select sum(impression) as daily_impression from ad_app_unit_daily_report where app_id = '" + google_package_id + "' and is_valid = 1 and country_code = '" + country_code + "'";
+                                sql = "select sum(impression) as daily_impression from ad_app_unit_report_history where app_id = '" + google_package_id + "' and country_code = '"
+                                        + country_code + "' and date = '" + endTime + "' and is_valid = 1";
                                 oneC = DB.findOneBySql(sql);
                                 if(oneC != null && oneC.hasObjectData()){
                                     double dailyImpression = Utils.convertDouble(oneC.get("daily_impression"),0);
