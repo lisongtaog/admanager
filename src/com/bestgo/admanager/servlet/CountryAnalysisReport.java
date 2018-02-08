@@ -152,24 +152,32 @@ public class CountryAnalysisReport extends HttpServlet {
 
 
                                 //计算七天的总花费、总营收、总盈利
-                                sql = "select sum(cost) as seven_days_costs, sum(revenue) as seven_days_revenues " +
+                                sql = "select cost, revenue " +
                                         "from web_ad_country_analysis_report_history where app_id = '"+google_package_id+"' " +
                                         " and country_code = '" + country_code + "' and date BETWEEN '" + beforeSevenDays + "' AND '" + endTime + "'";
-                                JSObject oneC = DB.findOneBySql(sql);
+                                List<JSObject> listCR = DB.findListBySql(sql);
                                 double seven_days_costs  = 0;
                                 double seven_days_incoming  = 0;
                                 double seven_days_revenues = 0;
-                                if(oneC != null && oneC.hasObjectData()){
-                                    seven_days_costs  = Utils.convertDouble(oneC.get("seven_days_costs"),0);
-                                    seven_days_revenues  = Utils.convertDouble(oneC.get("seven_days_revenues"),0);
-                                    seven_days_incoming = Utils.convertDouble(seven_days_revenues - seven_days_costs,0);
+                                String everyDayRevenueForSevenDays = "";
+                                String everyDayCostForSevenDays = "";
+                                for(JSObject one : listCR){
+                                    if(one != null && one.hasObjectData()){
+                                        double cost = Utils.convertDouble(one.get("cost"), 0);
+                                        double revenue = Utils.convertDouble(one.get("revenue"), 0);
+                                        everyDayRevenueForSevenDays += (int)revenue + "\n";
+                                        everyDayCostForSevenDays += (int)cost + "\n";
+                                        seven_days_costs  += cost;
+                                        seven_days_revenues  += revenue;
+                                    }
                                 }
+                                seven_days_incoming = Utils.convertDouble(seven_days_revenues - seven_days_costs,0);
 
                                 //计算ACpa
                                 sql = "select purchased_user,total_installed,active_user " +
                                         " from web_ad_country_analysis_report_history where app_id = '"+google_package_id+"' " +
                                         " and country_code = '" + country_code + "' and date = '" + beforeThreeDays + "'";
-                                oneC = DB.findOneBySql(sql);
+                                JSObject oneC = DB.findOneBySql(sql);
                                 double natural_value = 0;
                                 double before_three_days_active_user = 0;
                                 double before_three_days_purchased_user = 0;
@@ -294,6 +302,8 @@ public class CountryAnalysisReport extends HttpServlet {
                                 d.addProperty("seven_days_costs", Utils.trimDouble(seven_days_costs,0));
                                 d.addProperty("seven_days_incoming", Utils.trimDouble(seven_days_incoming,0));
                                 d.addProperty("seven_days_revenues", Utils.trimDouble(seven_days_revenues,0));
+                                d.addProperty("every_day_revenue_for_seven_days", everyDayRevenueForSevenDays);
+                                d.addProperty("every_day_cost_for_seven_days", everyDayCostForSevenDays);
                                 d.addProperty("a_cpa", Utils.trimDouble(a_cpa,3));
                                 d.addProperty("incoming", Utils.trimDouble(incoming,0));
                                 d.addProperty("estimated_revenues", Utils.trimDouble(estimated_revenues,0));

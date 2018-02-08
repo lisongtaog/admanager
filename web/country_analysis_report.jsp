@@ -244,13 +244,18 @@
                 "uninstalled", "uninstalled_rate", "users", "active_users", "revenues","seven_days_revenues","pi",
                 "ecpm","cpa","a_cpa","cpa_dev_ecpm", "incoming","seven_days_incoming", "estimated_revenues","estimated_revenues_dev_cost","price","bidding"];
             for (var j = 0; j < keyset.length; j++) {
+                var key = keyset[j];
                 var td = $('<td></td>');
-                var r = one[keyset[j]];
-                if('incoming' == keyset[j]){
+                var r = one[key];
+                if('revenues' == key){
+                    td = $('<td title="'+ one['every_day_revenue_for_seven_days'] + '"></td>');
+                }else if('costs' == key){
+                    td = $('<td title="'+ one['every_day_cost_for_seven_days'] + '"></td>');
+                }else if('incoming' == key){
                     if(r <0){
                         td.addClass("red");
-                    }''
-                }else if('estimated_revenues_dev_cost' == keyset[j]){
+                    }
+                }else if('estimated_revenues_dev_cost' == key){
                     if(r > data.es14_dev_cost){
                         td.addClass("green");
                     }else if(r < data.es14_dev_cost){
