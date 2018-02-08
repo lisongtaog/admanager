@@ -252,7 +252,7 @@
                 }
                 tr.append(td);
             }
-            td = $('<td><a class="link_modify" href="javascript:void(0)">修改</a>');
+            td = $('<td><a class="link_modify" href="javascript:void(0)"><span class="glyphicon glyphicon-pencil"></span></a>');
             tr.append(td);
             $('.table tbody').append(tr);
         }

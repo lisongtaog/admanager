@@ -123,7 +123,7 @@
           <td><%=one.get("page_id")%></td>
           <td><%=one.get("google_package_id")%></td>
           <td><%=one.get("firebase_project_id")%></td>
-          <td><a class="link_modify" href="#">修改</a><a class="link_delete" href="#">删除</a></td>
+          <td><a class="link_modify" href="#"><span class="glyphicon glyphicon-pencil"></span></a><a class="link_delete" href="#"><span class="glyphicon glyphicon-remove"></span></a></td>
         </tr>
         <% } %>
         </tbody>
@@ -356,7 +356,7 @@
             td = $('<td></td>');
             td.text(one.firebase_project_id);
             tr.append(td);
-          td = $('<td><a class="link_modify" href="#">修改</a>&nbsp;&nbsp;<a class="link_delete" href="#">删除</a></td>');
+          td = $('<td><a class="link_modify" href="#"><span class="glyphicon glyphicon-pencil"></span></a>&nbsp;&nbsp;<a class="link_delete" href="#"><span class="glyphicon glyphicon-remove"></span></a></td>');
           tr.append(td);
           $('#tableFBAppRel tbody').append(tr);
         }

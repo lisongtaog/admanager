@@ -89,7 +89,7 @@
           <td><%=one.get("campaign_name")%></td>
           <td><%=one.get("bugdet")%></td>
           <td><%=one.get("bidding")%></td>
-          <td><a class="link_modify" target="_blank" href="campaigns_create.jsp?type=auto_create&network=<%=network%>&id=<%=one.get("id")%>">修改</a>&nbsp;&nbsp;<a class="link_delete" href="#">删除</a></td>
+          <td><a class="link_modify" target="_blank" href="campaigns_create.jsp?type=auto_create&network=<%=network%>&id=<%=one.get("id")%>"><span class="glyphicon glyphicon-pencil"></span></a>&nbsp;&nbsp;<a class="link_delete" href="#"><span class="glyphicon glyphicon-remove"></span></a></td>
           <td><input class="checkbox_campaign_enable" type="checkbox" <% if (one.get("enabled").equals(1)) { %> checked <% }%> /></td>
         </tr>
         <% } %>

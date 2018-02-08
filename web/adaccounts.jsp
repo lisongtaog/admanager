@@ -232,7 +232,7 @@
         td = $('<td></td>');
         td.text(one.balance);
         tr.append(td);
-        td = $('<td><a class="link_modify" href="#">修改</a><a class="link_delete" href="#">删除</a></td>');
+        td = $('<td><a class="link_modify" href="#"><span class="glyphicon glyphicon-pencil"></span></a><a class="link_delete" href="#"><span class="glyphicon glyphicon-remove"></span></a></td>');
         tr.append(td);
         $('.table tbody').append(tr);
       }
