@@ -58,25 +58,7 @@
 %>
 
 <div class="container-fluid">
-    <ul class="nav nav-pills">
-        <li role="presentation"><a href="index.jsp">首页</a></li>
-        <li role="presentation"><a href="campaigns_create.jsp">创建广告</a></li>
-        <li role="presentation"><a href="campaigns_update_daily_log.jsp">日更记录</a></li>
-        <li role="presentation" class="active"><a href="#">分析报告</a></li>
-        <li role="presentation"><a href="adaccounts.jsp">广告账号管理</a></li>
-        <li role="presentation"><a href="adaccounts_admob.jsp">广告账号管理(AdMob)</a></li>
-        <li role="presentation"><a href="campaigns.jsp">广告系列管理</a></li>
-        <li role="presentation"><a href="campaigns_admob.jsp">广告系列管理(AdMob)</a></li>
-        <li role="presentation"><a href="tags.jsp">标签管理</a></li>
-        <li role="presentation"><a href="rules.jsp">规则</a></li>
-        <li role="presentation"><a href="query.jsp">查询</a></li>
-        <li role="presentation"><a href="system.jsp">系统管理</a></li>
-        <li role="presentation"><a href="advert_insert.jsp">广告存储</a></li>
-        <li role="presentation"><a href="country_revenue_spend.jsp">国家收支</a></li>
-        <li role="presentation"><a href="summary.jsp">七天汇总</a></li>
-        <li role="presentation"><a href="temp_index2.jsp">临时用的2</a></li>
-
-    </ul>
+    <%@include file="common/navigationbar.jsp"%>
 
     <div class="panel panel-default" style="margin-top: 10px">
         <div class="panel-heading" id="panel_title">
@@ -131,6 +113,7 @@
 <script src="js/country-name-code-dict.js"></script>
 
 <script>
+    $("li[role='presentation']:eq(2)").addClass("active");
     var now = new Date(new Date().getTime() - 86400 * 1000);
     $('#inputStartTime').val(now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + now.getDate());
     $('#inputEndTime').val(now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + now.getDate());

@@ -23,20 +23,7 @@
   %>
 
   <div class="container-fluid">
-    <ul class="nav nav-pills">
-      <li role="presentation"><a href="index.jsp">首页</a></li>
-      <li role="presentation"><a href="campaigns_create.jsp">创建广告</a></li>
-      <li role="presentation"><a href="adaccounts.jsp">广告账号管理</a></li>
-      <li role="presentation" class="active"><a href="#">广告账号管理(AdMob)</a></li>
-      <li role="presentation"><a href="campaigns.jsp">广告系列管理</a></li>
-      <li role="presentation"><a href="campaigns_admob.jsp">广告系列管理(AdMob)</a></li>
-      <li role="presentation"><a href="tags.jsp">标签管理</a></li>
-      <li role="presentation"><a href="rules.jsp">规则</a></li>
-      <li role="presentation"><a href="query.jsp">查询</a></li>
-      <li role="presentation"><a href="system.jsp">系统管理</a></li>
-      <li role="presentation"><a href="summary.jsp">七天汇总</a></li>
-      <li role="presentation"><a href="advert_insert.jsp">广告存储</a></li>
-    </ul>
+    <%@include file="common/navigationbar.jsp"%>
 
     <div class="panel panel-default">
       <!-- Default panel contents -->
@@ -141,6 +128,8 @@
   <script type="text/javascript">
     var modifyType = 'new';
     var id;
+
+    $("li[role='presentation']:eq(5)").addClass("active");
 
     $("#btn_add_new_account").click(function() {
       modifyType = 'new';
