@@ -151,21 +151,37 @@ public class CountryAnalysisReport extends HttpServlet {
                                 String country_code = j.get("country_code");
 
 
-                                //计算七天的总花费、总营收、总盈利
-                                sql = "select cost, revenue " +
+                                //计算七天的总花费、总营收、总盈利等
+                                sql = "select cost, revenue,purchased_user, " +
+                                        " (revenue - cost) as incoming, "+
+                                        "(case when impression > 0 then revenue * 1000 / impression else 0 end) as ecpm,"+
+                                        "(case when purchased_user > 0 then cost / purchased_user else 0 end) as cpa "+
                                         "from web_ad_country_analysis_report_history where app_id = '"+google_package_id+"' " +
                                         " and country_code = '" + country_code + "' and date BETWEEN '" + beforeSevenDays + "' AND '" + endTime + "'";
                                 List<JSObject> listCR = DB.findListBySql(sql);
+
                                 double seven_days_costs  = 0;
                                 double seven_days_incoming  = 0;
                                 double seven_days_revenues = 0;
                                 String everyDayRevenueForSevenDays = "";
                                 String everyDayCostForSevenDays = "";
+                                String everyDayPurchasedUserForSevenDays = "";
+                                String everyDayEcpmForSevenDays = "";
+                                String everyDayCpaForSevenDays = "";
+                                String everyDayIncomingForSevenDays = "";
                                 for(JSObject one : listCR){
                                     if(one != null && one.hasObjectData()){
                                         double cost = Utils.convertDouble(one.get("cost"), 0);
                                         double revenue = Utils.convertDouble(one.get("revenue"), 0);
+                                        double purchasedUser = Utils.convertDouble(one.get("purchased_user"), 0);
+                                        double incoming = Utils.convertDouble(one.get("incoming"), 0);
+                                        double ecpm = Utils.convertDouble(one.get("ecpm"), 0);
+                                        double cpa = Utils.convertDouble(one.get("cpa"), 0);
+                                        everyDayPurchasedUserForSevenDays += (int)purchasedUser + "\n";
+                                        everyDayEcpmForSevenDays += Utils.trimDouble(ecpm,3) + "\n";
                                         everyDayRevenueForSevenDays += (int)revenue + "\n";
+                                        everyDayCpaForSevenDays += Utils.trimDouble(cpa,3) + "\n";
+                                        everyDayIncomingForSevenDays += (int)incoming + "\n";
                                         everyDayCostForSevenDays += (int)cost + "\n";
                                         seven_days_costs  += cost;
                                         seven_days_revenues  += revenue;
@@ -244,42 +260,42 @@ public class CountryAnalysisReport extends HttpServlet {
                                 double cpa = Utils.convertDouble(j.get("cpa"),0);
                                 double incoming = Utils.convertDouble(j.get("incoming"),0);
                                 double cpa_dev_ecpm = (ecpm == 0) ? 0 : (cpa / ecpm);
-                                String sqlAB = "select bidding from ad_campaigns_admob_auto_create where app_name = '"
-                                                       + tagName + "' and country_region like '%" + country_code + "%'";
-                                List<JSObject> adwordsBiddingList = DB.findListBySql(sqlAB);
-
-                                String sqlFB = "select bidding from ad_campaigns_auto_create where app_name = '"
-                                                       + tagName + "' and country_region like '%" + countryName + "%'";
-                                List<JSObject> facebookBiddingList = DB.findListBySql(sqlFB);
-
-
-                                Set<String> biddingSet = new HashSet<>();
-                                for(JSObject ff : facebookBiddingList){
-                                    if(ff != null && ff.hasObjectData()){
-                                        String bidding = ff.get("bidding");
-                                        String[] split = bidding.split(",");
-                                        for(String s : split){
-                                            biddingSet.add(s);
-                                        }
-                                    }
-                                }
-                                for(JSObject aa : adwordsBiddingList){
-                                    if(aa != null && aa.hasObjectData()){
-                                        String bidding = aa.get("bidding");
-                                        String[] split = bidding.split(",");
-                                        for(String s : split){
-                                            biddingSet.add(s);
-                                        }
-                                    }
-                                }
-                                String biddingsStr = "";
-                                if(biddingSet != null && biddingSet.size()>0){
-                                    for(String s : biddingSet){
-                                        biddingsStr += s + ",";
-                                    }
-                                }else{
-                                    biddingsStr = "--";
-                                }
+//                                String sqlAB = "select bidding from ad_campaigns_admob_auto_create where app_name = '"
+//                                                       + tagName + "' and country_region like '%" + country_code + "%'";
+//                                List<JSObject> adwordsBiddingList = DB.findListBySql(sqlAB);
+//
+//                                String sqlFB = "select bidding from ad_campaigns_auto_create where app_name = '"
+//                                                       + tagName + "' and country_region like '%" + countryName + "%'";
+//                                List<JSObject> facebookBiddingList = DB.findListBySql(sqlFB);
+//
+//
+//                                Set<String> biddingSet = new HashSet<>();
+//                                for(JSObject ff : facebookBiddingList){
+//                                    if(ff != null && ff.hasObjectData()){
+//                                        String bidding = ff.get("bidding");
+//                                        String[] split = bidding.split(",");
+//                                        for(String s : split){
+//                                            biddingSet.add(s);
+//                                        }
+//                                    }
+//                                }
+//                                for(JSObject aa : adwordsBiddingList){
+//                                    if(aa != null && aa.hasObjectData()){
+//                                        String bidding = aa.get("bidding");
+//                                        String[] split = bidding.split(",");
+//                                        for(String s : split){
+//                                            biddingSet.add(s);
+//                                        }
+//                                    }
+//                                }
+//                                String biddingsStr = "";
+//                                if(biddingSet != null && biddingSet.size()>0){
+//                                    for(String s : biddingSet){
+//                                        biddingsStr += s + ",";
+//                                    }
+//                                }else{
+//                                    biddingsStr = "--";
+//                                }
 
                                 total_cost += costs;
                                 total_puserchaed_user += purchased_users;
@@ -304,18 +320,22 @@ public class CountryAnalysisReport extends HttpServlet {
                                 d.addProperty("seven_days_revenues", Utils.trimDouble(seven_days_revenues,0));
                                 d.addProperty("every_day_revenue_for_seven_days", everyDayRevenueForSevenDays);
                                 d.addProperty("every_day_cost_for_seven_days", everyDayCostForSevenDays);
+                                d.addProperty("every_day_incoming_for_seven_days", everyDayIncomingForSevenDays);
+                                d.addProperty("every_day_cpa_for_seven_days", everyDayCpaForSevenDays);
+                                d.addProperty("every_day_ecpm_for_seven_days", everyDayEcpmForSevenDays);
+                                d.addProperty("every_day_purchased_user_for_seven_days", everyDayPurchasedUserForSevenDays);
                                 d.addProperty("a_cpa", Utils.trimDouble(a_cpa,3));
                                 d.addProperty("incoming", Utils.trimDouble(incoming,0));
                                 d.addProperty("estimated_revenues", Utils.trimDouble(estimated_revenues,0));
                                 d.addProperty("estimated_revenues_dev_cost", Utils.trimDouble(estRevDevCost,3));
-                                String sqlP = "select price from web_ad_country_analysis_report_price where app_id = '"+google_package_id+"' and country_code = '"+country_code+"'";
-                                JSObject oneP = DB.findOneBySql(sqlP);
-                                double price = 0;
-                                if(oneP != null && oneP.hasObjectData()){
-                                    price = Utils.convertDouble(oneP.get("price"),0);
-                                }
-                                d.addProperty("price", Utils.trimDouble(price,1));
-                                d.addProperty("bidding", biddingsStr);
+//                                String sqlP = "select price from web_ad_country_analysis_report_price where app_id = '"+google_package_id+"' and country_code = '"+country_code+"'";
+//                                JSObject oneP = DB.findOneBySql(sqlP);
+//                                double price = 0;
+//                                if(oneP != null && oneP.hasObjectData()){
+//                                    price = Utils.convertDouble(oneP.get("price"),0);
+//                                }
+//                                d.addProperty("price", Utils.trimDouble(price,1));
+//                                d.addProperty("bidding", biddingsStr);
                                 d.addProperty("cpa", Utils.trimDouble(cpa,3));
                                 jsonArray.add(d);
                             }

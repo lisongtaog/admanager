@@ -112,9 +112,6 @@
             <th>Incoming</th>
             <th>EstimatedRevenue14</th>
             <th>Revenue14/Cost</th>
-            <th>成本价</th>
-            <th>出价</th>
-
         </tr>
         </thead>
         <tbody id="results_body">
@@ -176,8 +173,7 @@
                     "<th>ACpa</th><th>CPA/ECPM</th>" +
                     "<th>Incoming<span sorterId=\"1042\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th><th>7daysIncoming</th>" +
                     "<th>EstimatedRevenue14<span sorterId=\"1044\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
-                    "<th>Revenue14/Cost<span sorterId=\"1045\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
-                    "<th>成本价</th><th>出价</th></tr>");
+                    "<th>Revenue14/Cost<span sorterId=\"1045\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th></tr>");
                 setData(data,query);
                 bindSortOp();
                 var str = "Cost: " + data.total_cost + "&nbsp;&nbsp;&nbsp;&nbsp;PuserchaedUser: " + data.total_puserchaed_user +
@@ -242,7 +238,7 @@
             tr.append(td_outer_a);
             var keyset = ["costs","seven_days_costs", "purchased_users", "installed",
                 "uninstalled", "uninstalled_rate", "users", "active_users", "revenues","seven_days_revenues","pi",
-                "ecpm","cpa","a_cpa","cpa_dev_ecpm", "incoming","seven_days_incoming", "estimated_revenues","estimated_revenues_dev_cost","price","bidding"];
+                "ecpm","cpa","a_cpa","cpa_dev_ecpm", "incoming","seven_days_incoming", "estimated_revenues","estimated_revenues_dev_cost"];
             for (var j = 0; j < keyset.length; j++) {
                 var key = keyset[j];
                 var td = $('<td></td>');
@@ -251,7 +247,14 @@
                     td = $('<td title="'+ one['every_day_revenue_for_seven_days'] + '"></td>');
                 }else if('costs' == key){
                     td = $('<td title="'+ one['every_day_cost_for_seven_days'] + '"></td>');
+                }else if('purchased_users' == key){
+                    td = $('<td title="'+ one['every_day_purchased_user_for_seven_days'] + '"></td>');
+                }else if('ecpm' == key){
+                    td = $('<td title="'+ one['every_day_ecpm_for_seven_days'] + '"></td>');
+                }else if('cpa' == key){
+                    td = $('<td title="'+ one['every_day_cpa_for_seven_days'] + '"></td>');
                 }else if('incoming' == key){
+                    td = $('<td title="'+ one['every_day_incoming_for_seven_days'] + '"></td>');
                     if(r <0){
                         td.addClass("red");
                     }
