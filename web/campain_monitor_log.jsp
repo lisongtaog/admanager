@@ -27,7 +27,7 @@
       <!-- Default panel contents -->
       <div class="panel-heading">关停记录
         <input id="inputQueryText" type="text"/>
-        <button id="btnQuery" class="btn btn-default">查询</button>
+        <button id="btnQuery" class="btn btn-default glyphicon glyphicon-search"></button>
       </div>
 
       <table class="table">

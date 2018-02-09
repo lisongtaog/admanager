@@ -90,7 +90,7 @@
             <%--<select id="biddingOperator"><option value="7" selected="true">大于</option><option value="8">小于</option><option value="9"  selected="true">等于</option></select>--%>
             <input id="inputBiddingComparisonValue" class="form-control" style="display: inline; width: auto;" type="text" />
 
-            <button id="btnSearch" class="btn btn-default">条件查找</button><br>
+            <button id="btnSearch" class="btn btn-default glyphicon glyphicon-search"></button><br>
 
             <input type="checkbox" name="adnetwork" id="facebookCheck"/><label for="facebookCheck">只显示Facebook</label>
             <input type="checkbox" name="adnetwork" id="adwordsCheck"/><label for="adwordsCheck">只显示AdWords</label>

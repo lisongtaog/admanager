@@ -31,7 +31,7 @@
         <a href="campain_monitor_log.jsp" target="_blank">关停记录</a>
         <button id="btn_add_new_rule" class="btn btn-default">添加</button>
         <input id="inputQueryText" type="text"/>
-        <button id="btnQuery" class="btn btn-default">查询</button>
+        <button id="btnQuery" class="btn btn-default glyphicon glyphicon-search"></button>
       </div>
 
       <table class="table">
@@ -214,7 +214,7 @@
         td = $('<td></td>');
         td.text(one.rule_content);
         tr.append(td);
-        td = $('<td><a class="link_modify" href="#"><span class="glyphicon glyphicon-pencil"></span></a><a class="link_delete" href="#"><span class="glyphicon glyphicon-remove"></span></a></td>');
+        td = $('<td><a class="link_modify glyphicon glyphicon-pencil" href="#"></a><a class="link_delete glyphicon glyphicon-remove" href="#"></a></td>');
         tr.append(td);
         $('.table tbody').append(tr);
       }

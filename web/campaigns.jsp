@@ -35,7 +35,7 @@
             <button id="btnNotExistTagSearch" class="btn btn-default" name="false">只显示没有加上标签的广告系列</button>
             &nbsp;&nbsp;
             <input id="inputSearch" class="form-control" placeholder="系列名字或系列ID，系列名字可以模糊查询" style="display: inline; width: auto;" type="text" />
-            <button id="btnSearch" class="btn btn-default">查找</button>
+            <button id="btnSearch" class="btn btn-default glyphicon glyphicon-search"></button>
 
         </div>
 

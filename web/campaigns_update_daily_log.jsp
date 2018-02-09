@@ -66,7 +66,7 @@
             <input type="text" value="2012-05-15" id="inputEndTime" readonly>
             <span>标签</span>
             <input id="inputSearch" class="form-control" style="display: inline; width: auto;" type="text"/>
-            <button id="btnSearch" class="btn btn-default">查询</button>
+            <button id="btnSearch" class="btn btn-default glyphicon glyphicon-search"></button>
         </div>
     </div>
     <div class="panel panel-default">

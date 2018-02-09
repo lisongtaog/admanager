@@ -64,7 +64,7 @@
         <div class="panel-heading" id="panel_title">
             <span>标签</span>
             <input id="inputSearch" class="form-control" style="display: inline; width: auto;" type="text"/>
-            <button id="btnSearch" class="btn btn-default">查找</button>
+            <button id="btnSearch" class="btn btn-default glyphicon glyphicon-search"></button>
         </div>
     </div>
     <div class="panel panel-default">

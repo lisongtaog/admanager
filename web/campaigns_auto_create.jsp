@@ -35,7 +35,7 @@
           AdWords 广告
         </label>
         <input id="inputSearch" class="form-control" style="display: inline; width: auto;" type="text" />
-        <button id="btnSearch" class="btn btn-default">查找</button></div>
+        <button id="btnSearch" class="btn btn-default glyphicon glyphicon-search"></button></div>
 
       <%
         List<JSObject> data = new ArrayList<>();

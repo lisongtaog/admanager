@@ -56,7 +56,7 @@
         <div class="panel-heading" id="panel_title">
             <span>系列创建时间</span>
             <input type="text" value="2012-05-15" id="inputCampaignCreateTime" readonly>
-            <button id="btnSearch" class="btn btn-default">条件查找</button>
+            <button id="btnSearch" class="btn btn-default glyphicon glyphicon-search"></button>
         </div>
     </div>
     <div class="panel panel-default">

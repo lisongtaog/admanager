@@ -74,7 +74,8 @@
         <tr>
           <td><%=list.get(i).get("config_key")%></td>
           <td><input style="width: 100%;" class=".keyValue" value="<%=list.get(i).get("config_value")%>" /></td>
-          <td><a class="link_modify" href="javascript:void(0)">更新</a></td>
+          <td><a class="link_modify glyphicon glyphicon-refresh" href="javascript:void(0)"></a></td>
+          <%--<td><a class="link_modify" href="javascript:void(0)">更新</a></td>--%>
         </tr>
         <% } %>
         </tbody>
@@ -89,7 +90,7 @@
         Facebook ID对应关系表
         <button id="btn_add_new_relation" class="btn btn-default">添加</button>
         <input id="inputFBAppRelSearch" class="form-control" style="display: inline; width: auto;" type="text" />
-        <button id="btnFBAppRelSearch" class="btn btn-default">查找</button>
+        <button id="btnFBAppRelSearch" class="btn btn-default glyphicon glyphicon-search"></button>
       </div>
 
       <table class="table" id="tableFBAppRel">
@@ -123,7 +124,7 @@
           <td><%=one.get("page_id")%></td>
           <td><%=one.get("google_package_id")%></td>
           <td><%=one.get("firebase_project_id")%></td>
-          <td><a class="link_modify" href="#"><span class="glyphicon glyphicon-pencil"></span></a><a class="link_delete" href="#"><span class="glyphicon glyphicon-remove"></span></a></td>
+          <td><a class="link_modify glyphicon glyphicon-pencil" href="#"></a><a class="link_delete glyphicon glyphicon-remove" href="#"></a></td>
         </tr>
         <% } %>
         </tbody>
@@ -356,7 +357,7 @@
             td = $('<td></td>');
             td.text(one.firebase_project_id);
             tr.append(td);
-          td = $('<td><a class="link_modify" href="#"><span class="glyphicon glyphicon-pencil"></span></a>&nbsp;&nbsp;<a class="link_delete" href="#"><span class="glyphicon glyphicon-remove"></span></a></td>');
+          td = $('<td><a class="link_modify glyphicon glyphicon-pencil" href="#"></a>&nbsp;&nbsp;<a class="link_delete glyphicon glyphicon-remove" href="#"></a></td>');
           tr.append(td);
           $('#tableFBAppRel tbody').append(tr);
         }

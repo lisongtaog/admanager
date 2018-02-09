@@ -53,7 +53,7 @@
             <input id="inputSearch" class="form-control" style="display: inline; width: auto;" type="text"/>
             <span>国家</span>
             <input id="inputCountry" class="form-control" style="display: inline; width: auto;" type="text"/>
-            <button id="btnSearch" class="btn btn-default">查询</button>
+            <button id="btnSearch" class="btn btn-default glyphicon glyphicon-search"></button>
         </div>
     </div>
     <table class="table table-hover">
