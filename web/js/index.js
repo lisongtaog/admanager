@@ -350,7 +350,15 @@ function setDataSummary(data) {
         var tr = $('<tr></tr>');
         for (var j = 0; j < keyset.length; j++) {
             var td = $('<td></td>');
-            td.text(one[keyset[j]]);
+            var key = keyset[j];
+            if(key == 'total_spend'){
+              if(one['warning_level'] == 1){
+                 td.addClass("yellow");
+              }else if(one['warning_level'] == 2){
+                  td.addClass("red");
+              }
+            }
+            td.text(one[key]);
             tr.append(td);
         }
         total_spend += one['total_spend'];

@@ -30,7 +30,8 @@
         <div class="panel-heading">标签列表
             <button id="btn_add_new_tag" class="btn btn-default">添加</button>
             <input id="inputSearch" class="form-control" style="display: inline; width: auto;" type="text" />
-            <button id="btnSearch" class="btn btn-default glyphicon glyphicon-search"></button></div>
+            <button id="btnSearch" class="btn btn-default glyphicon glyphicon-search"></button>
+        </div>
 
         <table class="table">
             <thead>
@@ -62,7 +63,7 @@
                 <td><%=one.get("max_bidding")%></td>
                 <td><%=one.get("tag_category_id")%></td>
                 <td><%=one.get("category_name")%></td>
-                <td><a class="link_modify" href="#"><span class="glyphicon glyphicon-pencil"></span></a><a class="link_delete" href="#"><span class="glyphicon glyphicon-remove"></span></a></td>
+                <td><a class="link_modify glyphicon glyphicon-pencil" href="#"></a><a class="link_delete glyphicon glyphicon-remove" href="#"></a></td>
             </tr>
             <% } %>
 

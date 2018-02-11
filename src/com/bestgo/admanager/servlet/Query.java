@@ -376,6 +376,12 @@ public class Query extends HttpServlet {
                         for(CampaignsSummary cs : campaignsSummaryList){
                             JsonObject j = new JsonObject();
                             j.addProperty("name",cs.name);
+                            String sql = "select warning_level from  web_app_logs where app_name = '" + cs.name + "' and log_date = '" + endTime + "'";
+                            JSObject one = DB.findOneBySql(sql);
+                            if(one.hasObjectData()){
+                                int warningLevel = one.get("warning_level");
+                                j.addProperty("warning_level",warningLevel);
+                            }
                             j.addProperty("total_spend",Utils.trimDouble(cs.total_spend,0));
 //                            j.addProperty("seven_days_total_spend",cs.seven_days_total_spend);
 //                            j.addProperty("seven_days_total_revenue",cs.seven_days_total_revenue);
@@ -401,6 +407,7 @@ public class Query extends HttpServlet {
                         if (total_impressions == 0) {
                             continue;
                         }
+
                         double total_spend = admob.get("total_spend").getAsDouble() + facebook.get("total_spend").getAsDouble();
 //                        double seven_days_total_spend = admob.get("seven_days_total_spend").getAsDouble() + facebook.get("seven_days_total_spend").getAsDouble();
                         double total_installed = admob.get("total_installed").getAsDouble() + facebook.get("total_installed").getAsDouble();
@@ -417,6 +424,13 @@ public class Query extends HttpServlet {
                         admob.addProperty("total_cpa", Utils.trimDouble(total_cpa,3));
                         admob.addProperty("total_cvr", Utils.trimDouble(total_cvr,3));
                         admob.addProperty("name", tagName);
+                        String sql = "select warning_level from  web_app_logs where app_name = '" + tagName + "' and log_date = '" + endTime + "'";
+                        JSObject one = DB.findOneBySql(sql);
+                        if(one.hasObjectData()){
+                            int warningLevel = one.get("warning_level");
+                            admob.addProperty("warning_level",warningLevel);
+                        }
+
                         double total_revenue = 0;
 //                        double seven_days_total_revenue = 0;
                         String google_package_id = tagJSObject.get("google_package_id");
@@ -453,6 +467,7 @@ public class Query extends HttpServlet {
                     if (total_impression == 0) {
                         continue;
                     }
+
                     jsonObject.addProperty("name", tagName);
                     arr.add(jsonObject);
                 }
