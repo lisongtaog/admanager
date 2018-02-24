@@ -19,15 +19,15 @@
         td.changed {
             background-color: #0f0;
         }
-        #total_result.editable {
-            background-color: yellow;
+        .aqua {
+            background-color: #d1ffc1;
         }
         .qianse {
             background-color: #f2ffe8;
         }
 
-        .green {
-            color: green;
+        .red {
+            color: red;
         }
 
         .blue {
@@ -115,10 +115,10 @@
                 endTime: endTime,
             },function(data){
                 if(data && data.ret == 1){
-                    $('#result_header').html("<tr><th rowspan=\"2\">项目组</th><th rowspan=\"2\">Category</th><th rowspan=\"2\">AppName</th>" +
+                    $('#result_header').html("<tr class='aqua'><th rowspan=\"2\">项目组</th><th rowspan=\"2\">Category</th><th rowspan=\"2\">AppName</th>" +
                         "<th></th><th></th><th colspan=\"3\" id=\"dateA\"></th><th colspan=\"3\" id=\"dateB\"></th><th colspan=\"3\" id=\"dateC\"></th>" +
                         "<th colspan=\"3\" id=\"dateD\"></th><th colspan=\"3\" id=\"dateE\"></th><th colspan=\"3\" id=\"dateF\"></th>" +
-                        "<th colspan=\"3\" id=\"dateG\"></th></tr><tr>" +
+                        "<th colspan=\"3\" id=\"dateG\"></th></tr><tr class='aqua'>" +
                         "<th>预计利润</th><th>预计收入</th><th>[利润</th><th>投放</th><th>收入]</th><th>[利润</th><th>投放</th>" +
                         "<th>收入]</th><th>[利润</th><th>投放</th><th>收入]</th><th>[利润</th><th>投放</th><th>收入]</th>" +
                         "<th>[利润</th><th>投放</th><th>收入]</th><th>[利润</th><th>投放</th><th>收入]</th><th>[利润</th>" +
@@ -373,7 +373,7 @@
                         categoryTotalRevenue6 = 0;
                     }
                     if(currTeam != teamName){
-                        var tTr = $('<tr class="green"></tr>');
+                        var tTr = $('<tr class="red"></tr>');
                         var tTd = $('<td colspan="3"></td>');
                         tTd.text("【"+currTeam + "】项目组汇总");
                         tTr.append(tTd);
@@ -763,7 +763,7 @@
                     tTr.append(tTd);
                     $('#results_body').append(tTr);
 
-                    tTr = $('<tr class="green"></tr>');
+                    tTr = $('<tr class="red"></tr>');
                     tTd = $('<td colspan="3"></td>');
                     tTd.text("【"+currTeam + "】项目组汇总");
                     tTr.append(tTd);
