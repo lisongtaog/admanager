@@ -29,14 +29,18 @@ public class ReleasedDataStatistics extends HttpServlet {
 
         String path = request.getPathInfo();
         JsonObject jsonObject = new JsonObject();
-        String sorterId = request.getParameter("sorterId");
+        String likeCategoryName = request.getParameter("likeCategoryName");
+        likeCategoryName = likeCategoryName.trim();
+        String likeTeamName = request.getParameter("likeTeamName");
+        likeTeamName = likeTeamName.trim();
         String endTime = request.getParameter("endTime");
-        String beforeSevenDays = DateUtil.addDay(endTime,-6,"yyyy-MM-dd");//包括endTime
-        String beforeThreeDays = DateUtil.addDay(endTime,-3,"yyyy-MM-dd");
         if (path.startsWith("/query_released_data_statistics")) {
             JsonArray jsonArray = new JsonArray();
             try {
                 String sqlG = "select id,team_name from web_ad_category_team";
+                if(!likeTeamName.isEmpty()){
+                    sqlG = "select id,team_name from web_ad_category_team where team_name like '%" + likeTeamName + "%'";
+                }
                 List<JSObject> listJS = DB.findListBySql(sqlG);
                 if(listJS != null && listJS.size()>0){
                     for(JSObject oneG : listJS){
@@ -44,6 +48,9 @@ public class ReleasedDataStatistics extends HttpServlet {
                             long teamId = oneG.get("id");
                             String teamName = oneG.get("team_name");
                             sqlG = "select id,category_name from web_ad_tag_category where team_id = " + teamId;
+                            if(!likeCategoryName.isEmpty()){
+                                sqlG = "select id,category_name from web_ad_tag_category where team_id = " + teamId + " and category_name like '%" + likeCategoryName + "%'";
+                            }
                             List<JSObject> listCategory = DB.findListBySql(sqlG);
                             if(listCategory != null && listCategory.size()>0){
                                 for(JSObject j : listCategory){

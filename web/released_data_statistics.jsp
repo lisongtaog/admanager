@@ -43,12 +43,6 @@
     if (object == null) {
         response.sendRedirect("login.jsp");
     }
-
-    List<JSObject> allTags = Tags.fetchAllTags();
-    JsonArray array = new JsonArray();
-    for (int i = 0; i < allTags.size(); i++) {
-        array.add((String) allTags.get(i).get("tag_name"));
-    }
 %>
 
 <div class="container-fluid">
@@ -58,13 +52,17 @@
         <div class="panel-heading" id="panel_title">
             <span>结束日期</span>
             <input type="text" value="2012-05-15" id="inputEndTime" readonly>
-            <button id="btnSearch" class="btn btn-default glyphicon glyphicon-search"></button>
+            <span>项目组名</span>
+            <input id="inputLikeTeamName" class="form-control" style="display: inline; width: auto;" type="text"/>
+            <span>品类名</span>
+            <input id="inputLikeCategoryName" class="form-control" style="display: inline; width: auto;" type="text"/>
+            <button id="btnSearch" class="btn btn-default">模糊查询</button>
         </div>
     </div>
-    <div class="panel panel-default">
-        <div class="panel-body" id="total_result">
-        </div>
-    </div>
+    <%--<div class="panel panel-default">--%>
+        <%--<div class="panel-body" id="total_result">--%>
+        <%--</div>--%>
+    <%--</div>--%>
     <table class="table table-hover">
         <thead id="result_header">
 
@@ -84,6 +82,7 @@
 <script src="jqueryui/jquery-ui.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.4/js/select2.min.js"></script>
 <script src="js/country-name-code-dict.js"></script>
+<script src="js/layer/layer.js" ></script>
 
 <script>
     function init() {
@@ -111,11 +110,19 @@
 
         $("#btnSearch").click(function(){
             var endTime = $('#inputEndTime').val();
+            var likeTeamName = $('#inputLikeTeamName').val();
+            var likeCategoryName = $('#inputLikeCategoryName').val();
+            $('#result_header > tr').remove();
+            $('#results_body > tr').remove();
+            var loadingIndex = layer.load(2,{time: 10000});
             $.post('released_data_statistics/query_released_data_statistics', {
                 endTime: endTime,
+                likeTeamName: likeTeamName,
+                likeCategoryName: likeCategoryName
             },function(data){
+                layer.close(loadingIndex);
                 if(data && data.ret == 1){
-                    $('#result_header').html("<tr class='aqua'><th rowspan=\"2\">项目组</th><th rowspan=\"2\">Category</th><th rowspan=\"2\">AppName</th>" +
+                    $('#result_header').html("<tr class='aqua'><th rowspan=\"2\">项目组</th><th rowspan=\"2\">品类名称</th><th rowspan=\"2\">应用名称</th>" +
                         "<th></th><th></th><th colspan=\"3\" id=\"dateA\"></th><th colspan=\"3\" id=\"dateB\"></th><th colspan=\"3\" id=\"dateC\"></th>" +
                         "<th colspan=\"3\" id=\"dateD\"></th><th colspan=\"3\" id=\"dateE\"></th><th colspan=\"3\" id=\"dateF\"></th>" +
                         "<th colspan=\"3\" id=\"dateG\"></th></tr><tr class='aqua'>" +
@@ -200,7 +207,6 @@
 //                "total_incoming-1","total_spend-1","total_revenue-1", "total_incoming-2","total_spend-2", "total_revenue-2",
 //                "total_incoming-3","total_spend-3","total_revenue-3", "total_incoming-4","total_spend-4", "total_revenue-4",
 //                "total_incoming-5", "total_spend-5","total_revenue-5", "total_incoming-6", "total_spend-6","total_revenue-6" ];
-            $('#results_body > tr').remove();
             var arr = data.array;
             var len = arr.length;
             var currCategory = "";
