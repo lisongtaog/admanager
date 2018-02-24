@@ -50,7 +50,7 @@ public class ReleasedDataStatistics extends HttpServlet {
                                     if(j.hasObjectData()){
                                         long categoryId = j.get("id");
                                         String categoryName = j.get("category_name");
-                                        sqlG = "select t.id,t.tag_name,google_package_id from web_tag t LEFT JOIN web_facebook_app_ids_rel r ON t.tag_name = r.tag_name  where tag_category_id = " + categoryId;
+                                        sqlG = "select t.id,t.tag_name,google_package_id,anticipated_incoming,anticipated_revenue from web_tag t LEFT JOIN web_facebook_app_ids_rel r ON t.tag_name = r.tag_name  where tag_category_id = " + categoryId;
                                         List<JSObject> listTag = DB.findListBySql(sqlG);
 
                                         if(listTag != null && listTag.size()>0){
@@ -58,10 +58,14 @@ public class ReleasedDataStatistics extends HttpServlet {
                                                 if(t.hasObjectData()){
                                                     long tagId = t.get("id");
                                                     String tagName = t.get("tag_name");
+                                                    double anticipatedIncoming = t.get("anticipated_incoming");
+                                                    double anticipatedRevenue = t.get("anticipated_revenue");
                                                     JsonObject d = new JsonObject();
                                                     d.addProperty("team_name",teamName);
                                                     d.addProperty("category_name",categoryName);
                                                     d.addProperty("tag_name",tagName);
+                                                    d.addProperty("anticipated_incoming",anticipatedIncoming);
+                                                    d.addProperty("anticipated_revenue",anticipatedRevenue);
                                                     for(int i=0;i>-7;i--){
                                                         String date = DateUtil.addDay(endTime,i,"yyyy-MM-dd");
                                                         sqlG = "select ch.total_spend " +

@@ -154,11 +154,11 @@
                     $('#result_header').html("<tr><th rowspan=\"2\">项目组</th><th rowspan=\"2\">Category</th><th rowspan=\"2\">AppName</th>" +
                         "<th></th><th></th><th colspan=\"3\" id=\"dateA\"></th><th colspan=\"3\" id=\"dateB\"></th><th colspan=\"3\" id=\"dateC\"></th>" +
                         "<th colspan=\"3\" id=\"dateD\"></th><th colspan=\"3\" id=\"dateE\"></th><th colspan=\"3\" id=\"dateF\"></th>" +
-                        "<th colspan=\"3\" id=\"dateG\"></th></tr><tr>") +
+                        "<th colspan=\"3\" id=\"dateG\"></th></tr><tr>" +
                         "<th>预计利润</th><th>预计收入</th><th>【利润</th><th>投放</th><th>收入】</th><th>【利润</th><th>投放</th>" +
                         "<th>收入】</th><th>【利润</th><th>投放</th><th>收入】</th><th>【利润</th><th>投放</th><th>收入】</th>" +
                         "<th>【利润</th><th>投放</th><th>收入】</th><th>【利润</th><th>投放</th><th>收入】</th><th>【利润</th>" +
-                        "<th>投放</th><th>收入】</th></tr>";
+                        "<th>投放</th><th>收入】</th></tr>");
 
                     $('#dateA').text(endTime);
                     var nowDate = new Date(endTime);
@@ -239,7 +239,7 @@
             for (var i = 0; i < len; i++) {
                 one = arr[i];
                 var tr = $('<tr></tr>');
-                var keyset = ["team_name","category_name", "tag_name", "total_revenue0",
+                var keyset = ["team_name","category_name", "tag_name","anticipated_incoming","anticipated_revenue", "total_revenue0",
                     "total_spend0", "totalIncoming0", "total_revenue-1", "total_spend-1", "totalIncoming-1","total_revenue-2", "total_spend-2", "totalIncoming-2",
                     "total_revenue-3", "total_spend-3", "totalIncoming-3","total_revenue-4", "total_spend-4", "totalIncoming-4",
                     "total_revenue-5", "total_spend-5", "totalIncoming-5","total_revenue-6", "total_spend-6", "totalIncoming-6"];
