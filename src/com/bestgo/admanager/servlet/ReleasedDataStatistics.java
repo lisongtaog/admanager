@@ -123,8 +123,6 @@ public class ReleasedDataStatistics extends HttpServlet {
                     jsonObject.addProperty("ret", 1);
                 }
 
-                jsonObject.addProperty("message", "执行成功");
-
             } catch (Exception e) {
                 jsonObject.addProperty("ret", 0);
                 jsonObject.addProperty("message", e.getMessage());

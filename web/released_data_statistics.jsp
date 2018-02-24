@@ -22,8 +22,8 @@
         #total_result.editable {
             background-color: yellow;
         }
-        .estimateResult {
-            color: red;
+        .qianse {
+            background-color: #f2ffe8;
         }
         .red {
             color: red;
@@ -31,6 +31,11 @@
         .green {
             color: green;
         }
+
+        .blue {
+            color: #1e5980;
+        }
+
         .orange{
             color: orange;
         }
@@ -219,6 +224,7 @@
             var arr = data.array;
             var len = arr.length;
             var currTag = "";
+            var currCategory = "";
             var currTeam = "";
             var tagTotalAnticipatedIncoming = 0;
             var tagTotalAnticipatedRevenue = 0;
@@ -254,15 +260,154 @@
             var teamTotalSpend6 = 0;
             var teamTotalRevenue6 = 0;
 
+            var categoryTotalAnticipatedIncoming = 0;
+            var categoryTotalAnticipatedRevenue = 0;
+            var categoryTotalSpend0 = 0;
+            var categoryTotalRevenue0 = 0;
+            var categoryTotalSpend1 = 0;
+            var categoryTotalRevenue1 = 0;
+            var categoryTotalSpend2 = 0;
+            var categoryTotalRevenue2 = 0;
+            var categoryTotalSpend3 = 0;
+            var categoryTotalRevenue3 = 0;
+            var categoryTotalSpend4 = 0;
+            var categoryTotalRevenue4 = 0;
+            var categoryTotalSpend5 = 0;
+            var categoryTotalRevenue5 = 0;
+            var categoryTotalSpend6 = 0;
+            var categoryTotalRevenue6 = 0;
+
             for (var i = 0; i < len; i++) {
-                var tr = $('<tr></tr>');
                 var one = arr[i];
                 var teamName = one['team_name'];
                 var categoryName = one['category_name'];
                 var tagName = one['tag_name'];
+
                 if(i == 0){
                     currTeam = teamName;
+                    currCategory = categoryName;
                 }else{
+                    if(currCategory != categoryName){
+                        var tTr = $('<tr class="blue"></tr>');
+
+                        var tTd = $('<td></td>');
+                        tTr.append(tTd);
+
+                        tTd = $('<td colspan="2"></td>');
+                        tTd.text("【"+currCategory + "】品类汇总");
+                        tTr.append(tTd);
+
+                        tTd = $('<td></td>');
+                        tTd.text(categoryTotalAnticipatedIncoming);
+                        tTr.append(tTd);
+
+                        tTd = $('<td></td>');
+                        tTd.text(categoryTotalAnticipatedRevenue);
+                        tTr.append(tTd);
+
+                        tTd = $('<td></td>');
+                        tTd.text(categoryTotalRevenue0 - categoryTotalSpend0);
+                        tTr.append(tTd);
+
+                        tTd = $('<td></td>');
+                        tTd.text(categoryTotalSpend0);
+                        tTr.append(tTd);
+
+                        tTd = $('<td></td>');
+                        tTd.text(categoryTotalRevenue0);
+                        tTr.append(tTd);
+
+                        tTd = $('<td></td>');
+                        tTd.text(categoryTotalRevenue1 - categoryTotalSpend1);
+                        tTr.append(tTd);
+
+                        tTd = $('<td></td>');
+                        tTd.text(categoryTotalSpend1);
+                        tTr.append(tTd);
+
+                        tTd = $('<td></td>');
+                        tTd.text(categoryTotalRevenue1);
+                        tTr.append(tTd);
+
+                        tTd = $('<td></td>');
+                        tTd.text(categoryTotalRevenue2 - categoryTotalSpend2);
+                        tTr.append(tTd);
+
+                        tTd = $('<td></td>');
+                        tTd.text(categoryTotalSpend2);
+                        tTr.append(tTd);
+
+                        tTd = $('<td></td>');
+                        tTd.text(categoryTotalRevenue2);
+                        tTr.append(tTd);
+
+                        tTd = $('<td></td>');
+                        tTd.text(categoryTotalRevenue3 - categoryTotalSpend3);
+                        tTr.append(tTd);
+
+                        tTd = $('<td></td>');
+                        tTd.text(categoryTotalSpend3);
+                        tTr.append(tTd);
+
+                        tTd = $('<td></td>');
+                        tTd.text(categoryTotalRevenue3);
+                        tTr.append(tTd);
+
+                        tTd = $('<td></td>');
+                        tTd.text(categoryTotalRevenue4 - categoryTotalSpend4);
+                        tTr.append(tTd);
+
+                        tTd = $('<td></td>');
+                        tTd.text(categoryTotalSpend4);
+                        tTr.append(tTd);
+
+                        tTd = $('<td></td>');
+                        tTd.text(categoryTotalRevenue4);
+                        tTr.append(tTd);
+
+                        tTd = $('<td></td>');
+                        tTd.text(categoryTotalRevenue5 - categoryTotalSpend5);
+                        tTr.append(tTd);
+
+                        tTd = $('<td></td>');
+                        tTd.text(categoryTotalSpend5);
+                        tTr.append(tTd);
+
+                        tTd = $('<td></td>');
+                        tTd.text(categoryTotalRevenue5);
+                        tTr.append(tTd);
+
+                        tTd = $('<td></td>');
+                        tTd.text(categoryTotalRevenue6 - categoryTotalSpend6);
+                        tTr.append(tTd);
+
+                        tTd = $('<td></td>');
+                        tTd.text(categoryTotalSpend6);
+                        tTr.append(tTd);
+
+                        tTd = $('<td></td>');
+                        tTd.text(categoryTotalRevenue6);
+                        tTr.append(tTd);
+                        $('#results_body').append(tTr);
+
+                        currCategory = categoryName;
+                        categoryTotalAnticipatedIncoming = 0;
+                        categoryTotalAnticipatedRevenue = 0;
+                        categoryTotalSpend0 = 0;
+                        categoryTotalRevenue0 = 0;
+                        categoryTotalSpend1 = 0;
+                        categoryTotalRevenue1 = 0;
+                        categoryTotalSpend2 = 0;
+                        categoryTotalRevenue2 = 0;
+                        categoryTotalSpend3 = 0;
+                        categoryTotalRevenue3 = 0;
+                        categoryTotalSpend4 = 0;
+                        categoryTotalRevenue4 = 0;
+                        categoryTotalSpend5 = 0;
+                        categoryTotalRevenue5 = 0;
+                        categoryTotalSpend6 = 0;
+                        categoryTotalRevenue6 = 0;
+                    }
                     if(currTeam != teamName){
                         var tTr = $('<tr class="green"></tr>');
                         var tTd = $('<td colspan="3"></td>');
@@ -381,7 +526,7 @@
                         teamTotalRevenue6 = 0;
                     }
                 }
-
+                var tr = $('<tr class="qianse"></tr>');
                 var td = $('<td></td>');
                 td.text(teamName);
                 tr.append(td);
@@ -402,6 +547,7 @@
                 tr.append(td);
                 tagTotalAnticipatedIncoming += anticipatedIncoming;
                 teamTotalAnticipatedIncoming += anticipatedIncoming;
+                categoryTotalAnticipatedIncoming += anticipatedIncoming;
 
                 td = $('<td></td>');
                 var anticipatedRevenue = one['anticipated_revenue'];
@@ -409,6 +555,7 @@
                 tr.append(td);
                 tagTotalAnticipatedRevenue += anticipatedRevenue;
                 teamTotalAnticipatedRevenue += anticipatedRevenue;
+                categoryTotalAnticipatedRevenue += anticipatedRevenue;
 
                 td = $('<td></td>');
                 var totalIncoming0 = one['total_incoming0'];
@@ -422,6 +569,7 @@
                 tr.append(td);
                 tagTotalSpend0 += totalSpend0;
                 teamTotalSpend0 += totalSpend0;
+                categoryTotalSpend0 += totalSpend0;
 
                 td = $('<td></td>');
                 var totalRevenue0 = one['total_revenue0'];
@@ -429,6 +577,7 @@
                 tr.append(td);
                 tagTotalRevenue0 += totalRevenue0;
                 teamTotalRevenue0 += totalRevenue0;
+                categoryTotalRevenue0 += totalRevenue0;
 
                 td = $('<td></td>');
                 var totalIncoming1 = one['total_incoming-1'];
@@ -442,6 +591,7 @@
                 tr.append(td);
                 tagTotalSpend1 += totalSpend1;
                 teamTotalSpend1 += totalSpend1;
+                categoryTotalSpend1 += totalSpend1;
 
                 td = $('<td></td>');
                 var totalRevenue1 = one['total_revenue-1'];
@@ -449,6 +599,7 @@
                 tr.append(td);
                 tagTotalRevenue1 += totalRevenue1;
                 teamTotalRevenue1 += totalRevenue1;
+                categoryTotalRevenue1 += totalRevenue1;
 
                 td = $('<td></td>');
                 var totalIncoming2 = one['total_incoming-2'];
@@ -462,6 +613,7 @@
                 tr.append(td);
                 tagTotalSpend2 += totalSpend2;
                 teamTotalSpend2 += totalSpend2;
+                categoryTotalSpend2 += totalSpend2;
 
                 td = $('<td></td>');
                 var totalRevenue2 = one['total_revenue-2'];
@@ -469,6 +621,7 @@
                 tr.append(td);
                 tagTotalRevenue2 += totalRevenue2;
                 teamTotalRevenue2 += totalRevenue2;
+                categoryTotalRevenue2 += totalRevenue2;
 
                 td = $('<td></td>');
                 var totalIncoming3 = one['total_incoming-3'];
@@ -482,6 +635,7 @@
                 tr.append(td);
                 tagTotalSpend3 += totalSpend3;
                 teamTotalSpend3 += totalSpend3;
+                categoryTotalSpend3 += totalSpend3;
 
                 td = $('<td></td>');
                 var totalRevenue3 = one['total_revenue-3'];
@@ -489,6 +643,7 @@
                 tr.append(td);
                 tagTotalRevenue3 += totalRevenue3;
                 teamTotalRevenue3 += totalRevenue3;
+                categoryTotalRevenue3 += totalRevenue3;
 
                 td = $('<td></td>');
                 var totalIncoming4 = one['total_incoming-4'];
@@ -502,6 +657,7 @@
                 tr.append(td);
                 tagTotalSpend4 += totalSpend4;
                 teamTotalSpend4 += totalSpend4;
+                categoryTotalSpend4 += totalSpend4;
 
                 td = $('<td></td>');
                 var totalRevenue4 = one['total_revenue-4'];
@@ -509,6 +665,7 @@
                 tr.append(td);
                 tagTotalRevenue4 += totalRevenue4;
                 teamTotalRevenue4 += totalRevenue4;
+                categoryTotalRevenue4 += totalRevenue4;
 
                 td = $('<td></td>');
                 var totalIncoming5 = one['total_incoming-5'];
@@ -522,6 +679,7 @@
                 tr.append(td);
                 tagTotalSpend5 += totalSpend5;
                 teamTotalSpend5 += totalSpend5;
+                categoryTotalSpend5 += totalSpend5;
 
                 td = $('<td></td>');
                 var totalRevenue5 = one['total_revenue-5'];
@@ -529,6 +687,7 @@
                 tr.append(td);
                 tagTotalRevenue5 += totalRevenue5;
                 teamTotalRevenue5 += totalRevenue5;
+                categoryTotalRevenue5 += totalRevenue5;
 
                 td = $('<td></td>');
                 var totalIncoming6 = one['total_incoming-6'];
@@ -542,6 +701,7 @@
                 tr.append(td);
                 tagTotalSpend6 += totalSpend6;
                 teamTotalSpend6 += totalSpend6;
+                categoryTotalSpend6 += totalSpend6;
 
                 td = $('<td></td>');
                 var totalRevenue6 = one['total_revenue-6'];
@@ -549,11 +709,114 @@
                 tr.append(td);
                 tagTotalRevenue6 += totalRevenue6;
                 teamTotalRevenue6 += totalRevenue6;
+                categoryTotalRevenue6 += totalRevenue6;
 
                 $('#results_body').append(tr);
                 if(i == len - 1){
-                    var tTr = $('<tr class="green"></tr>');
-                    var tTd = $('<td colspan="3"></td>');
+                    var tTr = $('<tr class="blue"></tr>');
+
+                    var tTd = $('<td></td>');
+                    tTr.append(tTd);
+
+                    tTd = $('<td colspan="2"></td>');
+                    tTd.text("【"+currCategory + "】品类汇总");
+                    tTr.append(tTd);
+
+                    tTd = $('<td></td>');
+                    tTd.text(categoryTotalAnticipatedIncoming);
+                    tTr.append(tTd);
+
+                    tTd = $('<td></td>');
+                    tTd.text(categoryTotalAnticipatedRevenue);
+                    tTr.append(tTd);
+
+                    tTd = $('<td></td>');
+                    tTd.text(categoryTotalRevenue0 - categoryTotalSpend0);
+                    tTr.append(tTd);
+
+                    tTd = $('<td></td>');
+                    tTd.text(categoryTotalSpend0);
+                    tTr.append(tTd);
+
+                    tTd = $('<td></td>');
+                    tTd.text(categoryTotalRevenue0);
+                    tTr.append(tTd);
+
+                    tTd = $('<td></td>');
+                    tTd.text(categoryTotalRevenue1 - categoryTotalSpend1);
+                    tTr.append(tTd);
+
+                    tTd = $('<td></td>');
+                    tTd.text(categoryTotalSpend1);
+                    tTr.append(tTd);
+
+                    tTd = $('<td></td>');
+                    tTd.text(categoryTotalRevenue1);
+                    tTr.append(tTd);
+
+                    tTd = $('<td></td>');
+                    tTd.text(categoryTotalRevenue2 - categoryTotalSpend2);
+                    tTr.append(tTd);
+
+                    tTd = $('<td></td>');
+                    tTd.text(categoryTotalSpend2);
+                    tTr.append(tTd);
+
+                    tTd = $('<td></td>');
+                    tTd.text(categoryTotalRevenue2);
+                    tTr.append(tTd);
+
+                    tTd = $('<td></td>');
+                    tTd.text(categoryTotalRevenue3 - categoryTotalSpend3);
+                    tTr.append(tTd);
+
+                    tTd = $('<td></td>');
+                    tTd.text(categoryTotalSpend3);
+                    tTr.append(tTd);
+
+                    tTd = $('<td></td>');
+                    tTd.text(categoryTotalRevenue3);
+                    tTr.append(tTd);
+
+                    tTd = $('<td></td>');
+                    tTd.text(categoryTotalRevenue4 - categoryTotalSpend4);
+                    tTr.append(tTd);
+
+                    tTd = $('<td></td>');
+                    tTd.text(categoryTotalSpend4);
+                    tTr.append(tTd);
+
+                    tTd = $('<td></td>');
+                    tTd.text(categoryTotalRevenue4);
+                    tTr.append(tTd);
+
+                    tTd = $('<td></td>');
+                    tTd.text(categoryTotalRevenue5 - categoryTotalSpend5);
+                    tTr.append(tTd);
+
+                    tTd = $('<td></td>');
+                    tTd.text(categoryTotalSpend5);
+                    tTr.append(tTd);
+
+                    tTd = $('<td></td>');
+                    tTd.text(categoryTotalRevenue5);
+                    tTr.append(tTd);
+
+                    tTd = $('<td></td>');
+                    tTd.text(categoryTotalRevenue6 - categoryTotalSpend6);
+                    tTr.append(tTd);
+
+                    tTd = $('<td></td>');
+                    tTd.text(categoryTotalSpend6);
+                    tTr.append(tTd);
+
+                    tTd = $('<td></td>');
+                    tTd.text(categoryTotalRevenue6);
+                    tTr.append(tTd);
+                    $('#results_body').append(tTr);
+
+                    tTr = $('<tr class="green"></tr>');
+                    tTd = $('<td colspan="3"></td>');
                     tTd.text("【"+currTeam + "】项目组汇总");
                     tTr.append(tTd);
 
