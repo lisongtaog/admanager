@@ -68,7 +68,7 @@ public class ReleasedDataStatistics extends HttpServlet {
                                                     d.addProperty("anticipated_revenue",anticipatedRevenue);
                                                     for(int i=0;i>-7;i--){
                                                         String date = DateUtil.addDay(endTime,i,"yyyy-MM-dd");
-                                                        sqlG = "select ch.total_spend " +
+                                                        sqlG = "select sum(ch.total_spend) as spend " +
                                                                 " from web_ad_campaigns c, web_ad_campaigns_history ch, " +
                                                                 "(select distinct campaign_id from web_ad_campaign_tag_rel where tag_id = " + tagId + ") rt " +
                                                                 "where rt.campaign_id = ch.campaign_id and c.campaign_id = ch.campaign_id " +
@@ -77,9 +77,9 @@ public class ReleasedDataStatistics extends HttpServlet {
                                                         JSObject x = DB.findOneBySql(sqlG);
                                                         double totalSpend = 0;
                                                         if(x.hasObjectData()){
-                                                            totalSpend = Utils.convertDouble(x.get("total_spend"),0);
+                                                            totalSpend = Utils.convertDouble(x.get("spend"),0);
                                                         }
-                                                        sqlG = "select ch.total_spend " +
+                                                        sqlG = "select sum(ch.total_spend) as spend " +
                                                                 " from web_ad_campaigns_admob c, web_ad_campaigns_history_admob ch, " +
                                                                 "(select distinct campaign_id from web_ad_campaign_tag_admob_rel where tag_id = " + tagId + ") rt " +
                                                                 "where rt.campaign_id = ch.campaign_id and c.campaign_id = ch.campaign_id " +
@@ -87,17 +87,17 @@ public class ReleasedDataStatistics extends HttpServlet {
                                                                 "and c.status != 'removed'";
                                                         x = DB.findOneBySql(sqlG);
                                                         if(x.hasObjectData()){
-                                                            totalSpend += Utils.convertDouble(x.get("total_spend"),0);
+                                                            totalSpend += Utils.convertDouble(x.get("spend"),0);
                                                         }
                                                         double totalRevenue = 0;
                                                         String google_package_id = t.get("google_package_id");
                                                         if(google_package_id != null){
-                                                            String sqlR = "select revenue " +
+                                                            sqlG =  "select sum(revenue) as revenues " +
                                                                     "from web_ad_country_analysis_report_history where app_id = '"
                                                                     + google_package_id + "' and date = '" + date + "'";
-                                                            JSObject oneR = DB.findOneBySql(sqlR);
+                                                            JSObject oneR = DB.findOneBySql(sqlG);
                                                             if(oneR != null){
-                                                                totalRevenue = Utils.convertDouble(oneR.get("revenue"),0);
+                                                                totalRevenue = Utils.convertDouble(oneR.get("revenues"),0);
                                                             }
                                                         }
                                                         double totalIncoming = totalRevenue - totalSpend;
