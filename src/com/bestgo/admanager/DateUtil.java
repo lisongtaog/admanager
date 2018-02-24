@@ -5,6 +5,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.TimeZone;
 
 public class DateUtil {
 
@@ -39,11 +40,32 @@ public class DateUtil {
      * 获取当前时间
      * @return 时间字符串
      */
-    public static String getNow() {
+    public static String getNowTime() {
         Calendar calendar = Calendar.getInstance();
         String now  = String.format("%d-%02d-%02d %02d:%02d:%02d", calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH),
                 calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), calendar.get(Calendar.SECOND));
         return now;
+    }
+
+    /**
+     * 获取当前日期
+     * @return 日期字符串
+     */
+    public static String getNowDate() {
+        Calendar calendar = Calendar.getInstance();
+        String now  = String.format("%d-%02d-%02d", calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH));
+        return now;
+    }
+
+    /**
+     * 获取美国当前日期
+     * @return 日期字符串
+     */
+    public static String getUSANowDate() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeZone(TimeZone.getTimeZone("GMT-8:00"));
+        String date = String.format("%d-%d-%d", calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH));
+        return date;
     }
 
 

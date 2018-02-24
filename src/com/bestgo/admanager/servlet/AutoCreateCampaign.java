@@ -372,7 +372,7 @@ public class AutoCreateCampaign extends HttpServlet {
                         .put("message", message)
                         .put("image_path", imagePath)
                         .put("video_path", videoPath)
-                        .put("create_time", DateUtil.getNow())
+                        .put("create_time", DateUtil.getNowTime())
                         .executeReturnId();
                 if (recordId > 0) {
                     result.result = true;
@@ -489,7 +489,7 @@ public class AutoCreateCampaign extends HttpServlet {
                         .put("message", message)
                         .put("image_path", imagePath)
                         .put("video_path", videoPath)
-                        .put("update_time", DateUtil.getNow())
+                        .put("update_time", DateUtil.getNowTime())
                         .where(DB.filter().whereEqualTo("id", id))
                         .execute();
                 result.result = true;
@@ -672,7 +672,7 @@ public class AutoCreateCampaign extends HttpServlet {
                         .put("explode_bidding", Boolean.parseBoolean(explodeBidding) ? 1 : 0)
                         .put("max_cpa", maxCPA)
                         .put("image_path", imagePath)
-                        .put("create_time", DateUtil.getNow())
+                        .put("create_time", DateUtil.getNowTime())
                         .executeReturnId();
                 if (recordId > 0) {
                     result.result = true;
@@ -786,7 +786,7 @@ public class AutoCreateCampaign extends HttpServlet {
                         .put("explode_bidding", Boolean.parseBoolean(explodeBidding) ? 1 : 0)
                         .put("max_cpa", maxCPA)
                         .put("image_path", imagePath)
-                        .put("update_time", DateUtil.getNow())
+                        .put("update_time", DateUtil.getNowTime())
                         .where(DB.filter().whereEqualTo("id", id))
                         .execute();
                 result.result = true;

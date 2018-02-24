@@ -6,7 +6,7 @@
 
 <html>
 <head>
-    <title>首页</title>
+    <title>日更记录</title>
     <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css"/>
     <link rel="stylesheet" href="bootstrap/css/bootstrap-theme.min.css"/>
     <link rel="stylesheet" href="css/core.css"/>
@@ -153,7 +153,7 @@
     });
 
     function init() {
-        $("li[role='presentation']:eq(16)").addClass("active");
+        $("li[role='presentation']:eq(17)").addClass("active");
         var now = new Date(new Date().getTime() - 86400 * 1000);
         $('#inputStartTime').val(now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + now.getDate());
         $('#inputEndTime').val(now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + now.getDate());

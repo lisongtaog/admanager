@@ -209,7 +209,7 @@
 <script src="js/summary.js?t=20180123"></script>
 
 <script>
-    $("li[role='presentation']:eq(14)").addClass("active");
+    $("li[role='presentation']:eq(15)").addClass("active");
     var data = <%=array.toString()%>;
     $("#inputSearch").autocomplete({
         source: data

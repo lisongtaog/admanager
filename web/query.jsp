@@ -58,7 +58,7 @@
   <script src="js/core.js"></script>
 
   <script type="text/javascript">
-      $("li[role='presentation']:eq(10)").addClass("active");
+      $("li[role='presentation']:eq(11)").addClass("active");
     function targetSearch(q) {
       var accountId = $('#accountId').text().trim();
       var accessToken = $('#accessToken').text().trim();

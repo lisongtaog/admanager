@@ -340,7 +340,7 @@
     var appList = [];
 
     function init() {
-        $("li[role='presentation']:eq(12)").addClass("active");
+        $("li[role='presentation']:eq(13)").addClass("active");
         $('.select2').select2();
 
         $('.btn-more').click(function() {

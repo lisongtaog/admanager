@@ -132,7 +132,7 @@ public class QueryZero extends HttpServlet {
                                 .where(DB.filter().whereEqualTo("id", id))
                                 .execute();
                     } else {
-                        String now = DateUtil.getNow();
+                        String now = DateUtil.getNowTime();
                         DB.insert("web_ad_batch_change_campaigns")
                                 .put("enabled", enabled)
                                 .put("bugdet", 0)

@@ -693,7 +693,7 @@ public class Campaign extends HttpServlet {
                 JsonParser parser = new JsonParser();
                 Gson gson = new Gson();
                 JsonArray array = parser.parse(data).getAsJsonArray();
-                String now = DateUtil.getNow();
+                String now = DateUtil.getNowTime();
 
                 for (int i = 0; i < array.size(); i++) {
                     BatchChangeItem item = gson.fromJson(array.get(i), BatchChangeItem.class);

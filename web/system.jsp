@@ -229,7 +229,7 @@
   <script type="text/javascript">
     var modifyType;
     var id;
-    $("li[role='presentation']:eq(11)").addClass("active");
+    $("li[role='presentation']:eq(12)").addClass("active");
     function bindTableFBOp() {
       $('#tableFBAppRel .link_modify').click(function () {
         var tds = $(this).parents("tr").find('td');
