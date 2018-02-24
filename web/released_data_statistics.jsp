@@ -67,22 +67,22 @@
     </div>
     <table class="table table-hover">
         <thead id="result_header">
-        <tr>
-            <th rowspan="2">项目组</th>
-            <th rowspan="2">Category</th>
-            <th rowspan="2">AppName</th>
-            <th></th>
-            <th></th>
-            <th colspan="3" id="dateA">now</th><th colspan="3" id="dateB">now-1</th><th colspan="3" id="dateC">now-2</th>
-            <th colspan="3" id="dateD">now-3</th><th colspan="3" id="dateE">now-4</th><th colspan="3" id="dateF">now-5</th>
-            <th colspan="3" id="dateG">now-6</th>
-        </tr>
-        <tr>
-            <th>预计利润</th><th>预计收入</th><th>【利润</th><th>投放</th><th>收入】</th><th>【利润</th><th>投放</th>
-            <th>收入】</th><th>【利润</th><th>投放</th><th>收入】</th><th>【利润</th><th>投放</th><th>收入】</th>
-            <th>【利润</th><th>投放</th><th>收入】</th><th>【利润</th><th>投放</th><th>收入】</th><th>【利润</th>
-            <th>投放</th><th>收入】</th>
-        </tr>
+        <%--<tr>--%>
+            <%--<th rowspan="2">项目组</th>--%>
+            <%--<th rowspan="2">Category</th>--%>
+            <%--<th rowspan="2">AppName</th>--%>
+            <%--<th></th>--%>
+            <%--<th></th>--%>
+            <%--<th colspan="3" id="dateA">now</th><th colspan="3" id="dateB">now-1</th><th colspan="3" id="dateC">now-2</th>--%>
+            <%--<th colspan="3" id="dateD">now-3</th><th colspan="3" id="dateE">now-4</th><th colspan="3" id="dateF">now-5</th>--%>
+            <%--<th colspan="3" id="dateG">now-6</th>--%>
+        <%--</tr>--%>
+        <%--<tr>--%>
+            <%--<th>预计利润</th><th>预计收入</th><th>【利润</th><th>投放</th><th>收入】</th><th>【利润</th><th>投放</th>--%>
+            <%--<th>收入】</th><th>【利润</th><th>投放</th><th>收入】</th><th>【利润</th><th>投放</th><th>收入】</th>--%>
+            <%--<th>【利润</th><th>投放</th><th>收入】</th><th>【利润</th><th>投放</th><th>收入】</th><th>【利润</th>--%>
+            <%--<th>投放</th><th>收入】</th>--%>
+        <%--</tr>--%>
         </thead>
         <tbody id="results_body">
         </tbody>
@@ -116,26 +116,26 @@
         var nowDateStr = now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + now.getDate();
         $('#inputEndTime').val(nowDateStr);
 
-        $('#dateA').text(nowDateStr);
-        var nowDate = new Date(nowDateStr);
-
-        var dateB = getDate(nowDate,-1);
-        $('#dateB').text(dateB);
-
-        var dateC = getDate(nowDate,-1);
-        $('#dateC').text(dateC);
-
-        var dateD = getDate(nowDate,-1);
-        $('#dateD').text(dateD);
-
-        var dateE = getDate(nowDate,-1);
-        $('#dateE').text(dateE);
-
-        var dateF = getDate(nowDate,-1);
-        $('#dateF').text(dateF);
-
-        var dateG = getDate(nowDate,-1);
-        $('#dateG').text(dateG);
+//        $('#dateA').text(nowDateStr);
+//        var nowDate = new Date(nowDateStr);
+//
+//        var dateB = getDate(nowDate,-1);
+//        $('#dateB').text(dateB);
+//
+//        var dateC = getDate(nowDate,-1);
+//        $('#dateC').text(dateC);
+//
+//        var dateD = getDate(nowDate,-1);
+//        $('#dateD').text(dateD);
+//
+//        var dateE = getDate(nowDate,-1);
+//        $('#dateE').text(dateE);
+//
+//        var dateF = getDate(nowDate,-1);
+//        $('#dateF').text(dateF);
+//
+//        var dateG = getDate(nowDate,-1);
+//        $('#dateG').text(dateG);
 
 
         $('#inputEndTime').datetimepicker({
@@ -239,10 +239,10 @@
             for (var i = 0; i < len; i++) {
                 one = arr[i];
                 var tr = $('<tr></tr>');
-                var keyset = ["team_name","category_name", "tag_name","anticipated_incoming","anticipated_revenue", "total_revenue0",
-                    "total_spend0", "totalIncoming0", "total_revenue-1", "total_spend-1", "totalIncoming-1","total_revenue-2", "total_spend-2", "totalIncoming-2",
-                    "total_revenue-3", "total_spend-3", "totalIncoming-3","total_revenue-4", "total_spend-4", "totalIncoming-4",
-                    "total_revenue-5", "total_spend-5", "totalIncoming-5","total_revenue-6", "total_spend-6", "totalIncoming-6"];
+                var keyset = ["team_name","category_name", "tag_name","anticipated_incoming","anticipated_revenue", "totalIncoming0","total_spend0",  "total_revenue0",
+                     "totalIncoming-1","total_spend-1","total_revenue-1", "totalIncoming-2","total_spend-2", "total_revenue-2",
+                    "totalIncoming-3","total_spend-3","total_revenue-3", "totalIncoming-4","total_spend-4", "total_revenue-4",
+                    "totalIncoming-5", "total_spend-5","total_revenue-5", "totalIncoming-6", "total_spend-6","total_revenue-6" ];
                 for (var j = 0; j < keyset.length; j++) {
                     var key = keyset[j];
                     var td = $('<td></td>');
@@ -253,8 +253,10 @@
                 $('#results_body').append(tr);
             }
         }
+        $("#btnSearch").click();
     }
     init();
+
 </script>
 <script src="js/interlaced-color-change.js"></script>
 </body>

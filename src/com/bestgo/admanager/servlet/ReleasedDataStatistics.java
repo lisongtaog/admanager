@@ -73,7 +73,7 @@ public class ReleasedDataStatistics extends HttpServlet {
                                                                 "(select distinct campaign_id from web_ad_campaign_tag_rel where tag_id = " + tagId + ") rt " +
                                                                 "where rt.campaign_id = ch.campaign_id and c.campaign_id = ch.campaign_id " +
                                                                 "and date = '" + date + "' " +
-                                                                "and c.status != 'removed' ";
+                                                                "and c.status != 'removed'";
                                                         JSObject x = DB.findOneBySql(sqlG);
                                                         double totalSpend = 0;
                                                         if(x.hasObjectData()){
@@ -84,7 +84,7 @@ public class ReleasedDataStatistics extends HttpServlet {
                                                                 "(select distinct campaign_id from web_ad_campaign_tag_admob_rel where tag_id = " + tagId + ") rt " +
                                                                 "where rt.campaign_id = ch.campaign_id and c.campaign_id = ch.campaign_id " +
                                                                 "and date = '" + date + "' " +
-                                                                "and c.status != 'removed' ";
+                                                                "and c.status != 'removed'";
                                                         x = DB.findOneBySql(sqlG);
                                                         if(x.hasObjectData()){
                                                             totalSpend += Utils.convertDouble(x.get("total_spend"),0);
