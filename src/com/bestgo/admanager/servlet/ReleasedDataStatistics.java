@@ -103,7 +103,7 @@ public class ReleasedDataStatistics extends HttpServlet {
                                                         double totalIncoming = totalRevenue - totalSpend;
                                                         d.addProperty("total_revenue" + i,Utils.trimDouble(totalRevenue,0));
                                                         d.addProperty("total_spend" + i,Utils.trimDouble(totalSpend,0));
-                                                        d.addProperty("totalIncoming" + i,Utils.trimDouble(totalIncoming,0));
+                                                        d.addProperty("total_incoming" + i,Utils.trimDouble(totalIncoming,0));
                                                     }
                                                     jsonArray.add(d);
                                                 }
