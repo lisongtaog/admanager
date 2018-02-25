@@ -55,6 +55,10 @@
             color: orange;
         }
 
+        .background_modena {
+            background-color: #fcf6ff;
+        }
+
     </style>
 </head>
 <body>
@@ -400,7 +404,7 @@
                         categoryTotalRevenue6 = 0;
                     }
                     if(currTeam != teamName){
-                        var tTr = $('<tr class="red"></tr>');
+                        var tTr = $('<tr class="red background_modena"></tr>');
                         var tTd = $('<td colspan="3"></td>');
                         tTd.text("【"+currTeam + "】项目组汇总");
                         tTr.append(tTd);
@@ -790,7 +794,7 @@
                     tTr.append(tTd);
                     $('#results_body').append(tTr);
 
-                    tTr = $('<tr class="red"></tr>');
+                    tTr = $('<tr class="red background_modena"></tr>');
                     tTd = $('<td colspan="3"></td>');
                     tTd.text("【"+currTeam + "】项目组汇总");
                     tTr.append(tTd);
