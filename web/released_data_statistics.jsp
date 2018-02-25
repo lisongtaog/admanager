@@ -48,7 +48,7 @@
             color: #9671ff;
         }
         .modena {
-            color: #383dc0;
+            color: #9eb9ff;
         }
 
         .orange {
@@ -144,9 +144,9 @@
                 layer.close(loadingIndex);
                 if(data && data.ret == 1){
                     $('#result_header').html("<tr class='aqua'><th rowspan=\"2\">项目组</th><th rowspan=\"2\">品类名称</th><th rowspan=\"2\">应用名称</th>" +
-                        "<th></th><th></th><th colspan=\"3\" id=\"dateA\"></th><th colspan=\"3\" id=\"dateB\"></th><th colspan=\"3\" id=\"dateC\"></th>" +
-                        "<th colspan=\"3\" id=\"dateD\"></th><th colspan=\"3\" id=\"dateE\"></th><th colspan=\"3\" id=\"dateF\"></th>" +
-                        "<th colspan=\"3\" id=\"dateG\"></th></tr><tr class='aqua'>" +
+                        "<th></th><th></th><th colspan=\"3\" id=\"dateA\" class='td_left_border'></th><th colspan=\"3\" id=\"dateB\"  class='td_left_border'></th><th colspan=\"3\" id=\"dateC\"  class='td_left_border'></th>" +
+                        "<th colspan=\"3\" id=\"dateD\" class='td_left_border'></th><th colspan=\"3\" id=\"dateE\" class='td_left_border'></th><th colspan=\"3\" id=\"dateF\" class='td_left_border'></th>" +
+                        "<th colspan=\"3\" id=\"dateG\" class='td_left_border'></th></tr><tr class='aqua'>" +
                         "<th>预计利润</th><th>预计收入</th><th class='td_left_border'>利润</th><th>投放</th><th>收入</th><th class='td_left_border'>利润</th><th>投放</th>" +
                         "<th>收入</th><th class='td_left_border'>利润</th><th>投放</th><th>收入</th><th class='td_left_border'>利润</th><th>投放</th><th>收入</th>" +
                         "<th class='td_left_border'>利润</th><th>投放</th><th>收入</th><th class='td_left_border'>利润</th><th>投放</th><th>收入</th><th class='td_left_border'>利润</th>" +
