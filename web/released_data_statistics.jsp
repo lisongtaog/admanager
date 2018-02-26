@@ -24,6 +24,10 @@
             border-left:#000000 solid 1px;
         }
 
+        .td_top_bottom_border {
+            border-bottom: #ff2516 solid 1px;
+            /*border-top: #ff2516 solid 1px;*/
+        }
 
         .aqua {
             background-color: #d1ffc1;
@@ -44,12 +48,12 @@
             color: #ff615d;
         }
 
-        .purple {
-            color: #9671ff;
-        }
-        .modena {
-            color: #9eb9ff;
-        }
+        /*.purple {*/
+            /*color: #9671ff;*/
+        /*}*/
+        /*.modena {*/
+            /*color: #9eb9ff;*/
+        /*}*/
 
         .orange {
             color: orange;
@@ -189,43 +193,6 @@
                 }
             },'json');
         });
-        function bindSortOp() {
-            $('.sorter').click(function() {
-                var sorterId = $(this).attr('sorterId');
-                sorterId = parseInt(sorterId);
-                if ($(this).hasClass("glyphicon-arrow-down")) {
-                    $(this).removeClass("glyphicon-arrow-down");
-                    $(this).addClass("glyphicon-arrow-up");
-                    sorterId -= 1000;
-                } else {
-                    $(this).removeClass("glyphicon-arrow-up");
-                    $(this).addClass("glyphicon-arrow-down");
-                }
-
-                var query = $("#inputSearch").val();
-                var startTime = $('#inputStartTime').val();
-                var endTime = $('#inputEndTime').val();
-                $.post('country_analysis_report/query_country_analysis_report', {
-                    tagName: query,
-                    startTime: startTime,
-                    endTime: endTime,
-                    sorterId: sorterId
-                },function(data){
-                    if (data && data.ret == 1) {
-                        setData(data,query);
-                        var str = "Cost: " + data.total_cost + "&nbsp;&nbsp;&nbsp;&nbsp;PuserchaedUser: " + data.total_puserchaed_user +
-                            "&nbsp;&nbsp;&nbsp;&nbsp;CPA: " + data.total_cpa + "&nbsp;&nbsp;&nbsp;&nbsp;Revenue: " + data.total_revenue +
-                            "&nbsp;&nbsp;&nbsp;&nbsp;Es14: " + data.total_es14 + "&nbsp;&nbsp;&nbsp;&nbsp;Es14/Cost: " + data.es14_dev_cost;
-
-                        str += "<br/><span class='estimateResult'></span>"
-                        $('#total_result').removeClass("editable");
-                        $('#total_result').html(str);
-                    } else {
-                        admanager.showCommonDlg("错误", data.message);
-                    }
-                }, 'json');
-            });
-        }
 
         function setData(data) {
 //            var keyset = ["team_name","category_name", "tag_name","anticipated_incoming","anticipated_revenue", "total_incoming0","total_spend0",  "total_revenue0",
@@ -236,8 +203,6 @@
             var len = arr.length;
             var currCategory = "";
             var currTeam = "";
-
-
 
             var teamTotalAnticipatedIncoming = 0;
             var teamTotalAnticipatedRevenue = 0;
@@ -285,102 +250,102 @@
                     if(currCategory != categoryName){
                         var tTr = $('<tr class="blue"></tr>');
 
-                        var tTd = $('<td></td>');
+                        var tTd = $('<td class="td_top_bottom_border"></td>');
                         tTr.append(tTd);
 
-                        tTd = $('<td colspan="2"></td>');
+                        tTd = $('<td colspan="2" class="td_top_bottom_border"></td>');
                         tTd.text("["+currCategory + "]品类汇总");
                         tTr.append(tTd);
 
-                        tTd = $('<td></td>');
+                        tTd = $('<td class="td_top_bottom_border"></td>');
                         tTd.text(categoryTotalAnticipatedIncoming);
                         tTr.append(tTd);
 
-                        tTd = $('<td></td>');
+                        tTd = $('<td class="td_top_bottom_border"></td>');
                         tTd.text(categoryTotalAnticipatedRevenue);
                         tTr.append(tTd);
 
-                        tTd = $('<td class="green td_left_border"></td>');
+                        tTd = $('<td class="green td_left_border  td_top_bottom_border"></td>');
                         tTd.text(categoryTotalRevenue0 - categoryTotalSpend0);
                         tTr.append(tTd);
 
-                        tTd = $('<td class="orange"></td>');
+                        tTd = $('<td class="orange td_top_bottom_border"></td>');
                         tTd.text(categoryTotalSpend0);
                         tTr.append(tTd);
 
-                        tTd = $('<td class="pink tr_right_border"></td>');
+                        tTd = $('<td class="pink td_top_bottom_border"></td>');
                         tTd.text(categoryTotalRevenue0);
                         tTr.append(tTd);
 
-                        tTd = $('<td class="green td_left_border"></td>');
+                        tTd = $('<td class="green td_left_border td_top_bottom_border"></td>');
                         tTd.text(categoryTotalRevenue1 - categoryTotalSpend1);
                         tTr.append(tTd);
 
-                        tTd = $('<td class="orange"></td>');
+                        tTd = $('<td class="orange td_top_bottom_border"></td>');
                         tTd.text(categoryTotalSpend1);
                         tTr.append(tTd);
 
-                        tTd = $('<td class="pink tr_right_border"></td>');
+                        tTd = $('<td class="pink td_top_bottom_border"></td>');
                         tTd.text(categoryTotalRevenue1);
                         tTr.append(tTd);
 
-                        tTd = $('<td class="green td_left_border"></td>');
+                        tTd = $('<td class="green td_left_border td_top_bottom_border"></td>');
                         tTd.text(categoryTotalRevenue2 - categoryTotalSpend2);
                         tTr.append(tTd);
 
-                        tTd = $('<td class="orange"></td>');
+                        tTd = $('<td class="orange td_top_bottom_border"></td>');
                         tTd.text(categoryTotalSpend2);
                         tTr.append(tTd);
 
-                        tTd = $('<td class="pink tr_right_border"></td>');
+                        tTd = $('<td class="pink td_top_bottom_border"></td>');
                         tTd.text(categoryTotalRevenue2);
                         tTr.append(tTd);
 
-                        tTd = $('<td class="green td_left_border"></td>');
+                        tTd = $('<td class="green td_left_border td_top_bottom_border"></td>');
                         tTd.text(categoryTotalRevenue3 - categoryTotalSpend3);
                         tTr.append(tTd);
 
-                        tTd = $('<td class="orange"></td>');
+                        tTd = $('<td class="orange td_top_bottom_border"></td>');
                         tTd.text(categoryTotalSpend3);
                         tTr.append(tTd);
 
-                        tTd = $('<td class="pink tr_right_border"></td>');
+                        tTd = $('<td class="pink td_top_bottom_border"></td>');
                         tTd.text(categoryTotalRevenue3);
                         tTr.append(tTd);
 
-                        tTd = $('<td class="green td_left_border"></td>');
+                        tTd = $('<td class="green td_left_border td_top_bottom_border"></td>');
                         tTd.text(categoryTotalRevenue4 - categoryTotalSpend4);
                         tTr.append(tTd);
 
-                        tTd = $('<td class="orange"></td>');
+                        tTd = $('<td class="orange td_top_bottom_border"></td>');
                         tTd.text(categoryTotalSpend4);
                         tTr.append(tTd);
 
-                        tTd = $('<td class="pink tr_right_border"></td>');
+                        tTd = $('<td class="pink td_top_bottom_border"></td>');
                         tTd.text(categoryTotalRevenue4);
                         tTr.append(tTd);
 
-                        tTd = $('<td class="green td_left_border"></td>');
+                        tTd = $('<td class="green td_left_border td_top_bottom_border"></td>');
                         tTd.text(categoryTotalRevenue5 - categoryTotalSpend5);
                         tTr.append(tTd);
 
-                        tTd = $('<td class="orange"></td>');
+                        tTd = $('<td class="orange td_top_bottom_border"></td>');
                         tTd.text(categoryTotalSpend5);
                         tTr.append(tTd);
 
-                        tTd = $('<td class="pink"></td>');
+                        tTd = $('<td class="pink td_top_bottom_border"></td>');
                         tTd.text(categoryTotalRevenue5);
                         tTr.append(tTd);
 
-                        tTd = $('<td class="green td_left_border"></td>');
+                        tTd = $('<td class="green td_left_border td_top_bottom_border"></td>');
                         tTd.text(categoryTotalRevenue6 - categoryTotalSpend6);
                         tTr.append(tTd);
 
-                        tTd = $('<td class="orange"></td>');
+                        tTd = $('<td class="orange td_top_bottom_border"></td>');
                         tTd.text(categoryTotalSpend6);
                         tTr.append(tTd);
 
-                        tTd = $('<td class="pink"></td>');
+                        tTd = $('<td class="pink td_top_bottom_border"></td>');
                         tTd.text(categoryTotalRevenue6);
                         tTr.append(tTd);
                         $('#results_body').append(tTr);
@@ -404,100 +369,100 @@
                         categoryTotalRevenue6 = 0;
                     }
                     if(currTeam != teamName){
-                        var tTr = $('<tr class="red background_modena"></tr>');
-                        var tTd = $('<td colspan="3"></td>');
+                        var tTr = $('<tr class="red background_modena td_top_bottom_border"></tr>');
+                        var tTd = $('<td colspan="3" class="td_top_bottom_border"></td>');
                         tTd.text("【"+currTeam + "】项目组汇总");
                         tTr.append(tTd);
 
-                        tTd = $('<td></td>');
+                        tTd = $('<td class="td_top_bottom_border"></td>');
                         tTd.text(teamTotalAnticipatedIncoming);
                         tTr.append(tTd);
 
-                        tTd = $('<td></td>');
+                        tTd = $('<td class="td_top_bottom_border"></td>');
                         tTd.text(teamTotalAnticipatedRevenue);
                         tTr.append(tTd);
 
-                        tTd = $('<td class="green td_left_border"></td>');
+                        tTd = $('<td class="green td_left_border td_top_bottom_border"></td>');
                         tTd.text(teamTotalRevenue0 - teamTotalSpend0);
                         tTr.append(tTd);
 
-                        tTd = $('<td class="orange"></td>');
+                        tTd = $('<td class="orange td_top_bottom_border"></td>');
                         tTd.text(teamTotalSpend0);
                         tTr.append(tTd);
 
-                        tTd = $('<td class="pink"></td>');
+                        tTd = $('<td class="pink td_top_bottom_border"></td>');
                         tTd.text(teamTotalRevenue0);
                         tTr.append(tTd);
 
-                        tTd = $('<td class="green td_left_border"></td>');
+                        tTd = $('<td class="green td_left_border td_top_bottom_border"></td>');
                         tTd.text(teamTotalRevenue1 - teamTotalSpend1);
                         tTr.append(tTd);
 
-                        tTd = $('<td class="orange"></td>');
+                        tTd = $('<td class="orange td_top_bottom_border"></td>');
                         tTd.text(teamTotalSpend1);
                         tTr.append(tTd);
 
-                        tTd = $('<td class="pink"></td>');
+                        tTd = $('<td class="pink td_top_bottom_border"></td>');
                         tTd.text(teamTotalRevenue1);
                         tTr.append(tTd);
 
-                        tTd = $('<td class="green td_left_border"></td>');
+                        tTd = $('<td class="green td_left_border td_top_bottom_border"></td>');
                         tTd.text(teamTotalRevenue2 - teamTotalSpend2);
                         tTr.append(tTd);
 
-                        tTd = $('<td class="orange"></td>');
+                        tTd = $('<td class="orange td_top_bottom_border"></td>');
                         tTd.text(teamTotalSpend2);
                         tTr.append(tTd);
 
-                        tTd = $('<td class="pink"></td>');
+                        tTd = $('<td class="pink td_top_bottom_border"></td>');
                         tTd.text(teamTotalRevenue2);
                         tTr.append(tTd);
 
-                        tTd = $('<td class="green td_left_border"></td>');
+                        tTd = $('<td class="green td_left_border td_top_bottom_border"></td>');
                         tTd.text(teamTotalRevenue3 - teamTotalSpend3);
                         tTr.append(tTd);
 
-                        tTd = $('<td class="orange"></td>');
+                        tTd = $('<td class="orange td_top_bottom_border"></td>');
                         tTd.text(teamTotalSpend3);
                         tTr.append(tTd);
 
-                        tTd = $('<td class="pink"></td>');
+                        tTd = $('<td class="pink td_top_bottom_border"></td>');
                         tTd.text(teamTotalRevenue3);
                         tTr.append(tTd);
 
-                        tTd = $('<td class="green td_left_border"></td>');
+                        tTd = $('<td class="green td_left_border td_top_bottom_border"></td>');
                         tTd.text(teamTotalRevenue4 - teamTotalSpend4);
                         tTr.append(tTd);
 
-                        tTd = $('<td class="orange"></td>');
+                        tTd = $('<td class="orange td_top_bottom_border"></td>');
                         tTd.text(teamTotalSpend4);
                         tTr.append(tTd);
 
-                        tTd = $('<td class="pink"></td>');
+                        tTd = $('<td class="pink td_top_bottom_border"></td>');
                         tTd.text(teamTotalRevenue4);
                         tTr.append(tTd);
 
-                        tTd = $('<td class="green td_left_border"></td>');
+                        tTd = $('<td class="green td_left_border td_top_bottom_border"></td>');
                         tTd.text(teamTotalRevenue5 - teamTotalSpend5);
                         tTr.append(tTd);
 
-                        tTd = $('<td class="orange"></td>');
+                        tTd = $('<td class="orange td_top_bottom_border"></td>');
                         tTd.text(teamTotalSpend5);
                         tTr.append(tTd);
 
-                        tTd = $('<td class="pink"></td>');
+                        tTd = $('<td class="pink td_top_bottom_border"></td>');
                         tTd.text(teamTotalRevenue5);
                         tTr.append(tTd);
 
-                        tTd = $('<td class="green td_left_border"></td>');
+                        tTd = $('<td class="green td_left_border td_top_bottom_border"></td>');
                         tTd.text(teamTotalRevenue6 - teamTotalSpend6);
                         tTr.append(tTd);
 
-                        tTd = $('<td class="orange"></td>');
+                        tTd = $('<td class="orange td_top_bottom_border"></td>');
                         tTd.text(teamTotalSpend6);
                         tTr.append(tTd);
 
-                        tTd = $('<td class="pink"></td>');
+                        tTd = $('<td class="pink td_top_bottom_border"></td>');
                         tTd.text(teamTotalRevenue6);
                         tTr.append(tTd);
                         $('#results_body').append(tTr);
@@ -692,202 +657,202 @@
 
                 $('#results_body').append(tr);
                 if(i == len - 1){
-                    var tTr = $('<tr class="blue"></tr>');
+                    var tTr = $('<tr class="blue category_tr_bottom_border"></tr>');
 
-                    var tTd = $('<td></td>');
+                    var tTd = $('<td class="td_top_bottom_border"></td>');
                     tTr.append(tTd);
 
-                    tTd = $('<td colspan="2"></td>');
+                    tTd = $('<td colspan="2" class="td_top_bottom_border"></td>');
                     tTd.text("["+currCategory + "]品类汇总");
                     tTr.append(tTd);
 
-                    tTd = $('<td></td>');
+                    tTd = $('<td class="td_top_bottom_border"></td>');
                     tTd.text(categoryTotalAnticipatedIncoming);
                     tTr.append(tTd);
 
-                    tTd = $('<td></td>');
+                    tTd = $('<td class="td_top_bottom_border"></td>');
                     tTd.text(categoryTotalAnticipatedRevenue);
                     tTr.append(tTd);
 
-                    tTd = $('<td class="green td_left_border"></td>');
+                    tTd = $('<td class="green td_left_border td_top_bottom_border"></td>');
                     tTd.text(categoryTotalRevenue0 - categoryTotalSpend0);
                     tTr.append(tTd);
 
-                    tTd = $('<td class="orange"></td>');
+                    tTd = $('<td class="orange td_top_bottom_border"></td>');
                     tTd.text(categoryTotalSpend0);
                     tTr.append(tTd);
 
-                    tTd = $('<td class="pink"></td>');
+                    tTd = $('<td class="pink td_top_bottom_border"></td>');
                     tTd.text(categoryTotalRevenue0);
                     tTr.append(tTd);
 
-                    tTd = $('<td class="green td_left_border"></td>');
+                    tTd = $('<td class="green td_left_border td_top_bottom_border"></td>');
                     tTd.text(categoryTotalRevenue1 - categoryTotalSpend1);
                     tTr.append(tTd);
 
-                    tTd = $('<td class="orange"></td>');
+                    tTd = $('<td class="orange td_top_bottom_border"></td>');
                     tTd.text(categoryTotalSpend1);
                     tTr.append(tTd);
 
-                    tTd = $('<td class="pink"></td>');
+                    tTd = $('<td class="pink td_top_bottom_border"></td>');
                     tTd.text(categoryTotalRevenue1);
                     tTr.append(tTd);
 
-                    tTd = $('<td class="green td_left_border"></td>');
+                    tTd = $('<td class="green td_left_border td_top_bottom_border"></td>');
                     tTd.text(categoryTotalRevenue2 - categoryTotalSpend2);
                     tTr.append(tTd);
 
-                    tTd = $('<td class="orange"></td>');
+                    tTd = $('<td class="orange td_top_bottom_border"></td>');
                     tTd.text(categoryTotalSpend2);
                     tTr.append(tTd);
 
-                    tTd = $('<td class="pink"></td>');
+                    tTd = $('<td class="pink td_top_bottom_border"></td>');
                     tTd.text(categoryTotalRevenue2);
                     tTr.append(tTd);
 
-                    tTd = $('<td class="green td_left_border"></td>');
+                    tTd = $('<td class="green td_left_border td_top_bottom_border"></td>');
                     tTd.text(categoryTotalRevenue3 - categoryTotalSpend3);
                     tTr.append(tTd);
 
-                    tTd = $('<td class="orange"></td>');
+                    tTd = $('<td class="orange td_top_bottom_border"></td>');
                     tTd.text(categoryTotalSpend3);
                     tTr.append(tTd);
 
-                    tTd = $('<td class="pink"></td>');
+                    tTd = $('<td class="pink td_top_bottom_border"></td>');
                     tTd.text(categoryTotalRevenue3);
                     tTr.append(tTd);
 
-                    tTd = $('<td class="green td_left_border"></td>');
+                    tTd = $('<td class="green td_left_border td_top_bottom_border"></td>');
                     tTd.text(categoryTotalRevenue4 - categoryTotalSpend4);
                     tTr.append(tTd);
 
-                    tTd = $('<td class="orange"></td>');
+                    tTd = $('<td class="orange td_top_bottom_border"></td>');
                     tTd.text(categoryTotalSpend4);
                     tTr.append(tTd);
 
-                    tTd = $('<td class="pink"></td>');
+                    tTd = $('<td class="pink td_top_bottom_border"></td>');
                     tTd.text(categoryTotalRevenue4);
                     tTr.append(tTd);
 
-                    tTd = $('<td class="green td_left_border"></td>');
+                    tTd = $('<td class="green td_left_border td_top_bottom_border"></td>');
                     tTd.text(categoryTotalRevenue5 - categoryTotalSpend5);
                     tTr.append(tTd);
 
-                    tTd = $('<td class="orange"></td>');
+                    tTd = $('<td class="orange td_top_bottom_border"></td>');
                     tTd.text(categoryTotalSpend5);
                     tTr.append(tTd);
 
-                    tTd = $('<td class="pink"></td>');
+                    tTd = $('<td class="pink td_top_bottom_border"></td>');
                     tTd.text(categoryTotalRevenue5);
                     tTr.append(tTd);
 
-                    tTd = $('<td class="green td_left_border"></td>');
+                    tTd = $('<td class="green td_left_border td_top_bottom_border"></td>');
                     tTd.text(categoryTotalRevenue6 - categoryTotalSpend6);
                     tTr.append(tTd);
 
-                    tTd = $('<td class="orange"></td>');
+                    tTd = $('<td class="orange td_top_bottom_border"></td>');
                     tTd.text(categoryTotalSpend6);
                     tTr.append(tTd);
 
-                    tTd = $('<td class="pink"></td>');
+                    tTd = $('<td class="pink td_top_bottom_border"></td>');
                     tTd.text(categoryTotalRevenue6);
                     tTr.append(tTd);
                     $('#results_body').append(tTr);
 
-                    tTr = $('<tr class="red background_modena"></tr>');
-                    tTd = $('<td colspan="3"></td>');
+                    tTr = $('<tr class="red background_modena td_top_bottom_border"></tr>');
+                    tTd = $('<td colspan="3" class="td_top_bottom_border"></td>');
                     tTd.text("【"+currTeam + "】项目组汇总");
                     tTr.append(tTd);
 
-                    tTd = $('<td class="green"></td>');
+                    tTd = $('<td class="green td_top_bottom_border"></td>');
                     tTd.text(teamTotalAnticipatedIncoming);
                     tTr.append(tTd);
 
-                    tTd = $('<td class="pink"></td>');
+                    tTd = $('<td class="pink td_top_bottom_border"></td>');
                     tTd.text(teamTotalAnticipatedRevenue);
                     tTr.append(tTd);
 
-                    tTd = $('<td class="green td_left_border"></td>');
+                    tTd = $('<td class="green td_left_border td_top_bottom_border"></td>');
                     tTd.text(teamTotalRevenue0 - teamTotalSpend0);
                     tTr.append(tTd);
 
-                    tTd = $('<td class="orange"></td>');
+                    tTd = $('<td class="orange td_top_bottom_border"></td>');
                     tTd.text(teamTotalSpend0);
                     tTr.append(tTd);
 
-                    tTd = $('<td class="pink"></td>');
+                    tTd = $('<td class="pink td_top_bottom_border"></td>');
                     tTd.text(teamTotalRevenue0);
                     tTr.append(tTd);
 
-                    tTd = $('<td class="green td_left_border"></td>');
+                    tTd = $('<td class="green td_left_border td_top_bottom_border"></td>');
                     tTd.text(teamTotalRevenue1 - teamTotalSpend1);
                     tTr.append(tTd);
 
-                    tTd = $('<td class="orange"></td>');
+                    tTd = $('<td class="orange td_top_bottom_border"></td>');
                     tTd.text(teamTotalSpend1);
                     tTr.append(tTd);
 
-                    tTd = $('<td class="pink"></td>');
+                    tTd = $('<td class="pink td_top_bottom_border"></td>');
                     tTd.text(teamTotalRevenue1);
                     tTr.append(tTd);
 
-                    tTd = $('<td class="green td_left_border"></td>');
+                    tTd = $('<td class="green td_left_border td_top_bottom_border"></td>');
                     tTd.text(teamTotalRevenue2 - teamTotalSpend2);
                     tTr.append(tTd);
 
-                    tTd = $('<td class="orange"></td>');
+                    tTd = $('<td class="orange td_top_bottom_border"></td>');
                     tTd.text(teamTotalSpend2);
                     tTr.append(tTd);
 
-                    tTd = $('<td class="pink"></td>');
+                    tTd = $('<td class="pink td_top_bottom_border"></td>');
                     tTd.text(teamTotalRevenue2);
                     tTr.append(tTd);
 
-                    tTd = $('<td class="green td_left_border"></td>');
+                    tTd = $('<td class="green td_left_border td_top_bottom_border"></td>');
                     tTd.text(teamTotalRevenue3 - teamTotalSpend3);
                     tTr.append(tTd);
 
-                    tTd = $('<td class="orange"></td>');
+                    tTd = $('<td class="orange td_top_bottom_border"></td>');
                     tTd.text(teamTotalSpend3);
                     tTr.append(tTd);
 
-                    tTd = $('<td class="pink"></td>');
+                    tTd = $('<td class="pink td_top_bottom_border"></td>');
                     tTd.text(teamTotalRevenue3);
                     tTr.append(tTd);
 
-                    tTd = $('<td class="green td_left_border"></td>');
+                    tTd = $('<td class="green td_left_border td_top_bottom_border"></td>');
                     tTd.text(teamTotalRevenue4 - teamTotalSpend4);
                     tTr.append(tTd);
 
-                    tTd = $('<td class="orange"></td>');
+                    tTd = $('<td class="orange td_top_bottom_border"></td>');
                     tTd.text(teamTotalSpend4);
                     tTr.append(tTd);
 
-                    tTd = $('<td class="pink"></td>');
+                    tTd = $('<td class="pink td_top_bottom_border"></td>');
                     tTd.text(teamTotalRevenue4);
                     tTr.append(tTd);
 
-                    tTd = $('<td class="green td_left_border"></td>');
+                    tTd = $('<td class="green td_left_border td_top_bottom_border"></td>');
                     tTd.text(teamTotalRevenue5 - teamTotalSpend5);
                     tTr.append(tTd);
 
-                    tTd = $('<td class="orange"></td>');
+                    tTd = $('<td class="orange td_top_bottom_border"></td>');
                     tTd.text(teamTotalSpend5);
                     tTr.append(tTd);
 
-                    tTd = $('<td class="pink"></td>');
+                    tTd = $('<td class="pink td_top_bottom_border"></td>');
                     tTd.text(teamTotalRevenue5);
                     tTr.append(tTd);
 
-                    tTd = $('<td class="green td_left_border"></td>');
+                    tTd = $('<td class="green td_left_border td_top_bottom_border"></td>');
                     tTd.text(teamTotalRevenue6 - teamTotalSpend6);
                     tTr.append(tTd);
 
-                    tTd = $('<td class="orange"></td>');
+                    tTd = $('<td class="orange td_top_bottom_border"></td>');
                     tTd.text(teamTotalSpend6);
                     tTr.append(tTd);
 
-                    tTd = $('<td class="pink"></td>');
+                    tTd = $('<td class="pink td_top_bottom_border"></td>');
                     tTd.text(teamTotalRevenue6);
                     tTr.append(tTd);
                     $('#results_body').append(tTr);
@@ -899,6 +864,5 @@
     init();
 
 </script>
-<script src="js/interlaced-color-change.js"></script>
 </body>
 </html>
