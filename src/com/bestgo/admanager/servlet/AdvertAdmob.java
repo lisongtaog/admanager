@@ -17,7 +17,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @WebServlet(name = "AdvertAdMob", urlPatterns = {"/advert_admob/*"})
 public class AdvertAdmob extends HttpServlet {

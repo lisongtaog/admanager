@@ -2,6 +2,9 @@
 <%@ page import="com.bestgo.admanager.servlet.Tags" %>
 <%@ page import="com.bestgo.common.database.utils.JSObject" %>
 <%@ page import="java.util.List" %>
+<%@ page import="java.util.ArrayList" %>
+<%@ page import="com.bestgo.common.database.services.DB" %>
+<%@ page import="org.apache.log4j.Logger" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 
 <html>
@@ -68,33 +71,32 @@
             <input type="text" value="2012-05-15" id="inputEndTime" readonly>
             <span>标签</span>
             <input id="inputSearch" class="form-control" style="display: inline; width: auto;" type="text"/>
+            <span>国家</span>
+            <input id="country_filter"  style="display: inline; width: auto;" type="text" placeholder="select a country">
             <button id="btnSearch" class="btn btn-default">查找</button>
         </div>
     </div>
     <div class="panel panel-default">
-        <div>
-            &nbsp&nbsp&nbsp&nbsp
-            <span>筛选</span>
-            <select id="country_filter"><option selected="selected">all country</option></select>
-        </div>
         <div class="panel-body" id="total_result">
         </div>
     </div>
     <table class="table table-hover">
         <thead id="result_header">
         <tr>
-            <th>国家</th>
             <th>Date</th>
             <th>Cost</th>
             <th>PurchasedUser</th>
             <th>Installed</th>
             <th>Uninstalled</th>
-            <th>UninstalledRate</th>
             <th>TotalUser</th>
             <th>ActiveUser</th>
+            <th>UninstalledRate</th>
             <th>Revenue</th>
+            <th>PI</th>
             <th>ECPM</th>
             <th>CPA</th>
+            <th>ACpa</th>
+            <th>CPA/ECPM</th>
             <th>Incoming</th>
             <th>EstimatedRevenue14</th>
             <th>Revenue14/Cost</th>
@@ -117,6 +119,19 @@
 <script src="js/country-name-code-dict.js"></script>
 
 <script>
+
+    $.post("time_analysis_report/setOption",function(data){
+        var options = new Array();
+        var len = data.length;
+        for(var i=0;i<len;i++){
+            var op = data[i];
+            options[i] = op["country_name"];
+        }
+        $("#country_filter").autocomplete({
+            source: options
+        });
+    },"json")
+
     $("li[role='presentation']:eq(3)").addClass("active");
     //首先由默认的时间显示
     var now = new Date(new Date().getTime() - 86400 * 1000);
@@ -141,41 +156,32 @@
     });
 
     $("#btnSearch").click(function(){
-        //点击“查找”后，$("#country_filter")里添加国家选项
-        $.post("time_analysis_report/setOption", function(data){
-//            alert("hello"); //检查程序是否跳入了
-            $("#country_filter >option").remove();
-            var arr = data;
-            var len = arr.length;
-            for(i=0;i<len;i++){
-                var k = arr[i];
-                var op = $("<option></option>");
-                op.text(k["country_name"]);
-                $("#country_filter").append(op);
-            }
-        },"json");
 
         var query = $("#inputSearch").val();
+        var country_filter = $("#country_filter").val();
         var startTime = $('#inputStartTime').val();
         var endTime = $('#inputEndTime').val();
         $.post('time_analysis_report/time_query', {   //用于排序
             tagName: query,
             startTime: startTime,
             endTime: endTime,
+            country_filter: country_filter
         },function(data){
             if(data && data.ret == 1){
                 $('#result_header').html("<tr><th>Date<span sorterId=\"1032\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>"+
                     "<th>Cost<span sorterId=\"1031\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
-                    "<th>7daysCost</th><th>PurchasedUser<span sorterId=\"1033\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
+                    "<th>PurchasedUser<span sorterId=\"1033\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
                     "<th>Installed<span sorterId=\"1034\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
                     "<th>Uninstalled<span sorterId=\"1035\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
                     "<th>UninstalledRate</th><th>TotalUser<span sorterId=\"1037\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
                     "<th>ActiveUser<span sorterId=\"1038\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
-                    "<th>Revenue<span sorterId=\"1039\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th><th>7daysRevenue</th>" +
+                    "<th>Revenue<span sorterId=\"1039\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
+                    "<th>PI</th>"  +
                     "<th>ECPM<span sorterId=\"1040\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
                     "<th>CPA<span sorterId=\"1041\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
+                    "<th>ACpa</th>"+
                     "<th>CPA/ECPM</th>" +
-                    "<th>Incoming<span sorterId=\"1042\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th><th>7daysIncoming</th>" +
+                    "<th>Incoming<span sorterId=\"1042\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
                     "<th>EstimatedRevenue14<span sorterId=\"1044\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
                     "<th>Revenue14/Cost<span sorterId=\"1045\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>");
 
@@ -193,6 +199,8 @@
         },'json');
     });
 
+/*
+    //原想做成一个值改变就触发的事件
     $("#country_filter").change(function(){
         var query = $("#inputSearch").val();
         var startTime = $("#inputStartTime").val();
@@ -207,7 +215,7 @@
             setData(data);
         },"json");
     });
-
+*/
     function bindSortOp() {
         $('.sorter').click(function() {
             var sorterId = $(this).attr('sorterId');
@@ -224,11 +232,13 @@
             var query = $("#inputSearch").val();
             var startTime = $('#inputStartTime').val();
             var endTime = $('#inputEndTime').val();
+            var country_filter = $("#country_filter").val();
             $.post('time_analysis_report/time_query', {
                 tagName: query,   //query是在标签一栏输入的应用名(实操时候用了输入才会触发的下拉列表)
                 startTime: startTime,
                 endTime: endTime,
-                sorterId: sorterId
+                sorterId: sorterId,
+                country_filter: country_filter
             },function(data){
                 if (data && data.ret == 1) {
                     setData(data,query);
@@ -257,9 +267,9 @@
             one = arr[i];  //每个数组成员都是一个JS对象
 
             var tr = $('<tr></tr>');   //创建一个空的行元素：$("<></>")
-            var keyset = ["date","costs","seven_days_costs", "purchased_users", "installed",
-                "uninstalled", "uninstalled_rate", "users", "active_users", "revenues","seven_days_revenues",
-                "ecpm","cpa","cpa_dev_ecpm", "incoming","seven_days_incoming", "estimated_revenues","estimated_revenues_dev_cost"];
+            var keyset = ["date","costs", "purchased_users", "installed",
+                "uninstalled", "uninstalled_rate", "users", "active_users", "revenues","pi",
+                "ecpm","cpa","a_cpa","cpa_dev_ecpm", "incoming","estimated_revenues","estimated_revenues_dev_cost"];
             for (var j = 0; j < keyset.length; j++) {
                 var td = $('<td></td>');
                 var r = one[keyset[j]]; //选中集里的某个键

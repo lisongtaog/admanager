@@ -2,8 +2,6 @@ package com.bestgo.admanager.servlet;
 
 import com.bestgo.admanager.OperationResult;
 import com.bestgo.admanager.Utils;
-import com.bestgo.common.database.MySqlHelper;
-import com.bestgo.common.database.RecordSet;
 import com.bestgo.common.database.services.DB;
 import com.bestgo.common.database.utils.JSObject;
 import com.google.gson.JsonArray;
@@ -15,15 +13,9 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import javax.servlet.jsp.JspContext;
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Created by jikai on 5/31/17.

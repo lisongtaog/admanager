@@ -1,7 +1,6 @@
 package com.bestgo.admanager.servlet;
 
 import com.bestgo.admanager.Config;
-import com.bestgo.admanager.DateUtil;
 import com.bestgo.admanager.OperationResult;
 import com.bestgo.admanager.Utils;
 import com.bestgo.common.database.services.DB;

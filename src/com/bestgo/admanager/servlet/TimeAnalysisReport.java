@@ -13,8 +13,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.math.BigDecimal;
-import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.lang.String;
@@ -36,6 +34,9 @@ public class TimeAnalysisReport extends HttpServlet {
         String tagName = request.getParameter("tagName");
         String startTime = request.getParameter("startTime");
         String endTime = request.getParameter("endTime");
+
+        String beforeThreeDays = DateUtil.addDay(endTime,-3,"yyyy-MM-dd");  //计算ACPA用的
+
 //        String beforeSevenDays = DateUtil.addDay(endTime, -6, "yyyy-MM-dd"); //返回一个endTime-6 的日期
 
         //以下的if用于处理动态添加选项的问题
@@ -59,6 +60,13 @@ public class TimeAnalysisReport extends HttpServlet {
                 String google_package_id = oneG.get("google_package_id");
                 if (google_package_id != null) {
                     JsonArray jsonArray = new JsonArray();
+
+                    //这里用于匹配相关的country_code
+                    String sql_tem = "select country_code from app_country_code_dict where country_name = '"
+                            + country_filter +"'";
+                    JSObject country_fil_code = DB.findOneBySql(sql_tem);
+                    String country_filter_code = country_fil_code.get("country_code");
+
                     String sql = null;
                     if (path.matches(".*/time_query")) {
                         sql = "select country_code,date,sum(cost) as total_cost, sum(purchased_user) as total_purchased_user, " +
@@ -71,24 +79,23 @@ public class TimeAnalysisReport extends HttpServlet {
                                 " (case when sum(cost) > 0 then sum(estimated_revenue) / sum(cost) else 0 end) as est_rev_dev_cost " +
                                 "from web_ad_country_analysis_report_history where app_id = '" + google_package_id + "' " +
                                 "and date BETWEEN '" + startTime + "' AND '" + endTime + "' GROUP BY date"; //增加一个时间列,减少一个国家列
-                    }else if(path.matches(".*/country_filter")){
-                        String sql_tem = "select country_code from app_country_code_dict where country_name = '"
-                                          + country_filter +"'";
-                        JSObject country_fil_code = DB.findOneBySql(sql_tem);
-                        String country_filter_code = country_fil_code.get("country_code");
-
-                        sql = "select country_code,date,sum(cost) as total_cost, sum(purchased_user) as total_purchased_user, " +
-                                "sum(total_installed) as installed, sum(total_uninstalled) as uninstalled, sum(today_uninstalled) as total_today_uninstalled, " +
-                                "sum(total_user) as users, sum(active_user) as active_users, sum(impression) as impressions, sum(revenue) as revenues, " +
-                                "sum(estimated_revenue) as estimated_revenues, " +
-                                " (sum(revenue) - sum(cost)) as incoming, " +
-                                "(case when sum(impression) > 0 then sum(revenue) * 1000 / sum(impression) else 0 end) as ecpm," +
-                                "(case when sum(purchased_user) > 0 then sum(cost) / sum(purchased_user) else 0 end) as cpa, " +
-                                " (case when sum(cost) > 0 then sum(estimated_revenue) / sum(cost) else 0 end) as est_rev_dev_cost " +
-                                "from web_ad_country_analysis_report_history where app_id = '" + google_package_id + "' " +
-                                "and country_code = '"+ country_filter_code + "'" +
-                                "and date BETWEEN '" + startTime + "' AND '" + endTime + "' GROUP BY date";
+                        if(country_filter != null){
+                            if(!country_filter.isEmpty()) {
+                                sql = "select country_code,date,sum(cost) as total_cost, sum(purchased_user) as total_purchased_user, " +
+                                        "sum(total_installed) as installed, sum(total_uninstalled) as uninstalled, sum(today_uninstalled) as total_today_uninstalled, " +
+                                        "sum(total_user) as users, sum(active_user) as active_users, sum(impression) as impressions, sum(revenue) as revenues, " +
+                                        "sum(estimated_revenue) as estimated_revenues, " +
+                                        " (sum(revenue) - sum(cost)) as incoming, " +
+                                        "(case when sum(impression) > 0 then sum(revenue) * 1000 / sum(impression) else 0 end) as ecpm," +
+                                        "(case when sum(purchased_user) > 0 then sum(cost) / sum(purchased_user) else 0 end) as cpa, " +
+                                        " (case when sum(cost) > 0 then sum(estimated_revenue) / sum(cost) else 0 end) as est_rev_dev_cost " +
+                                        "from web_ad_country_analysis_report_history where app_id = '" + google_package_id + "' " +
+                                        "and country_code = '" + country_filter_code + "'" +
+                                        "and date BETWEEN '" + startTime + "' AND '" + endTime + "' GROUP BY date";
+                            }
+                        }
                     }
+
                     //上面的 sql 把各项都加起来，是为了让之后的sorter能进行排序
                     //这些数据取出来形成了一个临时表，并没有改变数据表的结构和内容
                     int sorter = 0;
@@ -181,7 +188,7 @@ public class TimeAnalysisReport extends HttpServlet {
                             sql += " order by est_rev_dev_cost";
                             break;
                         default:
-                            sql += " order by total_cost desc";  //默认排序方式
+                            sql += " order by date";  //默认排序方式
                     }
 
 
@@ -214,8 +221,52 @@ public class TimeAnalysisReport extends HttpServlet {
                                 }
                                 */
 
+                            //计算ACpa
+                            sql = "select purchased_user,total_installed,active_user " +
+                                    " from web_ad_country_analysis_report_history where app_id = '"+google_package_id+"' " +
+                                    " and country_code = '" + country_code + "' and date = '" + beforeThreeDays + "'";
+                            JSObject oneC = DB.findOneBySql(sql);
+                            double natural_value = 0;
+                            double before_three_days_active_user = 0;
+                            double before_three_days_purchased_user = 0;
+                            if(oneC != null && oneC.hasObjectData()){
+                                before_three_days_purchased_user = Utils.convertDouble(oneC.get("purchased_user"),0);
+                                double before_three_days_total_install = Utils.convertDouble(oneC.get("total_installed"),0);
+                                before_three_days_active_user = Utils.convertDouble(oneC.get("active_user"),0);
+                                natural_value = before_three_days_total_install - before_three_days_purchased_user;
+                            }
+                            sql = "select cost,purchased_user " +
+                                    " from web_ad_country_analysis_report_history where app_id = '"+google_package_id+"' " +
+                                    " and country_code = '" + country_code + "' and date = '" + endTime + "'";
+                            oneC = DB.findOneBySql(sql);
+                            double today_cost = 0;
+                            double today_purchased_user = 0;
+                            if(oneC != null && oneC.hasObjectData()){
+                                today_cost = Utils.convertDouble(oneC.get("cost"),0);
+                                today_purchased_user = Utils.convertDouble(oneC.get("purchased_user"),0);
+                            }
+                            double a_cpa = 0;
+                            double left_today_purchased_user = today_purchased_user + natural_value;
+                            a_cpa = left_today_purchased_user == 0 ? 0 : today_cost / left_today_purchased_user;
+
+                            //到这里a_cpa的计算结束
+
+                            //计算pi
+                            double pi = 0;
+                            sql = "select sum(impression) as daily_impression from ad_app_unit_report_history where app_id = '" + google_package_id + "' and country_code = '"
+                                    + country_code + "' and date = '" + endTime + "' and is_valid = 1";
+                            oneC = DB.findOneBySql(sql);
+                            if(oneC != null && oneC.hasObjectData()){
+                                double dailyImpression = Utils.convertDouble(oneC.get("daily_impression"),0);
+                                double left_today_active_user = today_purchased_user + before_three_days_active_user - before_three_days_purchased_user;
+                                if(left_today_active_user != 0){
+                                    pi = dailyImpression / left_today_active_user;
+                                }
+                            }
+
+
                             sql = "select country_name from app_country_code_dict where country_code = '" + country_code + "'";
-                            JSObject oneC = null;
+//                            JSObject oneC = null;
                             oneC = DB.findOneBySql(sql);   //按这里的SQL语句进行操作返回 JsonObject；每个循环只检索一个country_code
                             String countryName = "";
                             if (oneC != null && oneC.hasObjectData()) {
@@ -299,20 +350,22 @@ public class TimeAnalysisReport extends HttpServlet {
                             d.addProperty("users", users);
                             d.addProperty("active_users", active_users);
                             d.addProperty("revenues", Utils.trimDouble(revenues, 0));
+                            d.addProperty("pi", Utils.trimDouble(pi,3));
                             d.addProperty("ecpm", Utils.trimDouble(ecpm, 3));
                             d.addProperty("cpa_dev_ecpm", Utils.trimDouble(cpa_dev_ecpm, 3));
 //                                d.addProperty("seven_days_costs", Utils.trimDouble(seven_days_costs,0));
 //                                d.addProperty("seven_days_incoming", Utils.trimDouble(seven_days_incoming,0));
 //                                d.addProperty("seven_days_revenues", Utils.trimDouble(seven_days_revenues,0));
+                            d.addProperty("a_cpa", Utils.trimDouble(a_cpa,3));
                             d.addProperty("incoming", Utils.trimDouble(incoming, 0));
                             d.addProperty("estimated_revenues", Utils.trimDouble(estimated_revenues, 0));
                             d.addProperty("estimated_revenues_dev_cost", Utils.trimDouble(estRevDevCost, 3));
                             String sqlP = "select price from web_ad_country_analysis_report_price where app_id = '" + google_package_id + "' and country_code = '" + country_code + "'";
                             JSObject oneP = DB.findOneBySql(sqlP);  // 得到price
-                            double price = 0;
+/*                            double price = 0;
                             if (oneP != null && oneP.hasObjectData()) {
                                 price = Utils.convertDouble(oneP.get("price"), 0);
-                            }
+                            }*/
 
                             d.addProperty("cpa", Utils.trimDouble(cpa, 3));
                             jsonArray.add(d);

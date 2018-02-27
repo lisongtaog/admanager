@@ -1,12 +1,10 @@
 package com.bestgo.admanager.servlet;
 
-import com.bestgo.admanager.DateUtil;
 import com.bestgo.admanager.Utils;
 import com.bestgo.common.database.services.DB;
 import com.bestgo.common.database.utils.JSObject;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.sun.xml.internal.bind.v2.runtime.unmarshaller.TagName;
 import org.apache.log4j.Logger;
 
 import javax.servlet.ServletException;
@@ -16,8 +14,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 /**
  * 查询无数据的系列
