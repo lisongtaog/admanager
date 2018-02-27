@@ -15,7 +15,11 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 
-
+/**
+ * Author: mengjun
+ * Date: 2018/2/20 18:06
+ * Desc: 对每个项目组每个品类每个应用的投放数据的统计
+ */
 @WebServlet(name = "ReleasedDataStatistics", urlPatterns = {"/released_data_statistics/*"}, asyncSupported = true)
 public class ReleasedDataStatistics extends HttpServlet {
 
@@ -34,7 +38,7 @@ public class ReleasedDataStatistics extends HttpServlet {
         String likeTeamName = request.getParameter("likeTeamName");
         likeTeamName = likeTeamName.trim();
         String endTime = request.getParameter("endTime");
-        if (path.startsWith("/query_released_data_statistics")) {
+        if (path.matches("/query_released_data_statistics")) {
             JsonArray jsonArray = new JsonArray();
             try {
                 String sqlG = "select team_name,category_name,t.id,t.tag_name,anticipated_incoming,anticipated_revenue,google_package_id " +
@@ -43,14 +47,11 @@ public class ReleasedDataStatistics extends HttpServlet {
                         ((likeTeamName == "") ? " " : " and team_name like '%" + likeTeamName + "%' ") +
                         ((likeCategoryName == "") ? " " : " and category_name like '%" + likeCategoryName + "%' ") +
                         " ORDER BY ct.id,tc.id,t.id ";
-                java.lang.System.out.println(sqlG);
                 List<JSObject> listTag = DB.findListBySql(sqlG);
                 if (listTag != null && listTag.size() > 0) {
                     for (JSObject t : listTag) {
                         if (t.hasObjectData()) {
-//                            long teamId = t.get("team_id");
                             String teamName = t.get("team_name");
-//                            long categoryId = t.get("category_id");
                             String categoryName = t.get("category_name");
                             String google_package_id = t.get("google_package_id");
                             long tagId = t.get("id");
@@ -92,9 +93,9 @@ public class ReleasedDataStatistics extends HttpServlet {
                                     sqlG = "select sum(revenue) as revenues " +
                                             "from web_ad_country_analysis_report_history where app_id = '"
                                             + google_package_id + "' and date = '" + date + "'";
-                                    JSObject oneR = DB.findOneBySql(sqlG);
-                                    if (oneR != null) {
-                                        totalRevenue = Utils.convertDouble(oneR.get("revenues"), 0);
+                                    x = DB.findOneBySql(sqlG);
+                                    if (x.hasObjectData()) {
+                                        totalRevenue = Utils.convertDouble(x.get("revenues"), 0);
                                     }
                                 }
                                 double totalIncoming = totalRevenue - totalSpend;

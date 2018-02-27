@@ -20,7 +20,7 @@ import java.util.Map;
 /**
  * Author: mengjun
  * Date: 2018/2/2 21:15
- * Desc:
+ * Desc: 分析每个应用每个国家的活跃用户度的报告
  */
 @WebServlet(name = "ActiveUserReport", urlPatterns = {"/active_user_report/*"})
 public class ActiveUserReport extends HttpServlet {
@@ -56,7 +56,7 @@ public class ActiveUserReport extends HttpServlet {
         String tagName = request.getParameter("tagName");
 
 
-        if (path.startsWith("/query_active_user_report")) {
+        if (path.matches("/query_active_user_report")) {
             List<JSObject> list = null;
             JsonArray jsonArray = new JsonArray();
             try {

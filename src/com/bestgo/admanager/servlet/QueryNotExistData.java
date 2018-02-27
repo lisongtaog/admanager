@@ -20,7 +20,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
- *
+ * 查询无数据的系列
  */
 @WebServlet(name = "QueryNotExistData", urlPatterns = {"/query_not_exist_data"}, asyncSupported = true)
 public class QueryNotExistData extends HttpServlet {
