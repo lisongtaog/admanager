@@ -6,7 +6,7 @@
 
 <html>
 <head>
-    <title>分析报告(国家)</title>
+    <title>分析报告(时间)</title>
     <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css"/>
     <link rel="stylesheet" href="bootstrap/css/bootstrap-theme.min.css"/>
     <link rel="stylesheet" href="css/core.css"/>
@@ -16,14 +16,29 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.4/css/select2.min.css" rel="stylesheet" />
 
     <style>
+        td.editable {
+
+        }
+        td.editable.checkbox {
+
+        }
         td.changed {
             background-color: #0f0;
         }
         #total_result.editable {
             background-color: yellow;
         }
+        .estimateResult {
+            color: red;
+        }
         .red {
             color: red;
+        }
+        .green {
+            color: green;
+        }
+        .orange{
+            color: orange;
         }
     </style>
 </head>
@@ -35,7 +50,7 @@
         response.sendRedirect("login.jsp");
     }
 
-    List<JSObject> allTags = Tags.fetchAllTags();
+    List<JSObject> allTags = Tags.fetchAllTags();   //这里得到一个从表web_tag里导入的有 id，tag_name 两项的JsonObject数组
     JsonArray array = new JsonArray();
     for (int i = 0; i < allTags.size(); i++) {
         array.add((String) allTags.get(i).get("tag_name"));
@@ -53,10 +68,15 @@
             <input type="text" value="2012-05-15" id="inputEndTime" readonly>
             <span>标签</span>
             <input id="inputSearch" class="form-control" style="display: inline; width: auto;" type="text"/>
-            <button id="btnSearch" class="btn btn-default glyphicon glyphicon-search"></button>
+            <button id="btnSearch" class="btn btn-default">查找</button>
         </div>
     </div>
     <div class="panel panel-default">
+        <div>
+            &nbsp&nbsp&nbsp&nbsp
+            <span>筛选</span>
+            <select id="country_filter"><option selected="selected">all country</option></select>
+        </div>
         <div class="panel-body" id="total_result">
         </div>
     </div>
@@ -64,6 +84,7 @@
         <thead id="result_header">
         <tr>
             <th>国家</th>
+            <th>Date</th>
             <th>Cost</th>
             <th>PurchasedUser</th>
             <th>Installed</th>
@@ -73,9 +94,7 @@
             <th>ActiveUser</th>
             <th>Revenue</th>
             <th>ECPM</th>
-            <th>PI</th>
             <th>CPA</th>
-            <th>ACpa</th>
             <th>Incoming</th>
             <th>EstimatedRevenue14</th>
             <th>Revenue14/Cost</th>
@@ -98,15 +117,17 @@
 <script src="js/country-name-code-dict.js"></script>
 
 <script>
-    $("li[role='presentation']:eq(2)").addClass("active");
+    $("li[role='presentation']:eq(3)").addClass("active");
+    //首先由默认的时间显示
     var now = new Date(new Date().getTime() - 86400 * 1000);
     $('#inputStartTime').val(now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + now.getDate());
-    $('#inputEndTime').val(now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + now.getDate());
+    $('#inputEndTime').val(now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + now.getDate());   //不太明白这里为什么要+1
+    //datetimepicker是个现成插件
     $('#inputStartTime').datetimepicker({
-        minView: "month",
-        format: 'yyyy-mm-dd',
-        autoclose: true,
-        todayBtn: true
+        minView: "month",    //从月视图开始，选天
+        format: 'yyyy-mm-dd',  //显示格式
+        autoclose: true,    //选完以后是否自动关闭
+        todayBtn: true      //如果此值为true或者linked的话，在时间框底下显示“today”按钮以选择当前日期
     });
     $('#inputEndTime').datetimepicker({
         minView: "month",
@@ -114,40 +135,56 @@
         autoclose: true,
         todayBtn: true
     });
-    var data = <%=array.toString()%>;
+    var data = <%=array.toString()%>;  //array是这样的结构：[{},{},{},...]
     $("#inputSearch").autocomplete({
-        source: data
+        source: data   //label属性显示在建议菜单里
     });
 
     $("#btnSearch").click(function(){
+        //点击“查找”后，$("#country_filter")里添加国家选项
+        $.post("time_analysis_report/setOption", function(data){
+//            alert("hello"); //检查程序是否跳入了
+            $("#country_filter >option").remove();
+            var arr = data;
+            var len = arr.length;
+            for(i=0;i<len;i++){
+                var k = arr[i];
+                var op = $("<option></option>");
+                op.text(k["country_name"]);
+                $("#country_filter").append(op);
+            }
+        },"json");
+
         var query = $("#inputSearch").val();
         var startTime = $('#inputStartTime').val();
         var endTime = $('#inputEndTime').val();
-        $.post('country_analysis_report/query_country_analysis_report', {
+        $.post('time_analysis_report/time_query', {   //用于排序
             tagName: query,
             startTime: startTime,
             endTime: endTime,
         },function(data){
             if(data && data.ret == 1){
-                $('#result_header').html("<tr><th>国家</th><th>Cost<span sorterId=\"1031\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
+                $('#result_header').html("<tr><th>Date<span sorterId=\"1032\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>"+
+                    "<th>Cost<span sorterId=\"1031\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
                     "<th>7daysCost</th><th>PurchasedUser<span sorterId=\"1033\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
                     "<th>Installed<span sorterId=\"1034\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
                     "<th>Uninstalled<span sorterId=\"1035\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
                     "<th>UninstalledRate</th><th>TotalUser<span sorterId=\"1037\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
                     "<th>ActiveUser<span sorterId=\"1038\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
                     "<th>Revenue<span sorterId=\"1039\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th><th>7daysRevenue</th>" +
-                    "<th>PI</th><th>ECPM<span sorterId=\"1040\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
+                    "<th>ECPM<span sorterId=\"1040\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
                     "<th>CPA<span sorterId=\"1041\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
-                    "<th>ACpa</th><th>CPA/ECPM</th>" +
+                    "<th>CPA/ECPM</th>" +
                     "<th>Incoming<span sorterId=\"1042\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th><th>7daysIncoming</th>" +
                     "<th>EstimatedRevenue14<span sorterId=\"1044\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
-                    "<th>Revenue14/Cost<span sorterId=\"1045\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th></tr>");
-                setData(data,query);
-                bindSortOp();
+                    "<th>Revenue14/Cost<span sorterId=\"1045\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>");
+
+                setData(data,query);  //这里是往表格里添加项目，并设置某三列的颜色
+                bindSortOp();  //鼠标触发的排序
                 var str = "Cost: " + data.total_cost + "&nbsp;&nbsp;&nbsp;&nbsp;PuserchaedUser: " + data.total_puserchaed_user +
                     "&nbsp;&nbsp;&nbsp;&nbsp;CPA: " + data.total_cpa + "&nbsp;&nbsp;&nbsp;&nbsp;Revenue: " + data.total_revenue +
                     "&nbsp;&nbsp;&nbsp;&nbsp;Es14: " + data.total_es14 + "&nbsp;&nbsp;&nbsp;&nbsp;Es14/Cost: " + data.es14_dev_cost;
-                str += "<br/><span class='estimateResult'></span>"
+                str += "<br/><span class='estimateResult'></span>";
                 $('#total_result').html(str);
                 $('#total_result').removeClass("editable");
             } else {
@@ -155,6 +192,22 @@
             }
         },'json');
     });
+
+    $("#country_filter").change(function(){
+        var query = $("#inputSearch").val();
+        var startTime = $("#inputStartTime").val();
+        var endTime = $("#inputEndTime").val();
+        var country = $("#country_filter").val();
+        $.post("time_analysis_report/country_filter",{
+            tagName: query,
+            startTime: startTime,
+            endTime: endTime,
+            country_filter:country
+        },function(data){
+            setData(data);
+        },"json");
+    });
+
     function bindSortOp() {
         $('.sorter').click(function() {
             var sorterId = $(this).attr('sorterId');
@@ -162,7 +215,7 @@
             if ($(this).hasClass("glyphicon-arrow-down")) {
                 $(this).removeClass("glyphicon-arrow-down");
                 $(this).addClass("glyphicon-arrow-up");
-                sorterId -= 1000;
+                sorterId -= 1000; //便于在升序和降序间切换
             } else {
                 $(this).removeClass("glyphicon-arrow-up");
                 $(this).addClass("glyphicon-arrow-down");
@@ -171,21 +224,21 @@
             var query = $("#inputSearch").val();
             var startTime = $('#inputStartTime').val();
             var endTime = $('#inputEndTime').val();
-            $.post('country_analysis_report/query_country_analysis_report', {
-                tagName: query,
+            $.post('time_analysis_report/time_query', {
+                tagName: query,   //query是在标签一栏输入的应用名(实操时候用了输入才会触发的下拉列表)
                 startTime: startTime,
                 endTime: endTime,
                 sorterId: sorterId
             },function(data){
                 if (data && data.ret == 1) {
                     setData(data,query);
-                    var str = "Cost: " + data.total_cost + "&nbsp;&nbsp;&nbsp;&nbsp;PuserchaedUser: " + data.total_puserchaed_user +
+                    var str = "Cost: " + data.total_cost + "&nbsp;&nbsp;&nbsp;&nbsp;PuserchaedUser: " + data.total_puserchaed_user +  // &nbsp; 在html语言里表示空格
                         "&nbsp;&nbsp;&nbsp;&nbsp;CPA: " + data.total_cpa + "&nbsp;&nbsp;&nbsp;&nbsp;Revenue: " + data.total_revenue +
                         "&nbsp;&nbsp;&nbsp;&nbsp;Es14: " + data.total_es14 + "&nbsp;&nbsp;&nbsp;&nbsp;Es14/Cost: " + data.es14_dev_cost;
 
                     str += "<br/><span class='estimateResult'></span>"
-                    $('#total_result').removeClass("editable");
-                    $('#total_result').html(str);
+                    $('#total_result').removeClass("editable");  //移除 类editable
+                    $('#total_result').html(str); //把选中元素的内容替换成 str：结果是页面动态出现了一行字
                 } else {
                     admanager.showCommonDlg("错误", data.message);
                 }
@@ -193,71 +246,42 @@
         });
     }
 
+    //该方法仅用于设置某三项的字体颜色
     function setData(data,tagName) {
-        $('#results_body > tr').remove();
-        var arr = data.array;
+        $('#results_body > tr').remove();  //2018-2-9：多层级选择器
+        var arr = data.array;   //array是从后台取出来的原始、未改动数据
         var len = arr.length;
         var one;
+        //底下这个for循环是用于往数组array的其中三项添加属性以显示不同颜色,并在表格里添加数据
         for (var i = 0; i < len; i++) {
-            one = arr[i];
-            var tr = $('<tr></tr>');
-            var td_outer_a = $('<td></td>');
-            td_outer_a.text(one['country_name']);
-            tr.append(td_outer_a);
-            var keyset = ["costs","seven_days_costs", "purchased_users", "installed",
-                "uninstalled", "uninstalled_rate", "users", "active_users", "revenues","seven_days_revenues","pi",
-                "ecpm","cpa","a_cpa","cpa_dev_ecpm", "incoming","seven_days_incoming", "estimated_revenues","estimated_revenues_dev_cost"];
+            one = arr[i];  //每个数组成员都是一个JS对象
+
+            var tr = $('<tr></tr>');   //创建一个空的行元素：$("<></>")
+            var keyset = ["date","costs","seven_days_costs", "purchased_users", "installed",
+                "uninstalled", "uninstalled_rate", "users", "active_users", "revenues","seven_days_revenues",
+                "ecpm","cpa","cpa_dev_ecpm", "incoming","seven_days_incoming", "estimated_revenues","estimated_revenues_dev_cost"];
             for (var j = 0; j < keyset.length; j++) {
-                var key = keyset[j];
                 var td = $('<td></td>');
-                var r = one[key];
-                if('revenues' == key){
-                    td = $('<td title="'+ one['every_day_revenue_for_seven_days'] + '"></td>');
-                }else if('costs' == key){
-                    td = $('<td title="'+ one['every_day_cost_for_seven_days'] + '"></td>');
-                }else if('purchased_users' == key){
-                    td = $('<td title="'+ one['every_day_purchased_user_for_seven_days'] + '"></td>');
-                }else if('ecpm' == key){
-                    td = $('<td title="'+ one['every_day_ecpm_for_seven_days'] + '"></td>');
-                }else if('cpa' == key){
-                    td = $('<td title="'+ one['every_day_cpa_for_seven_days'] + '"></td>');
-                }else if('incoming' == key){
-                    td = $('<td title="'+ one['every_day_incoming_for_seven_days'] + '"></td>');
-                    if(r < 0){
+                var r = one[keyset[j]]; //选中集里的某个键
+                if('incoming' == keyset[j]){
+                    if(r <0){
                         td.addClass("red");
-                    }
-                }else if('estimated_revenues_dev_cost' == key){
+                    }''
+                }else if('estimated_revenues_dev_cost' == keyset[j]){
                     if(r > data.es14_dev_cost){
                         td.addClass("green");
                     }else if(r < data.es14_dev_cost){
                         td.addClass("orange");
                     }
                 }
-                td.text(r);
+                td.text(r);  //把某键的值以文本形式返回
                 tr.append(td);
             }
-            var td_outer = $('<td></td>');
-            var btn = $('<input type="button" value="跳转更新">');
-            btn.data("country_name", one['country_name']);
-            btn.click(function(){
-                var country_name = $(this).data("country_name");
-                $.post('country_analysis_report/query_id_of_auto_create_campaigns', {
-                    tagName: tagName,
-                    curr_country_name: country_name
-            },function(data){
-                    if (data && data.ret == 1) {
-                        window.open("campaigns_create.jsp?type=auto_create&network=facebook&id="+data.id_facebook,"_blank");
-                        window.open("campaigns_create.jsp?type=auto_create&network=adwords&id="+data.id_adwords,"_blank");
-                    } else {
-                        admanager.showCommonDlg("错误", data.message);
-                    }
-                }, 'json');
-            });
-            td_outer.append(btn);
-            tr.append(td_outer);
             $('#results_body').append(tr);
         }
     }
 </script>
+<script src="js/interlaced-color-change.js"></script>
 </body>
 </html>
+

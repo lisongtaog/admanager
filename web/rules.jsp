@@ -133,7 +133,7 @@
   <script type="text/javascript">
     var modifyType = 'new';
     var id;
-    $("li[role='presentation']:eq(10)").addClass("active");
+    $("li[role='presentation']:eq(11)").addClass("active");
 
     $("#btn_add_new_rule").click(function() {
       modifyType = 'new';

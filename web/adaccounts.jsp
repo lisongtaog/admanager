@@ -139,7 +139,7 @@
     var modifyType = 'new';
     var id;
 
-    $("li[role='presentation']:eq(5)").addClass("active");
+    $("li[role='presentation']:eq(6)").addClass("active");
 
     $("#btn_add_new_account").click(function() {
       modifyType = 'new';
