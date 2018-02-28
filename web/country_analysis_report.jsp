@@ -25,6 +25,12 @@
         .red {
             color: red;
         }
+        .green {
+            color: green;
+        }
+        .orange{
+            color: orange;
+        }
     </style>
 </head>
 <body>
@@ -126,7 +132,7 @@
         $.post('country_analysis_report/query_country_analysis_report', {
             tagName: query,
             startTime: startTime,
-            endTime: endTime,
+            endTime: endTime
         },function(data){
             if(data && data.ret == 1){
                 $('#result_header').html("<tr><th>国家</th><th>Cost<span sorterId=\"1031\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
