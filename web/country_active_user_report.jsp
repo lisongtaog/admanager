@@ -74,7 +74,7 @@
     <table class="table table-hover">
         <thead id="result_header">
         <tr>
-            <th>国家</th><th>7Days_ActiveUser</th><th>14Days_ActiveUser</th><th>30Days_ActiveUser</th><th>60Days_ActiveUser</th>
+            <th>国家</th><th>安装量总和</th><th>7Days_ActiveUser</th><th>14Days_ActiveUser</th><th>30Days_ActiveUser</th><th>60Days_ActiveUser</th>
         </tr>
         </thead>
         <tbody id="results_body">
@@ -105,7 +105,7 @@
             tagName: query
         },function(data){
             if(data && data.ret == 1){
-                $('#result_header').html("<tr><th>国家</th><th>7Days_ActiveUser</th><th>14Days_ActiveUser</th><th>30Days_ActiveUser</th><th>60Days_ActiveUser</th></tr>");
+                $('#result_header').html("<tr><th>国家</th><th>安装量总和</th><th>7Days_ActiveUser</th><th>14Days_ActiveUser</th><th>30Days_ActiveUser</th><th>60Days_ActiveUser</th></tr>");
                 data = data.array;
                 setData(data);
             } else {
@@ -120,7 +120,7 @@
         for (var i = 0; i < data.length; i++) {
             var one = data[i];
             var tr = $('<tr></tr>');
-            var keyset = ["country_name", "avg_7_day_active", "avg_14_day_active", "avg_30_day_active", "avg_60_day_active"];
+            var keyset = ["country_name","total_installeds", "avg_7_day_active", "avg_14_day_active", "avg_30_day_active", "avg_60_day_active"];
             for (var j = 0; j < keyset.length; j++) {
                 var td = $('<td></td>');
                 var field = keyset[j];
@@ -132,6 +132,5 @@
         }
     }
 </script>
-<script src="js/interlaced-color-change.js"></script>
 </body>
 </html>

@@ -59,33 +59,37 @@ public class ActiveUserReport extends HttpServlet {
             List<JSObject> list = null;
             JsonArray jsonArray = new JsonArray();
             try {
-                String sql = "select country_code,avg_7_day_active,avg_14_day_active,avg_30_day_active,avg_60_day_active " +
+                String sql = "select total_installeds,country_code,avg_7_day_active,avg_14_day_active,avg_30_day_active,avg_60_day_active " +
                         " from ad_report_active_user_admob_rel_result where tag_name = '" + tagName + "' ORDER BY country_code";
                 list = DB.findListBySql(sql);
                 for (JSObject j : list) {
-                    JsonObject jo = new JsonObject();
-                    String countryCode = j.get("country_code");
-                    String countryName = countryCodeMap.get(countryCode);
-                    if(countryName == null){
-                        sql = "select country_name from app_country_code_dict where country_code = '" + countryCode + "'";
-                        JSObject one = DB.findOneBySql(sql);
-                        if(one != null && one.hasObjectData()){
-                            countryName = one.get("country_name");
-                        }else{
-                            countryName = "--";
+                    if(j.hasObjectData()){
+                        JsonObject jo = new JsonObject();
+                        String countryCode = j.get("country_code");
+                        String countryName = countryCodeMap.get(countryCode);
+                        if(countryName == null){
+                            sql = "select country_name from app_country_code_dict where country_code = '" + countryCode + "'";
+                            JSObject one = DB.findOneBySql(sql);
+                            if(one != null && one.hasObjectData()){
+                                countryName = one.get("country_name");
+                            }else{
+                                countryName = "--";
+                            }
+                            countryCodeMap.put(countryCode,countryName);
                         }
-                        countryCodeMap.put(countryCode,countryName);
+                        double totalInstalleds = Utils.convertDouble(j.get("total_installeds"), 0);
+                        double avg_7_day_active = Utils.convertDouble(j.get("avg_7_day_active"), 0);
+                        double avg_14_day_active = Utils.convertDouble(j.get("avg_14_day_active"), 0);
+                        double avg_30_day_active = Utils.convertDouble(j.get("avg_30_day_active"), 0);
+                        double avg_60_day_active = Utils.convertDouble(j.get("avg_60_day_active"), 0);
+                        jo.addProperty("country_name", countryName);
+                        jo.addProperty("total_installeds", Utils.trimDouble(totalInstalleds,3));
+                        jo.addProperty("avg_7_day_active", Utils.trimDouble(avg_7_day_active,3));
+                        jo.addProperty("avg_14_day_active", Utils.trimDouble(avg_14_day_active,3));
+                        jo.addProperty("avg_30_day_active", Utils.trimDouble(avg_30_day_active,3));
+                        jo.addProperty("avg_60_day_active", Utils.trimDouble(avg_60_day_active,3));
+                        jsonArray.add(jo);
                     }
-                    double avg_7_day_active = Utils.convertDouble(j.get("avg_7_day_active"), 0);
-                    double avg_14_day_active = Utils.convertDouble(j.get("avg_14_day_active"), 0);
-                    double avg_30_day_active = Utils.convertDouble(j.get("avg_30_day_active"), 0);
-                    double avg_60_day_active = Utils.convertDouble(j.get("avg_60_day_active"), 0);
-                    jo.addProperty("country_name", countryName);
-                    jo.addProperty("avg_7_day_active", Utils.trimDouble(avg_7_day_active,3));
-                    jo.addProperty("avg_14_day_active", Utils.trimDouble(avg_14_day_active,3));
-                    jo.addProperty("avg_30_day_active", Utils.trimDouble(avg_30_day_active,3));
-                    jo.addProperty("avg_60_day_active", Utils.trimDouble(avg_60_day_active,3));
-                    jsonArray.add(jo);
                 }
 
                 jsonObject.add("array", jsonArray);
