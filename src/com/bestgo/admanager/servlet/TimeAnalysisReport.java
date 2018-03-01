@@ -13,6 +13,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.lang.String;
@@ -188,7 +190,7 @@ public class TimeAnalysisReport extends HttpServlet {
                             sql += " order by est_rev_dev_cost";
                             break;
                         default:
-                            sql += " order by date";  //默认排序方式
+                            sql += " order by date desc";  //默认排序方式
                     }
 
 
@@ -221,47 +223,15 @@ public class TimeAnalysisReport extends HttpServlet {
                                 }
                                 */
 
-                            //计算ACpa
-                            sql = "select purchased_user,total_installed,active_user " +
-                                    " from web_ad_country_analysis_report_history where app_id = '"+google_package_id+"' " +
-                                    " and country_code = '" + country_code + "' and date = '" + beforeThreeDays + "'";
+                            sql = "select pi,a_cpa " +
+                                    " from web_ad_country_analysis_report_history where app_id = '" + google_package_id + "' " +
+                                    " and country_code = '" + country_filter_code + "' and date = '" + endTime + "'";
                             JSObject oneC = DB.findOneBySql(sql);
-                            double natural_value = 0;
-                            double before_three_days_active_user = 0;
-                            double before_three_days_purchased_user = 0;
-                            if(oneC != null && oneC.hasObjectData()){
-                                before_three_days_purchased_user = Utils.convertDouble(oneC.get("purchased_user"),0);
-                                double before_three_days_total_install = Utils.convertDouble(oneC.get("total_installed"),0);
-                                before_three_days_active_user = Utils.convertDouble(oneC.get("active_user"),0);
-                                natural_value = before_three_days_total_install - before_three_days_purchased_user;
-                            }
-                            sql = "select cost,purchased_user " +
-                                    " from web_ad_country_analysis_report_history where app_id = '"+google_package_id+"' " +
-                                    " and country_code = '" + country_code + "' and date = '" + endTime + "'";
-                            oneC = DB.findOneBySql(sql);
-                            double today_cost = 0;
-                            double today_purchased_user = 0;
-                            if(oneC != null && oneC.hasObjectData()){
-                                today_cost = Utils.convertDouble(oneC.get("cost"),0);
-                                today_purchased_user = Utils.convertDouble(oneC.get("purchased_user"),0);
-                            }
-                            double a_cpa = 0;
-                            double left_today_purchased_user = today_purchased_user + natural_value;
-                            a_cpa = left_today_purchased_user == 0 ? 0 : today_cost / left_today_purchased_user;
-
-                            //到这里a_cpa的计算结束
-
-                            //计算pi
                             double pi = 0;
-                            sql = "select sum(impression) as daily_impression from ad_app_unit_report_history where app_id = '" + google_package_id + "' and country_code = '"
-                                    + country_code + "' and date = '" + endTime + "' and is_valid = 1";
-                            oneC = DB.findOneBySql(sql);
-                            if(oneC != null && oneC.hasObjectData()){
-                                double dailyImpression = Utils.convertDouble(oneC.get("daily_impression"),0);
-                                double left_today_active_user = today_purchased_user + before_three_days_active_user - before_three_days_purchased_user;
-                                if(left_today_active_user != 0){
-                                    pi = dailyImpression / left_today_active_user;
-                                }
+                            double a_cpa = 0;
+                            if(oneC.hasObjectData()){
+                                pi = Utils.convertDouble(oneC.get("pi"),0);
+                                a_cpa = Utils.convertDouble(oneC.get("a_cpa"),0);
                             }
 
 
@@ -360,8 +330,8 @@ public class TimeAnalysisReport extends HttpServlet {
                             d.addProperty("incoming", Utils.trimDouble(incoming, 0));
                             d.addProperty("estimated_revenues", Utils.trimDouble(estimated_revenues, 0));
                             d.addProperty("estimated_revenues_dev_cost", Utils.trimDouble(estRevDevCost, 3));
-                            String sqlP = "select price from web_ad_country_analysis_report_price where app_id = '" + google_package_id + "' and country_code = '" + country_code + "'";
-                            JSObject oneP = DB.findOneBySql(sqlP);  // 得到price
+//                            String sqlP = "select price from web_ad_country_analysis_report_price where app_id = '" + google_package_id + "' and country_code = '" + country_code + "'";
+//                            JSObject oneP = DB.findOneBySql(sqlP);  // 得到price
 /*                            double price = 0;
                             if (oneP != null && oneP.hasObjectData()) {
                                 price = Utils.convertDouble(oneP.get("price"), 0);

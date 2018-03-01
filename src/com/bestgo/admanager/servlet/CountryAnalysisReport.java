@@ -34,7 +34,6 @@ public class CountryAnalysisReport extends HttpServlet {
         String startTime = request.getParameter("startTime");
         String endTime = request.getParameter("endTime");
         String beforeSevenDays = DateUtil.addDay(endTime,-6,"yyyy-MM-dd");//包括endTime
-//        String beforeThreeDays = DateUtil.addDay(endTime,-3,"yyyy-MM-dd");
         if (path.startsWith("/query_country_analysis_report")) {
             try {
                 String sqlG = "select google_package_id from web_facebook_app_ids_rel WHERE tag_name = '" + tagName + "'";
