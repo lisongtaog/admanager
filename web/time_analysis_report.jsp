@@ -95,7 +95,7 @@
             <th>PI</th>
             <th>ECPM</th>
             <th>CPA</th>
-            <th>ACpa</th>
+            <th>AC</th>
             <th>CPA/ECPM</th>
             <th>Incoming</th>
             <th>EstimatedRevenue14</th>
@@ -179,7 +179,7 @@
                     "<th>PI</th>"  +
                     "<th>ECPM<span sorterId=\"1040\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
                     "<th>CPA<span sorterId=\"1041\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
-                    "<th>ACpa</th>"+
+                    "<th>ACPA</th>"+
                     "<th>CPA/ECPM</th>" +
                     "<th>Incoming<span sorterId=\"1042\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
                     "<th>EstimatedRevenue14<span sorterId=\"1044\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
@@ -283,6 +283,9 @@
                     }else if(r < data.es14_dev_cost){
                         td.addClass("orange");
                     }
+                }
+                if(r == null || r == ""){
+                    r = "--";
                 }
                 td.text(r);  //把某键的值以文本形式返回
                 tr.append(td);

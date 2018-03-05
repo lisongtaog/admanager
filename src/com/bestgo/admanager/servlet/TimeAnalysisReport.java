@@ -224,7 +224,7 @@ public class TimeAnalysisReport extends HttpServlet {
                                 */
 
                             sql = "select pi,a_cpa " +
-                                    " from web_ad_country_analysis_report_history where app_id = '" + google_package_id + "' " +
+                                    " from web_ad_country_analysis_report_history_by_date where app_id = '" + google_package_id + "' " +
                                     " and country_code = '" + country_filter_code + "' and date = '" + endTime + "'";
                             JSObject oneC = DB.findOneBySql(sql);
                             double pi = 0;
