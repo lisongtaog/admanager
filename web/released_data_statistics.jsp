@@ -116,13 +116,13 @@
 <script>
     function init() {
 
-    function getDate(dd,AddDayCount) {
-        dd.setDate(dd.getDate()+AddDayCount);//获取AddDayCount天后的日期
-        var y = dd.getFullYear();
-        var m = dd.getMonth()+1;//获取当前月份的日期
-        var d = dd.getDate();
-        return y+"-"+(m<10?"0"+m:m)+"-"+(d<10?"0"+d:d);
-    }
+        function getDate(dd,AddDayCount) {
+            dd.setDate(dd.getDate()+AddDayCount);//获取AddDayCount天后的日期
+            var y = dd.getFullYear();
+            var m = dd.getMonth()+1;//获取当前月份的日期
+            var d = dd.getDate();
+            return y+"-"+(m<10?"0"+m:m)+"-"+(d<10?"0"+d:d);
+        }
 
         $("li[role='presentation']:eq(4)").addClass("active");
         var now = new Date(new Date().getTime() - 86400 * 1000);

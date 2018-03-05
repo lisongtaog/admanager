@@ -42,6 +42,7 @@ $("#new_campaign_dlg .btn-primary").click(function() {
 
 var appQueryData = [];
 var strFullPath = "";
+
 function init() {
 
     var now = new Date(new Date().getTime() - 86400 * 1000);
@@ -305,7 +306,7 @@ function init() {
     $('#btnSummary').click(function () {
         var startTime = $('#inputStartTime').val();
         var endTime = $('#inputEndTime').val();
-        var adwordsCheck = $('#adwordsCheck').is(':checked');
+        var adwordsCheck = $('#adwordsCheck').is(':checked');  //is是一个方法的标签名
         var facebookCheck = $('#facebookCheck').is(':checked');
         $.post('query', {
             summary: true,
@@ -315,14 +316,14 @@ function init() {
             facebookCheck: facebookCheck,
         }, function (data) {
             if (data && data.ret == 1) {
-                $('#result_header').html("<tr><th>应用名称</th><th>总花费<span sorterId=\"70\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>7天总花费<span sorterId=\"71\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
-                    "<th>总营收<span sorterId=\"72\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>7天总营收<span sorterId=\"73\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
+                $('#result_header').html("<tr><th>应用名称</th><th>总花费<span sorterId=\"70\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>预计总花费<span sorterId=\"71\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
+                    "<th>总营收<span sorterId=\"72\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>预计总营收<span sorterId=\"73\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
                     "<th>总安装<span sorterId=\"74\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>总展示<span sorterId=\"75\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
                     "<th>总点击<span sorterId=\"76\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>CTR<span sorterId=\"77\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
                     "<th>CPA<span sorterId=\"78\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>CVR<span sorterId=\"79\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th></tr>");
 
 
-                data = data.data;
+                data = data.data; //这里把返回数据里的 data属性 的值给了变量data，即变量data 是Query.java里的 arr[{},{},...,{}]
                 setDataSummary(data);
                 bindSortOpSummary();
             } else {
@@ -332,6 +333,7 @@ function init() {
     });
 }
 
+//把各个应用的汇总信息（合并国家）显示出来
 function setDataSummary(data) {
     var total_spend = 0;
     var total_revenue = 0;
@@ -341,8 +343,36 @@ function setDataSummary(data) {
     var total_ctr = 0;
     var total_cpa = 0;
     var total_cvr = 0;
-    var keyset = ["name", "total_spend","seven_days_total_spend", "total_revenue", "seven_days_total_revenue","total_installed", "total_impressions", "total_click",
+    var keyset = ["name", "total_spend","endTime_total_spend", "total_revenue", "endTime_total_revenue","total_installed", "total_impressions", "total_click",
         "total_ctr", "total_cpa", "total_cvr"];
+    //后台传来的数组里每个JSON对象元素的属性排列顺序是一定的，但是按接下来的取法不必计较这个顺序
+    //total_spend是每20分钟抓一次，total_revenue是每小时抓一次
+
+    var d = new Date(); //创建一个Date对象
+    var localTime = d.getTime();
+    var localOffset = d.getTimezoneOffset()*60000; //获得当地时间与UTC偏移的毫秒数
+    var utc = localTime + localOffset; //utc即GMT时间
+    var offset = 8; //北京时间，东八区
+    var Los = utc - (3600000*offset);    //得到美西时间 Date类型
+    var nd = new Date(Los);
+    var westTime = nd.getHours();  //返回美西时间的小时数
+    var minutes = nd.getMinutes();
+    if(minutes != 0 && minutes != 20 && minutes != 40)
+        if(minutes > 0 && minutes <20){
+           var f_hours = 0;
+        }else if(minutes  >20 && minutes < 40){
+           f_hours = 1/3;
+        }else{
+           f_hours = 2/3;
+        }
+    else
+        switch(minutes){
+            case 0: f_hours = 1;break;
+            case 20: f_hours = 1/3;break;
+            case 40: f_hours = 2/3;break;
+        }
+    var d_hours = westTime - 16;   //得到北京时间与美西时间相差小时数
+
 
     $('#results_body > tr').remove();
     for (var i = 0; i < data.length; i++) {
@@ -351,14 +381,26 @@ function setDataSummary(data) {
         for (var j = 0; j < keyset.length; j++) {
             var td = $('<td></td>');
             var key = keyset[j];
-            if(key == 'total_spend'){
-              if(one['warning_level'] == 1){
-                 td.addClass("yellow");
-              }else if(one['warning_level'] == 2){
-                  td.addClass("red");
-              }
+            if(key == "endTime_total_spend"){
+                var endTime_total_spend = data[i][key]; //取当前数组成员 属性名为key 的属性值
+                var expected_total_spend = parseInt(endTime_total_spend/d_hours*24);
+                key = expected_total_spend;
+                td.append(key.toString());
+            }else if(key == "endTime_total_revenue"){
+                var endTime_total_revenue = data[i][key];
+                var expected_total_revenue = parseInt(endTime_total_revenue/(d_hours + f_hours)* 24);
+                key = expected_total_revenue;
+                td.append(key.toString());
+            }else{
+                if(key == 'total_spend'){     //对total_spend 条目进行颜色处理
+                    if(one['warning_level'] == 1){
+                        td.addClass("yellow");
+                    }else if(one['warning_level'] == 2){
+                        td.addClass("red");
+                    }
+                }
+                td.text(one[key]);
             }
-            td.text(one[key]);
             tr.append(td);
         }
         total_spend += one['total_spend'];

@@ -20,9 +20,10 @@ public class Test {
 
     public static void main(String[] args) {
         Calendar calendar = Calendar.getInstance();
-        calendar.setTimeZone(TimeZone.getTimeZone("GMT-8:00"));
-        String date = String.format("%d-%d-%d", calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH));
-        System.out.println("date=" + date);
+        int hour = calendar.get(Calendar.HOUR_OF_DAY);
+
+
+        System.out.println(hour);
         /*String a = "20171111";
         String b = "20180206";
         Integer intervalBetweenTwoDates = getIntervalBetweenTwoDates(a, b,"yyyyMMdd");

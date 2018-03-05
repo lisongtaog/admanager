@@ -1,18 +1,26 @@
 package com.bestgo.admanager.servlet;
 
+import com.bestgo.admanager.DateUtil;
 import com.bestgo.admanager.Utils;
 import com.bestgo.common.database.services.DB;
 import com.bestgo.common.database.utils.JSObject;
+import com.facebook.ads.sdk.User;
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.reflect.TypeToken;
+import com.sun.xml.internal.bind.v2.runtime.unmarshaller.TagName;
 import org.apache.log4j.Logger;
 
+import javax.rmi.CORBA.Util;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.lang.System;
 import java.util.*;
 
 /**
@@ -39,6 +47,8 @@ public class Query extends HttpServlet {
             sorter = Utils.parseInt(sorterId, 0);
         }
         try {
+//            double endTime_total_spend = 0;
+//            double endTime_total_revenue = 0;
             JsonArray arr = new JsonArray();
             if ("false".equals(adwordsCheck) && "false".equals(facebookCheck)) {
                 if(sorter > 0){
@@ -46,16 +56,24 @@ public class Query extends HttpServlet {
                     String sqlTag = "select t.id,t.tag_name,google_package_id from web_tag t LEFT JOIN web_facebook_app_ids_rel air ON t.tag_name = air.tag_name";
                     List<JSObject> tagList = DB.findListBySql(sqlTag);
                     for (JSObject tagJSObject : tagList) {
-                        CampaignsSummary campaignsSummary = new CampaignsSummary();
+                        CampaignsSummary campaignsSummary = new CampaignsSummary();    //CampaignsSummary类是一个没有构造器的类，当它被实例化以后系统会默认给其无参构造函数，初始化其中的实例为默认域
                         long id = tagJSObject.get("id");
-                        campaignsSummary.name = tagJSObject.get("tag_name");
-                        JsonObject admob = fetchOneAppDataSummary(id, startTime, endTime,true);
+                        campaignsSummary.name = tagJSObject.get("tag_name"); //可以用 .号来初始化特定的实例
+                        JsonObject admob = fetchOneAppDataSummary(id, startTime, endTime,true); //用这些条件从数据库取值，返回一个JSObject
                         JsonObject facebook =  fetchOneAppDataSummary(id, startTime, endTime,false);
+
+                        //以下两句：主要用于取endTime当天的 total_spend --------------------------------------------------------------------------------
+                        JsonObject admob1 = fetchOneAppDataSummary(id, endTime, endTime,true);
+                        JsonObject facebook1 =  fetchOneAppDataSummary(id, endTime, endTime,false);
+                        campaignsSummary.endTime_total_spend = Utils.trimDouble(admob1.get("total_spend").getAsDouble()+ facebook1.get("total_spend").getAsDouble(),0);
+                        // -----------------------------------------------------------------------------------------------------------------------------
+
                         campaignsSummary.total_impressions = admob.get("total_impressions").getAsDouble() + facebook.get("total_impressions").getAsDouble();
                         if (campaignsSummary.total_impressions == 0) {
                             continue;
                         }
                         campaignsSummary.total_spend = admob.get("total_spend").getAsDouble() + facebook.get("total_spend").getAsDouble();
+//                        campaignsSummary.seven_days_total_spend = admob.get("seven_days_total_spend").getAsDouble() + facebook.get("seven_days_total_spend").getAsDouble();
                         campaignsSummary.total_installed = admob.get("total_installed").getAsDouble() + facebook.get("total_installed").getAsDouble();
                         campaignsSummary.total_click = admob.get("total_click").getAsDouble() + facebook.get("total_click").getAsDouble();
                         campaignsSummary.total_ctr = campaignsSummary.total_impressions > 0 ? campaignsSummary.total_click / campaignsSummary.total_impressions : 0;
@@ -70,6 +88,15 @@ public class Query extends HttpServlet {
                             if(oneR != null){
                                 campaignsSummary.total_revenue = Utils.convertDouble(oneR.get("revenues"),0);
                             }
+                            //下面用于赋值campaignsSummary.endTime_total_revenue ----------------------------------------------------------
+                            sqlR = "select sum(revenue) as revenues " +
+                                    "from web_ad_country_analysis_report_history where app_id = '"
+                                    + google_package_id + "' and date = '" + endTime + "'";
+                            oneR = DB.findOneBySql(sqlR);
+                            if(oneR != null){
+                                campaignsSummary.endTime_total_revenue = Utils.trimDouble(Utils.convertDouble(oneR.get("revenues"),0),0);
+                            }
+                            // -------------------------------------------------------------------------------------------------------------
                         }
                         campaignsSummaryList.add(campaignsSummary);
                     }
@@ -362,10 +389,12 @@ public class Query extends HttpServlet {
                             String sql = "select warning_level from  web_app_logs where app_name = '" + cs.name + "' and log_date = '" + endTime + "'";
                             JSObject one = DB.findOneBySql(sql);
                             if(one.hasObjectData()){
-                                int warningLevel = one.get("warning_level");
+                                int warningLevel = one.get("warning_level");             //指标warning_level 仅仅与endTime有关
                                 j.addProperty("warning_level",warningLevel);
                             }
-                            j.addProperty("total_spend",Utils.trimDouble(cs.total_spend,0));
+                            j.addProperty("total_spend",Utils.trimDouble(cs.endTime_total_spend,0));
+                            j.addProperty("endTime_total_spend",Utils.trimDouble(cs.total_spend,0));
+                            j.addProperty("endTime_total_revenue",Utils.trimDouble(cs.endTime_total_revenue,0));
                             j.addProperty("total_installed",cs.total_installed);
                             j.addProperty("total_impressions",cs.total_impressions);
                             j.addProperty("total_click",cs.total_click);
@@ -376,7 +405,7 @@ public class Query extends HttpServlet {
                             arr.add(j);
                         }
                     }
-                }else{
+                }else{   //这里是不符合 sorter>0 的条件时
                     String sqlTag = "select t.id,t.tag_name,google_package_id from web_tag t LEFT JOIN web_facebook_app_ids_rel air ON t.tag_name = air.tag_name ORDER BY t.tag_name";
                     List<JSObject> tagList = DB.findListBySql(sqlTag);
                     for (JSObject tagJSObject : tagList) {
@@ -384,6 +413,25 @@ public class Query extends HttpServlet {
                         String tagName = tagJSObject.get("tag_name");
                         JsonObject admob = fetchOneAppDataSummary(id, startTime, endTime,true);
                         JsonObject facebook =  fetchOneAppDataSummary(id, startTime, endTime,false);
+
+                        JsonObject admob1 = fetchOneAppDataSummary(id, endTime, endTime,true);
+                        JsonObject facebook1 =  fetchOneAppDataSummary(id, endTime, endTime,false);
+                        double endTime_total_spend = admob1.get("total_spend").getAsDouble() + facebook1.get("total_spend").getAsDouble();
+                        admob.addProperty("endTime_total_spend", Utils.trimDouble( endTime_total_spend,0));
+
+                        String google_package_id = tagJSObject.get("google_package_id");
+                        if(google_package_id != null) {
+                            String sqlR = "select sum(revenue) as revenues " +
+                                    "from web_ad_country_analysis_report_history where app_id = '"
+                                    + google_package_id + "' and date = '" + endTime + "'";
+                            JSObject oneR = DB.findOneBySql(sqlR);
+                            if (oneR != null) {
+                                double endTime_total_revenue = Utils.convertDouble(oneR.get("revenues"), 0);
+                                admob.addProperty("endTime_total_revenue", Utils.trimDouble( endTime_total_revenue,0));
+                            }
+                        }
+
+
                         double total_impressions = admob.get("total_impressions").getAsDouble() + facebook.get("total_impressions").getAsDouble();
                         if (total_impressions == 0) {
                             continue;
@@ -395,7 +443,10 @@ public class Query extends HttpServlet {
                         double total_ctr = total_impressions > 0 ? total_click / total_impressions : 0;
                         double total_cpa = total_installed > 0 ? total_spend / total_installed : 0;
                         double total_cvr = total_click > 0 ? total_installed / total_click : 0;
+
+                        //这行之前的JsonObject admob 是个从表里取出的JSON对象，经下面一系列addProperty的操作后，变为存储处理好的值的JSON对象
                         admob.addProperty("total_spend", Utils.trimDouble(total_spend,0));
+//                        admob.addProperty("seven_days_total_spend", Utils.trimDouble(seven_days_total_spend));
                         admob.addProperty("total_installed", total_installed);
                         admob.addProperty("total_impressions", total_impressions);
                         admob.addProperty("total_click", total_click);
@@ -410,8 +461,10 @@ public class Query extends HttpServlet {
                             admob.addProperty("warning_level",warningLevel);
                         }
 
+                        //这里计算 total_revenue
                         double total_revenue = 0;
-                        String google_package_id = tagJSObject.get("google_package_id");
+//                        double seven_days_total_revenue = 0;
+                        google_package_id = tagJSObject.get("google_package_id");
                         if(google_package_id != null){
                             String sqlR = "select sum(revenue) as revenues " +
                                     "from web_ad_country_analysis_report_history where app_id = '"
@@ -420,14 +473,13 @@ public class Query extends HttpServlet {
                             if(oneR != null){
                                 total_revenue = Utils.convertDouble(oneR.get("revenues"),0);
                             }
-
                         }
                         admob.addProperty("total_revenue",Utils.trimDouble(total_revenue,0));
                         arr.add(admob);
                     }
                 }
 
-            } else {
+            } else {     //这里是不符合 adwordsCheck  facebookCheck 都为false的条件时
                 String sqlTag = "select id,tag_name from web_tag ORDER BY tag_name";
                 List<JSObject> tagList = DB.findListBySql(sqlTag);
                 for (int i = 0; i < tagList.size(); i++) {
@@ -458,6 +510,8 @@ public class Query extends HttpServlet {
         response.getWriter().write(json.toString());
     }
 
+
+    //以下是在 startTime和endTime之间取一堆值初始化
     private JsonObject fetchOneAppDataSummary(long tagId, String startTime, String endTime, boolean admobCheck) throws Exception {
         String webAdCampaignTagRelTable = "web_ad_campaign_tag_rel";
         String webAdCampaignsTable = "web_ad_campaigns";
@@ -500,6 +554,8 @@ public class Query extends HttpServlet {
         public String name;
         public double total_spend;
         public double seven_days_total_spend;
+        public double endTime_total_spend;
+        public double endTime_total_revenue;
         public double total_installed;
         public double total_impressions;
         public double total_click;
