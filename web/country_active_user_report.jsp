@@ -105,14 +105,43 @@
             tagName: query
         },function(data){
             if(data && data.ret == 1){
-                $('#result_header').html("<tr><th>国家</th><th>安装量总和</th><th>7Days_ActiveUser</th><th>14Days_ActiveUser</th><th>30Days_ActiveUser</th><th>60Days_ActiveUser</th></tr>");
+                $('#result_header').html("<tr><th>国家</th><th>安装量总和</th><th>7Days_ActiveUser<span sorterId=\"2091\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th><th>14Days_ActiveUser<span sorterId=\"2092\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th><th>30Days_ActiveUser<span sorterId=\"2093\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th><th>60Days_ActiveUser<span sorterId=\"2094\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th></tr>");
                 data = data.array;
                 setData(data);
+                bindSortOp();
             } else {
                 admanager.showCommonDlg("错误", data.message);
             }
         },'json');
     });
+
+    function bindSortOp() {
+        $('.sorter').click(function() {
+            var sorterId = $(this).attr('sorterId');
+            sorterId = parseInt(sorterId);
+            if ($(this).hasClass("glyphicon-arrow-down")) {
+                $(this).removeClass("glyphicon-arrow-down");
+                $(this).addClass("glyphicon-arrow-up");
+                sorterId -= 2000;
+            } else {
+                $(this).removeClass("glyphicon-arrow-up");
+                $(this).addClass("glyphicon-arrow-down");
+            }
+
+            var query = $("#inputSearch").val();
+            $.post('active_user_report/query_active_user_report', {
+                tagName: query,
+                sorterId: sorterId
+            },function(data){
+                if (data && data.ret == 1) {
+                    data = data.array;
+                    setData(data);
+                } else {
+                    admanager.showCommonDlg("错误", data.message);
+                }
+            }, 'json');
+        });
+    }
 
 
     function setData(data) {

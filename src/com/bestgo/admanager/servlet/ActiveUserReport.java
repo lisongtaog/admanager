@@ -53,6 +53,7 @@ public class ActiveUserReport extends HttpServlet {
         String path = request.getPathInfo();
         JsonObject jsonObject = new JsonObject();
         String tagName = request.getParameter("tagName");
+        String sorterId = request.getParameter("sorterId");
 
 
         if (path.matches("/query_active_user_report")) {
@@ -60,7 +61,37 @@ public class ActiveUserReport extends HttpServlet {
             JsonArray jsonArray = new JsonArray();
             try {
                 String sql = "select total_installeds,country_code,avg_7_day_active,avg_14_day_active,avg_30_day_active,avg_60_day_active " +
-                        " from ad_report_active_user_admob_rel_result where tag_name = '" + tagName + "' ORDER BY country_code";
+                        " from ad_report_active_user_admob_rel_result where tag_name = '" + tagName + "' ";
+                int sorter = 0;
+                if (sorterId != null) {
+                    sorter = Utils.parseInt(sorterId, 0);
+                    switch(sorter) {
+                        case 2091:
+                            sql += " order by avg_7_day_active desc";
+                            break;
+                        case 91:
+                            sql += " order by avg_7_day_active";
+                            break;
+                        case 2092:
+                            sql += " order by avg_14_day_active desc";
+                            break;
+                        case 92:
+                            sql += " order by avg_14_day_active";
+                            break;
+                        case 2093:
+                            sql += " order by avg_30_day_active desc";
+                            break;
+                        case 93:
+                            sql += " order by avg_30_day_active";
+                            break;
+                        case 2094:
+                            sql += " order by avg_60_day_active desc";
+                            break;
+                        case 94:
+                            sql += " order by avg_60_day_active";
+                            break;
+                    }
+                }
                 list = DB.findListBySql(sql);
                 for (JSObject j : list) {
                     if(j.hasObjectData()){
@@ -100,6 +131,7 @@ public class ActiveUserReport extends HttpServlet {
                 jsonObject.addProperty("message", e.getMessage());
             }
         }
+
         response.getWriter().write(jsonObject.toString());
     }
 
