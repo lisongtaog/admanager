@@ -120,20 +120,24 @@ public class ActiveUserReport extends HttpServlet {
                                 countryCode + "' AND date BETWEEN '" + sevenDayAgo + "' and '" + yesterday + "'";
                         one = DB.findOneBySql(sql);
                         if(one.hasObjectData()){
-                            sevenDaysAvgARPU = Utils.convertDouble(one.get("seven_days_avg_arpu"),0);
+                            sevenDaysAvgARPU = Utils.trimDouble(Utils.convertDouble(one.get("seven_days_avg_arpu"),0),3);
                         }
-                        double totalInstalleds = Utils.convertDouble(j.get("total_installeds"), 0);
-                        double avg_7_day_active = Utils.convertDouble(j.get("avg_7_day_active"), 0);
-                        double avg_14_day_active = Utils.convertDouble(j.get("avg_14_day_active"), 0);
-                        double avg_30_day_active = Utils.convertDouble(j.get("avg_30_day_active"), 0);
-                        double avg_60_day_active = Utils.convertDouble(j.get("avg_60_day_active"), 0);
+                        double totalInstalleds = Utils.trimDouble(Utils.convertDouble(j.get("total_installeds"), 0),3);
+                        double avgSevenDayActive = Utils.trimDouble(Utils.convertDouble(j.get("avg_7_day_active"), 0),3);
+                        double avgFourteenDayActive = Utils.trimDouble(Utils.convertDouble(j.get("avg_14_day_active"), 0),3);
+                        double avgThirtyDayActive = Utils.trimDouble(Utils.convertDouble(j.get("avg_30_day_active"), 0),3);
+                        double avgSixtyDayActive = Utils.trimDouble(Utils.convertDouble(j.get("avg_60_day_active"), 0),3);
                         jo.addProperty("country_name", countryName);
-                        jo.addProperty("total_installeds", Utils.trimDouble(totalInstalleds,3));
-                        jo.addProperty("avg_7_day_active", Utils.trimDouble(avg_7_day_active,3));
-                        jo.addProperty("avg_14_day_active", Utils.trimDouble(avg_14_day_active,3));
-                        jo.addProperty("avg_30_day_active", Utils.trimDouble(avg_30_day_active,3));
-                        jo.addProperty("avg_60_day_active", Utils.trimDouble(avg_60_day_active,3));
-                        jo.addProperty("seven_days_avg_arpu", Utils.trimDouble(sevenDaysAvgARPU,3));
+                        jo.addProperty("total_installeds", totalInstalleds);
+                        jo.addProperty("avg_7_day_active", avgSevenDayActive);
+                        jo.addProperty("avg_14_day_active", avgFourteenDayActive);
+                        jo.addProperty("avg_30_day_active", avgThirtyDayActive);
+                        jo.addProperty("avg_60_day_active", avgSixtyDayActive);
+                        jo.addProperty("seven_days_avg_arpu", sevenDaysAvgARPU);
+                        jo.addProperty("avg_7_day_active_mul_arpu", avgSevenDayActive * sevenDaysAvgARPU);
+                        jo.addProperty("avg_14_day_active_mul_arpu", avgFourteenDayActive * sevenDaysAvgARPU);
+                        jo.addProperty("avg_30_day_active_mul_arpu", avgThirtyDayActive * sevenDaysAvgARPU);
+                        jo.addProperty("avg_60_day_active_mul_arpu", avgSixtyDayActive * sevenDaysAvgARPU);
                         jsonArray.add(jo);
                     }
                 }

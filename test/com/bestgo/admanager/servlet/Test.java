@@ -19,9 +19,11 @@ import static sun.plugin.cache.FileVersion.regEx;
 public class Test {
 
     public static void main(String[] args) {
-        Calendar calendar = Calendar.getInstance();
-        int hour = calendar.get(Calendar.HOUR_OF_DAY);
-        System.out.println(hour);
+        String date = "2018-03-05";
+        String s = DateUtil.addDay(date, -3, "yyyy-MM-dd");
+//        Calendar calendar = Calendar.getInstance();
+//        int hour = calendar.get(Calendar.HOUR_OF_DAY);
+//        System.out.println(hour);
     }
            /* try {
                 //中文
