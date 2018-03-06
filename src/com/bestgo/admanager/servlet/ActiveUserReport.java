@@ -134,10 +134,10 @@ public class ActiveUserReport extends HttpServlet {
                         jo.addProperty("avg_30_day_active", avgThirtyDayActive);
                         jo.addProperty("avg_60_day_active", avgSixtyDayActive);
                         jo.addProperty("seven_days_avg_arpu", sevenDaysAvgARPU);
-                        jo.addProperty("avg_7_day_active_mul_arpu", avgSevenDayActive * sevenDaysAvgARPU);
-                        jo.addProperty("avg_14_day_active_mul_arpu", avgFourteenDayActive * sevenDaysAvgARPU);
-                        jo.addProperty("avg_30_day_active_mul_arpu", avgThirtyDayActive * sevenDaysAvgARPU);
-                        jo.addProperty("avg_60_day_active_mul_arpu", avgSixtyDayActive * sevenDaysAvgARPU);
+                        jo.addProperty("avg_7_day_active_mul_arpu", Utils.trimDouble(avgSevenDayActive * sevenDaysAvgARPU,3));
+                        jo.addProperty("avg_14_day_active_mul_arpu", Utils.trimDouble(avgFourteenDayActive * sevenDaysAvgARPU,3));
+                        jo.addProperty("avg_30_day_active_mul_arpu", Utils.trimDouble(avgThirtyDayActive * sevenDaysAvgARPU,3));
+                        jo.addProperty("avg_60_day_active_mul_arpu", Utils.trimDouble(avgSixtyDayActive * sevenDaysAvgARPU,3));
                         jsonArray.add(jo);
                     }
                 }
