@@ -50,6 +50,9 @@
         <%-- 17 --%>
     <li role="presentation"><a href="advert_conversions_insert.jsp">转化录入</a></li>
     <li role="presentation"><a href="campaigns_update_daily_log.jsp">日更记录</a></li>
+
+        <%-- 19 --%>
+    <li role="presentation"><a href="project_team_total_ revenue_and_total_cost.jsp">项目组总收支</a></li>
 </ul>
 </body>
 </html>
