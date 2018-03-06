@@ -1,5 +1,6 @@
 package com.bestgo.admanager.servlet;
 
+import com.bestgo.admanager.DateUtil;
 import com.bestgo.admanager.Utils;
 import com.bestgo.common.database.services.DB;
 import com.bestgo.common.database.utils.JSObject;
@@ -12,6 +13,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -60,6 +62,9 @@ public class ActiveUserReport extends HttpServlet {
             List<JSObject> list = null;
             JsonArray jsonArray = new JsonArray();
             try {
+                String today = DateUtil.getNowDate();
+                String yesterday = DateUtil.addDay(today,-1,"yyyy-MM-dd");//美国今天
+                String sevenDayAgo = DateUtil.addDay(today,-7,"yyyy-MM-dd");//美国七天前
                 String sql = "select total_installeds,country_code,avg_7_day_active,avg_14_day_active,avg_30_day_active,avg_60_day_active " +
                         " from ad_report_active_user_admob_rel_result where tag_name = '" + tagName + "' ";
                 int sorter = 0;
@@ -98,15 +103,24 @@ public class ActiveUserReport extends HttpServlet {
                         JsonObject jo = new JsonObject();
                         String countryCode = j.get("country_code");
                         String countryName = countryCodeMap.get(countryCode);
+                        JSObject one = null;
                         if(countryName == null){
                             sql = "select country_name from app_country_code_dict where country_code = '" + countryCode + "'";
-                            JSObject one = DB.findOneBySql(sql);
-                            if(one != null && one.hasObjectData()){
+                            one = DB.findOneBySql(sql);
+                            if(one.hasObjectData()){
                                 countryName = one.get("country_name");
                             }else{
                                 countryName = "--";
                             }
                             countryCodeMap.put(countryCode,countryName);
+                        }
+                        double sevenDaysAvgARPU = 0;
+                        sql = "SELECT avg(arpu) AS seven_days_avg_arpu FROM web_ad_country_analysis_report_history h,web_facebook_app_ids_rel r " +
+                                "WHERE h.app_id = r.google_package_id AND tag_name = '" + tagName + "' AND country_code = '" +
+                                countryCode + "' AND date BETWEEN '" + sevenDayAgo + "' and '" + yesterday + "'";
+                        one = DB.findOneBySql(sql);
+                        if(one.hasObjectData()){
+                            sevenDaysAvgARPU = Utils.convertDouble(one.get("seven_days_avg_arpu"),0);
                         }
                         double totalInstalleds = Utils.convertDouble(j.get("total_installeds"), 0);
                         double avg_7_day_active = Utils.convertDouble(j.get("avg_7_day_active"), 0);
@@ -119,6 +133,7 @@ public class ActiveUserReport extends HttpServlet {
                         jo.addProperty("avg_14_day_active", Utils.trimDouble(avg_14_day_active,3));
                         jo.addProperty("avg_30_day_active", Utils.trimDouble(avg_30_day_active,3));
                         jo.addProperty("avg_60_day_active", Utils.trimDouble(avg_60_day_active,3));
+                        jo.addProperty("seven_days_avg_arpu", Utils.trimDouble(sevenDaysAvgARPU,3));
                         jsonArray.add(jo);
                     }
                 }

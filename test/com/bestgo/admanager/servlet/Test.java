@@ -19,15 +19,10 @@ import static sun.plugin.cache.FileVersion.regEx;
 public class Test {
 
     public static void main(String[] args) {
-        Calendar calendar = Calendar.getInstance();
-        int hour = calendar.get(Calendar.HOUR_OF_DAY);
-
-
-        System.out.println(hour);
-        /*String a = "20171111";
-        String b = "20180206";
+        String a = "20171203";
+        String b = "20180304";
         Integer intervalBetweenTwoDates = getIntervalBetweenTwoDates(a, b,"yyyyMMdd");
-        System.out.println(intervalBetweenTwoDates);*/
+        System.out.println(intervalBetweenTwoDates);
     }
            /* try {
                 //中文

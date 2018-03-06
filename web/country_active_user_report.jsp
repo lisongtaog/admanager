@@ -74,7 +74,7 @@
     <table class="table table-hover">
         <thead id="result_header">
         <tr>
-            <th>国家</th><th>安装量总和</th><th>7Days_ActiveUser</th><th>14Days_ActiveUser</th><th>30Days_ActiveUser</th><th>60Days_ActiveUser</th>
+            <th>国家</th><th>安装量总和</th><th>7Days_ActiveUser</th><th>14Days_ActiveUser</th><th>30Days_ActiveUser</th><th>60Days_ActiveUser</th><th>7DaysAvgARPU</th>
         </tr>
         </thead>
         <tbody id="results_body">
@@ -105,7 +105,7 @@
             tagName: query
         },function(data){
             if(data && data.ret == 1){
-                $('#result_header').html("<tr><th>国家</th><th>安装量总和</th><th>7Days_ActiveUser<span sorterId=\"2091\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th><th>14Days_ActiveUser<span sorterId=\"2092\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th><th>30Days_ActiveUser<span sorterId=\"2093\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th><th>60Days_ActiveUser<span sorterId=\"2094\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th></tr>");
+                $('#result_header').html("<tr><th>国家</th><th>安装量总和</th><th>7Days_ActiveUser<span sorterId=\"2091\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th><th>14Days_ActiveUser<span sorterId=\"2092\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th><th>30Days_ActiveUser<span sorterId=\"2093\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th><th>60Days_ActiveUser<span sorterId=\"2094\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th><th>7DaysAvgARPU</th></tr>");
                 data = data.array;
                 setData(data);
                 bindSortOp();
@@ -149,7 +149,7 @@
         for (var i = 0; i < data.length; i++) {
             var one = data[i];
             var tr = $('<tr></tr>');
-            var keyset = ["country_name","total_installeds", "avg_7_day_active", "avg_14_day_active", "avg_30_day_active", "avg_60_day_active"];
+            var keyset = ["country_name","total_installeds", "avg_7_day_active", "avg_14_day_active", "avg_30_day_active", "avg_60_day_active","seven_days_avg_arpu"];
             for (var j = 0; j < keyset.length; j++) {
                 var td = $('<td></td>');
                 var field = keyset[j];
