@@ -43,13 +43,11 @@ public class CountryAnalysisReport extends HttpServlet {
                     if(appId != null){
                         JsonArray jsonArray = new JsonArray();
                         String sql = "select country_code, sum(cost) as total_cost, sum(purchased_user) as total_purchased_user, " +
-                                "sum(total_installed) as installed, sum(total_uninstalled) as uninstalled, sum(today_uninstalled) as total_today_uninstalled, " +
+                                "sum(total_installed) as installed, sum(today_uninstalled) as total_today_uninstalled, " +
                                 "sum(total_user) as users, sum(active_user) as active_users, sum(impression) as impressions, sum(revenue) as revenues, " +
-                                "sum(estimated_revenue) as estimated_revenues, " +
                                 " (sum(revenue) - sum(cost)) as incoming, "+
                                 "(case when sum(impression) > 0 then sum(revenue) * 1000 / sum(impression) else 0 end) as ecpm,"+
-                                "(case when sum(purchased_user) > 0 then sum(cost) / sum(purchased_user) else 0 end) as cpa, "+
-                                " (case when sum(cost) > 0 then sum(estimated_revenue) / sum(cost) else 0 end) as est_rev_dev_cost " +
+                                "(case when sum(purchased_user) > 0 then sum(cost) / sum(purchased_user) else 0 end) as cpa "+
                                 "from web_ad_country_analysis_report_history where app_id = '" + appId +"' " +
                                 "and date BETWEEN '" + startTime + "' AND '" + endTime + "' GROUP BY country_code";
 
@@ -75,13 +73,6 @@ public class CountryAnalysisReport extends HttpServlet {
                                 break;
                             case 34:
                                 sql += " order by installed";
-                                break;
-
-                            case 1035:
-                                sql += " order by uninstalled desc";
-                                break;
-                            case 35:
-                                sql += " order by uninstalled";
                                 break;
                             case 1037:
                                 sql += " order by users desc";
@@ -119,18 +110,6 @@ public class CountryAnalysisReport extends HttpServlet {
                             case 42:
                                 sql += " order by incoming";
                                 break;
-                            case 1044:
-                                sql += " order by estimated_revenues desc";
-                                break;
-                            case 44:
-                                sql += " order by estimated_revenues";
-                                break;
-                            case 1045:
-                                sql += " order by est_rev_dev_cost desc";
-                                break;
-                            case 45:
-                                sql += " order by est_rev_dev_cost";
-                                break;
                             default:
                                 sql += " order by total_cost desc";
 
@@ -140,7 +119,6 @@ public class CountryAnalysisReport extends HttpServlet {
                         double total_cost = 0;
                         double total_puserchaed_user = 0;
                         double total_revenue = 0;
-                        double total_es14 = 0;
 
 
                         for(JSObject j : countryDetailJSObjectList){
@@ -210,7 +188,6 @@ public class CountryAnalysisReport extends HttpServlet {
                                 double costs = Utils.convertDouble(j.get("total_cost"),0);
                                 double purchased_users = Utils.convertDouble(j.get("total_purchased_user"),0);
                                 double installed = Utils.convertDouble(j.get("installed"),0);
-                                double uninstalled = Utils.convertDouble(j.get("uninstalled"),0);
                                 double total_today_uninstalled = Utils.convertDouble(j.get("total_today_uninstalled"),0);
                                 double uninstalledRate = installed != 0 ? total_today_uninstalled / installed : 0;
 
@@ -218,60 +195,20 @@ public class CountryAnalysisReport extends HttpServlet {
                                 double users = Utils.convertDouble(j.get("users"),0);
                                 double active_users = Utils.convertDouble(j.get("active_users"),0);
 
-                                double estimated_revenues = Utils.convertDouble(j.get("estimated_revenues"),0);
 
-                                double estRevDevCost = Utils.convertDouble(j.get("est_rev_dev_cost"),0);
                                 double cpa = Utils.convertDouble(j.get("cpa"),0);
                                 double incoming = Utils.convertDouble(j.get("incoming"),0);
                                 double cpa_dev_ecpm = (ecpm == 0) ? 0 : (cpa / ecpm);
-//                                String sqlAB = "select bidding from ad_campaigns_admob_auto_create where app_name = '"
-//                                                       + tagName + "' and country_region like '%" + country_code + "%'";
-//                                List<JSObject> adwordsBiddingList = DB.findListBySql(sqlAB);
-//
-//                                String sqlFB = "select bidding from ad_campaigns_auto_create where app_name = '"
-//                                                       + tagName + "' and country_region like '%" + countryName + "%'";
-//                                List<JSObject> facebookBiddingList = DB.findListBySql(sqlFB);
-//
-//
-//                                Set<String> biddingSet = new HashSet<>();
-//                                for(JSObject ff : facebookBiddingList){
-//                                    if(ff != null && ff.hasObjectData()){
-//                                        String bidding = ff.get("bidding");
-//                                        String[] split = bidding.split(",");
-//                                        for(String s : split){
-//                                            biddingSet.add(s);
-//                                        }
-//                                    }
-//                                }
-//                                for(JSObject aa : adwordsBiddingList){
-//                                    if(aa != null && aa.hasObjectData()){
-//                                        String bidding = aa.get("bidding");
-//                                        String[] split = bidding.split(",");
-//                                        for(String s : split){
-//                                            biddingSet.add(s);
-//                                        }
-//                                    }
-//                                }
-//                                String biddingsStr = "";
-//                                if(biddingSet != null && biddingSet.size()>0){
-//                                    for(String s : biddingSet){
-//                                        biddingsStr += s + ",";
-//                                    }
-//                                }else{
-//                                    biddingsStr = "--";
-//                                }
 
                                 total_cost += costs;
                                 total_puserchaed_user += purchased_users;
                                 total_revenue += revenues;
-                                total_es14 += estimated_revenues;
 
                                 JsonObject d = new JsonObject();
                                 d.addProperty("country_name", countryName);
                                 d.addProperty("costs", Utils.trimDouble(costs,0));
                                 d.addProperty("purchased_users", purchased_users);
                                 d.addProperty("installed", installed);
-                                d.addProperty("uninstalled", uninstalled);
                                 d.addProperty("uninstalled_rate", Utils.trimDouble(uninstalledRate,3));
                                 d.addProperty("users", users);
                                 d.addProperty("active_users", active_users);
@@ -290,22 +227,11 @@ public class CountryAnalysisReport extends HttpServlet {
                                 d.addProperty("every_day_purchased_user_for_seven_days", everyDayPurchasedUserForSevenDays);
                                 d.addProperty("a_cpa", Utils.trimDouble(aCpa,3));
                                 d.addProperty("incoming", Utils.trimDouble(incoming,0));
-                                d.addProperty("estimated_revenues", Utils.trimDouble(estimated_revenues,0));
-                                d.addProperty("estimated_revenues_dev_cost", Utils.trimDouble(estRevDevCost,3));
-//                                String sqlP = "select price from web_ad_country_analysis_report_price where app_id = '"+google_package_id+"' and country_code = '"+country_code+"'";
-//                                JSObject oneP = DB.findOneBySql(sqlP);
-//                                double price = 0;
-//                                if(oneP != null && oneP.hasObjectData()){
-//                                    price = Utils.convertDouble(oneP.get("price"),0);
-//                                }
-//                                d.addProperty("price", Utils.trimDouble(price,1));
-//                                d.addProperty("bidding", biddingsStr);
                                 d.addProperty("cpa", Utils.trimDouble(cpa,3));
                                 jsonArray.add(d);
                             }
 
                         }
-                        double es14_dev_cost = total_cost != 0 ? total_es14 / total_cost : 0;
                         double total_cpa = total_puserchaed_user != 0 ? total_cost / total_puserchaed_user : 0;
                         jsonObject.add("array", jsonArray);
 
@@ -313,8 +239,6 @@ public class CountryAnalysisReport extends HttpServlet {
                         jsonObject.addProperty("total_puserchaed_user", Utils.trimDouble(total_puserchaed_user,0));
                         jsonObject.addProperty("total_cpa", Utils.trimDouble(total_cpa,3));
                         jsonObject.addProperty("total_revenue", Utils.trimDouble(total_revenue,0));
-                        jsonObject.addProperty("total_es14", Utils.trimDouble(total_es14,0));
-                        jsonObject.addProperty("es14_dev_cost", Utils.trimDouble(es14_dev_cost,3));
                         jsonObject.addProperty("ret", 1);
 
                     }

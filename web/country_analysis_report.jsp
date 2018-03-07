@@ -73,7 +73,6 @@
             <th>Cost</th>
             <th>PurchasedUser</th>
             <th>Installed</th>
-            <th>Uninstalled</th>
             <th>UninstalledRate</th>
             <th>TotalUser</th>
             <th>ActiveUser</th>
@@ -83,8 +82,6 @@
             <th>CPA</th>
             <th>ACpa</th>
             <th>Incoming</th>
-            <th>EstimatedRevenue14</th>
-            <th>Revenue14/Cost</th>
         </tr>
         </thead>
         <tbody id="results_body">
@@ -138,7 +135,6 @@
                 $('#result_header').html("<tr><th>国家</th><th>Cost<span sorterId=\"1031\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
                     "<th>7daysCost</th><th>PurchasedUser<span sorterId=\"1033\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
                     "<th>Installed<span sorterId=\"1034\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
-                    "<th>Uninstalled<span sorterId=\"1035\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
                     "<th>UninstalledRate</th><th>TotalUser<span sorterId=\"1037\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
                     "<th>ActiveUser<span sorterId=\"1038\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
                     "<th>Revenue<span sorterId=\"1039\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th><th>7daysRevenue</th>" +
@@ -146,8 +142,7 @@
                     "<th>CPA<span sorterId=\"1041\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
                     "<th>ACpa</th><th>CPA/ECPM</th>" +
                     "<th>Incoming<span sorterId=\"1042\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th><th>7daysIncoming</th>" +
-                    "<th>EstimatedRevenue14<span sorterId=\"1044\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
-                    "<th>Revenue14/Cost<span sorterId=\"1045\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th></tr>");
+                    "</tr>");
                 setData(data,query);
                 bindSortOp();
                 var str = "Cost: " + data.total_cost + "&nbsp;&nbsp;&nbsp;&nbsp;PuserchaedUser: " + data.total_puserchaed_user +
@@ -211,8 +206,8 @@
             td_outer_a.text(one['country_name']);
             tr.append(td_outer_a);
             var keyset = ["costs","seven_days_costs", "purchased_users", "installed",
-                "uninstalled", "uninstalled_rate", "users", "active_users", "revenues","seven_days_revenues","pi",
-                "ecpm","cpa","a_cpa","cpa_dev_ecpm", "incoming","seven_days_incoming", "estimated_revenues","estimated_revenues_dev_cost"];
+                "uninstalled_rate", "users", "active_users", "revenues","seven_days_revenues","pi",
+                "ecpm","cpa","a_cpa","cpa_dev_ecpm", "incoming","seven_days_incoming"];
             for (var j = 0; j < keyset.length; j++) {
                 var key = keyset[j];
                 var td = $('<td></td>');
@@ -231,12 +226,6 @@
                     td = $('<td title="'+ one['every_day_incoming_for_seven_days'] + '"></td>');
                     if(r < 0){
                         td.addClass("red");
-                    }
-                }else if('estimated_revenues_dev_cost' == key){
-                    if(r > data.es14_dev_cost){
-                        td.addClass("green");
-                    }else if(r < data.es14_dev_cost){
-                        td.addClass("orange");
                     }
                 }
                 td.text(r);
