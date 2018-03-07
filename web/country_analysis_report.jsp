@@ -213,18 +213,28 @@
                 var key = keyset[j];
                 var td = $('<td></td>');
                 var r = one[key];
-                if('revenues' == key){
-                    td = $('<td title="'+ one['every_day_revenue_for_seven_days'] + '"></td>');
-                }else if('costs' == key){
-                    td = $('<td title="'+ one['every_day_cost_for_seven_days'] + '"></td>');
+                if('costs' == key){
+                    td = $('<td title="'+ one['every_day_cost_for_fourteen_days'] + '"></td>');
                 }else if('purchased_users' == key){
-                    td = $('<td title="'+ one['every_day_purchased_user_for_seven_days'] + '"></td>');
+                    td = $('<td title="'+ one['every_day_purchased_user_for_fourteen_days'] + '"></td>');
+                }else if('installed' == key){
+                    td = $('<td title="'+ one['every_day_installed_for_fourteen_days'] + '"></td>');
+                }else if('uninstalled_rate' == key){
+                    td = $('<td title="'+ one['every_day_uninstalled_rate_for_fourteen_days'] + '"></td>');
+                }else if('active_users' == key){
+                    td = $('<td title="'+ one['every_day_active_user_for_fourteen_days'] + '"></td>');
+                }else if('revenues' == key){
+                    td = $('<td title="'+ one['every_day_revenue_for_fourteen_days'] + '"></td>');
+                }else if('pi' == key){
+                    td = $('<td title="'+ one['every_day_pi_for_fourteen_days'] + '"></td>');
                 }else if('ecpm' == key){
-                    td = $('<td title="'+ one['every_day_ecpm_for_seven_days'] + '"></td>');
+                    td = $('<td title="'+ one['every_day_ecpm_for_fourteen_days'] + '"></td>');
                 }else if('cpa' == key){
-                    td = $('<td title="'+ one['every_day_cpa_for_seven_days'] + '"></td>');
+                    td = $('<td title="'+ one['every_day_cpa_for_fourteen_days'] + '"></td>');
+                }else if('cpa_dev_ecpm' == key){
+                    td = $('<td title="'+ one['every_day_cpa_dev_ecpm_for_fourteen_days'] + '"></td>');
                 }else if('incoming' == key){
-                    td = $('<td title="'+ one['every_day_incoming_for_seven_days'] + '"></td>');
+                    td = $('<td title="'+ one['every_day_incoming_for_fourteen_days'] + '"></td>');
                     if(r < 0){
                         td.addClass("red");
                     }
