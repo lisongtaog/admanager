@@ -82,6 +82,7 @@
             <th>CPA</th>
             <th>ACpa</th>
             <th>Incoming</th>
+            <th>RT</th>
         </tr>
         </thead>
         <tbody id="results_body">
@@ -142,7 +143,7 @@
                     "<th>CPA<span sorterId=\"1041\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
                     "<th>ACpa</th><th>CPA/ECPM</th>" +
                     "<th>Incoming<span sorterId=\"1042\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th><th>7daysIncoming</th>" +
-                    "</tr>");
+                    "<th>RT</th></tr>");
                 setData(data,query);
                 bindSortOp();
                 var str = "Cost: " + data.total_cost + "&nbsp;&nbsp;&nbsp;&nbsp;PuserchaedUser: " + data.total_puserchaed_user +
@@ -207,7 +208,7 @@
             tr.append(td_outer_a);
             var keyset = ["costs","seven_days_costs", "purchased_users", "installed",
                 "uninstalled_rate", "users", "active_users", "revenues","seven_days_revenues","pi",
-                "ecpm","cpa","a_cpa","cpa_dev_ecpm", "incoming","seven_days_incoming"];
+                "ecpm","cpa","a_cpa","cpa_dev_ecpm", "incoming","seven_days_incoming","rt"];
             for (var j = 0; j < keyset.length; j++) {
                 var key = keyset[j];
                 var td = $('<td></td>');

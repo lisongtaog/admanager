@@ -200,6 +200,9 @@ public class CountryAnalysisReport extends HttpServlet {
                                 double incoming = Utils.convertDouble(j.get("incoming"),0);
                                 double cpa_dev_ecpm = (ecpm == 0) ? 0 : (cpa / ecpm);
 
+                                //RT回报时长=CPA * 1000 / PI / ECPM
+                                double rt = (pi == 0 || ecpm == 0) ? 0 : (cpa * 1000 / pi / ecpm);
+
                                 total_cost += costs;
                                 total_puserchaed_user += purchased_users;
                                 total_revenue += revenues;
@@ -228,6 +231,7 @@ public class CountryAnalysisReport extends HttpServlet {
                                 d.addProperty("a_cpa", Utils.trimDouble(aCpa,3));
                                 d.addProperty("incoming", Utils.trimDouble(incoming,0));
                                 d.addProperty("cpa", Utils.trimDouble(cpa,3));
+                                d.addProperty("rt", Utils.trimDouble(rt,3));
                                 jsonArray.add(d);
                             }
 
