@@ -20,7 +20,7 @@ public class Test {
 
     public static void main(String[] args) {
         String endTime = "2018-03-07";
-        String beforeSevenDay = DateUtil.addDay(endTime,-10,"yyyy-MM-dd");//不包括endTime
+        String beforeSevenDay = DateUtil.addDay(endTime,-22,"yyyy-MM-dd");//不包括endTime
         String yesterday = DateUtil.addDay(endTime,-4,"yyyy-MM-dd");//不包括endTime
         System.out.println(beforeSevenDay);
         System.out.println(yesterday);

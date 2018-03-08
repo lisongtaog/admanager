@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -40,6 +41,7 @@ public class CountryAnalysisReport extends HttpServlet {
 
         String beforeTenDay = DateUtil.addDay(endTime,-10,"yyyy-MM-dd");//不包括endTime
         String beforeFourDay = DateUtil.addDay(endTime,-4,"yyyy-MM-dd");//不包括endTime
+        String beforeTwentyTwoDay = DateUtil.addDay(endTime,-22,"yyyy-MM-dd");//不包括endTime
         if (path.matches("/query_country_analysis_report")) {
             try {
                 String sqlG = "select google_package_id from web_facebook_app_ids_rel WHERE tag_name = '" + tagName + "'";
@@ -146,7 +148,6 @@ public class CountryAnalysisReport extends HttpServlet {
                                         double cost = Utils.convertDouble(one.get("cost"), 0);
                                         double revenue = Utils.convertDouble(one.get("revenue"), 0);
                                         double impression = Utils.convertDouble(one.get("impression"), 0);
-                                        double pi = Utils.convertDouble(one.get("pi"), 0);
                                         sevenDaysCosts  += cost;
                                         sevenDaysRevenues  += revenue;
                                         sevenDaysImpressions  += impression;
@@ -157,7 +158,7 @@ public class CountryAnalysisReport extends HttpServlet {
 
 
                                 //悬浮显示十四天的总花费、总营收、总盈利等
-                                sql = "select cost, purchased_user,total_installed,revenue,active_user,pi, " +
+                                sql = "select date,cost, purchased_user,total_installed,revenue,active_user, " +
                                         "(case when total_installed > 0 then today_uninstalled / total_installed else 0 end) as uninstall_rate," +
                                         "(case when impression > 0 then revenue * 1000 / impression else 0 end) as ecpm," +
                                         "(case when purchased_user > 0 then cost / purchased_user else 0 end) as cpa " +
@@ -170,38 +171,47 @@ public class CountryAnalysisReport extends HttpServlet {
                                 String everyDayUninstalledRateForFourteenDays = "";
                                 String everyDayActiveUserForFourteenDays = "";
                                 String everyDayRevenueForFourteenDays = "";
-                                String everyDayPiForFourteenDays = "";
                                 String everyDayEcpmForFourteenDays = "";
                                 String everyDayCpaForFourteenDays = "";
                                 String everyDayCpaDevEcpmForFourteenDays = "";
                                 String everyDayIncomingForFourteenDays = "";
                                 for(JSObject one : listCR){
                                     if(one.hasObjectData()){
+                                        Date date = one.get("date");
                                         double cost = Utils.convertDouble(one.get("cost"), 0);
                                         double purchasedUser = Utils.convertDouble(one.get("purchased_user"), 0);
                                         double installed = Utils.convertDouble(one.get("total_installed"), 0);
                                         double uninstallRate = Utils.convertDouble(one.get("uninstall_rate"), 0);
                                         double activeUser = Utils.convertDouble(one.get("active_user"), 0);
                                         double revenue = Utils.convertDouble(one.get("revenue"), 0);
-                                        double pi = Utils.convertDouble(one.get("pi"), 0);
                                         double ecpm = Utils.convertDouble(one.get("ecpm"), 0);
                                         double cpa = Utils.convertDouble(one.get("cpa"), 0);
                                         double cpaDevEcpm = ecpm == 0 ? 0 : cpa / ecpm;
                                         double incoming = revenue - cost;
-                                        everyDayCostForFourteenDays += (int)cost + "\n";
-                                        everyDayPurchasedUserForFourteenDays += (int)purchasedUser + "\n";
-                                        everyDayInstalledForFourteenDays += (int)installed + "\n";
-                                        everyDayUninstalledRateForFourteenDays += Utils.trimDouble(uninstallRate,3) + "\n";
-                                        everyDayActiveUserForFourteenDays += (int)activeUser + "\n";
-                                        everyDayRevenueForFourteenDays += (int)revenue + "\n";
-                                        everyDayPiForFourteenDays += Utils.trimDouble(pi,3) + "\n";
-                                        everyDayEcpmForFourteenDays += Utils.trimDouble(ecpm,3) + "\n";
-                                        everyDayCpaForFourteenDays += Utils.trimDouble(cpa,3) + "\n";
-                                        everyDayCpaDevEcpmForFourteenDays += Utils.trimDouble(cpaDevEcpm,3) + "\n";
-                                        everyDayIncomingForFourteenDays += (int)incoming + "\n";
+                                        everyDayCostForFourteenDays += date + "("+ (int)cost + ")" + "\n";
+                                        everyDayPurchasedUserForFourteenDays +=  date + "("+ (int)purchasedUser + ")" + "\n";
+                                        everyDayInstalledForFourteenDays +=  date + "("+ (int)installed + ")" + "\n";
+                                        everyDayUninstalledRateForFourteenDays +=  date + "("+ Utils.trimDouble(uninstallRate,3) + ")" + "\n";
+                                        everyDayActiveUserForFourteenDays +=  date + "("+ (int)activeUser + ")" + "\n";
+                                        everyDayRevenueForFourteenDays +=  date + "("+ (int)revenue + ")" + "\n";
+                                        everyDayEcpmForFourteenDays +=  date + "("+ Utils.trimDouble(ecpm,3) + ")" + "\n";
+                                        everyDayCpaForFourteenDays +=  date + "("+ Utils.trimDouble(cpa,3) + ")" + "\n";
+                                        everyDayCpaDevEcpmForFourteenDays +=  date + "("+ Utils.trimDouble(cpaDevEcpm,3) + ")" + "\n";
+                                        everyDayIncomingForFourteenDays +=  date + "("+ (int)incoming + ")" + "\n";
                                     }
                                 }
 
+                                sql = "select date, pi from web_ad_country_analysis_report_history_by_date where app_id = '" + appId + "' " +
+                                        " and country_code = '" + countryCode + "' and date BETWEEN '" + beforeTwentyTwoDay + "' AND '" + beforeFourDay + "'";
+                                listCR = DB.findListBySql(sql);
+                                String everyDayPiForFourteenDays = "";
+                                if(listCR != null && listCR.size()>0){
+                                    for(JSObject one : listCR){
+                                        double pi = Utils.convertDouble(one.get("pi"), 0);
+                                        Date date = one.get("date");
+                                        everyDayPiForFourteenDays += date + "(" + Utils.trimDouble(pi,3) + ")" + "\n";
+                                    }
+                                }
 
                                 sql = "select pi,a_cpa " +
                                         " from web_ad_country_analysis_report_history where app_id = '" + appId + "' " +
