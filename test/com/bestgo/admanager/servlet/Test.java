@@ -19,9 +19,9 @@ import static sun.plugin.cache.FileVersion.regEx;
 public class Test {
 
     public static void main(String[] args) {
-        String endTime = "2018-03-01";
-        String beforeSevenDay = DateUtil.addDay(endTime,-7,"yyyy-MM-dd");//不包括endTime
-        String yesterday = DateUtil.addDay(endTime,-1,"yyyy-MM-dd");//不包括endTime
+        String endTime = "2018-03-07";
+        String beforeSevenDay = DateUtil.addDay(endTime,-10,"yyyy-MM-dd");//不包括endTime
+        String yesterday = DateUtil.addDay(endTime,-4,"yyyy-MM-dd");//不包括endTime
         System.out.println(beforeSevenDay);
         System.out.println(yesterday);
     }

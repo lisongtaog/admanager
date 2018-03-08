@@ -38,8 +38,8 @@ public class CountryAnalysisReport extends HttpServlet {
         String sevenDaysAgo = DateUtil.addDay(endTime,-6,"yyyy-MM-dd");//包括endTime
         String fourteenDaysAgo = DateUtil.addDay(endTime,-13,"yyyy-MM-dd");//包括endTime
 
-        String beforeSevenDay = DateUtil.addDay(endTime,-7,"yyyy-MM-dd");//不包括endTime
-        String yesterday = DateUtil.addDay(endTime,-1,"yyyy-MM-dd");//不包括endTime
+        String beforeTenDay = DateUtil.addDay(endTime,-10,"yyyy-MM-dd");//不包括endTime
+        String beforeFourDay = DateUtil.addDay(endTime,-4,"yyyy-MM-dd");//不包括endTime
         if (path.matches("/query_country_analysis_report")) {
             try {
                 String sqlG = "select google_package_id from web_facebook_app_ids_rel WHERE tag_name = '" + tagName + "'";
@@ -240,7 +240,7 @@ public class CountryAnalysisReport extends HttpServlet {
                                 double cpaDevEcpm = (ecpm == 0) ? 0 : (cpa / ecpm);
 
                                 sql = "SELECT avg(pi) as avg_pi FROM web_ad_country_analysis_report_history_by_date " +
-                                        "WHERE app_id = '" + appId + "' AND country_code = '" + countryCode + "' AND date BETWEEN '" + beforeSevenDay + "' AND '" + yesterday + "'";
+                                        "WHERE app_id = '" + appId + "' AND country_code = '" + countryCode + "' AND date BETWEEN '" + beforeTenDay + "' AND '" + beforeFourDay + "'";
                                 oneC = DB.findOneBySql(sql);
                                 double sevenDaysAvgPi = 0;
                                 if(oneC.hasObjectData()){
