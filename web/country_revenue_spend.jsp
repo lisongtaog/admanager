@@ -58,9 +58,9 @@
 
     <div class="panel panel-default" style="margin-top: 10px">
         <div class="panel-heading" id="panel_title">
-            <span>开始时间</span>
+            <span>开始日期</span>
             <input type="text" value="2012-05-15" id="inputStartTime" readonly>
-            <span>结束时间</span>
+            <span>结束日期</span>
             <input type="text" value="2012-05-15" id="inputEndTime" readonly>
             <span>标签</span>
             <input id="inputSearch" class="form-control" style="display: inline; width: auto;" type="text"/>
