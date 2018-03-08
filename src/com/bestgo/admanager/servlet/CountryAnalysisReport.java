@@ -130,22 +130,30 @@ public class CountryAnalysisReport extends HttpServlet {
 
 
                                 //计算七天的总花费、总营收、总盈利等
-                                sql = "select cost, revenue,purchased_user " +
+                                sql = "select cost, revenue,purchased_user,impression,pi " +
                                         "from web_ad_country_analysis_report_history where app_id = '" + appId + "' " +
                                         " and country_code = '" + countryCode + "' and date BETWEEN '" + sevenDaysAgo + "' AND '" + endTime + "'";
                                 List<JSObject> listCR = DB.findListBySql(sql);
 
-                                double seven_days_costs  = 0;
-                                double seven_days_revenues = 0;
+                                double sevenDaysCosts  = 0;
+                                double sevenDaysRevenues = 0;
+                                double sevenDaysImpressions = 0;
+                                double sevenDaysPis = 0;
                                 for(JSObject one : listCR){
                                     if(one != null && one.hasObjectData()){
                                         double cost = Utils.convertDouble(one.get("cost"), 0);
                                         double revenue = Utils.convertDouble(one.get("revenue"), 0);
-                                        seven_days_costs  += cost;
-                                        seven_days_revenues  += revenue;
+                                        double impression = Utils.convertDouble(one.get("impression"), 0);
+                                        double pi = Utils.convertDouble(one.get("pi"), 0);
+                                        sevenDaysCosts  += cost;
+                                        sevenDaysRevenues  += revenue;
+                                        sevenDaysImpressions  += impression;
+                                        sevenDaysPis  += pi;
                                     }
                                 }
-                                double seven_days_incoming = Utils.convertDouble(seven_days_revenues - seven_days_costs,0);
+                                double sevenDaysAvgEcpm = sevenDaysImpressions == 0 ? 0 : sevenDaysRevenues * 1000 / sevenDaysImpressions;
+                                double sevenDaysAvgPi = sevenDaysPis / 7;
+                                double sevenDaysIncoming = sevenDaysRevenues - sevenDaysCosts;
 
 
                                 //悬浮显示十四天的总花费、总营收、总盈利等
@@ -207,7 +215,6 @@ public class CountryAnalysisReport extends HttpServlet {
                                 }
 
                                 double revenues = Utils.convertDouble(j.get("revenues"),0);
-                                //    double ecpm = impressions == 0 ? 0 : Utils.trimDouble3(revenues * 1000 / impressions );
                                 double ecpm = Utils.convertDouble(j.get("ecpm"),0);
                                 sql = "select country_name from app_country_code_dict where country_code = '" + countryCode + "'";
                                 oneC = DB.findOneBySql(sql);
@@ -232,8 +239,8 @@ public class CountryAnalysisReport extends HttpServlet {
                                 double incoming = Utils.convertDouble(j.get("incoming"),0);
                                 double cpa_dev_ecpm = (ecpm == 0) ? 0 : (cpa / ecpm);
 
-                                //RT回报时长=CPA * 1000 / PI / ECPM
-                                double rt = (pi == 0 || ecpm == 0) ? 0 : (cpa * 1000 / pi / ecpm);
+                                //RT回报时长=CPA * 1000 / sevenDaysAvgPi / sevenDaysAvgEcpm
+                                double rt = (sevenDaysAvgPi == 0 || sevenDaysAvgEcpm == 0) ? 0 : (cpa * 1000 / sevenDaysAvgPi / sevenDaysAvgEcpm);
 
                                 total_cost += costs;
                                 total_puserchaed_user += purchased_users;
@@ -251,9 +258,9 @@ public class CountryAnalysisReport extends HttpServlet {
                                 d.addProperty("pi", Utils.trimDouble(pi,3));
                                 d.addProperty("ecpm", Utils.trimDouble(ecpm,3));
                                 d.addProperty("cpa_dev_ecpm", Utils.trimDouble(cpa_dev_ecpm,3));
-                                d.addProperty("seven_days_costs", Utils.trimDouble(seven_days_costs,0));
-                                d.addProperty("seven_days_incoming", Utils.trimDouble(seven_days_incoming,0));
-                                d.addProperty("seven_days_revenues", Utils.trimDouble(seven_days_revenues,0));
+                                d.addProperty("seven_days_costs", Utils.trimDouble(sevenDaysCosts,0));
+                                d.addProperty("seven_days_incoming", Utils.trimDouble(sevenDaysIncoming,0));
+                                d.addProperty("seven_days_revenues", Utils.trimDouble(sevenDaysRevenues,0));
 
 
                                 d.addProperty("every_day_cost_for_fourteen_days", everyDayCostForFourteenDays);
