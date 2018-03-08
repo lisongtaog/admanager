@@ -36,6 +36,8 @@ public class CountryAnalysisReport extends HttpServlet {
         String startTime = request.getParameter("startTime");
         String endTime = request.getParameter("endTime");
         String sevenDaysAgo = DateUtil.addDay(endTime,-6,"yyyy-MM-dd");//包括endTime
+        String beforeSevenDay = DateUtil.addDay(endTime,-7,"yyyy-MM-dd");//不包括endTime
+        String yesterday = DateUtil.addDay(endTime,-1,"yyyy-MM-dd");//不包括endTime
         String fourteenDaysAgo = DateUtil.addDay(endTime,-13,"yyyy-MM-dd");//包括endTime
         if (path.startsWith("/query_country_analysis_report")) {
             try {
@@ -130,7 +132,7 @@ public class CountryAnalysisReport extends HttpServlet {
 
 
                                 //计算七天的总花费、总营收、总盈利等
-                                sql = "select cost, revenue,purchased_user,impression,pi " +
+                                sql = "select cost, revenue,purchased_user,impression " +
                                         "from web_ad_country_analysis_report_history where app_id = '" + appId + "' " +
                                         " and country_code = '" + countryCode + "' and date BETWEEN '" + sevenDaysAgo + "' AND '" + endTime + "'";
                                 List<JSObject> listCR = DB.findListBySql(sql);
@@ -138,7 +140,6 @@ public class CountryAnalysisReport extends HttpServlet {
                                 double sevenDaysCosts  = 0;
                                 double sevenDaysRevenues = 0;
                                 double sevenDaysImpressions = 0;
-                                double sevenDaysPis = 0;
                                 for(JSObject one : listCR){
                                     if(one != null && one.hasObjectData()){
                                         double cost = Utils.convertDouble(one.get("cost"), 0);
@@ -148,11 +149,9 @@ public class CountryAnalysisReport extends HttpServlet {
                                         sevenDaysCosts  += cost;
                                         sevenDaysRevenues  += revenue;
                                         sevenDaysImpressions  += impression;
-                                        sevenDaysPis  += pi;
                                     }
                                 }
                                 double sevenDaysAvgEcpm = sevenDaysImpressions == 0 ? 0 : sevenDaysRevenues * 1000 / sevenDaysImpressions;
-                                double sevenDaysAvgPi = sevenDaysPis / 7;
                                 double sevenDaysIncoming = sevenDaysRevenues - sevenDaysCosts;
 
 
@@ -219,7 +218,7 @@ public class CountryAnalysisReport extends HttpServlet {
                                 sql = "select country_name from app_country_code_dict where country_code = '" + countryCode + "'";
                                 oneC = DB.findOneBySql(sql);
                                 String countryName = "";
-                                if(oneC != null && oneC.hasObjectData()){
+                                if(oneC.hasObjectData()){
                                     countryName = oneC.get("country_name");
                                 }else{
                                     countryName = countryCode;
@@ -238,6 +237,14 @@ public class CountryAnalysisReport extends HttpServlet {
                                 double cpa = Utils.convertDouble(j.get("cpa"),0);
                                 double incoming = Utils.convertDouble(j.get("incoming"),0);
                                 double cpa_dev_ecpm = (ecpm == 0) ? 0 : (cpa / ecpm);
+
+                                sql = "SELECT avg(pi) as avg_pi FROM web_ad_country_analysis_report_history_by_date " +
+                                        "WHERE app_id = '" + appId + "' AND country_code = '" + countryCode + "' AND date BETWEEN '" + beforeSevenDay + "' AND '" + yesterday + "'";
+                                oneC = DB.findOneBySql(sql);
+                                double sevenDaysAvgPi = 0;
+                                if(oneC.hasObjectData()){
+                                    sevenDaysAvgPi = oneC.get("avg_pi");
+                                }
 
                                 //RT回报时长=CPA * 1000 / sevenDaysAvgPi / sevenDaysAvgEcpm
                                 double rt = (sevenDaysAvgPi == 0 || sevenDaysAvgEcpm == 0) ? 0 : (cpa * 1000 / sevenDaysAvgPi / sevenDaysAvgEcpm);
