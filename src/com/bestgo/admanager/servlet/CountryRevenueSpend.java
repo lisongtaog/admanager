@@ -29,7 +29,7 @@ public class CountryRevenueSpend extends HttpServlet {
 
         JsonObject json = new JsonObject();
         Map<String, CountryRecord> map = new HashMap<>();
-        String tag_name = request.getParameter("tag_name");
+        String tagName = request.getParameter("tag_name");
         String startTime = request.getParameter("startTime");
         String endTime = request.getParameter("endTime");
         OperationResult result = new OperationResult();
@@ -37,13 +37,13 @@ public class CountryRevenueSpend extends HttpServlet {
         try {
             result.result = true;
 
-            if (tag_name.isEmpty()) {
+            if (tagName.isEmpty()) {
                 result.result = false;
                 json.addProperty("message", "标签不能为空");
             }
             JsonArray jsonArray = new JsonArray();
             if(result.result){
-                String sqlWT = "select id from web_tag where tag_name = '" + tag_name + "'";
+                String sqlWT = "select id from web_tag where tag_name = '" + tagName + "'";
                 JSObject idJS = DB.findOneBySql(sqlWT);
                 long tag_id = idJS.get("id");
 
@@ -61,8 +61,8 @@ public class CountryRevenueSpend extends HttpServlet {
                     if(countryFacebookList != null && countryFacebookList.size() >0){
                         for (JSObject cf : countryFacebookList) {
                             CountryRecord record = new CountryRecord();
-                            String country_code1 = cf.get("country_code");
-                            record.country_code = country_code1;
+                            String countryCode1 = cf.get("country_code");
+                            record.country_code = countryCode1;
                             record.installed = Utils.convertDouble(cf.get("installed"),0.0);
                             record.spend = Utils.convertDouble(cf.get("spend"),0.0);
                             if(record.installed >0){
@@ -70,7 +70,7 @@ public class CountryRevenueSpend extends HttpServlet {
                             }else{
                                 record.cpa = 0.0;
                             }
-                            map.put(country_code1, record);
+                            map.put(countryCode1, record);
                         }
                         flag = true;
                     }
@@ -129,7 +129,7 @@ public class CountryRevenueSpend extends HttpServlet {
                         countryMap.put(j.get("country_code"),j.get("country_name"));
                     }
 
-                    String sqlFAIR = "select google_package_id from web_facebook_app_ids_rel where tag_name = '" + tag_name + "'";
+                    String sqlFAIR = "select google_package_id from web_facebook_app_ids_rel where tag_name = '" + tagName + "'";
                     JSObject goolePackageIdJSObject = DB.findOneBySql(sqlFAIR);
                     String google_package_id = goolePackageIdJSObject.get("google_package_id");
 

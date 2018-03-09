@@ -37,9 +37,6 @@ public class TimeAnalysisReport extends HttpServlet {
         String startTime = request.getParameter("startTime");
         String endTime = request.getParameter("endTime");
 
-        String beforeThreeDays = DateUtil.addDay(endTime,-3,"yyyy-MM-dd");  //计算ACPA用的
-
-//        String beforeSevenDays = DateUtil.addDay(endTime, -6, "yyyy-MM-dd"); //返回一个endTime-6 的日期
 
         //以下的if用于处理动态添加选项的问题
         List<JSObject> country_array = null;
@@ -204,46 +201,21 @@ public class TimeAnalysisReport extends HttpServlet {
 
                     for (JSObject j : timeDetailJSObjectList) {
                         if (j != null && j.hasObjectData()) {
-                            String country_code = j.get("country_code");
-/*                                sql = "select sum(cost) as seven_days_costs, sum(revenue) as seven_days_revenues " +
-                                        "from web_ad_country_analysis_report_history where app_id = '"+google_package_id+"' " +
-                                        " and country_code = '" + country_code + "' and date BETWEEN '" + beforeSevenDays + "' AND '" + endTime + "'";
-                                // 先选择好了日期区间，才在区间的范围内进行SUM()运算
-
-                                JSObject oneC = DB.findOneBySql(sql);
-
-                                double seven_days_costs  = 0;
-                                double seven_days_incoming  = 0;
-                                double seven_days_revenues = 0;
-
-                                if(oneC != null && oneC.hasObjectData()){     //hasObjectData()用于判断是否含名称/值对
-                                    seven_days_costs  = Utils.convertDouble(oneC.get("seven_days_costs"),0);
-                                    seven_days_revenues  = Utils.convertDouble(oneC.get("seven_days_revenues"),0);
-                                    seven_days_incoming = Utils.convertDouble(seven_days_revenues - seven_days_costs,0);
-                                }
-                                */
-
-                            sql = "select pi,a_cpa " +
-                                    " from web_ad_country_analysis_report_history_by_date where app_id = '" + google_package_id + "' " +
-                                    " and country_code = '" + country_filter_code + "' and date = '" + endTime + "'";
-                            JSObject oneC = DB.findOneBySql(sql);
                             double pi = 0;
                             double a_cpa = 0;
-                            if(oneC.hasObjectData()){
-                                pi = Utils.convertDouble(oneC.get("pi"),0);
-                                a_cpa = Utils.convertDouble(oneC.get("a_cpa"),0);
+                            if(country_filter != null && country_filter != ""){
+                                sql = "select pi,a_cpa " +
+                                        " from web_ad_country_analysis_report_history_by_date where app_id = '" + google_package_id + "' " +
+                                        " and country_code = '" + country_filter_code + "' and date between '" + startTime + "'" +
+                                        "and '" + endTime +"'";
+                                JSObject oneC = DB.findOneBySql(sql);
+                                if(oneC.hasObjectData()){
+                                    pi = Utils.convertDouble(oneC.get("pi"),0);
+                                    a_cpa = Utils.convertDouble(oneC.get("a_cpa"),0);
+                                }
                             }
 
 
-                            sql = "select country_name from app_country_code_dict where country_code = '" + country_code + "'";
-//                            JSObject oneC = null;
-                            oneC = DB.findOneBySql(sql);   //按这里的SQL语句进行操作返回 JsonObject；每个循环只检索一个country_code
-                            String countryName = "";
-                            if (oneC != null && oneC.hasObjectData()) {
-                                countryName = oneC.get("country_name");
-                            } else {
-                                countryName = country_code;
-                            }
                             String date = null;
                             if (path.matches(".*/time_query")||path.matches(".*/country_filter")) {
                                 SimpleDateFormat date_wfc = new SimpleDateFormat("yyyy-MM-dd");  //这里是设置一个日期的格式
@@ -267,42 +239,6 @@ public class TimeAnalysisReport extends HttpServlet {
                             double cpa = Utils.convertDouble(j.get("cpa"), 0);
                             double incoming = Utils.convertDouble(j.get("incoming"), 0);
                             double cpa_dev_ecpm = (ecpm == 0) ? 0 : (cpa / ecpm);
-                            String sqlAB = "select bidding from ad_campaigns_admob_auto_create where app_name = '"
-                                    + tagName + "' and country_region like '%" + country_code + "%'";
-                            List<JSObject> adwordsBiddingList = DB.findListBySql(sqlAB);
-
-                            String sqlFB = "select bidding from ad_campaigns_auto_create where app_name = '"
-                                    + tagName + "' and country_region like '%" + countryName + "%'";
-                            List<JSObject> facebookBiddingList = DB.findListBySql(sqlFB);
-
-
-                            Set<String> biddingSet = new HashSet<>();
-                            for (JSObject ff : facebookBiddingList) {
-                                if (ff != null && ff.hasObjectData()) {
-                                    String bidding = ff.get("bidding");
-                                    String[] split = bidding.split(",");
-                                    for (String s : split) {
-                                        biddingSet.add(s);   //字符串从 ,处拆掉一一存进biddingSet里
-                                    }
-                                }
-                            }
-                            for (JSObject aa : adwordsBiddingList) {
-                                if (aa != null && aa.hasObjectData()) {
-                                    String bidding = aa.get("bidding");
-                                    String[] split = bidding.split(",");
-                                    for (String s : split) {
-                                        biddingSet.add(s);   //到这里，两张表里的bidding都被插入集 biddingSet 里了
-                                    }
-                                }
-                            }
-                            String biddingsStr = "";
-                            if (biddingSet != null && biddingSet.size() > 0) {
-                                for (String s : biddingSet) {
-                                    biddingsStr += s + ","; //重新把集变成由,分隔的字符串
-                                }
-                            } else {
-                                biddingsStr = "--";
-                            }
 
                             total_cost += costs;
                             total_puserchaed_user += purchased_users;
@@ -310,7 +246,7 @@ public class TimeAnalysisReport extends HttpServlet {
                             total_es14 += estimated_revenues;  //前面声明的这四个变量，在每一次循环中累加
 
                             JsonObject d = new JsonObject(); // 仍在由 List<JSObject> countryDetailJSObjectList控制的大循环里，每次 d 只得到一行的数据
-                            d.addProperty("country_name", countryName);
+
                             d.addProperty("date", date);
                             d.addProperty("costs", Utils.trimDouble(costs, 0));
                             d.addProperty("purchased_users", purchased_users);
@@ -320,23 +256,15 @@ public class TimeAnalysisReport extends HttpServlet {
                             d.addProperty("users", users);
                             d.addProperty("active_users", active_users);
                             d.addProperty("revenues", Utils.trimDouble(revenues, 0));
-                            d.addProperty("pi", Utils.trimDouble(pi,3));
+                            if(country_filter != null && country_filter != ""){
+                                d.addProperty("pi", Utils.trimDouble(pi,3));
+                                d.addProperty("a_cpa", Utils.trimDouble(a_cpa,3));
+                            }
                             d.addProperty("ecpm", Utils.trimDouble(ecpm, 3));
                             d.addProperty("cpa_dev_ecpm", Utils.trimDouble(cpa_dev_ecpm, 3));
-//                                d.addProperty("seven_days_costs", Utils.trimDouble(seven_days_costs,0));
-//                                d.addProperty("seven_days_incoming", Utils.trimDouble(seven_days_incoming,0));
-//                                d.addProperty("seven_days_revenues", Utils.trimDouble(seven_days_revenues,0));
-                            d.addProperty("a_cpa", Utils.trimDouble(a_cpa,3));
                             d.addProperty("incoming", Utils.trimDouble(incoming, 0));
                             d.addProperty("estimated_revenues", Utils.trimDouble(estimated_revenues, 0));
                             d.addProperty("estimated_revenues_dev_cost", Utils.trimDouble(estRevDevCost, 3));
-//                            String sqlP = "select price from web_ad_country_analysis_report_price where app_id = '" + google_package_id + "' and country_code = '" + country_code + "'";
-//                            JSObject oneP = DB.findOneBySql(sqlP);  // 得到price
-/*                            double price = 0;
-                            if (oneP != null && oneP.hasObjectData()) {
-                                price = Utils.convertDouble(oneP.get("price"), 0);
-                            }*/
-
                             d.addProperty("cpa", Utils.trimDouble(cpa, 3));
                             jsonArray.add(d);
                         }
@@ -352,10 +280,8 @@ public class TimeAnalysisReport extends HttpServlet {
                     jsonObject.addProperty("total_es14", Utils.trimDouble(total_es14, 0));
                     jsonObject.addProperty("es14_dev_cost", Utils.trimDouble(es14_dev_cost, 3));
                     jsonObject.addProperty("ret", 1);
-
                 }
             }
-
             jsonObject.addProperty("message", "执行成功");
 
         } catch (Exception e) {

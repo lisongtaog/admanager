@@ -65,9 +65,9 @@
 
     <div class="panel panel-default" style="margin-top: 10px">
         <div class="panel-heading" id="panel_title">
-            <span>开始时间</span>
+            <span>开始日期</span>
             <input type="text" value="2012-05-15" id="inputStartTime" readonly>
-            <span>结束时间</span>
+            <span>结束日期</span>
             <input type="text" value="2012-05-15" id="inputEndTime" readonly>
             <span>标签</span>
             <input id="inputSearch" class="form-control" style="display: inline; width: auto;" type="text"/>
@@ -256,7 +256,7 @@
         });
     }
 
-    //该方法仅用于设置某三项的字体颜色
+
     function setData(data,tagName) {
         $('#results_body > tr').remove();  //2018-2-9：多层级选择器
         var arr = data.array;   //array是从后台取出来的原始、未改动数据
@@ -271,8 +271,15 @@
                 "uninstalled", "uninstalled_rate", "users", "active_users", "revenues","pi",
                 "ecpm","cpa","a_cpa","cpa_dev_ecpm", "incoming","estimated_revenues","estimated_revenues_dev_cost"];
             for (var j = 0; j < keyset.length; j++) {
+                var r = one[keyset[j]]; //得到集里的某个键的value
+                //下面先判是否有空键
+                if(r === null || r === ""){
+                    var td = $('<td></td>');
+                    td.text(" -- ");
+                    tr.append(td);
+                    continue;
+                }
                 var td = $('<td></td>');
-                var r = one[keyset[j]]; //选中集里的某个键
                 if('incoming' == keyset[j]){
                     if(r <0){
                         td.addClass("red");
@@ -283,9 +290,6 @@
                     }else if(r < data.es14_dev_cost){
                         td.addClass("orange");
                     }
-                }
-                if(r == null || r == ""){
-                    r = "--";
                 }
                 td.text(r);  //把某键的值以文本形式返回
                 tr.append(td);
