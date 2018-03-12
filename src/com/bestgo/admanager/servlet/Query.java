@@ -43,12 +43,10 @@ public class Query extends HttpServlet {
         String adwordsCheck = request.getParameter("adwordsCheck");
         String facebookCheck = request.getParameter("facebookCheck");
         int sorter = 0;
-        if (sorterId != null && sorterId != "") {
+        if (sorterId != null) {
             sorter = Utils.parseInt(sorterId, 0);
         }
         try {
-//            double endTime_total_spend = 0;
-//            double endTime_total_revenue = 0;
             JsonArray arr = new JsonArray();
             if ("false".equals(adwordsCheck) && "false".equals(facebookCheck)) {
                 if(sorter > 0){
@@ -73,7 +71,6 @@ public class Query extends HttpServlet {
                             continue;
                         }
                         campaignsSummary.total_spend = admob.get("total_spend").getAsDouble() + facebook.get("total_spend").getAsDouble();
-//                        campaignsSummary.seven_days_total_spend = admob.get("seven_days_total_spend").getAsDouble() + facebook.get("seven_days_total_spend").getAsDouble();
                         campaignsSummary.total_installed = admob.get("total_installed").getAsDouble() + facebook.get("total_installed").getAsDouble();
                         campaignsSummary.total_click = admob.get("total_click").getAsDouble() + facebook.get("total_click").getAsDouble();
                         campaignsSummary.total_ctr = campaignsSummary.total_impressions > 0 ? campaignsSummary.total_click / campaignsSummary.total_impressions : 0;
@@ -85,7 +82,7 @@ public class Query extends HttpServlet {
                                     "from web_ad_country_analysis_report_history where app_id = '"
                                     + google_package_id + "' and date BETWEEN '" + startTime + "' AND '" + endTime + "'";
                             JSObject oneR = DB.findOneBySql(sqlR);
-                            if(oneR != null){
+                            if(oneR.hasObjectData()){
                                 campaignsSummary.total_revenue = Utils.convertDouble(oneR.get("revenues"),0);
                             }
                             //下面用于赋值campaignsSummary.endTime_total_revenue ----------------------------------------------------------
@@ -93,7 +90,7 @@ public class Query extends HttpServlet {
                                     "from web_ad_country_analysis_report_history where app_id = '"
                                     + google_package_id + "' and date = '" + endTime + "'";
                             oneR = DB.findOneBySql(sqlR);
-                            if(oneR != null){
+                            if(oneR.hasObjectData()){
                                 campaignsSummary.endTime_total_revenue = Utils.trimDouble(Utils.convertDouble(oneR.get("revenues"),0),0);
                             }
                             // -------------------------------------------------------------------------------------------------------------
@@ -425,7 +422,7 @@ public class Query extends HttpServlet {
                                     "from web_ad_country_analysis_report_history where app_id = '"
                                     + google_package_id + "' and date = '" + endTime + "'";
                             JSObject oneR = DB.findOneBySql(sqlR);
-                            if (oneR != null) {
+                            if (oneR.hasObjectData()) {
                                 double endTime_total_revenue = Utils.convertDouble(oneR.get("revenues"), 0);
                                 admob.addProperty("endTime_total_revenue", Utils.trimDouble( endTime_total_revenue,0));
                             }
@@ -446,7 +443,6 @@ public class Query extends HttpServlet {
 
                         //这行之前的JsonObject admob 是个从表里取出的JSON对象，经下面一系列addProperty的操作后，变为存储处理好的值的JSON对象
                         admob.addProperty("total_spend", Utils.trimDouble(total_spend,0));
-//                        admob.addProperty("seven_days_total_spend", Utils.trimDouble(seven_days_total_spend));
                         admob.addProperty("total_installed", total_installed);
                         admob.addProperty("total_impressions", total_impressions);
                         admob.addProperty("total_click", total_click);
@@ -463,14 +459,13 @@ public class Query extends HttpServlet {
 
                         //这里计算 total_revenue
                         double total_revenue = 0;
-//                        double seven_days_total_revenue = 0;
                         google_package_id = tagJSObject.get("google_package_id");
                         if(google_package_id != null){
                             String sqlR = "select sum(revenue) as revenues " +
                                     "from web_ad_country_analysis_report_history where app_id = '"
                                     + google_package_id + "' and date BETWEEN '" + startTime + "' AND '" + endTime + "'";
                             JSObject oneR = DB.findOneBySql(sqlR);
-                            if(oneR != null){
+                            if(oneR.hasObjectData()){
                                 total_revenue = Utils.convertDouble(oneR.get("revenues"),0);
                             }
                         }
@@ -505,7 +500,6 @@ public class Query extends HttpServlet {
             Logger logger = Logger.getRootLogger();
             logger.error(ex.getMessage(), ex);
         }
-
 
         response.getWriter().write(json.toString());
     }

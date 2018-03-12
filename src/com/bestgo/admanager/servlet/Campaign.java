@@ -701,17 +701,6 @@ public class Campaign extends HttpServlet {
                             .select("id").where(DB.filter().whereEqualTo("campaign_id", item.campaignId))
                             .and(DB.filter().whereEqualTo("success", 0)).execute();
 
-//                    String sqlNetwork = "";
-//                    String sqlCountry = "";
-//                    if("admob".equals(item.network)){
-//                        sqlNetwork = "select campaign_name,budget,bidding from web_ad_campaigns_admob where campaign_id = '"+item.campaignId+"'";
-//                        sqlCountry = "select DISTINCT country_code from web_ad_campaigns_country_history_admob where campaign_id = '"+item.campaignId+"'";
-//                    }else if("facebook".equals(item.network)){
-//                        sqlNetwork = "select campaign_name,budget,bidding from web_ad_campaigns where campaign_id = '"+item.campaignId+"'";
-//                        sqlCountry = "select DISTINCT country_code from web_ad_campaigns_country_history where campaign_id = '"+item.campaignId+"'";
-//                    }
-//                    JSObject one = DB.findOneBySql(sqlNetwork);
-//                    List<JSObject> countryJSObjectList = DB.findListBySql(sqlCountry);
                     int enabled = -1;
                     if (item.enabled != null) {
                         enabled = item.enabled ? 1 : 0;
