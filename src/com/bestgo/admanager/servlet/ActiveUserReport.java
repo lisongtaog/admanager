@@ -13,10 +13,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Author: mengjun
@@ -65,7 +62,8 @@ public class ActiveUserReport extends HttpServlet {
                 String today = DateUtil.getNowDate();
                 String yesterday = DateUtil.addDay(today,-1,"yyyy-MM-dd");//美国今天
                 String sevenDayAgo = DateUtil.addDay(today,-7,"yyyy-MM-dd");//美国七天前
-                String sql = "select total_installeds,country_code,avg_7_day_active,avg_14_day_active,avg_30_day_active,avg_60_day_active " +
+                String sql = "select total_installeds,country_code,avg_7_day_active,avg_14_day_active,avg_30_day_active,avg_60_day_active, " +
+                        "seven_days_data_update_date,fourteen_days_data_update_date,thirty_days_data_update_date,sixty_days_data_update_date " +
                         " from ad_report_active_user_admob_rel_result where tag_name = '" + tagName + "' ";
                 int sorter = 0;
                 if (sorterId != null) {
@@ -127,6 +125,13 @@ public class ActiveUserReport extends HttpServlet {
                         double avgFourteenDayActive = Utils.trimDouble(Utils.convertDouble(j.get("avg_14_day_active"), 0),3);
                         double avgThirtyDayActive = Utils.trimDouble(Utils.convertDouble(j.get("avg_30_day_active"), 0),3);
                         double avgSixtyDayActive = Utils.trimDouble(Utils.convertDouble(j.get("avg_60_day_active"), 0),3);
+
+                        //业务逻辑上，这里不应该出现空值，所以不用判断
+                        Date sevenDaysDataUpdateDate = j.get("seven_days_data_update_date");
+                        Date fourteenDaysDataUpdateDate = j.get("fourteen_days_data_update_date");
+                        Date thirtyDaysDataUpdateDate = j.get("thirty_days_data_update_date");
+                        Date sixtyDaysDataUpdateDate = j.get("sixty_days_data_update_date");
+
                         jo.addProperty("country_name", countryName);
                         jo.addProperty("total_installeds", totalInstalleds);
                         jo.addProperty("avg_7_day_active", avgSevenDayActive);
@@ -134,6 +139,12 @@ public class ActiveUserReport extends HttpServlet {
                         jo.addProperty("avg_30_day_active", avgThirtyDayActive);
                         jo.addProperty("avg_60_day_active", avgSixtyDayActive);
                         jo.addProperty("seven_days_avg_arpu", sevenDaysAvgARPU);
+
+                        jo.addProperty("seven_days_data_update_date", sevenDaysDataUpdateDate.toString());
+                        jo.addProperty("fourteen_days_data_update_date", fourteenDaysDataUpdateDate.toString());
+                        jo.addProperty("thirty_days_data_update_date", thirtyDaysDataUpdateDate.toString());
+                        jo.addProperty("sixty_days_data_update_date", sixtyDaysDataUpdateDate.toString());
+
                         jo.addProperty("avg_7_day_active_mul_arpu", Utils.trimDouble(avgSevenDayActive * sevenDaysAvgARPU,3));
                         jo.addProperty("avg_14_day_active_mul_arpu", Utils.trimDouble(avgFourteenDayActive * sevenDaysAvgARPU,3));
                         jo.addProperty("avg_30_day_active_mul_arpu", Utils.trimDouble(avgThirtyDayActive * sevenDaysAvgARPU,3));

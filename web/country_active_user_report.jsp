@@ -154,8 +154,16 @@
             for (var j = 0; j < keyset.length; j++) {
                 var td = $('<td></td>');
                 var field = keyset[j];
-                var field_value = one[field];
-                td.text(field_value);
+                if('avg_7_day_active' == field){
+                    td = $("<td title=\""+one['seven_days_data_update_date']+"\"></td>");
+                }else if('avg_14_day_active' == field){
+                    td = $("<td title=\""+one['fourteen_days_data_update_date']+"\"></td>");
+                }else if('avg_30_day_active' == field){
+                    td = $("<td title=\""+one['thirty_days_data_update_date']+"\"></td>");
+                }else if('avg_60_day_active' == field){
+                    td = $("<td title=\""+one['sixty_days_data_update_date']+"\"></td>");
+                }
+                td.text(one[field]);
                 tr.append(td);
             }
             $('#results_body').append(tr);
