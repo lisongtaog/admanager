@@ -44,9 +44,6 @@ public class Query2 extends HttpServlet {
         String adwordsCheck = request.getParameter("adwordsCheck");
         String facebookCheck = request.getParameter("facebookCheck");
 
-        //类公共变量，用于存放14天数据
-//        String[] fourteen_arr = new String[5];
-
         int sorter = 0;
         if (sorterId != null) {
             sorter = Utils.parseInt(sorterId, 0);
@@ -61,25 +58,22 @@ public class Query2 extends HttpServlet {
 
 
                     for (JSObject tagJSObject : tagList) {
-                        CampaignsSummary campaignsSummary = new CampaignsSummary();    //CampaignsSummary类是一个没有构造器的类，当它被实例化以后系统会默认给其无参构造函数，初始化其中的实例为默认域
+                        CampaignsSummary campaignsSummary = new CampaignsSummary();
                         long id = tagJSObject.get("id");
                         campaignsSummary.name = tagJSObject.get("tag_name"); //可以用 .号来初始化特定的实例
-                        JsonObject admob = fetchOneAppDataSummary(id, startTime, endTime, true); //用这些条件从数据库取值，返回一个JSObject
+                        JsonObject admob = fetchOneAppDataSummary(id, startTime, endTime, true);
                         JsonObject facebook = fetchOneAppDataSummary(id, startTime, endTime, false);
 
                         //以下两句：主要用于取endTime当天的 total_spend --------------------------------------------------------------------------------
                         JsonObject admob1 = fetchOneAppDataSummary(id, endTime, endTime, true);
                         JsonObject facebook1 = fetchOneAppDataSummary(id, endTime, endTime, false);
                         campaignsSummary.endTime_total_spend = Utils.trimDouble(admob1.get("total_spend").getAsDouble() + facebook1.get("total_spend").getAsDouble(), 0);
-                        // -----------------------------------------------------------------------------------------------------------------------------
-
 
                         campaignsSummary.total_impressions = admob.get("total_impressions").getAsDouble() + facebook.get("total_impressions").getAsDouble();
                         if (campaignsSummary.total_impressions == 0) {
                             continue;
                         }
                         campaignsSummary.total_spend = admob.get("total_spend").getAsDouble() + facebook.get("total_spend").getAsDouble();
-//                        campaignsSummary.seven_days_total_spend = admob.get("seven_days_total_spend").getAsDouble() + facebook.get("seven_days_total_spend").getAsDouble();
                         campaignsSummary.total_installed = admob.get("total_installed").getAsDouble() + facebook.get("total_installed").getAsDouble();
                         campaignsSummary.total_click = admob.get("total_click").getAsDouble() + facebook.get("total_click").getAsDouble();
                         campaignsSummary.total_ctr = campaignsSummary.total_impressions > 0 ? campaignsSummary.total_click / campaignsSummary.total_impressions : 0;
@@ -106,293 +100,17 @@ public class Query2 extends HttpServlet {
                             if (oneR.hasObjectData()) {
                                 campaignsSummary.endTime_total_revenue = Utils.trimDouble(Utils.convertDouble(oneR.get("revenues"), 0), 0);
                             }
-                            // -------------------------------------------------------------------------------------------------------------
+
+                            //接下来计算ecpm和incoming
+                            campaignsSummary.ecpm = campaignsSummary.total_revenue * 1000 / campaignsSummary.total_impressions;
+                            campaignsSummary.incoming = campaignsSummary.total_revenue - campaignsSummary.total_spend;
                         }
                         campaignsSummaryList.add(campaignsSummary);
                     }
+
+                    sorting(campaignsSummaryList,sorter);
+
                     if (campaignsSummaryList != null && campaignsSummaryList.size() > 0) {
-                        switch (sorter) {
-                            case 70:
-                                Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
-                                    @Override
-                                    public int compare(CampaignsSummary a, CampaignsSummary b) {
-                                        if (a.total_spend > b.total_spend) {
-                                            return 1;
-                                        } else if (a.total_spend < b.total_spend) {
-                                            return -1;
-                                        } else {
-                                            return 0;
-                                        }
-                                    }
-                                });
-                                break;
-                            case 1070:
-                                Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
-                                    @Override
-                                    public int compare(CampaignsSummary a, CampaignsSummary b) {
-                                        if (a.total_spend < b.total_spend) {
-                                            return 1;
-                                        } else if (a.total_spend > b.total_spend) {
-                                            return -1;
-                                        } else {
-                                            return 0;
-                                        }
-                                    }
-                                });
-                                break;
-                            case 71:
-                                Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
-                                    @Override
-                                    public int compare(CampaignsSummary a, CampaignsSummary b) {
-                                        if (a.seven_days_total_spend > b.seven_days_total_spend) {
-                                            return 1;
-                                        } else if (a.seven_days_total_spend < b.seven_days_total_spend) {
-                                            return -1;
-                                        } else {
-                                            return 0;
-                                        }
-                                    }
-                                });
-                                break;
-                            case 1071:
-                                Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
-                                    @Override
-                                    public int compare(CampaignsSummary a, CampaignsSummary b) {
-                                        if (a.seven_days_total_spend < b.seven_days_total_spend) {
-                                            return 1;
-                                        } else if (a.seven_days_total_spend > b.seven_days_total_spend) {
-                                            return -1;
-                                        } else {
-                                            return 0;
-                                        }
-                                    }
-                                });
-                                break;
-                            case 72:
-                                Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
-                                    @Override
-                                    public int compare(CampaignsSummary a, CampaignsSummary b) {
-                                        if (a.total_revenue > b.total_revenue) {
-                                            return 1;
-                                        } else if (a.total_revenue < b.total_revenue) {
-                                            return -1;
-                                        } else {
-                                            return 0;
-                                        }
-                                    }
-                                });
-                                break;
-                            case 1072:
-                                Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
-                                    @Override
-                                    public int compare(CampaignsSummary a, CampaignsSummary b) {
-                                        if (a.total_revenue < b.total_revenue) {
-                                            return 1;
-                                        } else if (a.total_revenue > b.total_revenue) {
-                                            return -1;
-                                        } else {
-                                            return 0;
-                                        }
-                                    }
-                                });
-                                break;
-                            case 73:
-                                Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
-                                    @Override
-                                    public int compare(CampaignsSummary a, CampaignsSummary b) {
-                                        if (a.seven_days_total_revenue > b.seven_days_total_revenue) {
-                                            return 1;
-                                        } else if (a.seven_days_total_revenue < b.seven_days_total_revenue) {
-                                            return -1;
-                                        } else {
-                                            return 0;
-                                        }
-                                    }
-                                });
-                                break;
-                            case 1073:
-                                Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
-                                    @Override
-                                    public int compare(CampaignsSummary a, CampaignsSummary b) {
-                                        if (a.seven_days_total_revenue < b.seven_days_total_revenue) {
-                                            return 1;
-                                        } else if (a.seven_days_total_revenue > b.seven_days_total_revenue) {
-                                            return -1;
-                                        } else {
-                                            return 0;
-                                        }
-                                    }
-                                });
-                                break;
-                            case 74:
-                                Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
-                                    @Override
-                                    public int compare(CampaignsSummary a, CampaignsSummary b) {
-                                        if (a.total_installed > b.total_installed) {
-                                            return 1;
-                                        } else if (a.total_installed < b.total_installed) {
-                                            return -1;
-                                        } else {
-                                            return 0;
-                                        }
-                                    }
-                                });
-                                break;
-                            case 1074:
-                                Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
-                                    @Override
-                                    public int compare(CampaignsSummary a, CampaignsSummary b) {
-                                        if (a.total_installed < b.total_installed) {
-                                            return 1;
-                                        } else if (a.total_installed > b.total_installed) {
-                                            return -1;
-                                        } else {
-                                            return 0;
-                                        }
-                                    }
-                                });
-                                break;
-                            case 75:
-                                Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
-                                    @Override
-                                    public int compare(CampaignsSummary a, CampaignsSummary b) {
-                                        if (a.total_impressions > b.total_impressions) {
-                                            return 1;
-                                        } else if (a.total_impressions < b.total_impressions) {
-                                            return -1;
-                                        } else {
-                                            return 0;
-                                        }
-                                    }
-                                });
-                                break;
-                            case 1075:
-                                Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
-                                    @Override
-                                    public int compare(CampaignsSummary a, CampaignsSummary b) {
-                                        if (a.total_impressions < b.total_impressions) {
-                                            return 1;
-                                        } else if (a.total_impressions > b.total_impressions) {
-                                            return -1;
-                                        } else {
-                                            return 0;
-                                        }
-                                    }
-                                });
-                                break;
-                            case 76:
-                                Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
-                                    @Override
-                                    public int compare(CampaignsSummary a, CampaignsSummary b) {
-                                        if (a.total_click > b.total_click) {
-                                            return 1;
-                                        } else if (a.total_click < b.total_click) {
-                                            return -1;
-                                        } else {
-                                            return 0;
-                                        }
-                                    }
-                                });
-                                break;
-                            case 1076:
-                                Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
-                                    @Override
-                                    public int compare(CampaignsSummary a, CampaignsSummary b) {
-                                        if (a.total_click < b.total_click) {
-                                            return 1;
-                                        } else if (a.total_click > b.total_click) {
-                                            return -1;
-                                        } else {
-                                            return 0;
-                                        }
-                                    }
-                                });
-                                break;
-                            case 77:
-                                Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
-                                    @Override
-                                    public int compare(CampaignsSummary a, CampaignsSummary b) {
-                                        if (a.total_ctr > b.total_ctr) {
-                                            return 1;
-                                        } else if (a.total_ctr < b.total_ctr) {
-                                            return -1;
-                                        } else {
-                                            return 0;
-                                        }
-                                    }
-                                });
-                                break;
-                            case 1077:
-                                Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
-                                    @Override
-                                    public int compare(CampaignsSummary a, CampaignsSummary b) {
-                                        if (a.total_ctr < b.total_ctr) {
-                                            return 1;
-                                        } else if (a.total_ctr > b.total_ctr) {
-                                            return -1;
-                                        } else {
-                                            return 0;
-                                        }
-                                    }
-                                });
-                                break;
-                            case 78:
-                                Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
-                                    @Override
-                                    public int compare(CampaignsSummary a, CampaignsSummary b) {
-                                        if (a.total_cpa > b.total_cpa) {
-                                            return 1;
-                                        } else if (a.total_cpa < b.total_cpa) {
-                                            return -1;
-                                        } else {
-                                            return 0;
-                                        }
-                                    }
-                                });
-                                break;
-                            case 1078:
-                                Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
-                                    @Override
-                                    public int compare(CampaignsSummary a, CampaignsSummary b) {
-                                        if (a.total_cpa < b.total_cpa) {
-                                            return 1;
-                                        } else if (a.total_cpa > b.total_cpa) {
-                                            return -1;
-                                        } else {
-                                            return 0;
-                                        }
-                                    }
-                                });
-                                break;
-                            case 79:
-                                Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
-                                    @Override
-                                    public int compare(CampaignsSummary a, CampaignsSummary b) {
-                                        if (a.total_cvr > b.total_cvr) {
-                                            return 1;
-                                        } else if (a.total_cvr < b.total_cvr) {
-                                            return -1;
-                                        } else {
-                                            return 0;
-                                        }
-                                    }
-                                });
-                                break;
-                            case 1079:
-                                Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
-                                    @Override
-                                    public int compare(CampaignsSummary a, CampaignsSummary b) {
-                                        if (a.total_cvr < b.total_cvr) {
-                                            return 1;
-                                        } else if (a.total_cvr > b.total_cvr) {
-                                            return -1;
-                                        } else {
-                                            return 0;
-                                        }
-                                    }
-                                });
-                                break;
-                        }
                         for (CampaignsSummary cs : campaignsSummaryList) {
                             JsonObject j = new JsonObject();
                             j.addProperty("name", cs.name);
@@ -412,6 +130,9 @@ public class Query2 extends HttpServlet {
                             j.addProperty("total_cpa", Utils.trimDouble(cs.total_cpa, 3));
                             j.addProperty("total_cvr", Utils.trimDouble(cs.total_cvr, 3));
                             j.addProperty("total_revenue", Utils.trimDouble(cs.total_revenue, 0));
+                            j.addProperty("ecpm",Utils.trimDouble(cs.ecpm,3));
+                            j.addProperty("incoming",Utils.trimDouble(cs.incoming,0));
+
 
                             //接下来在 数组arr 里添加 fourteen系列键值对，用于传回jsp生成悬浮窗
                             j.addProperty("spend_14", fourteen_arr[0]);
@@ -439,7 +160,7 @@ public class Query2 extends HttpServlet {
                         admob.addProperty("endTime_total_spend", Utils.trimDouble(endTime_total_spend, 0));
 
                         String google_package_id = tagJSObject.get("google_package_id");
-
+                        JsonObject ecpm_incoming = new JsonObject();
                         if (google_package_id != null && google_package_id != "") {
 
                             //14行悬浮窗：用一个静态方法FourteenData 来生成一个用于返回的数组 fourteen_arr,
@@ -468,9 +189,11 @@ public class Query2 extends HttpServlet {
                         double total_cpa = total_installed > 0 ? total_spend / total_installed : 0;
                         double total_cvr = total_click > 0 ? total_installed / total_click : 0;
 
+//                        double ecpm = ecpm_incoming.get("ecpm").getAsDouble();
+//                        double incoming = ecpm_incoming.get("incoming").getAsDouble();
+
                         //这行之前的JsonObject admob 是个从表里取出的JSON对象，经下面一系列addProperty的操作后，变为存储处理好的值的JSON对象
                         admob.addProperty("total_spend", Utils.trimDouble(total_spend, 0));
-//                        admob.addProperty("seven_days_total_spend", Utils.trimDouble(seven_days_total_spend));
                         admob.addProperty("total_installed", total_installed);
                         admob.addProperty("total_impressions", total_impressions);
                         admob.addProperty("total_click", total_click);
@@ -499,6 +222,13 @@ public class Query2 extends HttpServlet {
                             }
                         }
                         admob.addProperty("total_revenue", Utils.trimDouble(total_revenue, 0));
+
+                        //接下来计算ecpm和incoming
+                        double ecpm = total_revenue*1000/total_impressions;
+                        double incoming = total_revenue - total_spend;
+                        admob.addProperty("ecpm",Utils.trimDouble(ecpm,3));
+                        admob.addProperty("incoming",Utils.trimDouble(incoming,0));
+
 
                         //接下来在admob里添加14天数据
                         admob.addProperty("spend_14", fourteen_arr[0]);
@@ -622,6 +352,7 @@ public class Query2 extends HttpServlet {
     }
 
 
+    //14天数据的总方法（设置在title属性里）
     private List<JsonObject> AttrTitleData(long tagId, String endTime, boolean admobCheck) throws Exception {
         String webAdCampaignTagRelTable = "web_ad_campaign_tag_rel";
         String webAdCampaignsTable = "web_ad_campaigns";
@@ -690,6 +421,379 @@ public class Query2 extends HttpServlet {
         return revenue;
     }
 
+    //用于在首页的数据汇总后增加 ECPM 和 Incoming 两项
+    /*
+    private  static JsonObject NewNeed (String startTime,String endTime,String app_id){
+        JsonObject json = new JsonObject();
+        //SQL语句在拼字符串中容易出错
+        String sql = "select (case when sum(impression) > 0 then sum(revenue) * 1000 / sum(impression) else 0 end) as ecpm," +
+                "(sum(revenue) - sum(cost)) as incoming" +
+                " from web_ad_country_analysis_report_history" +
+                " where app_id = '" + app_id + "'and " +
+                "date between '" + startTime + "' and '" + endTime +"'";
+        JSObject one = null;
+        double ecpm = 0;
+        double incoming = 0;
+        try{
+            one = DB.findOneBySql(sql);
+        }catch(Exception e){ }
+        try{
+            ecpm = Utils.convertDouble(one.get("ecpm"),0);
+            incoming = Utils.convertDouble(one.get("incoming"),0);
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+
+        json.addProperty("ecpm",ecpm);
+        json.addProperty("incoming",incoming);
+        return json;
+    }
+    */
+
+    //以下封装了用于首页数据排序的方法
+    private static void sorting (ArrayList<CampaignsSummary> campaignsSummaryList,int sorter){
+        if (campaignsSummaryList != null && campaignsSummaryList.size() > 0) {
+            switch (sorter) {
+                case 70:
+                    Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
+                        @Override
+                        public int compare(CampaignsSummary a, CampaignsSummary b) {
+                            if (a.total_spend > b.total_spend) {
+                                return 1;
+                            } else if (a.total_spend < b.total_spend) {
+                                return -1;
+                            } else {
+                                return 0;
+                            }
+                        }
+                    });
+                    break;
+                case 1070:
+                    Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
+                        @Override
+                        public int compare(CampaignsSummary a, CampaignsSummary b) {
+                            if (a.total_spend < b.total_spend) {
+                                return 1;
+                            } else if (a.total_spend > b.total_spend) {
+                                return -1;
+                            } else {
+                                return 0;
+                            }
+                        }
+                    });
+                    break;
+                case 71:
+                    Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
+                        @Override
+                        public int compare(CampaignsSummary a, CampaignsSummary b) {
+                            if (a.seven_days_total_spend > b.seven_days_total_spend) {
+                                return 1;
+                            } else if (a.seven_days_total_spend < b.seven_days_total_spend) {
+                                return -1;
+                            } else {
+                                return 0;
+                            }
+                        }
+                    });
+                    break;
+                case 1071:
+                    Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
+                        @Override
+                        public int compare(CampaignsSummary a, CampaignsSummary b) {
+                            if (a.seven_days_total_spend < b.seven_days_total_spend) {
+                                return 1;
+                            } else if (a.seven_days_total_spend > b.seven_days_total_spend) {
+                                return -1;
+                            } else {
+                                return 0;
+                            }
+                        }
+                    });
+                    break;
+                case 72:
+                    Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
+                        @Override
+                        public int compare(CampaignsSummary a, CampaignsSummary b) {
+                            if (a.total_revenue > b.total_revenue) {
+                                return 1;
+                            } else if (a.total_revenue < b.total_revenue) {
+                                return -1;
+                            } else {
+                                return 0;
+                            }
+                        }
+                    });
+                    break;
+                case 1072:
+                    Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
+                        @Override
+                        public int compare(CampaignsSummary a, CampaignsSummary b) {
+                            if (a.total_revenue < b.total_revenue) {
+                                return 1;
+                            } else if (a.total_revenue > b.total_revenue) {
+                                return -1;
+                            } else {
+                                return 0;
+                            }
+                        }
+                    });
+                    break;
+                case 73:
+                    Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
+                        @Override
+                        public int compare(CampaignsSummary a, CampaignsSummary b) {
+                            if (a.seven_days_total_revenue > b.seven_days_total_revenue) {
+                                return 1;
+                            } else if (a.seven_days_total_revenue < b.seven_days_total_revenue) {
+                                return -1;
+                            } else {
+                                return 0;
+                            }
+                        }
+                    });
+                    break;
+                case 1073:
+                    Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
+                        @Override
+                        public int compare(CampaignsSummary a, CampaignsSummary b) {
+                            if (a.seven_days_total_revenue < b.seven_days_total_revenue) {
+                                return 1;
+                            } else if (a.seven_days_total_revenue > b.seven_days_total_revenue) {
+                                return -1;
+                            } else {
+                                return 0;
+                            }
+                        }
+                    });
+                    break;
+                case 74:
+                    Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
+                        @Override
+                        public int compare(CampaignsSummary a, CampaignsSummary b) {
+                            if (a.total_installed > b.total_installed) {
+                                return 1;
+                            } else if (a.total_installed < b.total_installed) {
+                                return -1;
+                            } else {
+                                return 0;
+                            }
+                        }
+                    });
+                    break;
+                case 1074:
+                    Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
+                        @Override
+                        public int compare(CampaignsSummary a, CampaignsSummary b) {
+                            if (a.total_installed < b.total_installed) {
+                                return 1;
+                            } else if (a.total_installed > b.total_installed) {
+                                return -1;
+                            } else {
+                                return 0;
+                            }
+                        }
+                    });
+                    break;
+                case 75:
+                    Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
+                        @Override
+                        public int compare(CampaignsSummary a, CampaignsSummary b) {
+                            if (a.total_impressions > b.total_impressions) {
+                                return 1;
+                            } else if (a.total_impressions < b.total_impressions) {
+                                return -1;
+                            } else {
+                                return 0;
+                            }
+                        }
+                    });
+                    break;
+                case 1075:
+                    Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
+                        @Override
+                        public int compare(CampaignsSummary a, CampaignsSummary b) {
+                            if (a.total_impressions < b.total_impressions) {
+                                return 1;
+                            } else if (a.total_impressions > b.total_impressions) {
+                                return -1;
+                            } else {
+                                return 0;
+                            }
+                        }
+                    });
+                    break;
+                case 76:
+                    Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
+                        @Override
+                        public int compare(CampaignsSummary a, CampaignsSummary b) {
+                            if (a.total_click > b.total_click) {
+                                return 1;
+                            } else if (a.total_click < b.total_click) {
+                                return -1;
+                            } else {
+                                return 0;
+                            }
+                        }
+                    });
+                    break;
+                case 1076:
+                    Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
+                        @Override
+                        public int compare(CampaignsSummary a, CampaignsSummary b) {
+                            if (a.total_click < b.total_click) {
+                                return 1;
+                            } else if (a.total_click > b.total_click) {
+                                return -1;
+                            } else {
+                                return 0;
+                            }
+                        }
+                    });
+                    break;
+                case 77:
+                    Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
+                        @Override
+                        public int compare(CampaignsSummary a, CampaignsSummary b) {
+                            if (a.total_ctr > b.total_ctr) {
+                                return 1;
+                            } else if (a.total_ctr < b.total_ctr) {
+                                return -1;
+                            } else {
+                                return 0;
+                            }
+                        }
+                    });
+                    break;
+                case 1077:
+                    Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
+                        @Override
+                        public int compare(CampaignsSummary a, CampaignsSummary b) {
+                            if (a.total_ctr < b.total_ctr) {
+                                return 1;
+                            } else if (a.total_ctr > b.total_ctr) {
+                                return -1;
+                            } else {
+                                return 0;
+                            }
+                        }
+                    });
+                    break;
+                case 78:
+                    Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
+                        @Override
+                        public int compare(CampaignsSummary a, CampaignsSummary b) {
+                            if (a.total_cpa > b.total_cpa) {
+                                return 1;
+                            } else if (a.total_cpa < b.total_cpa) {
+                                return -1;
+                            } else {
+                                return 0;
+                            }
+                        }
+                    });
+                    break;
+                case 1078:
+                    Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
+                        @Override
+                        public int compare(CampaignsSummary a, CampaignsSummary b) {
+                            if (a.total_cpa < b.total_cpa) {
+                                return 1;
+                            } else if (a.total_cpa > b.total_cpa) {
+                                return -1;
+                            } else {
+                                return 0;
+                            }
+                        }
+                    });
+                    break;
+                case 79:
+                    Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
+                        @Override
+                        public int compare(CampaignsSummary a, CampaignsSummary b) {
+                            if (a.total_cvr > b.total_cvr) {
+                                return 1;
+                            } else if (a.total_cvr < b.total_cvr) {
+                                return -1;
+                            } else {
+                                return 0;
+                            }
+                        }
+                    });
+                    break;
+                case 1079:
+                    Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
+                        @Override
+                        public int compare(CampaignsSummary a, CampaignsSummary b) {
+                            if (a.total_cvr < b.total_cvr) {
+                                return 1;
+                            } else if (a.total_cvr > b.total_cvr) {
+                                return -1;
+                            } else {
+                                return 0;
+                            }
+                        }
+                    });
+                    break;
+                case 80:
+                    Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
+                        @Override
+                        public int compare(CampaignsSummary a, CampaignsSummary b) {
+                            if (a.ecpm > b.ecpm) {
+                                return 1;
+                            } else if (a.ecpm < b.ecpm) {
+                                return -1;
+                            } else {
+                                return 0;
+                            }
+                        }
+                    });
+                    break;
+                case 1080:
+                    Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
+                        @Override
+                        public int compare(CampaignsSummary a, CampaignsSummary b) {
+                            if (a.ecpm < b.ecpm) {
+                                return 1;
+                            } else if (a.ecpm > b.ecpm) {
+                                return -1;
+                            } else {
+                                return 0;
+                            }
+                        }
+                    });
+                    break;
+                case 81:
+                    Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
+                        @Override
+                        public int compare(CampaignsSummary a, CampaignsSummary b) {
+                            if (a.incoming > b.incoming) {
+                                return 1;
+                            } else if (a.incoming < b.incoming) {
+                                return -1;
+                            } else {
+                                return 0;
+                            }
+                        }
+                    });
+                    break;
+                case 1081:
+                    Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
+                        @Override
+                        public int compare(CampaignsSummary a, CampaignsSummary b) {
+                            if (a.incoming < b.incoming) {
+                                return 1;
+                            } else if (a.incoming > b.incoming) {
+                                return -1;
+                            } else {
+                                return 0;
+                            }
+                        }
+                    });
+                    break;
+            }
+        }
+    }
+
     class CampaignsSummary {
         public String name;
         public double total_spend;
@@ -705,6 +809,8 @@ public class Query2 extends HttpServlet {
         public double total_revenue;
         public double seven_days_total_revenue;
         public String network;
+        public double ecpm;
+        public double incoming;
     }
 
     static class FourteenDays {

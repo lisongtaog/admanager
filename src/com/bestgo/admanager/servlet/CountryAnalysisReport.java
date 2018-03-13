@@ -336,12 +336,12 @@ public class CountryAnalysisReport extends HttpServlet {
                 }
                 String sqlA = "select id from ad_campaigns_admob_auto_create where app_name = '" + tagName + "' and country_region like '%" + curr_country_code + "%'";
                 JSObject oneA = DB.findOneBySql(sqlA);
-                long id_adwords = -1;
+                long adwordsId = -1;
                 if(oneA != null && oneA.hasObjectData()){
-                    id_adwords = oneA.get("id");
+                    adwordsId = oneA.get("id");
                 }
                 jsonObject.addProperty("id_facebook", facebookId);
-                jsonObject.addProperty("id_adwords", id_adwords);
+                jsonObject.addProperty("id_adwords", adwordsId);
                 jsonObject.addProperty("ret", 1);
                 jsonObject.addProperty("message", "执行成功");
             } catch (Exception e) {

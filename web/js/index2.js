@@ -320,7 +320,8 @@ function init() {
                     "<th>总营收<span sorterId=\"72\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>预计总营收<span sorterId=\"73\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
                     "<th>总安装<span sorterId=\"74\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>总展示<span sorterId=\"75\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
                     "<th>总点击<span sorterId=\"76\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>CTR<span sorterId=\"77\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
-                    "<th>CPA<span sorterId=\"78\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>CVR<span sorterId=\"79\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th></tr>");
+                    "<th>CPA<span sorterId=\"78\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>CVR<span sorterId=\"79\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>"+
+                    "<th>ECPM<span sorterId=\"80\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>Incoming<span sorterId=\"81\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th></tr>");
 
 
                 data = data.data; //这里把返回数据里的 data属性 的值给了变量data，即变量data 是Query.java里的 arr[{},{},...,{}]
@@ -343,8 +344,10 @@ function setDataSummary(data) {
     var total_ctr = 0;
     var total_cpa = 0;
     var total_cvr = 0;
+    var total_ecpm = 0;
+    var total_incoming = 0;
     var keyset = ["name", "total_spend","endTime_total_spend", "total_revenue", "endTime_total_revenue","total_installed", "total_impressions", "total_click",
-        "total_ctr", "total_cpa", "total_cvr"];
+        "total_ctr", "total_cpa", "total_cvr","ecpm","incoming"];
     //后台传来的数组里每个JSON对象元素的属性排列顺序是一定的，但是按接下来的取法不必计较这个顺序
     //total_spend是每20分钟抓一次，total_revenue是每小时抓一次
 
@@ -424,6 +427,7 @@ function setDataSummary(data) {
         total_installed += one['total_installed'];
         total_impressions += one['total_impressions'];
         total_click += one['total_click'];
+        total_incoming += one['incoming'];
 
         total_ctr = total_impressions > 0 ? total_click / total_impressions : 0;
         total_cpa = total_installed > 0 ? total_spend / total_installed : 0;
@@ -433,12 +437,14 @@ function setDataSummary(data) {
     if(adwordsCheck || facebookCheck){
         var str = "总花费: " + total_spend + " 总安装: " + total_installed +
             " 总展示: " + total_impressions + " 总点击: " + total_click +
-            " CTR: " + total_ctr + " CPA: " + total_cpa + " CVR: " + total_cvr;
+            " CTR: " + total_ctr + " CPA: " + total_cpa + " CVR: " + total_cvr +
+            " 总营收: "+ total_revenue + " Incoming in total: " + total_incoming;
         $('#total_result').text(str);
     }else{
         var str = "总花费: " + total_spend + "  总营收: " + total_revenue + " 总安装: " + total_installed +
             " 总展示: " + total_impressions + " 总点击: " + total_click +
-            " CTR: " + total_ctr + " CPA: " + total_cpa + " CVR: " + total_cvr;
+            " CTR: " + total_ctr + " CPA: " + total_cpa + " CVR: " + total_cvr +
+            " 总营收: "+ total_revenue + " Incoming in total: " + total_incoming;
         $('#total_result').text(str);
     }
 
