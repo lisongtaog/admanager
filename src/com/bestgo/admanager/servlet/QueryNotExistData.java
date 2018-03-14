@@ -36,7 +36,6 @@ public class QueryNotExistData extends HttpServlet {
         String adwordsCheck = request.getParameter("adwordsCheck");
         String facebookCheck = request.getParameter("facebookCheck");
         String countryCode = request.getParameter("countryCode");
-//        HashMap<String ,String> countryMap = Utils.getCountryMap();
         String countryName = request.getParameter("countryName");
         String likeCampaignName = request.getParameter("likeCampaignName");
         String campaignCreateTime = request.getParameter("campaignCreateTime");
@@ -105,7 +104,7 @@ public class QueryNotExistData extends HttpServlet {
         String webAdCampaignsHistoryTable = "web_ad_campaigns_history";
         String webAdCampaignsCountryHistoryTable = "web_ad_campaigns_country_history";
         String webAccountIdTable = "web_account_id";
-        String FieldStatus = "ACTIVE";
+        String openStatus = "ACTIVE";
         List<JSObject> listAll = new ArrayList<>();
         List<JSObject> listHasData = new ArrayList<>();
         if (admobCheck) {
@@ -114,7 +113,7 @@ public class QueryNotExistData extends HttpServlet {
             webAdCampaignsTable = "web_ad_campaigns_admob";
             webAdCampaignsHistoryTable = "web_ad_campaigns_history_admob";
             webAccountIdTable = "web_account_id_admob";
-            FieldStatus = "enabled";
+            openStatus = "enabled";
             webAdCampaignsCountryHistoryTable = "web_ad_campaigns_country_history_admob";
         }
         List<JSObject> list = null;
@@ -157,13 +156,27 @@ public class QueryNotExistData extends HttpServlet {
         if(campaignIds != null && campaignIds.length()>0){
             campaignIds = campaignIds.substring(0,campaignIds.length()-1);
         }
+        String sql = "";
         if (!campaignIds.isEmpty()) {
-            String sql = "select campaign_id, a.account_id, short_name, campaign_name, create_time, a.status, budget, bidding, total_spend, " +
-                    " total_installed, total_click, cpa,ctr, " +
-                    " (case when total_click > 0 then total_installed/total_click else 0 end) as cvr " +
-                    "  from " + webAdCampaignsTable + " a LEFT JOIN " + webAccountIdTable + " b ON a.account_id = b.account_id where a.status = '" + FieldStatus + "' and " +
-                    "  campaign_id in (" + campaignIds + ") " +
-                    ((likeCampaignName == "" || likeCampaignName == null) ? "" : " and campaign_name like %" + likeCampaignName + "%");
+
+            if(admobCheck){
+                sql = "select campaign_id, a.account_id, short_name, campaign_name, create_time, a.status, budget, bidding, total_spend, " +
+                        " total_installed, total_click, cpa,ctr, " +
+                        " (case when total_click > 0 then total_installed/total_click else 0 end) as cvr " +
+                        "  from " + webAdCampaignsTable + " a LEFT JOIN " + webAccountIdTable + " b ON a.account_id = b.account_id " +
+                        " where a.status = '" + openStatus + "'" +
+                        " and campaign_id in (" + campaignIds + ") " +
+                        ((likeCampaignName == "" || likeCampaignName == null) ? "" : " and campaign_name like %" + likeCampaignName + "%");
+            }else{
+                sql = "select campaign_id, a.account_id, short_name, campaign_name, create_time, a.status, budget, bidding, total_spend, " +
+                        " total_installed, total_click, cpa,ctr, " +
+                        " (case when total_click > 0 then total_installed/total_click else 0 end) as cvr " +
+                        "  from " + webAdCampaignsTable + " a LEFT JOIN " + webAccountIdTable + " b ON a.account_id = b.account_id " +
+                        " where a.status = '" + openStatus + "' AND b.status = 1 " +
+                        " and campaign_id in (" + campaignIds + ") " +
+                        ((likeCampaignName == "" || likeCampaignName == null) ? "" : " and campaign_name like %" + likeCampaignName + "%");
+            }
+
             listAll = DB.findListBySql(sql);
             if(country == "" || country == null){
                 sql = "select campaign_id, impressions from ( " +

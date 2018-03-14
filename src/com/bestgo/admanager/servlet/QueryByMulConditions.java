@@ -44,7 +44,6 @@ public class QueryByMulConditions extends HttpServlet {
         String tag = request.getParameter("tag");
         String countryCheck = request.getParameter("countryCheck");
         String containsNoDataCampaignCheck = request.getParameter("containsNoDataCampaignCheck");
-//        String onlyQueryNoDataCampaignCheck = request.getParameter("onlyQueryNoDataCampaignCheck");
         String campaignCreateTime = request.getParameter("campaignCreateTime");
         String countryCode = request.getParameter("countryCode");
         String countryName = request.getParameter("countryName");
@@ -769,7 +768,7 @@ public class QueryByMulConditions extends HttpServlet {
         String webAdCampaignsHistoryTable = "web_ad_campaigns_history";
         String webAccountIdTable = "web_account_id";
         String webAdCampaignsCountryHistoryTable = "web_ad_campaigns_country_history";
-        String FieldStatus = "ACTIVE";
+        String openStatus = "ACTIVE";
         List<JSObject> listAll = new ArrayList<>();
         List<JSObject> listNoData = null;
         if (admobCheck) {
@@ -779,7 +778,7 @@ public class QueryByMulConditions extends HttpServlet {
             webAdCampaignsHistoryTable = "web_ad_campaigns_history_admob";
             webAccountIdTable = "web_account_id_admob";
             webAdCampaignsCountryHistoryTable = "web_ad_campaigns_country_history_admob";
-            FieldStatus = "enabled";
+            openStatus = "enabled";
         }
 
         List<JSObject> list = DB.scan(webAdCampaignTagRelTable).select("campaign_id")
@@ -865,12 +864,21 @@ public class QueryByMulConditions extends HttpServlet {
 
                 list = DB.findListBySql(sql);
                 if(containsNoDataCampaignCheck){
-                    sql = "select c.campaign_id, c.account_id, short_name, c.campaign_name, c.create_time, c.status, budget, c.bidding, c.total_spend " +
-                            " from " + adCampaignsTable + " a, " + webAdCampaignsTable + " c, " + webAccountIdTable + " b where a.campaign_id = c.campaign_id " +
-                            " c.account_id = b.account_id and c.status = '" + FieldStatus + "' and a.country_region = '" + country + "' and app_name = '" + tagName + "' " +
-                            ((likeCampaignName == "" || likeCampaignName == null) ? " " : " and c.campaign_name like '%" + likeCampaignName +"%' " );
+                    if(admobCheck){
+                        sql = "SELECT c.campaign_id, c.account_id, short_name, c.campaign_name, c.create_time, c.status, budget, c.bidding, c.total_spend " +
+                                " FROM " + adCampaignsTable + " a, " + webAdCampaignsTable + " c, " + webAccountIdTable + " b WHERE a.campaign_id = c.campaign_id " +
+                                " AND c.account_id = b.account_id AND c.status = '" + openStatus + "' AND a.country_region = '" + country + "' AND app_name = '" + tagName + "' " +
+                                ((likeCampaignName == "" || likeCampaignName == null) ? " " : " and c.campaign_name like '%" + likeCampaignName +"%' " );
+                    }else{
+                        sql = "SELECT c.campaign_id, c.account_id, short_name, c.campaign_name, c.create_time, c.status, budget, c.bidding, c.total_spend " +
+                                " FROM " + adCampaignsTable + " a, " + webAdCampaignsTable + " c, " + webAccountIdTable + " b WHERE a.campaign_id = c.campaign_id " +
+                                " AND c.account_id = b.account_id AND b.status = 1 " +
+                                " AND c.status = '" + openStatus + "' AND a.country_region = '" + country + "' AND app_name = '" + tagName + "' " +
+                                ((likeCampaignName == "" || likeCampaignName == null) ? " " : " and c.campaign_name like '%" + likeCampaignName +"%' " );
+                    }
+
                     listAll = DB.findListBySql(sql);
-                    if(list != null && list.size() >0){
+                    if(list != null && list.size() > 0){
                         listNoData = Utils.getDiffJSObjectList(listAll, list, "campaign_id");
                     }else{
                         listNoData = listAll;
@@ -905,10 +913,19 @@ public class QueryByMulConditions extends HttpServlet {
                         ") a left join " + webAccountIdTable + " b on a.account_id = b.account_id";
                 list = DB.findListBySql(sql);
                 if(containsNoDataCampaignCheck){
-                    sql = "select campaign_id, c.account_id, short_name, campaign_name, create_time, c.status, budget, bidding, c.total_spend " +
-                            "  from " + webAdCampaignsTable + " c LEFT JOIN " + webAccountIdTable + " b ON c.account_id = b.account_id where c.status = '" + FieldStatus + "'" +
-                            ((likeCampaignName == "" || likeCampaignName == null) ? " " : " and campaign_name like '%" + likeCampaignName +"%' " )  +
-                            " and campaign_id in (" + campaignIds + ") ";
+                    if(admobCheck){
+                        sql = "select campaign_id, c.account_id, short_name, campaign_name, create_time, c.status, budget, bidding, c.total_spend " +
+                                "  from " + webAdCampaignsTable + " c LEFT JOIN " + webAccountIdTable + " b ON c.account_id = b.account_id where c.status = '" + openStatus + "'" +
+                                ((likeCampaignName == "" || likeCampaignName == null) ? " " : " and campaign_name like '%" + likeCampaignName +"%' " )  +
+                                " and campaign_id in (" + campaignIds + ") ";
+                    }else{
+                        sql = "select campaign_id, c.account_id, short_name, campaign_name, create_time, c.status, budget, bidding, c.total_spend " +
+                                "  from " + webAdCampaignsTable + " c LEFT JOIN " + webAccountIdTable + " b ON c.account_id = b.account_id " +
+                                "where c.status = '" + openStatus + "' AND b.status = 1 " +
+                                ((likeCampaignName == "" || likeCampaignName == null) ? " " : " and campaign_name like '%" + likeCampaignName +"%' " )  +
+                                " AND campaign_id in (" + campaignIds + ") ";
+                    }
+
                     listAll = DB.findListBySql(sql);
                     if(list != null && list.size() >0){
                         listNoData = Utils.getDiffJSObjectList(listAll, list, "campaign_id");
