@@ -69,6 +69,12 @@ public class ActiveUserReport extends HttpServlet {
                 if (sorterId != null) {
                     sorter = Utils.parseInt(sorterId, 0);
                     switch(sorter) {
+                        case 2090:
+                            sql += " order by total_installeds desc";
+                            break;
+                        case 90:
+                            sql += " order by total_installeds";
+                            break;
                         case 2091:
                             sql += " order by avg_7_day_active desc";
                             break;

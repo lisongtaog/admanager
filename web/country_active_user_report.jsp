@@ -99,7 +99,7 @@
             tagName: query
         },function(data){
             if(data && data.ret == 1){
-                $('#result_header').html("<tr><th>国家</th><th>安装量总和</th>" +
+                $('#result_header').html("<tr><th>国家</th><th>安装量总和<span sorterId=\"2090\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
                     "<th>7DaysActiveUser<span sorterId=\"2091\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
                     "<th>14DaysActiveUser<span sorterId=\"2092\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
                     "<th>30DaysActiveUser<span sorterId=\"2093\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
