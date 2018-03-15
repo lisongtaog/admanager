@@ -32,6 +32,7 @@ function getExplodeParams(params, explodeParam) {
  * @param {{region: string, gender: string, age: string, bidding: string}}
  *
  **/
+//以下拼凑 系列名称 字符串
 function generateFacebookCampaignName(params) {
     if (!params) {
         params = {};
@@ -101,6 +102,7 @@ function generateFacebookCampaignName(params) {
     return dims.join("_");
 }
 
+//以下拼凑 admob系列名称 字符串
 function generateAdmobCampaignName(params) {
     if (!params) {
         params = {};
@@ -152,7 +154,7 @@ function batchRequest(params, send, onFinish) {
     var stop = false;
 
     function getProgress() {
-        return idx + " / " + params.length;
+        return idx + " / " + params.length; //根据JS的规则这里会拼成一个字符串
     }
 
     function getFullLog() {
@@ -207,6 +209,7 @@ function init() {
         popupCenter("campaign_status.jsp", "创建状态监控", 600, 480);
     });
 
+    //“批量输入”: <input type="button">
     $('.btn-more').click(function () {
         var id = $(this).attr('id');
         var targetId = '';
@@ -219,7 +222,7 @@ function init() {
         } else if (id == 'btnSelectRegionAdmobMore') {
             targetId = '#selectRegionAdmob';
         }
-        $('#moreCountryDlg').modal("show");
+        $('#moreCountryDlg').modal("show");   //modal() 是一个Bootstrap模态框插件
         $('#moreCountryDlg .btn-primary').off('click');
         $('#moreCountryDlg .btn-primary').click(function () {
             console.log(id);
@@ -254,7 +257,7 @@ function init() {
         });
     });
 
-
+    //以下的六个遍历用于动态添加选项
     languageList.forEach(function (one) {
         $('#selectLanguage').append($("<option>" + one + "</option>"));
     });
@@ -280,57 +283,65 @@ function init() {
         $('#selectRegionUnselectedAdmob').append($("<option value='" + value + "'>" + key + "</option>"));
     }
 
-    var pendingList = [1, 2, 3];
-    $.post('system/fb_app_id_rel/query', {
-        word: '',
-    }, function (data) {
-        if (data && data.ret == 1) {
-            appList = data.data;
-            appList.forEach(function (one) {
-                $('#selectApp').append($("<option>" + one.tag_name + "</option>"));
-                $('#selectAppAdmob').append($("<option>" + one.tag_name + "</option>"));
-            });
-            $("#inputImagePath").val(appList[0].tag_name + "/");
-            $("#inputImagePathAdmob").val(appList[0].tag_name + "/");
-            pendingList.shift();
-            if (pendingList.length == 0) {
-                initFormData();
-            }
-        } else {
-            admanager.showCommonDlg("错误", data.message);
-        }
-    }, 'json');
+   if(isAutoCreate && modifyNetwork!=null && modifyRecordId!=null){
+       var pendingList = [1, 2, 3];
+       /*
+        * 三个 $.post 是异步执行的，哪个先返回response就先执行哪一个的 function
+        * 数组 pendingList 的作用在于当最后一个response 返回后执行 initFormData()
+        * 而initFormData()是需要三个参数 isAutoCreate, modifyNetwork,modifyRecordId
+        */
+       $.post('system/fb_app_id_rel/query', {
+           word: '',
+       }, function (data) {
+           if (data && data.ret == 1) {
+               appList = data.data;
+               appList.forEach(function (one) {
+                   $('#selectApp').append($("<option>" + one.tag_name + "</option>"));
+                   $('#selectAppAdmob').append($("<option>" + one.tag_name + "</option>"));
+               });
+               $("#inputImagePath").val(appList[0].tag_name + "/");
+               $("#inputImagePathAdmob").val(appList[0].tag_name + "/");
+               pendingList.shift();
+               if (pendingList.length == 0) {
+                   initFormData();  //在第三次的时候执行这个方法
+               }
+           } else {
+               admanager.showCommonDlg("错误", data.message);
+           }
+       }, 'json');
 
-    $.post('adaccount_admob/query', {word: ''}, function (data) {
-        if (data && data.ret == 1) {
-            var accountList = data.data;
-            accountList.forEach(function (one) {
-                $('#selectAccountAdmob').append($("<option value='" + one.account_id + "'>" + one.short_name + "</option>"));
-            });
-            pendingList.shift();
-            if (pendingList.length == 0) {
-                initFormData();
-            }
-        } else {
-            admanager.showCommonDlg("错误", data.message);
-        }
-    }, 'json');
+       $.post('adaccount_admob/query', {word: ''}, function (data) {
+           if (data && data.ret == 1) {
+               var accountList = data.data;
+               accountList.forEach(function (one) {
+                   $('#selectAccountAdmob').append($("<option value='" + one.account_id + "'>" + one.short_name + "</option>"));
+               });
+               pendingList.shift();
+               if (pendingList.length == 0) {
+                   initFormData();
+               }
+           } else {
+               admanager.showCommonDlg("错误", data.message);
+           }
+       }, 'json');
 
-    $.post('adaccount/query', {word: ''}, function (data) {
-        if (data && data.ret == 1) {
-            var accountList = data.data;
-            accountList.forEach(function (one) {
-                $('#selectAccount').append($("<option value='" + one.account_id + "'>" + one.short_name + "</option>"));
-            });
-            pendingList.shift();
-            if (pendingList.length == 0) {
-                initFormData();
-            }
-        } else {
-            admanager.showCommonDlg("错误", data.message);
-        }
-    }, 'json');
+       $.post('adaccount/query', {word: ''}, function (data) {
+           if (data && data.ret == 1) {
+               var accountList = data.data;
+               accountList.forEach(function (one) {
+                   $('#selectAccount').append($("<option value='" + one.account_id + "'>" + one.short_name + "</option>"));
+               });
+               pendingList.shift();
+               if (pendingList.length == 0) {
+                   initFormData();
+               }
+           } else {
+               admanager.showCommonDlg("错误", data.message);
+           }
+       }, 'json');
+   }
 
+    //以下两项决定隐藏哪个表单
     $('#checkAdmob').click(function () {
         if ($('#checkAdmob').prop('checked')) {
             $('#formFacebook').hide();
@@ -344,7 +355,8 @@ function init() {
         }
     });
 
-    $('#formAdmob').hide();
+    $('#formAdmob').hide();  //默认隐藏
+    //以下用于读取admob表单数据（手动输入时）
     $('#btnCreateAdmob').click(function () {
         var appName = $('#selectAppAdmob').val();
         var selectOptionsAdmob = $('#selectAccountAdmob option:selected');
@@ -539,6 +551,7 @@ function init() {
         $('#inputCampaignNameAdmob').val(generateAdmobCampaignName());
     });
 
+    //以下触发读取表单数据的行为
     $('#btnCreate').click(function () {
         var appName = $('#selectApp').val();
         var selectOptions = $('#selectAccount option:selected');
@@ -789,7 +802,7 @@ function init() {
 
 
 }
-
+//执行初始化的方法
 init();
 
 $('#selectApp').change(function () {
@@ -958,6 +971,76 @@ $('#selectRegionAdmob,#selectAdvertGroupIdAdmob').change(function () {
     return false;
 });
 
+//从（暂定）index2.jsp传来的参数进行各表单的自动填充
+function indexInitFormData(isIndexCreate,campaign_id) {
+    if (isIndexCreate) {
+        $.post("IndexCampaignCreate", {
+            campaign_id:campaign_id
+        },function (data) {
+            var str = data;   //这里传回的data是一个字符串，首先要转成一个json
+            var campaignData = JSON.parse(str);   //将字符串转成json
+            if(campaignData.no_data === "no_data"){
+                alert("There's no data which campaign_id = "+campaign_id);
+            }else{
+                if (campaignData.flag == "facebook") {
+                    $('#checkFacebook').prop('checked', true); //“Facebook广告”：prop()，设置属性checked为true
+                    $('#checkAutoCreate').prop('checked', true);   //“设置为自动创建”
+
+
+                    $('#selectApp').val(campaignData.app_name);
+
+                    $('#selectAccount').val(campaignData.account_id);  //val()方法大多用于input元素
+                    $('#selectAccount').trigger('change');
+
+                    $("#inputCreateCount").val(1);
+
+                    $('#selectRegion').val(campaignData.country_region.split(','));
+                    $('#selectRegion').trigger('change');
+
+                    $('#inputBudget').val(campaignData.bugdet);
+
+                    $('#inputBidding').val(campaignData.bidding);
+                    $('#inputBiddingExplode').prop('checked', campaignData.explode_bidding == 1);
+
+                    $('#inputTitle').val(campaignData.title);
+                    $('#inputMessage').val(campaignData.message);
+
+                    $('#inputCampaignName').val(campaignData.campaign_name);
+
+
+
+                }else if (campaignData.flag == "admob") {
+                    $('#checkAdmob').prop('checked', true);
+                    $('#checkAdmob').click();
+                    $('#checkAdmobAutoCreate').prop('checked', true);
+
+                    $('#selectAppAdmob').val(campaignData.app_name);
+                    $('#selectAccountAdmob').val(campaignData.account_id);
+                    $('#selectAccountAdmob').trigger('change');
+
+                    $("#inputCreateCountAdmob").val(1);
+
+                    $('#inputCampaignNameAdmob').val(campaignData.campaign_name);
+
+                    $('#inputBudgetAdmob').val(campaignData.bugdet);
+                    $('#inputBiddingAdmob').val(campaignData.bidding);
+                    $('#inputBiddingAdmobExplode').prop('checked', campaignData.explode_bidding == 1); //"分离到系列"
+
+                    $('#inputMessage1').val(campaignData.message1);
+                    $('#inputMessage2').val(campaignData.message2);
+                    $('#inputMessage3').val(campaignData.message3);
+                    $('#inputMessage4').val(campaignData.message4);
+
+                    $('#inputImagePathAdmob').val(campaignData.image_path);
+
+                }
+            }
+        });
+    }
+}
+indexInitFormData(isIndexCreate,campaign_id);
+
+//在isAutoCreate情况下，需要 modifyNetwork以及 modifyRecordId ，此方法仅在前面 init() 内的三个post中调用
 function initFormData() {
     if (isAutoCreate) {
         $.post('auto_create_campaign/' + modifyNetwork + '/query_by_id', {

@@ -41,6 +41,10 @@
         network = "facebook";
     }
     int recordId = Utils.parseInt(request.getParameter("id"), 0);
+
+    //以下接收的是从index2传来的页面
+    String campaignId = request.getParameter("campaignId");
+    boolean isIndexCreate = "auto_create".equals(type);
 %>
 
 <div class="container-fluid">
@@ -404,13 +408,18 @@
 <script src="js/bootstrap-datetimepicker.js"></script>
 <script src="jqueryui/jquery-ui.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.4/js/select2.min.js"></script>
+
+
 <script>
     $("li[role='presentation']:eq(1)").addClass("active");
     var isAutoCreate = <%=isAutoCreate%>;
     var modifyNetwork = "<%=network%>";
     var modifyRecordId = <%=recordId%>;
+    var isIndexCreate = <%=isIndexCreate%>;
+    var campaign_id = <%=campaignId%>;
 </script>
 
 <script src="js/campaign_create.js?t=20180118"></script>
+
 </body>
 </html>

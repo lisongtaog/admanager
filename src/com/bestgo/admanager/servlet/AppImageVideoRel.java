@@ -136,6 +136,28 @@ public class AppImageVideoRel extends HttpServlet {
                 jsonObject.addProperty("ret", 0);
                 jsonObject.addProperty("message", e.getMessage());
             }
+        }else if(path.matches("/query_image_path_by_app")){
+            JsonArray imageArray = new JsonArray();
+            try {
+                String appName = request.getParameter("appName");
+                String sql = "SELECT image_path FROM ad_app_image_path_rel WHERE app_name = '" + appName + "'";
+                List<JSObject> imagePathList = DB.findListBySql(sql);
+                if(imagePathList != null && imagePathList.size() > 0){
+                    for(JSObject j : imagePathList){
+                        if(j.hasObjectData()){
+                            String imagePath = j.get("image_path");
+                            JsonObject jo = new JsonObject();
+                            jo.addProperty("image_path",imagePath);
+                            imageArray.add(jo);
+                        }
+                    }
+                    jsonObject.add("image_array", imageArray);
+                    jsonObject.addProperty("ret", 1);
+                }
+            } catch (Exception e) {
+                jsonObject.addProperty("ret", 0);
+                jsonObject.addProperty("message", e.getMessage());
+            }
         }
         response.getWriter().write(jsonObject.toString());
     }

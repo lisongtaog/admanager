@@ -51,7 +51,7 @@ public class IndexCampaignCreate extends HttpServlet{
             String account_id = fb.get("account_id");
             String country_region = fb.get("country_region");
             String language = fb.get("language");
-            String budget = fb.get("budget");
+            String bugdet = fb.get("bugdet");
             String bidding = fb.get("bidding");
             String title = fb.get("title");
             String message = fb.get("message");
@@ -60,8 +60,7 @@ public class IndexCampaignCreate extends HttpServlet{
                 facebook_campaign.addProperty("app_name",app_name);
                 facebook_campaign.addProperty("account_id",account_id);
                 facebook_campaign.addProperty("country_region",country_region);
-                facebook_campaign.addProperty("language",language);
-                facebook_campaign.addProperty("bugdet",budget);
+                facebook_campaign.addProperty("bugdet",bugdet);
                 facebook_campaign.addProperty("bidding",bidding);
                 facebook_campaign.addProperty("title",title);
                 facebook_campaign.addProperty("message",message);
@@ -70,6 +69,7 @@ public class IndexCampaignCreate extends HttpServlet{
             }else{
                 facebook_campaign.addProperty("no_data","no_data");
             }
+            response.setCharacterEncoding("UTF-8");
             response.getWriter().write(facebook_campaign.toString());
         }else if(Pattern.matches(admob,CampaignId)){
             sql = "select app_name,account_id,campaign_name,bugdet,bidding,message1,message2,message3,message4,image_path"+
@@ -104,6 +104,7 @@ public class IndexCampaignCreate extends HttpServlet{
             }else{
                 admob_campaign.addProperty("no_data","no_data");
             }
+            response.setCharacterEncoding("UTF-8");
             response.getWriter().write(admob_campaign.toString());
         }
     }

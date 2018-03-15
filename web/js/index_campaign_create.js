@@ -459,11 +459,6 @@ function init() {
             autoCreateParams.campaignName = $('#inputCampaignNameAdmob').val();
             var url = "auto_create_campaign/adwords/create";
             var messageBody = "创建成功";
-            if (isAutoCreate && modifyRecordId > 0) {
-                autoCreateParams.id = modifyRecordId;
-                url = "auto_create_campaign/adwords/modify";
-                messageBody = "更新成功";
-            }
             $.post(url, autoCreateParams, function (data) {
                 if (data && data.ret == 1) {
                     admanager.showCommonDlg("提示", messageBody, function () {
@@ -509,11 +504,7 @@ function init() {
                     autoCreateParams.campaignName = $('#inputCampaignNameAdmob').val();
                     var url = "auto_create_campaign/adwords/create";
                     var messageBody = "创建成功";
-                    if (isAutoCreate && modifyRecordId > 0) {
-                        autoCreateParams.id = modifyRecordId;
-                        url = "auto_create_campaign/adwords/modify";
-                        messageBody = "更新成功";
-                    }
+
                     $.post(url, autoCreateParams, function (data) {
                         if (data && data.ret == 1) {
                             admanager.showCommonDlg("提示", messageBody, function () {
@@ -531,7 +522,7 @@ function init() {
         return false;
     });
 
-    $('#formFacebook input, #formFacebook select').change(function () {
+    $('#formFacebook input, #formFacebook select').change(function () {    //jQuery选择器中，用逗号，隔开的是两组元素，用空格隔开的是子元素
 //            标签名_地理位置&性别&年龄&设备&操作系统_语言_账号_广告图路径
         if ($(this).attr('id') == 'inputCampaignName') return;
         $('#inputCampaignName').val(generateFacebookCampaignName());
@@ -716,11 +707,7 @@ function init() {
             autoCreateParams.campaignName = $('#inputCampaignName').val();
             var url = "auto_create_campaign/facebook/create";
             var messageBody = "创建成功";
-            if (isAutoCreate && modifyRecordId > 0) {
-                autoCreateParams.id = modifyRecordId;
-                url = "auto_create_campaign/facebook/modify";
-                messageBody = "更新成功";
-            }
+
             $.post(url, autoCreateParams, function (data) {
                 if (data && data.ret == 1) {
                     admanager.showCommonDlg("提示", messageBody, function () {
@@ -773,11 +760,7 @@ function init() {
                     autoCreateParams.campaignName = $('#inputCampaignName').val();
                     var url = "auto_create_campaign/facebook/create";
                     var messageBody = "创建成功";
-                    if (isAutoCreate && modifyRecordId > 0) {
-                        autoCreateParams.id = modifyRecordId;
-                        url = "auto_create_campaign/facebook/modify";
-                        messageBody = "更新成功";
-                    }
+
                     $.post(url, autoCreateParams, function (data) {
                         if (data && data.ret == 1) {
                             admanager.showCommonDlg("提示", messageBody, function () {
@@ -896,10 +879,7 @@ $('#selectAppAdmob').change(function () {
 
 
 $('#selectRegion,#selectAdvertGroupId').change(function () {
-    if (isAutoCreate && !firstInitForm) {
-        firstInitForm = true;
-        return;
-    }
+
     var region = $('#selectRegion').val();
     if (region != null && region.length > 0) {
         var appName = $('#selectApp').val();
@@ -926,10 +906,7 @@ $('#selectRegion,#selectAdvertGroupId').change(function () {
 });
 
 $('#selectRegionAdmob,#selectAdvertGroupIdAdmob').change(function () {
-    if (isAutoCreate && !firstInitForm) {
-        firstInitForm = true;
-        return;
-    }
+
     var selectOptions = $('#selectRegionAdmob option:selected');
     var regionAdmob = [];
     selectOptions.each(function () {
@@ -990,8 +967,6 @@ function indexInitFormData(isIndexCreate,campaign_id) {
                     $('#selectRegion').val(campaignData.country_region.split(','));
                     $('#selectRegion').trigger('change');
 
-                    $('#selectLanguage').val(campaignData.language);
-
                     $('#inputBudget').val(campaignData.bugdet);
 
                     $('#inputBidding').val(campaignData.bidding);
@@ -1001,7 +976,8 @@ function indexInitFormData(isIndexCreate,campaign_id) {
                     $('#inputMessage').val(campaignData.message);
 
                     $('#inputCampaignName').val(campaignData.campaign_name);
-                    
+
+
 
                 }else if (campaignData.flag == "admob") {
                     $('#checkAdmob').prop('checked', true);

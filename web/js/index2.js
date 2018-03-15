@@ -509,7 +509,7 @@ function setData(data) {
             btn.data("campaign_id", one['campaign_id']);    //给当前这个键增加键值对
             btn.click(function(){
                 var campaign_id = $(this).data("campaign_id");  //选中当前元素中键campaign_id的值
-                window.open("index_campaigns_create.jsp?type=auto_create&campaignId="+ campaign_id,"_blank");
+                window.open("campaigns_create.jsp?type=auto_create&campaignId="+ campaign_id,"_blank");
                     //window.open(url,name,features,replace)，四个参数分别针对url，新窗口target属性或窗口名称，窗口特征和浏览器历史
             });
         }

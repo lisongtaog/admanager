@@ -19,9 +19,8 @@ import static sun.plugin.cache.FileVersion.regEx;
 public class Test {
 
     public static void main(String[] args) {
-        String endTime = "2018-03-06";
-        String threeDaysAgo = DateUtil.addDay(endTime,-3,"yyyy-MM-dd");
-        System.out.println(threeDaysAgo);
+        String usaNowDate = DateUtil.getUSANowDate();
+        System.out.println(usaNowDate);
     }
            /* try {
                 //中文
