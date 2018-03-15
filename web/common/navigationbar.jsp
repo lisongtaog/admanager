@@ -53,6 +53,7 @@
 
         <%-- 19 --%>
     <li role="presentation"><a href="project_team_total_ revenue_and_total_cost.jsp">项目组总收支</a></li>
+    <li role="presentation"><a href="app_image_video_rel_insert.jsp">应用图片视频关联录入</a></li>
 </ul>
 </body>
 </html>

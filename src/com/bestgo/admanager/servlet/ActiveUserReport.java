@@ -36,7 +36,7 @@ public class ActiveUserReport extends HttpServlet {
         }
         if(list != null){
             for(JSObject j : list){
-                if(j != null){
+                if(j != null && j.hasObjectData()){
                     String countryCode = j.get("country_code");
                     String countryName = j.get("country_name");
                     if(countryCode != null && countryName != null){
