@@ -42,6 +42,7 @@ public class CountryAnalysisReport extends HttpServlet {
         String beforeTenDay = DateUtil.addDay(endTime,-10,"yyyy-MM-dd");//不包括endTime
         String beforeFourDay = DateUtil.addDay(endTime,-4,"yyyy-MM-dd");//不包括endTime
         String beforeTwentyTwoDay = DateUtil.addDay(endTime,-22,"yyyy-MM-dd");//不包括endTime
+
         if (path.matches("/query_country_analysis_report")) {
             try {
                 String sqlG = "select google_package_id from web_facebook_app_ids_rel WHERE tag_name = '" + tagName + "'";
@@ -133,6 +134,23 @@ public class CountryAnalysisReport extends HttpServlet {
                             if(j.hasObjectData()){
                                 String countryCode = j.get("country_code");
 
+                                //计算30DaysActiveUser*ARPU
+                                sql = "select avg_30_day_active from ad_report_active_user_admob_rel_result where tag_name = '" + tagName + "' and country_code = '" + countryCode + "'";
+                                JSObject oneC = DB.findOneBySql(sql);
+                                double thirtyDaysActiveUser = 0;
+                                if(oneC.hasObjectData()){
+                                    thirtyDaysActiveUser = Utils.convertDouble(oneC.get("avg_30_day_active"),0);
+                                }
+                                sql = "SELECT avg(arpu) AS seven_days_avg_arpu FROM web_ad_country_analysis_report_history h,web_facebook_app_ids_rel r " +
+                                        "WHERE h.app_id = r.google_package_id AND tag_name = '" + tagName + "' AND country_code = '" +
+                                        countryCode + "' AND date BETWEEN '" + sevenDaysAgo + "' and '" + endTime + "'";
+                                oneC = DB.findOneBySql(sql);
+                                double sevenDaysAvgARPU = 0;
+                                if(oneC.hasObjectData()){
+                                    sevenDaysAvgARPU = oneC.get("seven_days_avg_arpu");
+                                }
+                                double thirtyDaysActiveUserMulARPU = thirtyDaysActiveUser * sevenDaysAvgARPU;
+
 
                                 //计算七天的总花费、总营收、总盈利等
                                 sql = "select cost, revenue,purchased_user,impression " +
@@ -216,7 +234,7 @@ public class CountryAnalysisReport extends HttpServlet {
                                 sql = "select pi,a_cpa " +
                                         " from web_ad_country_analysis_report_history where app_id = '" + appId + "' " +
                                         " and country_code = '" + countryCode + "' and date = '" + endTime + "'";
-                                JSObject oneC = DB.findOneBySql(sql);
+                                oneC = DB.findOneBySql(sql);
                                 double pi = 0;
                                 double aCpa = 0;
                                 if(oneC.hasObjectData()){
@@ -297,6 +315,9 @@ public class CountryAnalysisReport extends HttpServlet {
                                 d.addProperty("incoming", Utils.trimDouble(incoming,0));
                                 d.addProperty("cpa", Utils.trimDouble(cpa,3));
                                 d.addProperty("rt", Utils.trimDouble(rt,3));
+                                d.addProperty("thirty_days_active_user", Utils.trimDouble(thirtyDaysActiveUser,3));
+                                d.addProperty("thirty_days_active_user_mul_arpu", Utils.trimDouble(thirtyDaysActiveUserMulARPU,3));
+
                                 jsonArray.add(d);
                             }
 
