@@ -283,63 +283,67 @@ function init() {
         $('#selectRegionUnselectedAdmob').append($("<option value='" + value + "'>" + key + "</option>"));
     }
 
-   if(isAutoCreate && modifyNetwork!=null && modifyRecordId!=null){
-       var pendingList = [1, 2, 3];
-       /*
-        * 三个 $.post 是异步执行的，哪个先返回response就先执行哪一个的 function
-        * 数组 pendingList 的作用在于当最后一个response 返回后执行 initFormData()
-        * 而initFormData()是需要三个参数 isAutoCreate, modifyNetwork,modifyRecordId
-        */
-       $.post('system/fb_app_id_rel/query', {
-           word: '',
-       }, function (data) {
-           if (data && data.ret == 1) {
-               appList = data.data;
-               appList.forEach(function (one) {
-                   $('#selectApp').append($("<option>" + one.tag_name + "</option>"));
-                   $('#selectAppAdmob').append($("<option>" + one.tag_name + "</option>"));
-               });
-               $("#inputImagePath").val(appList[0].tag_name + "/");
-               $("#inputImagePathAdmob").val(appList[0].tag_name + "/");
-               pendingList.shift();
-               if (pendingList.length == 0) {
-                   initFormData();  //在第三次的时候执行这个方法
-               }
-           } else {
-               admanager.showCommonDlg("错误", data.message);
-           }
-       }, 'json');
+    var pendingList = [1, 2, 3];
+    /*
+     * 三个 $.post 是异步执行的，哪个先返回response就先执行哪一个的 function
+     * 数组 pendingList 的作用在于当最后一个response 返回后执行 initFormData()
+     * 而initFormData()是需要三个参数 isAutoCreate, modifyNetwork,modifyRecordId
+     */
+    $.post('system/fb_app_id_rel/query', {
+        word: '',
+    }, function (data) {
+        if (data && data.ret == 1) {
+            appList = data.data;
+            appList.forEach(function (one) {
+                $('#selectApp').append($("<option>" + one.tag_name + "</option>"));
+                $('#selectAppAdmob').append($("<option>" + one.tag_name + "</option>"));
+            });
+            $("#inputImagePath").val(appList[0].tag_name + "/");
+            $("#inputImagePathAdmob").val(appList[0].tag_name + "/");
+            pendingList.shift();
+            if (pendingList.length == 0) {
+                if(isAutoCreate && modifyNetwork!=null && modifyRecordId!=null){
+                    initFormData();
+                }
+            }
+        } else {
+            admanager.showCommonDlg("错误", data.message);
+        }
+    }, 'json');
 
-       $.post('adaccount_admob/query', {word: ''}, function (data) {
-           if (data && data.ret == 1) {
-               var accountList = data.data;
-               accountList.forEach(function (one) {
-                   $('#selectAccountAdmob').append($("<option value='" + one.account_id + "'>" + one.short_name + "</option>"));
-               });
-               pendingList.shift();
-               if (pendingList.length == 0) {
-                   initFormData();
-               }
-           } else {
-               admanager.showCommonDlg("错误", data.message);
-           }
-       }, 'json');
+    $.post('adaccount_admob/query', {word: ''}, function (data) {
+        if (data && data.ret == 1) {
+            var accountList = data.data;
+            accountList.forEach(function (one) {
+                $('#selectAccountAdmob').append($("<option value='" + one.account_id + "'>" + one.short_name + "</option>"));
+            });
+            pendingList.shift();
+            if (pendingList.length == 0) {
+                if(isAutoCreate && modifyNetwork!=null && modifyRecordId!=null){
+                    initFormData();
+                }
+            }
+        } else {
+            admanager.showCommonDlg("错误", data.message);
+        }
+    }, 'json');
 
-       $.post('adaccount/query', {word: ''}, function (data) {
-           if (data && data.ret == 1) {
-               var accountList = data.data;
-               accountList.forEach(function (one) {
-                   $('#selectAccount').append($("<option value='" + one.account_id + "'>" + one.short_name + "</option>"));
-               });
-               pendingList.shift();
-               if (pendingList.length == 0) {
-                   initFormData();
-               }
-           } else {
-               admanager.showCommonDlg("错误", data.message);
-           }
-       }, 'json');
-   }
+    $.post('adaccount/query', {word: ''}, function (data) {
+        if (data && data.ret == 1) {
+            var accountList = data.data;
+            accountList.forEach(function (one) {
+                $('#selectAccount').append($("<option value='" + one.account_id + "'>" + one.short_name + "</option>"));
+            });
+            pendingList.shift();
+            if (pendingList.length == 0) {
+                if(isAutoCreate && modifyNetwork!=null && modifyRecordId!=null){
+                    initFormData();
+                }
+            }
+        } else {
+            admanager.showCommonDlg("错误", data.message);
+        }
+    }, 'json');
 
     //以下两项决定隐藏哪个表单
     $('#checkAdmob').click(function () {
@@ -1007,8 +1011,6 @@ function indexInitFormData(isIndexCreate,campaign_id) {
 
                     $('#inputCampaignName').val(campaignData.campaign_name);
 
-
-
                 }else if (campaignData.flag == "admob") {
                     $('#checkAdmob').prop('checked', true);
                     $('#checkAdmob').click();
@@ -1033,6 +1035,15 @@ function indexInitFormData(isIndexCreate,campaign_id) {
 
                     $('#inputImagePathAdmob').val(campaignData.image_path);
 
+                    if(campaignData.country_region != null && campaignData.country_region != ""){
+                        $('#selectRegionAdmob').val(campaignData.country_region.split(',')); //将字符串从指定符号处分割为字符串数组
+                        $('#selectRegionAdmob').trigger('change');
+                    }
+
+                    if(campaignData.excluded_region != "" && campaignData.excluded_region != null){
+                        $('#selectRegionUnselectedAdmob').val(campaignData.excluded_region.split(','));
+                        $('#selectRegionUnselectedAdmob').trigger('change');
+                    }
                 }
             }
         });

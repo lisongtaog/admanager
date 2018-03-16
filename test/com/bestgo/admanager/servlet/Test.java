@@ -19,8 +19,10 @@ import static sun.plugin.cache.FileVersion.regEx;
 public class Test {
 
     public static void main(String[] args) {
-        String usaNowDate = DateUtil.getUSANowDate();
-        System.out.println(usaNowDate);
+//        String usaNowDate = DateUtil.getUSANowDate();
+        String str = "/home/fan/ad_auto/facebook_ads_videos/shadu3/1";
+        str = str.replaceAll("/home/fan/ad_auto/facebook_ads_videos","");
+        System.out.println(str);
     }
            /* try {
                 //中文

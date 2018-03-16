@@ -24,6 +24,9 @@ import java.util.*;
 import java.util.regex.Pattern;
 
 /**
+ * Author: Yunxi
+ * Date: 2018-03-14
+ * Description:
  * @parameter campaign_id 是从index2 页面传来的 系列ID，以此来判断从facebook的表还是adwords的表取数据
  * 取完的数据返回js文件，用于往jsp页面上的表单填充
  */
@@ -50,7 +53,6 @@ public class IndexCampaignCreate extends HttpServlet{
             String app_name = fb.get("app_name");
             String account_id = fb.get("account_id");
             String country_region = fb.get("country_region");
-            String language = fb.get("language");
             String bugdet = fb.get("bugdet");
             String bidding = fb.get("bidding");
             String title = fb.get("title");
@@ -69,10 +71,10 @@ public class IndexCampaignCreate extends HttpServlet{
             }else{
                 facebook_campaign.addProperty("no_data","no_data");
             }
-            response.setCharacterEncoding("UTF-8");
+            response.setCharacterEncoding("UTF-8"); //这一行： 设置response里的编码格式
             response.getWriter().write(facebook_campaign.toString());
         }else if(Pattern.matches(admob,CampaignId)){
-            sql = "select app_name,account_id,campaign_name,bugdet,bidding,message1,message2,message3,message4,image_path"+
+            sql = "select app_name,account_id,campaign_name,country_region,excluded_region,bugdet,bidding,message1,message2,message3,message4,image_path"+
                     " from ad_campaigns_admob where campaign_id ='"+CampaignId+"'";
             JSObject ad = null;
             try{
@@ -82,6 +84,27 @@ public class IndexCampaignCreate extends HttpServlet{
             String app_name = ad.get("app_name");
             String account_id = ad.get("account_id");
             String campaign_name = ad.get("campaign_name");
+            String country_region = ad.get("country_region");  //这里拿到的是如'BR'一样的国家代码，有时会有多个：“BR,AR,US”
+            String excluded_region = ad.get("excluded_region");
+
+            //以下if拼凑一个由多个国家名称组成的字符串；当然这很麻烦
+            /*
+            if(country_region != null){
+                List<JSObject> adCountry = new ArrayList<>();
+                sql = "select country_name from app_country_code_dict where country_code = '" + country_region + "'";
+                try{
+                    adCountry = DB.findListBySql(sql);
+                }catch(Exception e){}
+                country_region = "";
+                for(int i=0;i<adCountry.size();i++){
+                    if(i==adCountry.size()-1){
+                        country_region += adCountry.get(i).get("country_name");
+                    }else{
+                        country_region += adCountry.get(i)+ ",";//这里拼国家名称字符串："Britain,Australia"
+                    }
+                }
+            }
+            */
             String budget = ad.get("bugdet");
             String bidding = ad.get("bidding");
             String message1 = ad.get("message1");
@@ -93,6 +116,8 @@ public class IndexCampaignCreate extends HttpServlet{
                 admob_campaign.addProperty("app_name",app_name);
                 admob_campaign.addProperty("account_id",account_id);
                 admob_campaign.addProperty("campaign_name",campaign_name);
+                admob_campaign.addProperty("country_region",country_region);
+                admob_campaign.addProperty("excluded_region",excluded_region);
                 admob_campaign.addProperty("bugdet",budget);
                 admob_campaign.addProperty("bidding",bidding);
                 admob_campaign.addProperty("message1",message1);

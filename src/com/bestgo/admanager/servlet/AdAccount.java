@@ -72,7 +72,7 @@ public class AdAccount extends HttpServlet {
                     long count = count();
                     int index = Utils.parseInt(request.getParameter("page_index"), 0);
                     int size = Utils.parseInt(request.getParameter("page_size"), 20);
-                    long totalPage = count / size + (count % size == 0 ? 0 : 1);
+//                    long totalPage = count / size + (count % size == 0 ? 0 : 1);
                     List<JSObject> data = fetchData(index, size);
                     json.addProperty("ret", 1);
                     JsonArray array = new JsonArray();
@@ -106,7 +106,9 @@ public class AdAccount extends HttpServlet {
         try {
             return DB.scan("web_account_id").select("id", "account_id", "short_name", "status" ,"spend_cap", "amount_spent")
                     .where(DB.filter().whereLikeTo("account_id", "%" + word + "%"))
-                    .or(DB.filter().whereLikeTo("short_name", "%" + word + "%")).orderByAsc("id").execute();
+                    .or(DB.filter().whereLikeTo("short_name", "%" + word + "%"))
+                    .orderByAsc("id")
+                    .execute();
         } catch (Exception ex) {
             Logger logger = Logger.getRootLogger();
             logger.error(ex.getMessage(), ex);
@@ -117,7 +119,11 @@ public class AdAccount extends HttpServlet {
     public static List<JSObject> fetchData(int index, int size) {
         List<JSObject> list = new ArrayList<>();
         try {
-            return DB.scan("web_account_id").select("id", "account_id", "short_name", "status" ,"spend_cap", "amount_spent").limit(size).start(index * size).orderByAsc("id").execute();
+            return DB.scan("web_account_id")
+                    .select("id", "account_id", "short_name", "status" ,"spend_cap", "amount_spent")
+                    .limit(size).start(index * size)
+                    .orderByAsc("id")
+                    .execute();
         } catch (Exception ex) {
             Logger logger = Logger.getRootLogger();
             logger.error(ex.getMessage(), ex);
@@ -127,7 +133,9 @@ public class AdAccount extends HttpServlet {
 
     public static long count() {
         try {
-            JSObject object = DB.simpleScan("web_account_id").select(DB.func(DB.COUNT, "id")).execute();
+            JSObject object = DB.simpleScan("web_account_id")
+                    .select(DB.func(DB.COUNT, "id"))
+                    .execute();
             return object.get("count(id)");
         } catch (Exception ex) {
             Logger logger = Logger.getRootLogger();
@@ -158,7 +166,10 @@ public class AdAccount extends HttpServlet {
         OperationResult ret = new OperationResult();
 
         try {
-            JSObject one = DB.simpleScan("web_account_id").select("account_id").where(DB.filter().whereEqualTo("account_id", account)).execute();
+            JSObject one = DB.simpleScan("web_account_id")
+                    .select("account_id")
+                    .where(DB.filter().whereEqualTo("account_id", account))
+                    .execute();
             if (one.get("account_id") != null) {
                 ret.result = false;
                 ret.message = "已经存在这个账号了";
@@ -183,14 +194,18 @@ public class AdAccount extends HttpServlet {
         OperationResult ret = new OperationResult();
 
         try {
-            JSObject one = DB.simpleScan("web_account_id").select("account_id").where(DB.filter().whereEqualTo("account_id", account)).execute();
+            JSObject one = DB.simpleScan("web_account_id")
+                    .select("account_id")
+                    .where(DB.filter().whereEqualTo("account_id", account))
+                    .execute();
             if (one.get("account_id") != null) {
                 ret.result = false;
                 ret.message = "已经存在这个账号了";
             } else {
                 DB.update("web_account_id").put("account_id", account)
                         .put("short_name", shortName)
-                        .where(DB.filter().whereEqualTo("id", id)).execute();
+                        .where(DB.filter().whereEqualTo("id", id))
+                        .execute();
 
                 ret.result = true;
                 ret.message = "修改成功";

@@ -685,8 +685,6 @@ public class Campaign extends HttpServlet {
         } else if (path.startsWith("/batch_change")) {
             try {
                 String data = request.getParameter("data");
-//                String  appName = request.getParameter("appName");
-
                 JsonParser parser = new JsonParser();
                 Gson gson = new Gson();
                 JsonArray array = parser.parse(data).getAsJsonArray();
@@ -694,9 +692,6 @@ public class Campaign extends HttpServlet {
 
                 for (int i = 0,len=array.size(); i <len; i++) {
                     BatchChangeItem item = gson.fromJson(array.get(i), BatchChangeItem.class);
-//                    String sql = "";
-
-
                     JSObject record = DB.simpleScan("web_ad_batch_change_campaigns")
                             .select("id").where(DB.filter().whereEqualTo("campaign_id", item.campaignId))
                             .and(DB.filter().whereEqualTo("success", 0)).execute();
@@ -734,39 +729,6 @@ public class Campaign extends HttpServlet {
                                 .put("success", 0)
                                 .execute();
                     }
-
-//                    String budgetStr = "";
-//                    String biddingStr = "";
-//                    if(record.hasObjectData()){
-//                        double bugdet = one.get("budget");
-//                        bugdet = bugdet / 100;
-//                        double bidding = one.get("bidding");
-//                        bidding = bidding / 100;
-//                        if(bugdet  < item.budget){
-//                            budgetStr = "预算上升；";
-//                        }
-//                        if(bugdet > item.budget){
-//                            budgetStr = "预算下降；";
-//                        }
-//                        if(bidding < item.bidding){
-//                            biddingStr = "竞价上升；";
-//                        }
-//                        if(bidding > item.bidding){
-//                            biddingStr = "竞价下降；";
-//                        }
-//                        for(JSObject js : countryJSObjectList){
-//                            DB.insert("web_ad_campaign_operation_log")
-//                                    .put("operation_date", now)
-//                                    .put("app_name",appName)
-//                                    .put("country_code",js.get("country_code"))
-//                                    .put("campaign_id",item.campaignId)
-//                                    .put("campaign_name", one.get("campaign_name"))
-//                                    .put("enabled",enabled)
-//                                    .put("details_text",budgetStr + biddingStr)
-//                                    .execute();
-//                        }
-
-//                    }
                 }
                 json.addProperty("ret", 1);
             } catch (Exception ex) {
