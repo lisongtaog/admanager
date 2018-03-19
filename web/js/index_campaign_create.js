@@ -942,10 +942,11 @@ $('#selectRegionAdmob,#selectAdvertGroupIdAdmob').change(function () {
 });
 
 //进行各表单的自动填充
-function indexInitFormData(isIndexCreate,campaign_id) {
+function indexInitFormData(isIndexCreate,campaign_id,modifyNetwork) {
     if (isIndexCreate) {
         $.post("IndexCampaignCreate", {
-            campaign_id:campaign_id
+            campaign_id:campaign_id,
+            modifyNetwork:modifyNetwork
         },function (data) {
             var str = data;   //这里传回的data是一个字符串，首先要转成一个json
             var campaignData = JSON.parse(str);   //将字符串转成json
@@ -1008,4 +1009,4 @@ function indexInitFormData(isIndexCreate,campaign_id) {
         });
     }
 }
-indexInitFormData(isIndexCreate,campaign_id);
+indexInitFormData(isIndexCreate,campaign_id,modifyNetwork);

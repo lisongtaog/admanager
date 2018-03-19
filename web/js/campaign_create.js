@@ -1049,7 +1049,9 @@ function indexInitFormData(isIndexCreate,campaign_id) {
         });
     }
 }
-indexInitFormData(isIndexCreate,campaign_id);
+if(isIndexCreate && campaign_id){
+    indexInitFormData(isIndexCreate,campaign_id);
+}
 
 //在isAutoCreate情况下，需要 modifyNetwork以及 modifyRecordId ，此方法仅在前面 init() 内的三个post中调用
 function initFormData() {
@@ -1126,4 +1128,36 @@ function initFormData() {
             }
         }, "json");
     }
+}
+
+//在并非国家分析报告创建也非首页创建的情况下，执行由app_name自动补充图片和视频路径
+if(!isIndexCreate && !isAutoCreate){
+    $("#selectApp").change(function() {
+        $('#checkFacebook').click();
+        var checkFacebook = $("#checkFacebook").prop("checked");
+        if (checkFacebook) {
+            var appName = $("#selectApp").val();
+            $.post("app_image_video_rel/facebook_path", {
+                app_name: appName
+            }, function (data) {
+                var imageTrimed = data.fb_image_path.replace(/home\/\w+\/\w+\/\w+\//,"");
+                var videoTrimed = data.fb_video_path.replace(/home\/\w+\/\w+\/\w+\//,"");
+                $("#inputImagePath").val(imageTrimed);
+                $("#inputVideoPath").val(videoTrimed);
+            }, "json");
+        }
+    });
+    $("#selectAppAdmob").change(function(){
+        $('#checkAdmob').click();
+        var checkAdmob = $("#checkAdmob").prop("checked");
+        if (checkAdmob) {
+            var appName = $("#selectAppAdmob").val();
+            $.post("app_image_video_rel/admob_path",
+                {app_name: appName},
+                function (data) {
+                    var ImageTrimed = data.image_path.replace(/home\/\w+\/\w+\/\w+\//,"");
+                    $("#inputImagePath").val(ImageTrimed);
+                }, "json");
+        }
+    });
 }

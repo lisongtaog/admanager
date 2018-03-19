@@ -23,6 +23,9 @@ import java.lang.*;
 import java.lang.System;
 import java.util.*;
 
+/**
+ *  Desc: 有关Facebook系列创建的操作
+ */
 @WebServlet(name = "Campaign", urlPatterns = "/campaign/*")
 public class Campaign extends HttpServlet {
     public static Map<String,Double> tagMaxBiddingRelationMap;

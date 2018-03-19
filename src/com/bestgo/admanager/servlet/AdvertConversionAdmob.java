@@ -15,6 +15,10 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 
+/**
+ * Author: mengjun
+ * Desc: 有关Adwords转化的操作
+ */
 @WebServlet(name = "AdvertConversionAdmob", urlPatterns = "/advert_conversion_admob/*")
 public class AdvertConversionAdmob extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

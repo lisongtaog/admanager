@@ -6,7 +6,7 @@
 
 <html>
 <head>
-    <title>分析报告(国家)</title>
+    <title>国家分析报告</title>
     <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css"/>
     <link rel="stylesheet" href="bootstrap/css/bootstrap-theme.min.css"/>
     <link rel="stylesheet" href="css/core.css"/>
@@ -135,17 +135,26 @@
             endTime: endTime
         },function(data){
             if(data && data.ret == 1){
-                $('#result_header').html("<tr><th>国家</th><th>Cost<span sorterId=\"1031\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
-                    "<th>7daysCost</th><th>PurchasedUser<span sorterId=\"1033\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
+                $('#result_header').html("<tr><th>国家</th>" +
+                    "<th>Cost<span sorterId=\"1031\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
+                    "<th>7daysCost</th>" +
+                    "<th>PurchasedUser<span sorterId=\"1033\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
                     "<th>Installed<span sorterId=\"1034\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
-                    "<th>UninstalledRate</th><th>TotalUser<span sorterId=\"1037\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
+                    "<th>UninstalledRate</th>" +
+                    "<th>TotalUser<span sorterId=\"1037\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
                     "<th>ActiveUser<span sorterId=\"1038\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
-                    "<th>Revenue<span sorterId=\"1039\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th><th>7daysRevenue</th>" +
-                    "<th>PI</th><th>ECPM<span sorterId=\"1040\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
+                    "<th>Revenue<span sorterId=\"1039\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
+                    "<th>7daysRevenue</th>" +
+                    "<th>PI</th>" +
+                    "<th>ECPM<span sorterId=\"1040\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
                     "<th>CPA<span sorterId=\"1041\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
-                    "<th>ACpa</th><th>CPA/ECPM</th>" +
-                    "<th>Incoming<span sorterId=\"1042\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th><th>7daysIncoming</th>" +
-                    "<th>RT</th><th>30DaysActiveUser</th><th>30DaysActiveUser*ARPU</th></tr>");
+                    "<th>ACpa</th>" +
+                    "<th>CPA/ECPM</th>" +
+                    "<th>Incoming<span sorterId=\"1042\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
+                    "<th>7daysIncoming</th>" +
+                    "<th>RT</th>" +
+                    "<th>30DaysActiveUser</th>" +
+                    "<th>30DaysActiveUser*ARPU</th></tr>");
                 setData(data,query);
                 bindSortOp();
                 var str = "Cost: " + data.total_cost + "&nbsp;&nbsp;&nbsp;&nbsp;PuserchaedUser: " + data.total_puserchaed_user +
@@ -200,15 +209,15 @@
         var arr = data.array;
         var len = arr.length;
         var one;
+        var keyset = ["costs","seven_days_costs", "purchased_users", "installed", "uninstalled_rate", "users",
+            "active_users", "revenues","seven_days_revenues","pi", "ecpm","cpa","a_cpa","cpa_dev_ecpm", "incoming",
+            "seven_days_incoming","rt","thirty_days_active_user", "thirty_days_active_user_mul_arpu"];
         for (var i = 0; i < len; i++) {
             one = arr[i];
             var tr = $('<tr></tr>');
             var td_outer_a = $('<td></td>');
             td_outer_a.text(one['country_name']);
             tr.append(td_outer_a);
-            var keyset = ["costs","seven_days_costs", "purchased_users", "installed",
-                "uninstalled_rate", "users", "active_users", "revenues","seven_days_revenues","pi",
-                "ecpm","cpa","a_cpa","cpa_dev_ecpm", "incoming","seven_days_incoming","rt","thirty_days_active_user","thirty_days_active_user_mul_arpu"];
             for (var j = 0; j < keyset.length; j++) {
                 var key = keyset[j];
                 var td = $('<td></td>');

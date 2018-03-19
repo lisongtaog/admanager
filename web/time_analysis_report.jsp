@@ -2,14 +2,11 @@
 <%@ page import="com.bestgo.admanager.servlet.Tags" %>
 <%@ page import="com.bestgo.common.database.utils.JSObject" %>
 <%@ page import="java.util.List" %>
-<%@ page import="java.util.ArrayList" %>
-<%@ page import="com.bestgo.common.database.services.DB" %>
-<%@ page import="org.apache.log4j.Logger" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 
 <html>
 <head>
-    <title>分析报告(时间)</title>
+    <title>时间分析报告</title>
     <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css"/>
     <link rel="stylesheet" href="bootstrap/css/bootstrap-theme.min.css"/>
     <link rel="stylesheet" href="css/core.css"/>
@@ -298,7 +295,6 @@
         }
     }
 </script>
-<script src="js/interlaced-color-change.js"></script>
 </body>
 </html>
 

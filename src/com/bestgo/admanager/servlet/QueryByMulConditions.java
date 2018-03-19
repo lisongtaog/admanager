@@ -956,8 +956,14 @@ public class QueryByMulConditions extends HttpServlet {
                         continue;
                     }
                 }
+                double installed = Utils.convertDouble(one.get("installed"), 0);
                 String campaignId = one.get("campaign_id");
+
+                //系列卸载率 = 系列卸载数量 / 系列安装数量
                 double unRate = 0;
+
+                //系列开启率 = 系列安装数量 / 系列总安装
+                double openRate = 0;
                 if(admobCheck){
                     String sqlQuery = "select COUNT(id) as uninstall_count from ad_campaign_user_date_admob_rel where campaign_id = '" + campaignId + "' and uninstall_date is NOT NULL";
                     JSObject oneQ = DB.findOneBySql(sqlQuery);
@@ -966,9 +972,10 @@ public class QueryByMulConditions extends HttpServlet {
                         if(uninstallCount != 0){
                             sqlQuery = "select COUNT(id) as install_count from ad_campaign_user_date_admob_rel where campaign_id = '" + campaignId + "'";
                             oneQ = DB.findOneBySql(sqlQuery);
-                            if(oneQ != null && oneQ.hasObjectData()){
+                            if(oneQ.hasObjectData()){
                                 long installCount = oneQ.get("install_count");
                                 unRate = installCount == 0 ? 0 : ((double)uninstallCount / installCount);
+                                openRate = installed == 0 ? 0 : ((double)installCount / installed);
                             }
                         }
                     }
@@ -985,7 +992,6 @@ public class QueryByMulConditions extends HttpServlet {
                 String country_code = one.get("country_code");
                 double budget = one.get("budget");
                 double spend = Utils.convertDouble(one.get("spend"), 0);
-                double installed = Utils.convertDouble(one.get("installed"), 0);
                 double impressions = Utils.convertDouble(one.get("impressions"), 0);
                 double click = Utils.convertDouble(one.get("click"), 0);
                 double ctr = impressions > 0 ? click / impressions : 0;
@@ -1026,6 +1032,7 @@ public class QueryByMulConditions extends HttpServlet {
                 d.addProperty("cpa", Utils.trimDouble(cpa,3));
                 d.addProperty("cvr", Utils.trimDouble(cvr,3));
                 d.addProperty("un_rate", Utils.trimDouble(unRate,3));
+                d.addProperty("open_rate", Utils.trimDouble(openRate,3));
                 if (admobCheck) {
                     d.addProperty("network", "admob");
                 } else {
@@ -1083,6 +1090,7 @@ public class QueryByMulConditions extends HttpServlet {
                 d.addProperty("cpa", 0);
                 d.addProperty("cvr", 0);
                 d.addProperty("un_rate", -100000);
+                d.addProperty("open_rate", -100000);
                 if (admobCheck) {
                     d.addProperty("network", "admob");
                 } else {

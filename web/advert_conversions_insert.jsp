@@ -126,7 +126,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.4/js/select2.min.js"></script>
 <script>
     function init() {
-        $("li[role='presentation']:eq(17)").addClass("active");
+        $("li[role='presentation']:eq(16)").addClass("active");
         $('.select2').select2();
         $.post('system/fb_app_id_rel/query', {
             word: '',

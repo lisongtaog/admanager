@@ -5,7 +5,6 @@ import com.bestgo.common.database.services.DB;
 import com.bestgo.common.database.utils.JSObject;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.sun.webkit.network.Util;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -23,9 +22,12 @@ import java.util.List;
  */
 @WebServlet(name = "AppImageVideoRel",urlPatterns = "/app_image_video_rel/*")
 public class AppImageVideoRel extends HttpServlet {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        doPost(request,response);
+    }
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         if (!Utils.isAdmin(request, response)) return;
-        String path = request.getPathInfo();
+        String path = request.getPathInfo();   //getPathInfo()用于截取urlPattern以后的部分
         JsonObject jsonObject = new JsonObject();
 
         if(path.matches("/query_image_and_video_by_app")){
@@ -158,11 +160,39 @@ public class AppImageVideoRel extends HttpServlet {
                 jsonObject.addProperty("ret", 0);
                 jsonObject.addProperty("message", e.getMessage());
             }
+        }else if(path.matches("/facebook_path")){
+            String AppName = request.getParameter("app_name"); //测试用AntivirusV1 和 AntivirusV2 来测试
+            JsonObject fb = new JsonObject();
+            String sql = "select image_path from ad_app_image_path_rel where app_name = '"+ AppName + "'";
+            JSObject fb_path = null;
+            try{
+                fb_path = DB.findOneBySql(sql);
+            }catch(Exception e){}
+            String image_path = "";
+            String video_path = "";
+            image_path = fb_path.get("image_path");
+            fb.addProperty("fb_image_path",image_path);
+            sql = "select video_path from ad_app_video_path_rel where app_name = '" + AppName+ "'";
+            try{
+                fb_path = DB.findOneBySql(sql);
+            }catch (Exception e){}
+
+            video_path = fb_path.get("video_path");
+            fb.addProperty("fb_video_path",video_path);
+            response.getWriter().write(fb.toString());
+
+        }else if(path.matches("/admob_path")){
+            String AppName = request.getParameter("app_name");
+            JsonObject ad = new JsonObject();
+            String sql = "select image_path from ad_app_image_path_rel where app_name = '"+ AppName + "'";
+            JSObject ad_path = null;
+            try{
+                ad_path = DB.findOneBySql(sql);
+            }catch(Exception e){}
+            String image_path = ad_path.get("image_path");
+            ad.addProperty("image_path",image_path);
+            response.getWriter().write(ad.toString());
         }
-        response.getWriter().write(jsonObject.toString());
     }
 
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        doPost(request,response);
-    }
 }

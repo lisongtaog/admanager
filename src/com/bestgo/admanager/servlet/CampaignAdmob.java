@@ -18,6 +18,9 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.util.*;
 
+/**
+ * Desc: 有关Adwords系列创建的操作
+ */
 @WebServlet(name = "CampaignAdMob", urlPatterns = "/campaign_admob/*")
 public class CampaignAdmob extends HttpServlet {
     public static Map<String,Double> tagMaxBiddingRelationMap;

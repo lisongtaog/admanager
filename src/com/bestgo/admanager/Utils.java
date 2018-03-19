@@ -162,7 +162,7 @@ public class Utils {
     /**
      * 将一个list根据某个属性去重，并遍历以逗号分隔拼接成字符串，用于in()里面的查询条件
      * @param list List<JSObject>
-     * @param attr JSObject的某个属性
+     * @param attr JSObject的某个属性,根据它来获取值
      * @param attrValueIsString  根据属性获得的每个值是否是字符串
      * @return 字符串
      */
@@ -182,7 +182,7 @@ public class Utils {
             }
         }
 
-        if(returnStr.length() >0){
+        if(returnStr.length() > 0){
             return  returnStr.substring(0,returnStr.length() - 1);
         }
         return null;

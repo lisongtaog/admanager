@@ -267,9 +267,28 @@ function init() {
                 if(data && data.ret == 1){
                     appQueryData = data.data.array;
                     if (countryCheck) {
-                        $('#result_header').html("<tr><th>国家</th><th>总展示<span sorterId=\"21\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>总花费<span sorterId=\"22\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>总安装<span sorterId=\"23\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>总点击<span sorterId=\"24\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>CPA<span sorterId=\"25\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>CTR<span sorterId=\"26\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>CVR<span sorterId=\"27\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th><span sorterId=\"28\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th></tr>");
+                        $('#result_header').html("<tr><th>国家</th>" +
+                            "<th>总展示<span sorterId=\"21\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
+                            "<th>总花费<span sorterId=\"22\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
+                            "<th>总安装<span sorterId=\"23\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
+                            "<th>总点击<span sorterId=\"24\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
+                            "<th>CPA<span sorterId=\"25\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
+                            "<th>CTR<span sorterId=\"26\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
+                            "<th>CVR<span sorterId=\"27\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th></tr>");
                     } else {
-                        $('#result_header').html("<tr><th>系列ID</th><th>账户ID</th><th>账户简称</th><th>系列名称</th><th>创建时间<span sorterId=\"1\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>状态<span sorterId=\"2\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>预算<span sorterId=\"3\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>竞价<span sorterId=\"4\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>总花费<span sorterId=\"5\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>总安装<span sorterId=\"6\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>总点击<span sorterId=\"7\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>CPA<span sorterId=\"8\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>CTR<span sorterId=\"9\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>CVR<span sorterId=\"10\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>UnRate<span sorterId=\"11\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th></tr>");
+                        $('#result_header').html("<tr><th>系列ID</th><th>账户ID</th><th>账户简称</th><th>系列名称</th>" +
+                            "<th>创建时间<span sorterId=\"1\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
+                            "<th>状态<span sorterId=\"2\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
+                            "<th>预算<span sorterId=\"3\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
+                            "<th>竞价<span sorterId=\"4\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
+                            "<th>总花费<span sorterId=\"5\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
+                            "<th>总安装<span sorterId=\"6\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
+                            "<th>总点击<span sorterId=\"7\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
+                            "<th>CPA<span sorterId=\"8\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
+                            "<th>CTR<span sorterId=\"9\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
+                            "<th>CVR<span sorterId=\"10\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
+                            "<th>UnRate<span sorterId=\"11\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
+                            "<th>OR</th></tr>");
                     }
                     data = data.data;
                     setData(data);
@@ -436,11 +455,11 @@ function setData(data) {
         var tr = $('<tr></tr>');
         var countryCheck = $('#countryCheck').is(':checked');
         var keyset = ["campaign_id", "account_id", "short_name", "campaign_name", "create_time",
-            "status", "budget", "bidding", "spend", "installed", "click", "cpa", "ctr", "cvr","un_rate"];
+            "status", "budget", "bidding", "spend", "installed", "click", "cpa", "ctr", "cvr","un_rate","open_rate"];
         var modifyColumns = ["campaign_name", "budget", "bidding"];
         if (countryCheck) {
             keyset = ["country_name",
-                "impressions","spend", "installed", "click", "cpa", "ctr", "cvr","un_rate"];
+                "impressions","spend", "installed", "click", "cpa", "ctr", "cvr"];
         }
         for (var j = 0; j < keyset.length; j++) {
             var campaignId = one['campaign_id'];
@@ -464,7 +483,7 @@ function setData(data) {
                 td.text(field_value / 100);
             } else if (field == 'spend') {
                 td.text(field_value + " / " + totalSpend);
-            } else if(field == 'un_rate'){
+            } else if(field == 'un_rate' || field == 'open_rate'){
                 if(field_value == -100000){
                     td.text("--");
                 }else{
