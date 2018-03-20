@@ -1137,13 +1137,35 @@ if(!isIndexCreate && !isAutoCreate){
         var checkFacebook = $("#checkFacebook").prop("checked");
         if (checkFacebook) {
             var appName = $("#selectApp").val();
-            $.post("app_image_video_rel/facebook_path", {
+            $.post("app_image_video_rel/query_facebook_path_by_app", {
                 app_name: appName
             }, function (data) {
-                var imageTrimed = data.fb_image_path.replace(/home\/\w+\/\w+\/\w+\//,"");
-                var videoTrimed = data.fb_video_path.replace(/home\/\w+\/\w+\/\w+\//,"");
-                $("#inputImagePath").val(imageTrimed);
-                $("#inputVideoPath").val(videoTrimed);
+                if(data.ret === 1){
+                    var image_path = [];
+                    if(data.image_array.length >0){
+                        for(var i=0;i<data.image_array.length; i++){
+                            var img = data.image_array[i];
+                            var imgTrimed = img["image_path"].replace(/home\/\w+\/\w+\/\w+\//,"");
+                            image_path[i] = imgTrimed;
+                        }
+                        $("#inputImagePath").autocomplete({
+                            source:image_path
+                        });
+                        $("#inputImagePath").val(image_path[0]);
+                    }
+                    var video_path = [];
+                    if(data.video_array.length >0){
+                        for(var i=0;i<data.video_array.length; i++){
+                            var vdo = data.video_array[i];
+                            var vdoTrimed = vdo["video_path"].replace(/home\/\w+\/\w+\/\w+\//,"");
+                            video_path[i] = vdoTrimed;
+                        }
+                        $("#inputVideoPath").autocomplete({
+                            source:video_path
+                        });
+                        $("#inputVideoPath").val(video_path[0]);
+                    }
+                }
             }, "json");
         }
     });
@@ -1152,11 +1174,21 @@ if(!isIndexCreate && !isAutoCreate){
         var checkAdmob = $("#checkAdmob").prop("checked");
         if (checkAdmob) {
             var appName = $("#selectAppAdmob").val();
-            $.post("app_image_video_rel/admob_path",
+            $.post("app_image_video_rel/query_admob_path_by_app",
                 {app_name: appName},
                 function (data) {
-                    var ImageTrimed = data.image_path.replace(/home\/\w+\/\w+\/\w+\//,"");
-                    $("#inputImagePath").val(ImageTrimed);
+                    var image_path = [];
+                    if(data.image_array.length >0){
+                        for(var i=0;i<data.image_array.length; i++){
+                            var img = data.image_array[i];
+                            var imgTrimed = img["image_path"].replace(/home\/\w+\/\w+\/\w+\//,"");
+                            image_path[i] = imgTrimed;
+                        }
+                        $("#inputImagePathAdmob").autocomplete({
+                            source:image_path
+                        });
+                        $("#inputImagePathAdmob").val(image_path[0]);
+                    }
                 }, "json");
         }
     });

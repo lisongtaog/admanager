@@ -62,7 +62,7 @@ public class VideoMaterialAnalysisReport extends HttpServlet {
                             videoPathStr += videoPath + ",";
                         }
 
-                        //根据图片路径匹配Facebook系列
+                        //根据视频路径匹配Facebook系列
                         sql = "SELECT campaign_id FROM ad_ads a,ad_campaigns c " +
                                 " WHERE a.parent_id = c.id AND create_time >= '" + startAddOneDay + "' " +
                                 " AND create_time < '" + tomorrow + "' AND video_file_path LIKE '%" + videoPath + "%'";

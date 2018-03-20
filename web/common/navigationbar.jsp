@@ -53,8 +53,7 @@
     <li role="presentation"><a href="app_image_video_rel_insert.jsp">应用图片视频关联录入</a></li>
 
         <%-- 20 --%>
-    <li role="presentation"><a href="image_material_analysis_report.jsp">图片素材分析报告</a></li>
-    <li role="presentation"><a href="video_material_analysis_report.jsp">视频素材分析报告(仅Facebook)</a></li>
+    <li role="presentation"><a href="material_analysis_report.jsp">素材分析报告</a></li>
 </ul>
 </body>
 </html>

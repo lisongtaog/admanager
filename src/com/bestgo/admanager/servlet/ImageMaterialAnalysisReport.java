@@ -37,8 +37,8 @@ public class ImageMaterialAnalysisReport extends HttpServlet {
                 String endTime = request.getParameter("endTime");
 
                 //create_time >= startAddOneDay AND create_time < tomorrow
-                String startAddOneDay = DateUtil.addDay(startTime,1,"yyyy-MM-dd");
-                String tomorrow = DateUtil.addDay(endTime,2,"yyyy-MM-dd");//北京时间明天
+                String startAddOneDay = DateUtil.addDay(startTime,1,"yyyy-MM-dd");//北京时间
+                String tomorrow = DateUtil.addDay(endTime,2,"yyyy-MM-dd");//北京时间
 
                 String sql = "SELECT country_name,country_code FROM app_country_code_dict ORDER BY country_name";
                 List<JSObject> countryList = DB.findListBySql(sql);

@@ -1,5 +1,6 @@
 package com.bestgo.admanager.servlet;
 
+import com.bestgo.admanager.DateUtil;
 import com.bestgo.admanager.Utils;
 import com.bestgo.common.database.services.DB;
 import com.bestgo.common.database.utils.JSObject;
@@ -58,6 +59,8 @@ public class QueryByMulConditions extends HttpServlet {
 
         String likeCampaignName = request.getParameter("likeCampaignName");
         HashMap<String ,String> countryMap = Utils.getCountryMap();
+
+        String beforeThreeDays = DateUtil.addDay(endTime,-3,"yyyy-MM-dd");//不包括endTime
         try {
             JSObject tagObject = DB.simpleScan("web_tag")
                     .select("id", "tag_name")
@@ -69,8 +72,8 @@ public class QueryByMulConditions extends HttpServlet {
                     countryCheck = "false";
                 }
                 if ("false".equals(adwordsCheck) && "false".equals(facebookCheck)) {
-                    JsonObject admob = fetchOneAppData(id, tag,startTime, endTime, true, "true".equals(countryCheck), countryCode,likeCampaignName,campaignCreateTime,countryMap,totalInstallComparisonValue, "true".equals(containsNoDataCampaignCheck),countryCode,cpaComparisonValue,biddingComparisonValue,totalInstallOperator,cpaOperator);
-                    JsonObject facebook = fetchOneAppData(id, tag,startTime, endTime,false, "true".equals(countryCheck), countryCode,likeCampaignName,campaignCreateTime,countryMap,totalInstallComparisonValue, "true".equals(containsNoDataCampaignCheck),countryName,cpaComparisonValue,biddingComparisonValue,totalInstallOperator,cpaOperator);
+                    JsonObject admob = fetchOneAppData(id, tag,startTime, endTime, true, "true".equals(countryCheck), countryCode,likeCampaignName,campaignCreateTime,countryMap,totalInstallComparisonValue, "true".equals(containsNoDataCampaignCheck),countryCode,cpaComparisonValue,biddingComparisonValue,totalInstallOperator,cpaOperator,beforeThreeDays);
+                    JsonObject facebook = fetchOneAppData(id, tag,startTime, endTime,false, "true".equals(countryCheck), countryCode,likeCampaignName,campaignCreateTime,countryMap,totalInstallComparisonValue, "true".equals(containsNoDataCampaignCheck),countryName,cpaComparisonValue,biddingComparisonValue,totalInstallOperator,cpaOperator,beforeThreeDays);
                     double total_spend = admob.get("total_spend").getAsDouble() + facebook.get("total_spend").getAsDouble();
                     double total_installed = admob.get("total_installed").getAsDouble() + facebook.get("total_installed").getAsDouble();
                     double total_impressions = admob.get("total_impressions").getAsDouble() + facebook.get("total_impressions").getAsDouble();
@@ -416,6 +419,7 @@ public class QueryByMulConditions extends HttpServlet {
                             j.addProperty("cpa",c.cpa);
                             j.addProperty("cvr",c.cvr);
                             j.addProperty("un_rate",c.un_rate);
+                            j.addProperty("open_rate",c.open_rate);
                             j.addProperty("campaign_spends",c.campaign_spends);
                             j.addProperty("network",c.network);
                             jsonArray.add(j);
@@ -442,10 +446,10 @@ public class QueryByMulConditions extends HttpServlet {
 
                 } else {
                     if("true".equals(adwordsCheck)){
-                        jsonObject = fetchOneAppData(id, tag,startTime, endTime, true, "true".equals(countryCheck), countryCode,likeCampaignName,campaignCreateTime,countryMap,totalInstallComparisonValue, "true".equals(containsNoDataCampaignCheck),countryCode,cpaComparisonValue,biddingComparisonValue,totalInstallOperator,cpaOperator);
+                        jsonObject = fetchOneAppData(id, tag,startTime, endTime, true, "true".equals(countryCheck), countryCode,likeCampaignName,campaignCreateTime,countryMap,totalInstallComparisonValue, "true".equals(containsNoDataCampaignCheck),countryCode,cpaComparisonValue,biddingComparisonValue,totalInstallOperator,cpaOperator,beforeThreeDays);
 
                     }else{
-                        jsonObject = fetchOneAppData(id, tag,startTime, endTime, false, "true".equals(countryCheck), countryCode,likeCampaignName,campaignCreateTime,countryMap,totalInstallComparisonValue, "true".equals(containsNoDataCampaignCheck),countryName,cpaComparisonValue,biddingComparisonValue,totalInstallOperator,cpaOperator);
+                        jsonObject = fetchOneAppData(id, tag,startTime, endTime, false, "true".equals(countryCheck), countryCode,likeCampaignName,campaignCreateTime,countryMap,totalInstallComparisonValue, "true".equals(containsNoDataCampaignCheck),countryName,cpaComparisonValue,biddingComparisonValue,totalInstallOperator,cpaOperator,beforeThreeDays);
 
                     }
                 }
@@ -761,7 +765,7 @@ public class QueryByMulConditions extends HttpServlet {
 
 
 
-    private JsonObject fetchOneAppData(long tagId, String tagName, String startTime, String endTime, boolean admobCheck, boolean countryCheck, String countryCode,String likeCampaignName,String campaignCreateTime,HashMap<String ,String> countryMap,String totalInstallComparisonValue, boolean containsNoDataCampaignCheck,String country,String cpaComparisonValue,String biddingComparisonValue,String totalInstallOperator,String cpaOperator) throws Exception {
+    private JsonObject fetchOneAppData(long tagId, String tagName, String startTime, String endTime, boolean admobCheck, boolean countryCheck, String countryCode,String likeCampaignName,String campaignCreateTime,HashMap<String ,String> countryMap,String totalInstallComparisonValue, boolean containsNoDataCampaignCheck,String country,String cpaComparisonValue,String biddingComparisonValue,String totalInstallOperator,String cpaOperator,String beforeThreeDays) throws Exception {
         String webAdCampaignTagRelTable = "web_ad_campaign_tag_rel";
         String webAdCampaignsTable = "web_ad_campaigns";
         String adCampaignsTable = "ad_campaigns";
@@ -959,25 +963,40 @@ public class QueryByMulConditions extends HttpServlet {
                 double installed = Utils.convertDouble(one.get("installed"), 0);
                 String campaignId = one.get("campaign_id");
 
-                //系列卸载率 = 系列卸载数量 / 系列安装数量
+                //系列卸载率 = 系列卸载数量 / 系列安装数量(随着数据量的增加，将来这里必须提前算出来！！！！！)
                 double unRate = 0;
 
-                //系列开启率 = 系列安装数量 / 系列总安装
+                //系列开启率 = 系列安装数量 / 系列总安装(随着数据量的增加，将来这里必须提前算出来！！！！！)
                 double openRate = 0;
+
                 if(admobCheck){
-                    String sqlQuery = "select COUNT(id) as uninstall_count from ad_campaign_user_date_admob_rel where campaign_id = '" + campaignId + "' and uninstall_date is NOT NULL";
+//                    String sqlQuery = "select COUNT(id) as uninstall_count from ad_campaign_user_date_admob_rel where campaign_id = '" + campaignId + "' and uninstall_date is NOT NULL and ";
+                    String sqlQuery = "SELECT COUNT(id) AS uninstall_count FROM ad_campaign_user_date_admob_rel " +
+                                      " WHERE campaign_id = '" + campaignId + "' AND uninstall_date IS NOT NULL " +
+                                      " AND query_date BETWEEN '2018-02-11' AND '" + beforeThreeDays + "' ";
                     JSObject oneQ = DB.findOneBySql(sqlQuery);
-                    if(oneQ != null && oneQ.hasObjectData()){
-                        long uninstallCount = oneQ.get("uninstall_count");
-                        if(uninstallCount != 0){
-                            sqlQuery = "select COUNT(id) as install_count from ad_campaign_user_date_admob_rel where campaign_id = '" + campaignId + "'";
-                            oneQ = DB.findOneBySql(sqlQuery);
-                            if(oneQ.hasObjectData()){
-                                long installCount = oneQ.get("install_count");
-                                unRate = installCount == 0 ? 0 : ((double)uninstallCount / installCount);
-                                openRate = installed == 0 ? 0 : ((double)installCount / installed);
-                            }
-                        }
+                    long uninstallCount = 0;
+                    long installCount = 0;
+                    if(oneQ.hasObjectData()){
+                        uninstallCount = oneQ.get("uninstall_count");
+                    }
+                    sqlQuery = "SELECT COUNT(id) as install_count FROM ad_campaign_user_date_admob_rel " +
+                            " WHERE campaign_id = '" + campaignId + "'" +
+                            " AND query_date BETWEEN '2018-02-11' AND '" + beforeThreeDays + "' ";
+                    oneQ = DB.findOneBySql(sqlQuery);
+                    if(oneQ.hasObjectData()){
+                        installCount = oneQ.get("install_count");
+                        unRate = installCount == 0 ? 0 : ((double)uninstallCount / installCount);
+                    }
+                    sqlQuery = "SELECT sum(ch.total_installed) as total_installeds " +
+                               " FROM web_ad_campaigns_admob c, web_ad_campaigns_history_admob ch " +
+                               " WHERE c.campaign_id=ch.campaign_id  AND c.campaign_id = '" + campaignId + "'" +
+                               " AND c.status != 'removed' " +
+                               " AND date between '2018-02-11' AND '" + beforeThreeDays + "'";
+                    oneQ = DB.findOneBySql(sqlQuery);
+                    if(oneQ.hasObjectData()){
+                        double totalInstalleds = Utils.convertDouble(oneQ.get("total_installeds"),0);
+                        openRate = totalInstalleds == 0 ? 0 : ((double)installCount / totalInstalleds);
                     }
                 }
 
@@ -1140,6 +1159,7 @@ public class QueryByMulConditions extends HttpServlet {
         public double cpa;
         public double cvr;
         public double un_rate;
+        public double open_rate;
         public double campaign_spends;
         public String network;
     }
