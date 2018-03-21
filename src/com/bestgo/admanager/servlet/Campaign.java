@@ -74,6 +74,7 @@ public class Campaign extends HttpServlet {
             String bugdet = request.getParameter("bugdet");
             String bidding = request.getParameter("bidding");
             String maxCPA = request.getParameter("maxCPA");
+//            String groupId = request.getParameter("groupId");
             String title = request.getParameter("title");
             String message = request.getParameter("message");
             String imagePath = request.getParameter("imagePath");
@@ -182,6 +183,7 @@ public class Campaign extends HttpServlet {
                                     .put("page_id", pageId)
                                     .put("bugdet", bugdet)
                                     .put("bidding", bidding)
+//                                    .put("group_id", groupId)
                                     .put("title", title)
                                     .put("message", message)
                                     .put("app_name", appName)

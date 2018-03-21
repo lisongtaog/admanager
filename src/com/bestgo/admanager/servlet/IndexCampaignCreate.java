@@ -43,7 +43,7 @@ public class IndexCampaignCreate extends HttpServlet{
         String admob = p2.pattern();
         String sql = "";
         if(Pattern.matches(facebook,CampaignId)){
-            sql = "select app_name,account_id,country_region,language,bugdet,bidding,title,message,campaign_name"+
+            sql = "select app_name,account_id,country_region,language,bugdet,bidding,title,message,campaign_name,age,gender"+
                     " from ad_campaigns where campaign_id ='"+CampaignId+"'";
             JSObject fb = null;
             try{
@@ -58,6 +58,8 @@ public class IndexCampaignCreate extends HttpServlet{
             String title = fb.get("title");
             String message = fb.get("message");
             String campaign_name = fb.get("campaign_name");
+            String age = fb.get("age");
+            String gender = fb.get("gender");
             if(fb.hasObjectData()){
                 facebook_campaign.addProperty("app_name",app_name);
                 facebook_campaign.addProperty("account_id",account_id);
@@ -67,6 +69,8 @@ public class IndexCampaignCreate extends HttpServlet{
                 facebook_campaign.addProperty("title",title);
                 facebook_campaign.addProperty("message",message);
                 facebook_campaign.addProperty("campaign_name",campaign_name);
+                facebook_campaign.addProperty("age",age);
+                facebook_campaign.addProperty("gender",gender);
                 facebook_campaign.addProperty("flag","facebook");
             }else{
                 facebook_campaign.addProperty("no_data","no_data");

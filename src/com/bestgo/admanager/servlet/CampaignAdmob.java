@@ -64,6 +64,7 @@ public class CampaignAdmob extends HttpServlet {
             String bidding = request.getParameter("bidding");
             String maxCPA = request.getParameter("maxCPA");
             String message1 = request.getParameter("message1");
+//            String groupId = request.getParameter("group_id");
             String message2 = request.getParameter("message2");
             String message3 = request.getParameter("message3");
             String message4 = request.getParameter("message4");
@@ -172,6 +173,7 @@ public class CampaignAdmob extends HttpServlet {
                                             .put("bugdet", bugdet)
                                             .put("bidding", bidding)
                                             .put("max_cpa", maxCPA)
+//                                            .put("group_id", groupId)
                                             .put("message1", message1)
                                             .put("message2", message2)
                                             .put("message3", message3)

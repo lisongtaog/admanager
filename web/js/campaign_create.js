@@ -1011,6 +1011,9 @@ function indexInitFormData(isIndexCreate,campaign_id) {
 
                     $('#inputCampaignName').val(campaignData.campaign_name);
 
+                    $("#selectGender").val(campaignData.gender);
+                    $("#inputAge").val(campaignData.age);
+
                 }else if (campaignData.flag == "admob") {
                     $('#checkAdmob').prop('checked', true);
                     $('#checkAdmob').click();

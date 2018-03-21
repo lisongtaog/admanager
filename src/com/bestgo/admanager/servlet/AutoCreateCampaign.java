@@ -264,6 +264,7 @@ public class AutoCreateCampaign extends HttpServlet {
             String campaignName = request.getParameter("campaignName");
             String bugdet = request.getParameter("bugdet");
             String maxCPA = request.getParameter("maxCPA");
+//            String groupId = request.getParameter("group_id");
             String title = request.getParameter("title");
             String message = request.getParameter("message");
             String imagePath = request.getParameter("imagePath");
@@ -368,6 +369,7 @@ public class AutoCreateCampaign extends HttpServlet {
                         .put("bidding", bidding)
                         .put("explode_bidding", Boolean.parseBoolean(explodeBidding) ? 1 : 0)
                         .put("max_cpa", maxCPA)
+//                        .put("group_id", groupId)
                         .put("title", title)
                         .put("message", message)
                         .put("image_path", imagePath)
@@ -599,6 +601,7 @@ public class AutoCreateCampaign extends HttpServlet {
             String campaignName = request.getParameter("campaignName");
             String bugdet = request.getParameter("bugdet");
             String maxCPA = request.getParameter("maxCPA");
+//            String groupId = request.getParameter("group_id");
             String message1 = request.getParameter("message1");
             String message2 = request.getParameter("message2");
             String message3 = request.getParameter("message3");
@@ -665,6 +668,7 @@ public class AutoCreateCampaign extends HttpServlet {
                         .put("campaign_name", campaignName)
                         .put("bugdet", bugdet)
                         .put("bidding", bidding)
+//                        .put("group_id", groupId)
                         .put("message1", message1)
                         .put("message2", message2)
                         .put("message3", message3)
