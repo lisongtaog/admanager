@@ -526,9 +526,13 @@ function setData(data) {
         if(!countryCheck){
             var btn = $('<input type="button" value="新建">');   //临时创建了一个变量btn，“新建”键
             btn.data("campaign_id", one['campaign_id']);    //给当前这个键增加键值对
+            btn.data("budget",one['budget']);
+            btn.data("bidding",one['bidding']);
             btn.click(function(){
                 var campaign_id = $(this).data("campaign_id");  //选中当前元素中键campaign_id的值
-                window.open("campaigns_create.jsp?type=auto_create&campaignId="+ campaign_id,"_blank");
+                var budget = $(this).data("budget");
+                var bidding = $(this).data("bidding");
+                window.open("campaigns_create.jsp?type=auto_create&campaignId="+ campaign_id+ "&budget="+budget+"&bidding="+bidding,"_blank");
                     //window.open(url,name,features,replace)，四个参数分别针对url，新窗口target属性或窗口名称，窗口特征和浏览器历史
             });
         }

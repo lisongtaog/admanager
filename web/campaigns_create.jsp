@@ -44,6 +44,8 @@
 
     //以下接收的是从index2传来的页面
     String campaignId = request.getParameter("campaignId");
+    String budget = request.getParameter("budget");
+    String bidding = request.getParameter("bidding");
     boolean isIndexCreate = "auto_create".equals(type);
 %>
 
@@ -417,6 +419,8 @@
     var modifyRecordId = <%=recordId%>;
     var isIndexCreate = <%=isIndexCreate%>;
     var campaign_id = <%=campaignId%>;
+    var IndexBudget = <%=budget%>;
+    var IndexBidding = <%=bidding%>;
 </script>
 
 <script src="js/campaign_create.js?t=20180118"></script>

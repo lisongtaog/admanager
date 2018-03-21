@@ -1001,9 +1001,9 @@ function indexInitFormData(isIndexCreate,campaign_id) {
                     $('#selectRegion').val(campaignData.country_region.split(','));
                     $('#selectRegion').trigger('change');
 
-                    $('#inputBudget').val(campaignData.bugdet);
+                    $('#inputBudget').val(IndexBudget);
 
-                    $('#inputBidding').val(campaignData.bidding);
+                    $('#inputBidding').val(IndexBidding);
                     $('#inputBiddingExplode').prop('checked', campaignData.explode_bidding == 1);
 
                     $('#inputTitle').val(campaignData.title);
@@ -1027,8 +1027,8 @@ function indexInitFormData(isIndexCreate,campaign_id) {
 
                     $('#inputCampaignNameAdmob').val(campaignData.campaign_name);
 
-                    $('#inputBudgetAdmob').val(campaignData.bugdet);
-                    $('#inputBiddingAdmob').val(campaignData.bidding);
+                    $('#inputBudgetAdmob').val(IndexBudget);
+                    $('#inputBiddingAdmob').val(IndexBidding);
                     $('#inputBiddingAdmobExplode').prop('checked', campaignData.explode_bidding == 1); //"分离到系列"
 
                     $('#inputMessage1').val(campaignData.message1);
