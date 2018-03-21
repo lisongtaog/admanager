@@ -815,27 +815,6 @@ init();
 
 $('#selectApp').change(function () {
     var appName = $('#selectApp').val();
-    $('#inputImagePath').val(appName + "/");
-    // var language = $('#selectLanguage').val();
-
-    // if (language != null && language.length > 0) {
-    //     $.post("campaign/selectFacebookMessage", {
-    //         appName: appName,
-    //         language: language
-    //     }, function (data) {
-    //         if (data && data.ret == 1) {
-    //             $('#inputTitle').val(data.title);
-    //             $('#inputMessage').val(data.message);
-    //         } else {
-    //             $('#inputTitle').val("");
-    //             $('#inputMessage').val("");
-    //         }
-    //     }, "json");
-    // } else {
-    //     $('#inputTitle').val("");
-    //     $('#inputMessage').val("");
-    // }
-
     $.post("campaign/selectMaxBiddingByAppName", {
         appName: appName
     }, function (data) {
@@ -852,37 +831,6 @@ $('#selectApp').change(function () {
 
 $('#selectAppAdmob').change(function () {
     var appNameAdmob = $('#selectAppAdmob').val();
-    $('#inputImagePathAdmob').val(appNameAdmob + "/");
-    // var selectOptions = $('#selectLanguageAdmob option:selected');
-    // var languageAdmob = [];
-    // selectOptions.each(function () {
-    //     languageAdmob.push($(this).text())
-    // });
-    // if (languageAdmob != null && languageAdmob.length > 0) {
-    //
-    //     $.post("campaign_admob/selectAdmobMessage", {
-    //         appNameAdmob: appNameAdmob,
-    //         languageAdmob: languageAdmob.join(",")
-    //     }, function (data) {
-    //         if (data && data.ret == 1) {
-    //             $("#inputMessage1").val(data.message1);
-    //             $("#inputMessage2").val(data.message2);
-    //             $("#inputMessage3").val(data.message3);
-    //             $("#inputMessage4").val(data.message4);
-    //         } else {
-    //             $("#inputMessage1").val("");
-    //             $("#inputMessage2").val("");
-    //             $("#inputMessage3").val("");
-    //             $("#inputMessage4").val("");
-    //             admanager.showCommonDlg("提示", "数据为空！");
-    //         }
-    //     }, "json");
-    // } else {
-    //     $("#inputMessage1").val("");
-    //     $("#inputMessage2").val("");
-    //     $("#inputMessage3").val("");
-    //     $("#inputMessage4").val("");
-    // }
     $.post('advert_conversion_admob/query_advert_conversion_by_app_name', {appName: appNameAdmob}, function (result) {
         if (result && result.ret == 1) {
             var incidentList = result.data;
@@ -1149,7 +1097,7 @@ if(!isIndexCreate && !isAutoCreate){
             }, function (data) {
                 if(data.ret === 1){
                     var image_path = [];
-                    if(data.image_array.length >0){
+                    if(data.image_array != null && data.image_array.length >0){
                         for(var i=0;i<data.image_array.length; i++){
                             var img = data.image_array[i];
                             var imgTrimed = img["image_path"].replace(/home\/\w+\/\w+\/\w+\//,"");
@@ -1158,10 +1106,9 @@ if(!isIndexCreate && !isAutoCreate){
                         $("#inputImagePath").autocomplete({
                             source:image_path
                         });
-                        $("#inputImagePath").val(image_path[0]);
                     }
                     var video_path = [];
-                    if(data.video_array.length >0){
+                    if(data.video_array != null && data.video_array.length >0){
                         for(var i=0;i<data.video_array.length; i++){
                             var vdo = data.video_array[i];
                             var vdoTrimed = vdo["video_path"].replace(/home\/\w+\/\w+\/\w+\//,"");
@@ -1170,7 +1117,6 @@ if(!isIndexCreate && !isAutoCreate){
                         $("#inputVideoPath").autocomplete({
                             source:video_path
                         });
-                        $("#inputVideoPath").val(video_path[0]);
                     }
                 }
             }, "json");
@@ -1194,7 +1140,6 @@ if(!isIndexCreate && !isAutoCreate){
                         $("#inputImagePathAdmob").autocomplete({
                             source:image_path
                         });
-                        $("#inputImagePathAdmob").val(image_path[0]);
                     }
                 }, "json");
         }
