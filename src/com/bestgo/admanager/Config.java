@@ -108,6 +108,7 @@ public class Config {
         regionLanguageRelMap.put("Czechia","Czech");
         regionLanguageRelMap.put("Canada","English");
 
+        regionLanguageRelMap.put("Dominican Republic","Spanish");
         regionLanguageRelMap.put("Malawi","English");
         regionLanguageRelMap.put("The Gambia","Arabic");
         regionLanguageRelMap.put("Madagascar","French");

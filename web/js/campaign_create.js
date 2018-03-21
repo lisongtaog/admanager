@@ -380,6 +380,7 @@ function init() {
         var bugdet = $('#inputBudgetAdmob').val();
         var bidding = $('#inputBiddingAdmob').val();
         var maxCPA = $('#inputMaxCpaAdmob').val();
+        var groupId = $('#selectAdvertGroupIdAdmob').val();
         var message1 = $('#inputMessage1').val();
         var message2 = $('#inputMessage2').val();
         var message3 = $('#inputMessage3').val();
@@ -440,6 +441,7 @@ function init() {
             //bidding: bidding,
             gpPackageId: app.google_package_id,
             maxCPA: maxCPA,
+            groupId: groupId,
             message1: message1,
             message2: message2,
             message3: message3,
@@ -579,6 +581,7 @@ function init() {
         var bugdet = $('#inputBudget').val();
         var bidding = $('#inputBidding').val();
         var maxCPA = $('#inputMaxCpa').val();
+        var groupId = $('#selectAdvertGroupId').val();
         var title = $('#inputTitle').val();
         var message = $('#inputMessage').val();
         var imagePath = $('#inputImagePath').val();
@@ -687,6 +690,7 @@ function init() {
             bugdet: bugdet,
             //bidding: bidding,
             maxCPA: maxCPA,
+            groupId: groupId,
             title: title,
             message: message,
             imagePath: imagePath,

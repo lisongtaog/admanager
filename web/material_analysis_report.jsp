@@ -18,7 +18,6 @@
     <style>
         .td_bottom_border {
             border-bottom: #ff2516 solid 1px;
-            /*border-top: #ff2516 solid 1px;*/
         }
         .td_left_border {
             border-left: #2f17ff solid 1px;
