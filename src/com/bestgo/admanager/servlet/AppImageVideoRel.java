@@ -139,7 +139,7 @@ public class AppImageVideoRel extends HttpServlet {
         }else if(path.matches("/query_admob_path_by_app")){
             JsonArray imageArray = new JsonArray();
             try {
-                String appName = request.getParameter("add_name");
+                String appName = request.getParameter("app_name");
                 String sql = "SELECT image_path FROM ad_app_image_path_rel WHERE app_name = '" + appName + "'";
                 List<JSObject> imagePathList = DB.findListBySql(sql);
                 if(imagePathList != null && imagePathList.size() > 0) {
