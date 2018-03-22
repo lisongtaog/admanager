@@ -94,7 +94,6 @@ function init() {
         var facebookCheck = $('#facebookCheck').is(':checked');
         var likeCampaignName = $('#inputLikeCampaignName').val();
         var containsNoDataCampaignCheck = $('#containsNoDataCampaignCheck').is(':checked');
-        // var onlyQueryNoDataCampaignCheck = $('#onlyQueryNoDataCampaignCheck').is(':checked');
 
         //非负整数
         var reg = /^\d+$/;
@@ -339,7 +338,8 @@ function init() {
                     "<th>总营收<span sorterId=\"72\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>预计总营收<span sorterId=\"73\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
                     "<th>总安装<span sorterId=\"74\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>总展示<span sorterId=\"75\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
                     "<th>总点击<span sorterId=\"76\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>CTR<span sorterId=\"77\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
-                    "<th>CPA<span sorterId=\"78\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>CVR<span sorterId=\"79\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th></tr>");
+                    "<th>CPA<span sorterId=\"78\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>CVR<span sorterId=\"79\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>"+
+                    "<th>ECPM<span sorterId=\"80\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>Incoming<span sorterId=\"81\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th></tr>");
 
 
                 data = data.data; //这里把返回数据里的 data属性 的值给了变量data，即变量data 是Query.java里的 arr[{},{},...,{}]
@@ -362,8 +362,10 @@ function setDataSummary(data) {
     var total_ctr = 0;
     var total_cpa = 0;
     var total_cvr = 0;
+    var total_ecpm = 0;
+    var total_incoming = 0;
     var keyset = ["name", "total_spend","endTime_total_spend", "total_revenue", "endTime_total_revenue","total_installed", "total_impressions", "total_click",
-        "total_ctr", "total_cpa", "total_cvr"];
+        "total_ctr", "total_cpa", "total_cvr","ecpm","incoming"];
     //后台传来的数组里每个JSON对象元素的属性排列顺序是一定的，但是按接下来的取法不必计较这个顺序
     //total_spend是每20分钟抓一次，total_revenue是每小时抓一次
 
@@ -390,26 +392,41 @@ function setDataSummary(data) {
             case 20: f_hours = 1/3;break;
             case 40: f_hours = 2/3;break;
         }
-    var d_hours = westTime - 16;   //得到北京时间与美西时间相差小时数
+    var d_hours = westTime;   //得到北京时间与美西时间相差小时数
 
 
     $('#results_body > tr').remove();
     for (var i = 0; i < data.length; i++) {
         var one = data[i];
-        var tr = $('<tr></tr>');
+        var tr = $("<tr></tr>");
+        var con;
         for (var j = 0; j < keyset.length; j++) {
-            var td = $('<td></td>');
+            if(keyset[j] == "total_spend"){
+                var td = $('<td title ="'+ data[i]["spend_14"]+'"></td>');
+            }
+            else if(keyset[j] == "total_revenue"){
+                var td = $('<td title ="'+ data[i]["revenue_14"]+'"></td>');
+            }
+            else if(keyset[j] == "total_installed"){
+                var td = $('<td title ="'+ data[i]["installed_14"]+'"></td>');
+            }
+            else if(keyset[j] == "total_cpa"){
+                var td = $('<td title ="'+ data[i]["cpa_14"]+'"></td>');
+            }
+            else if(keyset[j] == "total_cvr"){
+                var td = $('<td title ="'+ data[i]["cvr_14"]+'"></td>');
+            }else{
+                var td = $("<td></td>");
+            }
             var key = keyset[j];
             if(key == "endTime_total_spend"){
                 var endTime_total_spend = data[i][key]; //取当前数组成员 属性名为key 的属性值
                 var expected_total_spend = parseInt(endTime_total_spend/d_hours*24);
-                key = expected_total_spend;
-                td.append(key.toString());
+                con = expected_total_spend;
             }else if(key == "endTime_total_revenue"){
                 var endTime_total_revenue = data[i][key];
                 var expected_total_revenue = parseInt(endTime_total_revenue/(d_hours + f_hours)* 24);
-                key = expected_total_revenue;
-                td.append(key.toString());
+                con = expected_total_revenue;
             }else{
                 if(key == 'total_spend'){     //对total_spend 条目进行颜色处理
                     if(one['warning_level'] == 1){
@@ -418,8 +435,9 @@ function setDataSummary(data) {
                         td.addClass("red");
                     }
                 }
-                td.text(one[key]);
+                con = one[key];
             }
+            td.text(con);
             tr.append(td);
         }
         total_spend += one['total_spend'];
@@ -427,6 +445,7 @@ function setDataSummary(data) {
         total_installed += one['total_installed'];
         total_impressions += one['total_impressions'];
         total_click += one['total_click'];
+        total_incoming += one['incoming'];
 
         total_ctr = total_impressions > 0 ? total_click / total_impressions : 0;
         total_cpa = total_installed > 0 ? total_spend / total_installed : 0;
@@ -436,12 +455,14 @@ function setDataSummary(data) {
     if(adwordsCheck || facebookCheck){
         var str = "总花费: " + total_spend + " 总安装: " + total_installed +
             " 总展示: " + total_impressions + " 总点击: " + total_click +
-            " CTR: " + total_ctr + " CPA: " + total_cpa + " CVR: " + total_cvr;
+            " CTR: " + total_ctr + " CPA: " + total_cpa + " CVR: " + total_cvr +
+            " 总营收: "+ total_revenue + " Incoming in total: " + total_incoming;
         $('#total_result').text(str);
     }else{
         var str = "总花费: " + total_spend + "  总营收: " + total_revenue + " 总安装: " + total_installed +
             " 总展示: " + total_impressions + " 总点击: " + total_click +
-            " CTR: " + total_ctr + " CPA: " + total_cpa + " CVR: " + total_cvr;
+            " CTR: " + total_ctr + " CPA: " + total_cpa + " CVR: " + total_cvr +
+            " 总营收: "+ total_revenue + " Incoming in total: " + total_incoming;
         $('#total_result').text(str);
     }
 
@@ -498,9 +519,25 @@ function setData(data) {
                 td[0].cloumnName = field;
             }
 
-
             tr.append(td);
         }
+        //这里增加“新建”按钮——————————————————————————————
+        if(!countryCheck){
+            var btn = $('<input type="button" value="新建">');   //临时创建了一个变量btn，“新建”键
+            btn.data("campaign_id", one['campaign_id']);    //给当前这个键增加键值对
+            btn.data("budget",one['budget']);
+            btn.data("bidding",one['bidding']);
+            btn.click(function(){
+                var campaign_id = $(this).data("campaign_id");  //选中当前元素中键campaign_id的值
+                var budget = $(this).data("budget");
+                var bidding = $(this).data("bidding");
+                window.open("campaigns_create.jsp?type=auto_create&campaignId="+ campaign_id+ "&budget="+budget+"&bidding="+bidding,"_blank");
+                    //window.open(url,name,features,replace)，四个参数分别针对url，新窗口target属性或窗口名称，窗口特征和浏览器历史
+            });
+        }
+        tr.append(btn);
+        //——————————————————————————————————————————
+
         if(one["impressions"] == 0){
             tr.addClass("lilac");
         }
@@ -516,6 +553,7 @@ function setData(data) {
     }
     bindOp();
 }
+
 
 function bindOp() {
     $(".link_modify").click(function() {
