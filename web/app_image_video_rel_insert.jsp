@@ -111,7 +111,7 @@
 
   <script type="text/javascript">
     var modifyType = 'new';
-    $("li[role='presentation']:eq(19)").addClass("active");
+    $("li[role='presentation']:eq(14)").addClass("active");
     var data = <%=array.toString()%>;
     $("#inputSearch").autocomplete({
         source: data

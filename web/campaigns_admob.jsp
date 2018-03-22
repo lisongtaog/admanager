@@ -157,7 +157,7 @@
 <script src="js/bootstrap-tagsinput.js"></script>
 
 <script type="text/javascript">
-    $("li[role='presentation']:eq(9)").addClass("active");
+    $("li[role='presentation']:eq(8)").addClass("active");
     var id;
 
     var data = <%=array.toString()%>;

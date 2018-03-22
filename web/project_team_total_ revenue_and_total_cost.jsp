@@ -84,7 +84,7 @@
 
 <script>
     function init() {
-        $("li[role='presentation']:eq(18)").addClass("active");
+        $("li[role='presentation']:eq(13)").addClass("active");
 
         var now = new Date(new Date().getTime() - 86400 * 1000);
         $('#inputStartDate').val(now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + now.getDate());
