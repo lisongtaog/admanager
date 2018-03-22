@@ -38,6 +38,7 @@
 
   <div class="container-fluid">
     <%@include file="common/navigationbar.jsp"%>
+      
     <table>
       <tr>
         <td ><a href="adaccounts.jsp" target="_blank">&nbsp;&nbsp;广告账号管理&nbsp;&nbsp;</a></td>
