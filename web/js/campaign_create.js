@@ -967,7 +967,9 @@ function indexInitFormData(isIndexCreate,campaign_id) {
                     $("#inputAge").val(campaignData.age);
 
                     var imageTrimed = campaignData.image_path.replace(/home\/\w+\/\w+\/\w+\//,"");
+                    imageTrimed = imageTrimed.replace(/(\/.+\/)(.*\.\w+)/,"$1");
                     var videoTrimed = campaignData.video_path.replace(/home\/\w+\/\w+\/\w+\//,"");
+                    videoTrimed = videoTrimed.replace(/(\/.+\/)(.*\.\w+)/,"$1");
                     $("#inputImagePath").val(imageTrimed);
                     $("#inputVideoPath").val(videoTrimed);
 
@@ -994,6 +996,7 @@ function indexInitFormData(isIndexCreate,campaign_id) {
                     $('#inputMessage4').val(campaignData.message4);
 
                     var imageTrimed = campaignData.image_path.replace(/home\/\w+\/\w+\/\w+\//,"");
+                    imageTrimed = imageTrimed.replace(/(\/.+\/)(.*\.\w+)/,"$1");
                     $('#inputImagePathAdmob').val(imageTrimed);
 
                     if(campaignData.country_region != null && campaignData.country_region != ""){
@@ -1109,6 +1112,7 @@ if(!isIndexCreate && !isAutoCreate){
                         for(var i=0;i<data.image_array.length; i++){
                             var img = data.image_array[i];
                             var imgTrimed = img["image_path"].replace(/home\/\w+\/\w+\/\w+\//,"");
+                            imgTrimed = imgTrimed.replace(/(\/.+\/)(.*\.\w+)/,"$1");
                             image_path[i] = imgTrimed;
                         }
                         $("#inputImagePath").autocomplete({
@@ -1120,6 +1124,7 @@ if(!isIndexCreate && !isAutoCreate){
                         for(var i=0;i<data.video_array.length; i++){
                             var vdo = data.video_array[i];
                             var vdoTrimed = vdo["video_path"].replace(/home\/\w+\/\w+\/\w+\//,"");
+                            vdoTrimed = vdoTrimed.replace(/(\/.+\/)(.*\.\w+)/,"$1");
                             video_path[i] = vdoTrimed;
                         }
                         $("#inputVideoPath").autocomplete({
@@ -1143,6 +1148,7 @@ if(!isIndexCreate && !isAutoCreate){
                         for(var i=0;i<data.image_array.length; i++){
                             var img = data.image_array[i];
                             var imgTrimed = img["image_path"].replace(/home\/\w+\/\w+\/\w+\//,"");
+                            imgTrimed = imgTrimed.replace(/(\/.+\/)(.*\.\w+)/,"$1");
                             image_path[i] = imgTrimed;
                         }
                         $("#inputImagePathAdmob").autocomplete({

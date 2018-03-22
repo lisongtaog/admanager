@@ -530,7 +530,9 @@ function setData(data) {
             btn.click(function(){
                 var campaign_id = $(this).data("campaign_id");  //选中当前元素中键campaign_id的值
                 var budget = $(this).data("budget");
+                budget = budget/100;
                 var bidding = $(this).data("bidding");
+                bidding = bidding/100;
                 window.open("campaigns_create.jsp?type=auto_create&campaignId="+ campaign_id+ "&budget="+budget+"&bidding="+bidding,"_blank");
                     //window.open(url,name,features,replace)，四个参数分别针对url，新窗口target属性或窗口名称，窗口特征和浏览器历史
             });
