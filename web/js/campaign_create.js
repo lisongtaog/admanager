@@ -927,7 +927,7 @@ $('#selectRegionAdmob,#selectAdvertGroupIdAdmob').change(function () {
     return false;
 });
 
-//从（暂定）index2.jsp传来的参数进行各表单的自动填充
+//从（暂定）index2.jsp 或 index.jsp传来的参数进行各表单的自动填充
 function indexInitFormData(isIndexCreate,campaign_id) {
     if (isIndexCreate) {
         $.post("IndexCampaignCreate", {
@@ -966,6 +966,11 @@ function indexInitFormData(isIndexCreate,campaign_id) {
                     $("#selectGender").val(campaignData.gender);
                     $("#inputAge").val(campaignData.age);
 
+                    var imageTrimed = campaignData.image_path.replace(/home\/\w+\/\w+\/\w+\//,"");
+                    var videoTrimed = campaignData.video_path.replace(/home\/\w+\/\w+\/\w+\//,"");
+                    $("#inputImagePath").val(imageTrimed);
+                    $("#inputVideoPath").val(videoTrimed);
+
                 }else if (campaignData.flag == "admob") {
                     $('#checkAdmob').prop('checked', true);
                     $('#checkAdmob').click();
@@ -988,7 +993,8 @@ function indexInitFormData(isIndexCreate,campaign_id) {
                     $('#inputMessage3').val(campaignData.message3);
                     $('#inputMessage4').val(campaignData.message4);
 
-                    $('#inputImagePathAdmob').val(campaignData.image_path);
+                    var imageTrimed = campaignData.image_path.replace(/home\/\w+\/\w+\/\w+\//,"");
+                    $('#inputImagePathAdmob').val(imageTrimed);
 
                     if(campaignData.country_region != null && campaignData.country_region != ""){
                         $('#selectRegionAdmob').val(campaignData.country_region.split(',')); //将字符串从指定符号处分割为字符串数组
@@ -1048,7 +1054,8 @@ function initFormData() {
                     $('#inputMaxCpa').val(campaignData.max_cpa);
                     $('#inputTitle').val(campaignData.title);
                     $('#inputMessage').val(campaignData.message);
-                    $('#inputImagePath').val(campaignData.image_path);
+                    var imageTrimed = campaignData.image_path.replace(/home\/\w+\/\w+\/\w+\//,"");
+                    $('#inputImagePath').val(imageTrimed);
                     $('#inputCampaignName').val(campaignData.campaign_name);
 
                     $('#btnCreate').val('更新');
@@ -1076,7 +1083,8 @@ function initFormData() {
                     $('#inputMessage2').val(campaignData.message2);
                     $('#inputMessage3').val(campaignData.message3);
                     $('#inputMessage4').val(campaignData.message4);
-                    $('#inputImagePathAdmob').val(campaignData.image_path);
+                    var imageTrimed = campaignData.image_path.replace(/home\/\w+\/\w+\/\w+\//,"");
+                    $('#inputImagePathAdmob').val(imageTrimed);
                     $('#inputCampaignNameAdmob').val(campaignData.campaign_name);
                     $('#btnCreateAdmob').val('更新');
                 }

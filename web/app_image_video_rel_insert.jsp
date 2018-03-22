@@ -10,6 +10,12 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css" />
 <link rel="stylesheet" href="bootstrap/css/bootstrap-theme.min.css" />
+<link rel="stylesheet" href="css/core.css"/>
+<link rel="stylesheet" href="css/bootstrap-tagsinput.css"/>
+<link rel="stylesheet" href="css/bootstrap-datetimepicker.css"/>
+<link rel="stylesheet" href="jqueryui/jquery-ui.css"/>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.4/css/select2.min.css" rel="stylesheet" />
+
 
 <html>
   <head>
