@@ -64,7 +64,7 @@ public class MaterialAnalysisReport extends HttpServlet {
                                 " AND create_time < '" + tomorrow + "' AND image_file_path LIKE '%" + imagePath + "%'";
                         List<JSObject> facebookCampaignIdList = DB.findListBySql(sql);
                         if (facebookCampaignIdList != null && facebookCampaignIdList.size() > 0) {
-                            facebookCampaignIdsStr = Utils.getStrForListDistinctByAttrWithCommmas(facebookCampaignIdList, "campaign_id", true);
+                            facebookCampaignIdsStr = Utils.getStrForListDistinctByAttrWithCommmas(facebookCampaignIdList, "campaign_id");
                         }
 
                         //根据图片路径匹配Adwords系列
@@ -73,7 +73,7 @@ public class MaterialAnalysisReport extends HttpServlet {
                                 " AND create_time < '" + tomorrow + "' AND image_path LIKE '%" + imagePath + "%'";
                         List<JSObject> adwordsCampaignIdList = DB.findListBySql(sql);
                         if (adwordsCampaignIdList != null && adwordsCampaignIdList.size() > 0) {
-                            adwordsCampaignIdsStr = Utils.getStrForListDistinctByAttrWithCommmas(adwordsCampaignIdList, "campaign_id", true);
+                            adwordsCampaignIdsStr = Utils.getStrForListDistinctByAttrWithCommmas(adwordsCampaignIdList, "campaign_id");
                         }
                         facebookCampaignIdsStr = facebookCampaignIdsStr == null ? "noData" : facebookCampaignIdsStr;
                         adwordsCampaignIdsStr = adwordsCampaignIdsStr == null ? "noData" : adwordsCampaignIdsStr;
@@ -107,7 +107,7 @@ public class MaterialAnalysisReport extends HttpServlet {
                                 " AND create_time < '" + tomorrow + "' AND video_file_path LIKE '%" + videoPath + "%'";
                         List<JSObject> facebookCampaignIdList = DB.findListBySql(sql);
                         if(facebookCampaignIdList != null && facebookCampaignIdList.size() > 0) {
-                            facebookCampaignIdsStr = Utils.getStrForListDistinctByAttrWithCommmas(facebookCampaignIdList, "campaign_id", true);
+                            facebookCampaignIdsStr = Utils.getStrForListDistinctByAttrWithCommmas(facebookCampaignIdList, "campaign_id");
                         }
 
                         facebookCampaignIdsStr = facebookCampaignIdsStr == null ? "noData" : facebookCampaignIdsStr;
@@ -123,7 +123,7 @@ public class MaterialAnalysisReport extends HttpServlet {
                         " AND group_id = 1";
                 List<JSObject> facebookGroupOneCampaignList = DB.findListBySql(sql);
                 if(facebookGroupOneCampaignList != null && facebookGroupOneCampaignList.size() > 0){
-                    String facebookGroupOneCampaignsStr = Utils.getStrForListDistinctByAttrWithCommmas(facebookGroupOneCampaignList,"campaign_id", true);
+                    String facebookGroupOneCampaignsStr = Utils.getStrForListDistinctByAttrWithCommmas(facebookGroupOneCampaignList,"campaign_id");
                     groupOneCampaignsStr = facebookGroupOneCampaignsStr == null ? "" : facebookGroupOneCampaignsStr;
                 }
                 sql = "SELECT campaign_id FROM ad_campaigns_admob WHERE app_name = '" + tagName + "' " +
@@ -131,7 +131,7 @@ public class MaterialAnalysisReport extends HttpServlet {
                         " AND group_id = 1";
                 List<JSObject> admobGroupOneCampaignList = DB.findListBySql(sql);
                 if(admobGroupOneCampaignList != null && admobGroupOneCampaignList.size() > 0){
-                    String admobGroupOneCampaignsStr = Utils.getStrForListDistinctByAttrWithCommmas(admobGroupOneCampaignList,"campaign_id", true);
+                    String admobGroupOneCampaignsStr = Utils.getStrForListDistinctByAttrWithCommmas(admobGroupOneCampaignList,"campaign_id");
                     groupOneCampaignsStr = admobGroupOneCampaignsStr == null ? groupOneCampaignsStr : groupOneCampaignsStr + "," + admobGroupOneCampaignsStr;
                 }
 
@@ -142,7 +142,7 @@ public class MaterialAnalysisReport extends HttpServlet {
                         " AND group_id = 2";
                 List<JSObject> facebookGroupTwoCampaignList = DB.findListBySql(sql);
                 if(facebookGroupTwoCampaignList != null && facebookGroupTwoCampaignList.size() > 0){
-                    String facebookGroupTwoCampaignsStr = Utils.getStrForListDistinctByAttrWithCommmas(facebookGroupTwoCampaignList,"campaign_id", true);
+                    String facebookGroupTwoCampaignsStr = Utils.getStrForListDistinctByAttrWithCommmas(facebookGroupTwoCampaignList,"campaign_id");
                     groupTwoCampaignsStr = facebookGroupTwoCampaignsStr == null ? "" : facebookGroupTwoCampaignsStr;
                 }
                 sql = "SELECT campaign_id FROM ad_campaigns_admob WHERE app_name = '" + tagName + "' " +
@@ -150,7 +150,7 @@ public class MaterialAnalysisReport extends HttpServlet {
                         " AND group_id = 2";
                 List<JSObject> admobGroupTwoCampaignList = DB.findListBySql(sql);
                 if(admobGroupTwoCampaignList != null && admobGroupTwoCampaignList.size() > 0){
-                    String admobGroupTwoCampaignsStr = Utils.getStrForListDistinctByAttrWithCommmas(admobGroupTwoCampaignList,"campaign_id", true);
+                    String admobGroupTwoCampaignsStr = Utils.getStrForListDistinctByAttrWithCommmas(admobGroupTwoCampaignList,"campaign_id");
                     groupTwoCampaignsStr = admobGroupTwoCampaignsStr == null ? groupTwoCampaignsStr : groupTwoCampaignsStr + "," + admobGroupTwoCampaignsStr;
                 }
 
@@ -161,7 +161,7 @@ public class MaterialAnalysisReport extends HttpServlet {
                         " AND group_id = 3";
                 List<JSObject> facebookGroupThreeCampaignList = DB.findListBySql(sql);
                 if(facebookGroupThreeCampaignList != null && facebookGroupThreeCampaignList.size() > 0){
-                    String facebookGroupThreeCampaignsStr = Utils.getStrForListDistinctByAttrWithCommmas(facebookGroupThreeCampaignList,"campaign_id", true);
+                    String facebookGroupThreeCampaignsStr = Utils.getStrForListDistinctByAttrWithCommmas(facebookGroupThreeCampaignList,"campaign_id");
                     groupThreeCampaignsStr = facebookGroupThreeCampaignsStr == null ? "" : facebookGroupThreeCampaignsStr;
                 }
                 sql = "SELECT campaign_id FROM ad_campaigns_admob WHERE app_name = '" + tagName + "' " +
@@ -169,7 +169,7 @@ public class MaterialAnalysisReport extends HttpServlet {
                         " AND group_id = 3";
                 List<JSObject> admobGroupThreeCampaignList = DB.findListBySql(sql);
                 if(admobGroupThreeCampaignList != null && admobGroupThreeCampaignList.size() > 0){
-                    String admobGroupThreeCampaignsStr = Utils.getStrForListDistinctByAttrWithCommmas(admobGroupThreeCampaignList,"campaign_id", true);
+                    String admobGroupThreeCampaignsStr = Utils.getStrForListDistinctByAttrWithCommmas(admobGroupThreeCampaignList,"campaign_id");
                     groupThreeCampaignsStr = admobGroupThreeCampaignsStr == null ? groupThreeCampaignsStr : groupThreeCampaignsStr + "," + admobGroupThreeCampaignsStr;
                 }
 
@@ -181,7 +181,7 @@ public class MaterialAnalysisReport extends HttpServlet {
                         " AND group_id = 4";
                 List<JSObject> facebookGroupFourCampaignList = DB.findListBySql(sql);
                 if(facebookGroupFourCampaignList != null && facebookGroupFourCampaignList.size() > 0){
-                    String facebookGroupFourCampaignsStr = Utils.getStrForListDistinctByAttrWithCommmas(facebookGroupFourCampaignList,"campaign_id", true);
+                    String facebookGroupFourCampaignsStr = Utils.getStrForListDistinctByAttrWithCommmas(facebookGroupFourCampaignList,"campaign_id");
                     groupFourCampaignsStr = facebookGroupFourCampaignsStr == null ? "" : facebookGroupFourCampaignsStr;
                 }
                 sql = "SELECT campaign_id FROM ad_campaigns_admob WHERE app_name = '" + tagName + "' " +
@@ -189,7 +189,7 @@ public class MaterialAnalysisReport extends HttpServlet {
                         " AND group_id = 4";
                 List<JSObject> admobGroupFourCampaignList = DB.findListBySql(sql);
                 if(admobGroupFourCampaignList != null && admobGroupFourCampaignList.size() > 0){
-                    String admobGroupFourCampaignsStr = Utils.getStrForListDistinctByAttrWithCommmas(admobGroupFourCampaignList,"campaign_id", true);
+                    String admobGroupFourCampaignsStr = Utils.getStrForListDistinctByAttrWithCommmas(admobGroupFourCampaignList,"campaign_id");
                     groupFourCampaignsStr = admobGroupFourCampaignsStr == null ? groupFourCampaignsStr : groupFourCampaignsStr + "," + admobGroupFourCampaignsStr;
                 }
 
