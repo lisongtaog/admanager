@@ -31,7 +31,7 @@ public class Query3 extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String[] fourteen_arr = null;
+//        String[] fourteen_arr = null;
         if (!Utils.isAdmin(request, response)) return;
 
         JsonObject json = new JsonObject();
@@ -69,18 +69,22 @@ public class Query3 extends HttpServlet {
                         CampaignsSummary campaignsSummary = new CampaignsSummary();
                         long id = tagJSObject.get("id");
                         campaignsSummary.name = tagJSObject.get("tag_name");
+
                         JsonObject admob = fetchOneAppDataSummary(id, startTime, endTime, true,sameTime);
                         JsonObject facebook = fetchOneAppDataSummary(id, startTime, endTime, false,sameTime);
-
-                        JsonObject admob1 = fetchOneAppDataSummary(id, endTime, endTime, true,sameTime);
-                        JsonObject facebook1 = fetchOneAppDataSummary(id, endTime, endTime, false,sameTime);
-                        campaignsSummary.end_time_total_spend = Utils.trimDouble(admob1.get("total_spend").getAsDouble() + facebook1.get("total_spend").getAsDouble(), 0);
-
                         campaignsSummary.total_impressions = admob.get("total_impressions").getAsDouble() + facebook.get("total_impressions").getAsDouble();
                         if (campaignsSummary.total_impressions == 0) {
                             continue;
                         }
                         campaignsSummary.total_spend = admob.get("total_spend").getAsDouble() + facebook.get("total_spend").getAsDouble();
+                        if(sameTime){
+                            campaignsSummary.end_time_total_spend = campaignsSummary.total_spend;
+                        }else{
+                            JsonObject admob1 = fetchOneAppDataSummary(id, endTime, endTime, true,true);
+                            JsonObject facebook1 = fetchOneAppDataSummary(id, endTime, endTime, false,true);
+                            campaignsSummary.end_time_total_spend = Utils.trimDouble(admob1.get("total_spend").getAsDouble() + facebook1.get("total_spend").getAsDouble(), 0);
+                        }
+
                         campaignsSummary.total_installed = admob.get("total_installed").getAsDouble() + facebook.get("total_installed").getAsDouble();
                         campaignsSummary.total_click = admob.get("total_click").getAsDouble() + facebook.get("total_click").getAsDouble();
                         campaignsSummary.total_ctr = campaignsSummary.total_impressions > 0 ? campaignsSummary.total_click / campaignsSummary.total_impressions : 0;
@@ -116,7 +120,7 @@ public class Query3 extends HttpServlet {
                             }
 
                             //14行悬浮窗：用一个静态方法FourteenData 来生成一个用于返回的数组 fourteen_arr,
-                            fourteen_arr = FourteenData(id, google_package_id, endTime);
+//                            fourteen_arr = FourteenData(id, google_package_id, endTime);
 
                             //计算ECPM和Incoming
                             campaignsSummary.ecpm = campaignsSummary.total_revenue * 1000 / campaignsSummary.total_impressions;
@@ -152,11 +156,11 @@ public class Query3 extends HttpServlet {
 
 
                             //在 数组arr 里添加 fourteen系列键值对，用于传回jsp生成悬浮窗
-                            j.addProperty("spend_14", fourteen_arr[0]);
-                            j.addProperty("installed_14", fourteen_arr[1]);
-                            j.addProperty("cpa_14", fourteen_arr[2]);
-                            j.addProperty("cvr_14", fourteen_arr[3]);
-                            j.addProperty("revenue_14", fourteen_arr[4]);
+//                            j.addProperty("spend_14", fourteen_arr[0]);
+//                            j.addProperty("installed_14", fourteen_arr[1]);
+//                            j.addProperty("cpa_14", fourteen_arr[2]);
+//                            j.addProperty("cvr_14", fourteen_arr[3]);
+//                            j.addProperty("revenue_14", fourteen_arr[4]);
 
                             arr.add(j);
                         }
@@ -165,23 +169,28 @@ public class Query3 extends HttpServlet {
                 } else {   //这里是sorter=0 的条件时,默认也是0
                     String sqlTag = "SELECT t.id,t.tag_name,google_package_id from web_tag t LEFT JOIN web_facebook_app_ids_rel air ON t.tag_name = air.tag_name ORDER BY t.tag_name";
                     List<JSObject> tagList = DB.findListBySql(sqlTag);
+                    JsonObject admob = null;
+                    JsonObject facebook = null;
                     for (JSObject tagJSObject : tagList) {
                         long id = tagJSObject.get("id");
                         String tagName = tagJSObject.get("tag_name");
-                        JsonObject admob = fetchOneAppDataSummary(id, startTime, endTime, true,sameTime);
-                        JsonObject facebook = fetchOneAppDataSummary(id, startTime, endTime, false,sameTime);
-
-                        JsonObject admob1 = fetchOneAppDataSummary(id, endTime, endTime, true,sameTime);
-                        JsonObject facebook1 = fetchOneAppDataSummary(id, endTime, endTime, false,sameTime);
-                        double endTime_total_spend = admob1.get("total_spend").getAsDouble() + facebook1.get("total_spend").getAsDouble();
-                        admob.addProperty("endTime_total_spend", Utils.trimDouble(endTime_total_spend, 0));
-
+                        admob = fetchOneAppDataSummary(id, startTime, endTime, true,sameTime);
+                        facebook = fetchOneAppDataSummary(id, startTime, endTime, false,sameTime);
                         double total_impressions = admob.get("total_impressions").getAsDouble() + facebook.get("total_impressions").getAsDouble();
                         if (total_impressions == 0) {
                             continue;
                         }
-
                         double total_spend = admob.get("total_spend").getAsDouble() + facebook.get("total_spend").getAsDouble();
+                        double endTime_total_spend = 0;
+                        if(sameTime){
+                            endTime_total_spend = total_spend;
+                        }else{
+                            JsonObject admob1 = fetchOneAppDataSummary(id, endTime, endTime, true,true);
+                            JsonObject facebook1 = fetchOneAppDataSummary(id, endTime, endTime, false,true);
+                            endTime_total_spend = admob1.get("total_spend").getAsDouble() + facebook1.get("total_spend").getAsDouble();
+                        }
+
+
                         double total_installed = admob.get("total_installed").getAsDouble() + facebook.get("total_installed").getAsDouble();
                         double total_click = admob.get("total_click").getAsDouble() + facebook.get("total_click").getAsDouble();
                         double total_ctr = total_impressions > 0 ? total_click / total_impressions : 0;
@@ -190,6 +199,7 @@ public class Query3 extends HttpServlet {
 
                         //这行之前的JsonObject admob 是个从表里取出的JSON对象，经下面一系列addProperty的操作后，变为存储处理好的值的JSON对象
                         admob.addProperty("total_spend", Utils.trimDouble(total_spend, 0));
+                        admob.addProperty("endTime_total_spend", Utils.trimDouble(endTime_total_spend, 0));
                         admob.addProperty("total_installed", total_installed);
                         admob.addProperty("total_impressions", total_impressions);
                         admob.addProperty("total_click", total_click);
@@ -236,7 +246,7 @@ public class Query3 extends HttpServlet {
                             }
 
                             //14行悬浮窗：用一个静态方法FourteenData 来生成一个用于返回的数组 fourteen_arr,
-                            fourteen_arr = FourteenData(id,endTime,googlePackageId);
+//                            fourteen_arr = FourteenData(id,endTime,googlePackageId);
                         }
                         admob.addProperty("endTime_total_revenue", Utils.trimDouble(endTimeTotalRevenue, 0));
                         admob.addProperty("total_revenue", Utils.trimDouble(totalRevenue, 0));
@@ -249,11 +259,11 @@ public class Query3 extends HttpServlet {
 
 
                         //在admob里添加14天数据
-                        admob.addProperty("spend_14", fourteen_arr[0]);
-                        admob.addProperty("installed_14", fourteen_arr[1]);
-                        admob.addProperty("cpa_14", fourteen_arr[2]);
-                        admob.addProperty("cvr_14", fourteen_arr[3]);
-                        admob.addProperty("revenue_14", fourteen_arr[4]);
+//                        admob.addProperty("spend_14", fourteen_arr[0]);
+//                        admob.addProperty("installed_14", fourteen_arr[1]);
+//                        admob.addProperty("cpa_14", fourteen_arr[2]);
+//                        admob.addProperty("cvr_14", fourteen_arr[3]);
+//                        admob.addProperty("revenue_14", fourteen_arr[4]);
 
                         arr.add(admob);
                     }
@@ -343,111 +353,111 @@ public class Query3 extends HttpServlet {
 
 
     //设计一个静态方法用于初始化数组 fourteen_arr,该数组存储14天数据
-    public static String[] FourteenData(long id, String end, String google_package_id) throws Exception {
-        //存储14天浮窗数据：形式为字符串
-        Query3 query = new Query3();
-        List<JsonObject> admob_14 = query.AttrTitleData(id, end, true);
-        List<JsonObject> facebook_14 = query.AttrTitleData(id, end, false);
-        List<JsonObject> revenue_14 = query.AttrTitleData_revenue(google_package_id, end);
-        FourteenDays FourteenList = new FourteenDays();
-        String[] fourteen_arr = new String[5];
-
-        for (int j = 0; j < 14; j++) {
-            JsonObject a = admob_14.get(j);
-            JsonObject f = facebook_14.get(j);
-            JsonObject r = revenue_14.get(j);
-            double spend = Utils.trimDouble(a.get("one_day_spend").getAsDouble() + f.get("one_day_spend").getAsDouble(), 0);
-            double installed = Utils.trimDouble(a.get("one_day_installed").getAsDouble() + f.get("one_day_spend").getAsDouble(), 0);
-            double click = a.get("one_day_click").getAsDouble() + f.get("one_day_click").getAsDouble();
-            double cpa_rough = installed > 0 ? spend / installed : 0;
-            double cpa = Utils.trimDouble(cpa_rough, 3);
-            double cvr_rough = click > 0 ? installed / click : 0;
-            double cvr = Utils.trimDouble(cvr_rough, 3);
-            double revenue = Utils.trimDouble(r.get("revenue").getAsDouble(),0);   //如这类，取到空值时会报异常
-            //以下开始拼接用于悬浮显示的字符串
-            FourteenList.one_day_spend_for_fourteen_days += spend + "\n";
-            FourteenList.one_day_installed_for_fourteen_days += installed + "\n";
-            FourteenList.one_day_cpa_for_fourteen_days += cpa + "\n";
-            FourteenList.one_day_cvr_for_fourteen_days += cvr + "\n";
-            FourteenList.one_day_revenue_for_fourteen_days += revenue + "\n";
-        }
-        fourteen_arr[0] = FourteenList.one_day_spend_for_fourteen_days;
-        fourteen_arr[1] = FourteenList.one_day_installed_for_fourteen_days;
-        fourteen_arr[2] = FourteenList.one_day_cpa_for_fourteen_days;
-        fourteen_arr[3] = FourteenList.one_day_cvr_for_fourteen_days;
-        fourteen_arr[4] = FourteenList.one_day_revenue_for_fourteen_days;
-        return fourteen_arr;
-    }
+//    public static String[] FourteenData(long id, String end, String google_package_id) throws Exception {
+//        //存储14天浮窗数据：形式为字符串
+//        Query4 query = new Query4();
+//        List<JsonObject> admob_14 = query.AttrTitleData(id, end, true);
+//        List<JsonObject> facebook_14 = query.AttrTitleData(id, end, false);
+//        List<JsonObject> revenue_14 = query.AttrTitleData_revenue(google_package_id, end);
+//        FourteenDays FourteenList = new FourteenDays();
+//        String[] fourteen_arr = new String[5];
+//
+//        for (int j = 0; j < 14; j++) {
+//            JsonObject a = admob_14.get(j);
+//            JsonObject f = facebook_14.get(j);
+//            JsonObject r = revenue_14.get(j);
+//            double spend = Utils.trimDouble(a.get("one_day_spend").getAsDouble() + f.get("one_day_spend").getAsDouble(), 0);
+//            double installed = Utils.trimDouble(a.get("one_day_installed").getAsDouble() + f.get("one_day_spend").getAsDouble(), 0);
+//            double click = a.get("one_day_click").getAsDouble() + f.get("one_day_click").getAsDouble();
+//            double cpa_rough = installed > 0 ? spend / installed : 0;
+//            double cpa = Utils.trimDouble(cpa_rough, 3);
+//            double cvr_rough = click > 0 ? installed / click : 0;
+//            double cvr = Utils.trimDouble(cvr_rough, 3);
+//            double revenue = Utils.trimDouble(r.get("revenue").getAsDouble(),0);   //如这类，取到空值时会报异常
+//            //以下开始拼接用于悬浮显示的字符串
+//            FourteenList.one_day_spend_for_fourteen_days += spend + "\n";
+//            FourteenList.one_day_installed_for_fourteen_days += installed + "\n";
+//            FourteenList.one_day_cpa_for_fourteen_days += cpa + "\n";
+//            FourteenList.one_day_cvr_for_fourteen_days += cvr + "\n";
+//            FourteenList.one_day_revenue_for_fourteen_days += revenue + "\n";
+//        }
+//        fourteen_arr[0] = FourteenList.one_day_spend_for_fourteen_days;
+//        fourteen_arr[1] = FourteenList.one_day_installed_for_fourteen_days;
+//        fourteen_arr[2] = FourteenList.one_day_cpa_for_fourteen_days;
+//        fourteen_arr[3] = FourteenList.one_day_cvr_for_fourteen_days;
+//        fourteen_arr[4] = FourteenList.one_day_revenue_for_fourteen_days;
+//        return fourteen_arr;
+//    }
 
 
     //14天数据的总方法（设置在title属性里）
-    private List<JsonObject> AttrTitleData(long tagId, String endTime, boolean admobCheck) throws Exception {
-        String webAdCampaignTagRelTable = "web_ad_campaign_tag_rel";
-        String webAdCampaignsTable = "web_ad_campaigns";
-        String webAdCampaignsHistoryTable = "web_ad_campaigns_history";
-        if (admobCheck) {
-            webAdCampaignTagRelTable = "web_ad_campaign_tag_admob_rel";
-            webAdCampaignsTable = "web_ad_campaigns_admob";
-            webAdCampaignsHistoryTable = "web_ad_campaigns_history_admob";
-        }
-        List<JsonObject> title = new ArrayList<>();
-        for (int i = 0; i < 14; i++) {
-            //DayCount : 每循环一次得到相比上次的前一天
-            JsonObject jsonObject = new JsonObject(); //在static context 里实例化非静态类，需要通过对象进行实例化
-            String DayCount = DateUtil.addDay(endTime, -i, "yyyy-MM-dd");
-            String sql = "select sum(ch.total_spend) as spend, " +
-                    "sum(ch.total_installed) as installed, sum(ch.total_impressions) as impressions " +
-                    ",sum(ch.total_click) as click from " + webAdCampaignsTable + " c, " + webAdCampaignsHistoryTable + " ch, " +
-                    "(select distinct campaign_id from " + webAdCampaignTagRelTable + " where tag_id = " + tagId + ") rt " +
-                    "where rt.campaign_id = ch.campaign_id and c.campaign_id = ch.campaign_id " +
-                    "and date = '" + DayCount + "'" +
-                    "and c.status != 'removed' ";
-            JSObject one = DB.findOneBySql(sql);
-            double total_installed = Utils.convertDouble(one.get("installed"), 0);
-            double total_spend = Utils.convertDouble(one.get("spend"), 0);
-            double total_click = Utils.convertDouble(one.get("click"), 0);
-            double total_cpa = total_installed > 0 ? total_spend / total_installed : 0;
-            double total_cvr = total_click > 0 ? total_installed / total_click : 0;
-
-            jsonObject.addProperty("one_day_spend", total_spend);
-            jsonObject.addProperty("one_day_installed", total_installed);
-            jsonObject.addProperty("one_day_click", total_click);
-            jsonObject.addProperty("one_day_cpa", Utils.trimDouble(total_cpa, 3));
-            jsonObject.addProperty("one_day_cvr", Utils.trimDouble(total_cvr, 3));
-            title.add(jsonObject);
-        }
-        return title;
-    }
+//    private List<JsonObject> AttrTitleData(long tagId, String endTime, boolean admobCheck) throws Exception {
+//        String webAdCampaignTagRelTable = "web_ad_campaign_tag_rel";
+//        String webAdCampaignsTable = "web_ad_campaigns";
+//        String webAdCampaignsHistoryTable = "web_ad_campaigns_history";
+//        if (admobCheck) {
+//            webAdCampaignTagRelTable = "web_ad_campaign_tag_admob_rel";
+//            webAdCampaignsTable = "web_ad_campaigns_admob";
+//            webAdCampaignsHistoryTable = "web_ad_campaigns_history_admob";
+//        }
+//        List<JsonObject> title = new ArrayList<>();
+//        for (int i = 0; i < 14; i++) {
+//            //DayCount : 每循环一次得到相比上次的前一天
+//            JsonObject jsonObject = new JsonObject(); //在static context 里实例化非静态类，需要通过对象进行实例化
+//            String DayCount = DateUtil.addDay(endTime, -i, "yyyy-MM-dd");
+//            String sql = "select sum(ch.total_spend) as spend, " +
+//                    "sum(ch.total_installed) as installed, sum(ch.total_impressions) as impressions " +
+//                    ",sum(ch.total_click) as click from " + webAdCampaignsTable + " c, " + webAdCampaignsHistoryTable + " ch, " +
+//                    "(select distinct campaign_id from " + webAdCampaignTagRelTable + " where tag_id = " + tagId + ") rt " +
+//                    "where rt.campaign_id = ch.campaign_id and c.campaign_id = ch.campaign_id " +
+//                    "and date = '" + DayCount + "'" +
+//                    "and c.status != 'removed' ";
+//            JSObject one = DB.findOneBySql(sql);
+//            double total_installed = Utils.convertDouble(one.get("installed"), 0);
+//            double total_spend = Utils.convertDouble(one.get("spend"), 0);
+//            double total_click = Utils.convertDouble(one.get("click"), 0);
+//            double total_cpa = total_installed > 0 ? total_spend / total_installed : 0;
+//            double total_cvr = total_click > 0 ? total_installed / total_click : 0;
+//
+//            jsonObject.addProperty("one_day_spend", total_spend);
+//            jsonObject.addProperty("one_day_installed", total_installed);
+//            jsonObject.addProperty("one_day_click", total_click);
+//            jsonObject.addProperty("one_day_cpa", Utils.trimDouble(total_cpa, 3));
+//            jsonObject.addProperty("one_day_cvr", Utils.trimDouble(total_cvr, 3));
+//            title.add(jsonObject);
+//        }
+//        return title;
+//    }
 
     //以下是取14天的revenue
-    private List<JsonObject> AttrTitleData_revenue(String google_package_id, String endTime) {
-
-        List<JsonObject> revenue = new ArrayList<>();
-        for (int i = 0; i < 14; i++) {
-            JsonObject jsonObject = new JsonObject();
-            String DayCount = DateUtil.addDay(endTime, -i, "yyyy-MM-dd");
-            String sqlR = "select sum(revenue) as revenues " +
-                    "from web_ad_country_analysis_report_history where app_id = '"
-                    + google_package_id + "' and date = '" + DayCount + "'";
-            //           JSObject one = DB.findOneBySql(sqlR); //这么写的时候，由于方法findOneBySql()声明过异常，则调用该方法的时候要截住异常。
-
-            JSObject one= null;
-            Double revenues=0.0;
-
-            /*
-             * 被try/catch对捕捉到的异常不会在控制台里报错
-             * 被catch的异常可以方便断点调试，比如在控制台里观察出错变量的信息
-             */
-            try {
-                one = DB.findOneBySql(sqlR);
-                revenues = one.get("revenues");
-            } catch (Exception e) {}
-
-            jsonObject.addProperty("revenue", Utils.trimDouble(revenues,0));
-            revenue.add(jsonObject);   //List是一个接口而不是实际类，接口内只有方法。其对象的实例化需要调用方法。
-        }
-        return revenue;
-    }
+//    private List<JsonObject> AttrTitleData_revenue(String google_package_id, String endTime) {
+//
+//        List<JsonObject> revenue = new ArrayList<>();
+//        for (int i = 0; i < 14; i++) {
+//            JsonObject jsonObject = new JsonObject();
+//            String DayCount = DateUtil.addDay(endTime, -i, "yyyy-MM-dd");
+//            String sqlR = "select sum(revenue) as revenues " +
+//                    "from web_ad_country_analysis_report_history where app_id = '"
+//                    + google_package_id + "' and date = '" + DayCount + "'";
+//            //           JSObject one = DB.findOneBySql(sqlR); //这么写的时候，由于方法findOneBySql()声明过异常，则调用该方法的时候要截住异常。
+//
+//            JSObject one= null;
+//            Double revenues=0.0;
+//
+//            /*
+//             * 被try/catch对捕捉到的异常不会在控制台里报错
+//             * 被catch的异常可以方便断点调试，比如在控制台里观察出错变量的信息
+//             */
+//            try {
+//                one = DB.findOneBySql(sqlR);
+//                revenues = one.get("revenues");
+//            } catch (Exception e) {}
+//
+//            jsonObject.addProperty("revenue", Utils.trimDouble(revenues,0));
+//            revenue.add(jsonObject);   //List是一个接口而不是实际类，接口内只有方法。其对象的实例化需要调用方法。
+//        }
+//        return revenue;
+//    }
 
 
     //以下封装了用于首页数据排序的方法

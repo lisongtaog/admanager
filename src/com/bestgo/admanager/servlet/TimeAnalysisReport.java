@@ -203,11 +203,12 @@ public class TimeAnalysisReport extends HttpServlet {
                         if (j != null && j.hasObjectData()) {
                             double pi = 0;
                             double a_cpa = 0;
+                            SimpleDateFormat date_wfc = new SimpleDateFormat("yyyy-MM-dd");
+                            String date = date_wfc.format(j.get("date"));
                             if(country_filter != null && country_filter != ""){
                                 sql = "select pi,a_cpa " +
                                         " from web_ad_country_analysis_report_history_by_date where app_id = '" + google_package_id + "' " +
-                                        " and country_code = '" + country_filter_code + "' and date between '" + startTime + "'" +
-                                        "and '" + endTime +"'";
+                                        " and country_code = '" + country_filter_code + "' and date = '" + date + "'";
                                 JSObject oneC = DB.findOneBySql(sql);
                                 if(oneC.hasObjectData()){
                                     pi = Utils.convertDouble(oneC.get("pi"),0);
@@ -216,9 +217,8 @@ public class TimeAnalysisReport extends HttpServlet {
                             }
 
 
-                            String date = null;
                             if (path.matches(".*/time_query")||path.matches(".*/country_filter")) {
-                                SimpleDateFormat date_wfc = new SimpleDateFormat("yyyy-MM-dd");  //这里是设置一个日期的格式
+                                date_wfc = new SimpleDateFormat("yyyy-MM-dd");  //这里是设置一个日期的格式
                                 date = date_wfc.format(j.get("date"));    //这里要把 SQL里的 date 格式转成 String 类型
                             }
                             double costs = Utils.convertDouble(j.get("total_cost"), 0);

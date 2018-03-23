@@ -19,9 +19,15 @@ import static sun.plugin.cache.FileVersion.regEx;
 public class Test {
 
     public static void main(String[] args) {
-        String imagePath = "/home/fan/ad_auto/facebook_ads_images/fsffl/";
-               imagePath = imagePath.replace("/home/fan/ad_auto/facebook_ads_images","");
-        System.out.println(imagePath);
+        String campaignName = "\"/home/fan/ad_auto/facebook_ads_images/fsffl/\"";
+        String sql = "";
+        if(campaignName.contains("\"")){
+            String cName = campaignName.replaceAll("\"","");
+            sql = "select campaign_id from web_ad_campaigns_admob where campaign_name like '%" + cName + "%'";
+        }else{
+            sql = "select campaign_id from web_ad_campaigns_admob where campaign_name = '" + campaignName + "'";
+        }
+        System.out.println(sql);
     }
            /* try {
                 //中文

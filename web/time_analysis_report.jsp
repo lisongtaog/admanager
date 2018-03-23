@@ -165,24 +165,41 @@
             country_filter: country_filter
         },function(data){
             if(data && data.ret == 1){
-                $('#result_header').html("<tr><th>Date<span sorterId=\"1032\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>"+
-                    "<th>Cost<span sorterId=\"1031\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
-                    "<th>PurchasedUser<span sorterId=\"1033\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
-                    "<th>Installed<span sorterId=\"1034\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
-                    "<th>Uninstalled<span sorterId=\"1035\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
-                    "<th>UninstalledRate</th><th>TotalUser<span sorterId=\"1037\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
-                    "<th>ActiveUser<span sorterId=\"1038\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
-                    "<th>Revenue<span sorterId=\"1039\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
-                    "<th>PI</th>"  +
-                    "<th>ECPM<span sorterId=\"1040\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
-                    "<th>CPA<span sorterId=\"1041\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
-                    "<th>ACPA</th>"+
-                    "<th>CPA/ECPM</th>" +
-                    "<th>Incoming<span sorterId=\"1042\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
-                    "<th>EstimatedRevenue14<span sorterId=\"1044\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
-                    "<th>Revenue14/Cost<span sorterId=\"1045\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>");
+                if(!country_filter){
+                    $('#result_header').html("<tr><th>Date<span sorterId=\"1032\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>"+
+                        "<th>Cost<span sorterId=\"1031\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
+                        "<th>PurchasedUser<span sorterId=\"1033\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
+                        "<th>Installed<span sorterId=\"1034\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
+                        "<th>Uninstalled<span sorterId=\"1035\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
+                        "<th>UninstalledRate</th><th>TotalUser<span sorterId=\"1037\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
+                        "<th>ActiveUser<span sorterId=\"1038\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
+                        "<th>Revenue<span sorterId=\"1039\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
+                        "<th>ECPM<span sorterId=\"1040\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
+                        "<th>CPA<span sorterId=\"1041\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
+                        "<th>CPA/ECPM</th>" +
+                        "<th>Incoming<span sorterId=\"1042\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
+                        "<th>EstimatedRevenue14<span sorterId=\"1044\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
+                        "<th>Revenue14/Cost<span sorterId=\"1045\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>");
+                }else{
+                    $('#result_header').html("<tr><th>Date<span sorterId=\"1032\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>"+
+                        "<th>Cost<span sorterId=\"1031\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
+                        "<th>PurchasedUser<span sorterId=\"1033\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
+                        "<th>Installed<span sorterId=\"1034\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
+                        "<th>Uninstalled<span sorterId=\"1035\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
+                        "<th>UninstalledRate</th><th>TotalUser<span sorterId=\"1037\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
+                        "<th>ActiveUser<span sorterId=\"1038\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
+                        "<th>Revenue<span sorterId=\"1039\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
+                        "<th>PI</th>"  +
+                        "<th>ECPM<span sorterId=\"1040\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
+                        "<th>CPA<span sorterId=\"1041\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
+                        "<th>ACPA</th>"+
+                        "<th>CPA/ECPM</th>" +
+                        "<th>Incoming<span sorterId=\"1042\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
+                        "<th>EstimatedRevenue14<span sorterId=\"1044\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
+                        "<th>Revenue14/Cost<span sorterId=\"1045\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>");
+                }
 
-                setData(data,query);  //这里是往表格里添加项目，并设置某三列的颜色
+                setData(data,query,country_filter);  //这里是往表格里添加项目，并设置某三列的颜色
                 bindSortOp();  //鼠标触发的排序
                 var str = "Cost: " + data.total_cost + "&nbsp;&nbsp;&nbsp;&nbsp;PuserchaedUser: " + data.total_puserchaed_user +
                     "&nbsp;&nbsp;&nbsp;&nbsp;CPA: " + data.total_cpa + "&nbsp;&nbsp;&nbsp;&nbsp;Revenue: " + data.total_revenue +
@@ -196,23 +213,6 @@
         },'json');
     });
 
-/*
-    //原想做成一个值改变就触发的事件
-    $("#country_filter").change(function(){
-        var query = $("#inputSearch").val();
-        var startTime = $("#inputStartTime").val();
-        var endTime = $("#inputEndTime").val();
-        var country = $("#country_filter").val();
-        $.post("time_analysis_report/country_filter",{
-            tagName: query,
-            startTime: startTime,
-            endTime: endTime,
-            country_filter:country
-        },function(data){
-            setData(data);
-        },"json");
-    });
-*/
     function bindSortOp() {
         $('.sorter').click(function() {
             var sorterId = $(this).attr('sorterId');
@@ -238,7 +238,7 @@
                 country_filter: country_filter
             },function(data){
                 if (data && data.ret == 1) {
-                    setData(data,query);
+                    setData(data,query,country_filter);
                     var str = "Cost: " + data.total_cost + "&nbsp;&nbsp;&nbsp;&nbsp;PuserchaedUser: " + data.total_puserchaed_user +  // &nbsp; 在html语言里表示空格
                         "&nbsp;&nbsp;&nbsp;&nbsp;CPA: " + data.total_cpa + "&nbsp;&nbsp;&nbsp;&nbsp;Revenue: " + data.total_revenue +
                         "&nbsp;&nbsp;&nbsp;&nbsp;Es14: " + data.total_es14 + "&nbsp;&nbsp;&nbsp;&nbsp;Es14/Cost: " + data.es14_dev_cost;
@@ -254,7 +254,7 @@
     }
 
 
-    function setData(data,tagName) {
+    function setData(data,tagName,countryFilter) {
         $('#results_body > tr').remove();  //2018-2-9：多层级选择器
         var arr = data.array;   //array是从后台取出来的原始、未改动数据
         var len = arr.length;
@@ -264,9 +264,17 @@
             one = arr[i];  //每个数组成员都是一个JS对象
 
             var tr = $('<tr></tr>');   //创建一个空的行元素：$("<></>")
-            var keyset = ["date","costs", "purchased_users", "installed",
-                "uninstalled", "uninstalled_rate", "users", "active_users", "revenues","pi",
-                "ecpm","cpa","a_cpa","cpa_dev_ecpm", "incoming","estimated_revenues","estimated_revenues_dev_cost"];
+            var keyset = [];
+            if(countryFilter){
+                keyset = ["date","costs", "purchased_users", "installed",
+                    "uninstalled", "uninstalled_rate", "users", "active_users", "revenues","pi",
+                    "ecpm","cpa","a_cpa","cpa_dev_ecpm", "incoming","estimated_revenues","estimated_revenues_dev_cost"];
+            }else{
+                keyset = ["date","costs", "purchased_users", "installed",
+                    "uninstalled", "uninstalled_rate", "users", "active_users", "revenues",
+                    "ecpm","cpa","cpa_dev_ecpm", "incoming","estimated_revenues","estimated_revenues_dev_cost"];
+            }
+
             for (var j = 0; j < keyset.length; j++) {
                 var r = one[keyset[j]]; //得到集里的某个键的value
                 //下面先判是否有空键
