@@ -69,18 +69,22 @@ public class Query extends HttpServlet {
                         CampaignsSummary campaignsSummary = new CampaignsSummary();
                         long id = tagJSObject.get("id");
                         campaignsSummary.name = tagJSObject.get("tag_name");
+
                         JsonObject admob = fetchOneAppDataSummary(id, startTime, endTime, true,sameTime);
                         JsonObject facebook = fetchOneAppDataSummary(id, startTime, endTime, false,sameTime);
-
-                        JsonObject admob1 = fetchOneAppDataSummary(id, endTime, endTime, true,sameTime);
-                        JsonObject facebook1 = fetchOneAppDataSummary(id, endTime, endTime, false,sameTime);
-                        campaignsSummary.end_time_total_spend = Utils.trimDouble(admob1.get("total_spend").getAsDouble() + facebook1.get("total_spend").getAsDouble(), 0);
-
                         campaignsSummary.total_impressions = admob.get("total_impressions").getAsDouble() + facebook.get("total_impressions").getAsDouble();
                         if (campaignsSummary.total_impressions == 0) {
                             continue;
                         }
                         campaignsSummary.total_spend = admob.get("total_spend").getAsDouble() + facebook.get("total_spend").getAsDouble();
+                        if(sameTime){
+                            campaignsSummary.end_time_total_spend = campaignsSummary.total_spend;
+                        }else{
+                            JsonObject admob1 = fetchOneAppDataSummary(id, endTime, endTime, true,true);
+                            JsonObject facebook1 = fetchOneAppDataSummary(id, endTime, endTime, false,true);
+                            campaignsSummary.end_time_total_spend = Utils.trimDouble(admob1.get("total_spend").getAsDouble() + facebook1.get("total_spend").getAsDouble(), 0);
+                        }
+
                         campaignsSummary.total_installed = admob.get("total_installed").getAsDouble() + facebook.get("total_installed").getAsDouble();
                         campaignsSummary.total_click = admob.get("total_click").getAsDouble() + facebook.get("total_click").getAsDouble();
                         campaignsSummary.total_ctr = campaignsSummary.total_impressions > 0 ? campaignsSummary.total_click / campaignsSummary.total_impressions : 0;
@@ -165,23 +169,28 @@ public class Query extends HttpServlet {
                 } else {   //这里是sorter=0 的条件时,默认也是0
                     String sqlTag = "SELECT t.id,t.tag_name,google_package_id from web_tag t LEFT JOIN web_facebook_app_ids_rel air ON t.tag_name = air.tag_name ORDER BY t.tag_name";
                     List<JSObject> tagList = DB.findListBySql(sqlTag);
+                    JsonObject admob = null;
+                    JsonObject facebook = null;
                     for (JSObject tagJSObject : tagList) {
                         long id = tagJSObject.get("id");
                         String tagName = tagJSObject.get("tag_name");
-                        JsonObject admob = fetchOneAppDataSummary(id, startTime, endTime, true,sameTime);
-                        JsonObject facebook = fetchOneAppDataSummary(id, startTime, endTime, false,sameTime);
-
-                        JsonObject admob1 = fetchOneAppDataSummary(id, endTime, endTime, true,sameTime);
-                        JsonObject facebook1 = fetchOneAppDataSummary(id, endTime, endTime, false,sameTime);
-                        double endTime_total_spend = admob1.get("total_spend").getAsDouble() + facebook1.get("total_spend").getAsDouble();
-                        admob.addProperty("endTime_total_spend", Utils.trimDouble(endTime_total_spend, 0));
-
+                        admob = fetchOneAppDataSummary(id, startTime, endTime, true,sameTime);
+                        facebook = fetchOneAppDataSummary(id, startTime, endTime, false,sameTime);
                         double total_impressions = admob.get("total_impressions").getAsDouble() + facebook.get("total_impressions").getAsDouble();
                         if (total_impressions == 0) {
                             continue;
                         }
-
                         double total_spend = admob.get("total_spend").getAsDouble() + facebook.get("total_spend").getAsDouble();
+                        double endTime_total_spend = 0;
+                        if(sameTime){
+                            endTime_total_spend = total_spend;
+                        }else{
+                            JsonObject admob1 = fetchOneAppDataSummary(id, endTime, endTime, true,true);
+                            JsonObject facebook1 = fetchOneAppDataSummary(id, endTime, endTime, false,true);
+                            endTime_total_spend = admob1.get("total_spend").getAsDouble() + facebook1.get("total_spend").getAsDouble();
+                        }
+
+
                         double total_installed = admob.get("total_installed").getAsDouble() + facebook.get("total_installed").getAsDouble();
                         double total_click = admob.get("total_click").getAsDouble() + facebook.get("total_click").getAsDouble();
                         double total_ctr = total_impressions > 0 ? total_click / total_impressions : 0;
@@ -190,6 +199,7 @@ public class Query extends HttpServlet {
 
                         //这行之前的JsonObject admob 是个从表里取出的JSON对象，经下面一系列addProperty的操作后，变为存储处理好的值的JSON对象
                         admob.addProperty("total_spend", Utils.trimDouble(total_spend, 0));
+                        admob.addProperty("endTime_total_spend", Utils.trimDouble(endTime_total_spend, 0));
                         admob.addProperty("total_installed", total_installed);
                         admob.addProperty("total_impressions", total_impressions);
                         admob.addProperty("total_click", total_click);
