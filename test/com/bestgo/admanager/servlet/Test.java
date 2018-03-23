@@ -1,9 +1,11 @@
 package com.bestgo.admanager.servlet;
 
 import com.bestgo.admanager.DateUtil;
+import com.bestgo.admanager.Utils;
 import com.bestgo.common.database.services.DB;
 import com.bestgo.common.database.utils.JSObject;
 import com.sun.org.apache.xpath.internal.SourceTree;
+import jdk.nashorn.internal.scripts.JS;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
@@ -19,15 +21,20 @@ import static sun.plugin.cache.FileVersion.regEx;
 public class Test {
 
     public static void main(String[] args) {
-        String campaignName = "\"/home/fan/ad_auto/facebook_ads_images/fsffl/\"";
-        String sql = "";
-        if(campaignName.contains("\"")){
-            String cName = campaignName.replaceAll("\"","");
-            sql = "select campaign_id from web_ad_campaigns_admob where campaign_name like '%" + cName + "%'";
-        }else{
-            sql = "select campaign_id from web_ad_campaigns_admob where campaign_name = '" + campaignName + "'";
-        }
-        System.out.println(sql);
+        String aaa = "\\.";
+        System.out.println(aaa.replaceAll("\"",""));
+//        List<JSObject> list = new ArrayList<>();
+//        JSObject js = new JSObject();
+//        js.put("aaaa","ww");
+//        list.add(js);
+//        js = new JSObject();
+//        js.put("aaaa","");
+//        list.add(js);
+//        js = new JSObject();
+//        js.put("aaaa","");
+//        list.add(js);
+//        String aaaa = Utils.getStrForListDistinctByAttrWithCommmas(list, "aaaa");
+//        System.out.println(aaaa);
     }
            /* try {
                 //中文

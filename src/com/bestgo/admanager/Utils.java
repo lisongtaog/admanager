@@ -163,29 +163,36 @@ public class Utils {
      * 将一个list根据某个属性去重，并遍历以逗号分隔拼接成字符串，用于in()里面的查询条件
      * @param list List<JSObject>
      * @param attr JSObject的某个属性,根据它来获取值
-     * @param attrValueIsString  根据属性获得的每个值是否是字符串
      * @return 字符串
      */
-    public static String getStrForListDistinctByAttrWithCommmas(List<JSObject> list,String attr,boolean attrValueIsString){
+    public static String getStrForListDistinctByAttrWithCommmas(List<JSObject> list,String attr){
+        if(list == null || list.size() == 0) return "";
+
         Set<String> set = new HashSet<>();
         String returnStr = "";
         for(JSObject j : list){
-            set.add(j.get(attr));
+            if(j.hasObjectData()) set.add(j.get(attr));
         }
-        if(attrValueIsString){
+
+        if(set.size() == 1){
             for(String s : set){
-                returnStr += "'" +s + "',";
+                if(s == null || s == "") {
+                    continue;
+                }
+                return "'" + s + "'";
             }
         }else{
             for(String s : set){
-                returnStr += s + ",";
+                if(s == null || s == "") {
+                    continue;
+                }
+                returnStr += "'" +s + "',";
+            }
+            if(returnStr.length() > 0){
+                return  returnStr.substring(0,returnStr.length() - 1);
             }
         }
-
-        if(returnStr.length() > 0){
-            return  returnStr.substring(0,returnStr.length() - 1);
-        }
-        return null;
+        return "";
     }
 
 

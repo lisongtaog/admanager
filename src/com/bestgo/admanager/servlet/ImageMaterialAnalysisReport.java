@@ -21,6 +21,7 @@ import java.util.*;
  * Author: mengjun
  * Date: 2018/3/16 16:57
  * Desc: 图片素材分析报告
+ * 暂未使用，使用前需测试！！！！！！
  */
 @WebServlet(name = "ImageMaterialAnalysisReport",urlPatterns = "/image_material_analysis_report/*")
 public class ImageMaterialAnalysisReport extends HttpServlet {
@@ -69,7 +70,7 @@ public class ImageMaterialAnalysisReport extends HttpServlet {
                                 " AND create_time < '" + tomorrow + "' AND image_file_path LIKE '%" + imagePath + "%'";
                         List<JSObject> facebookCampaignIdList = DB.findListBySql(sql);
                         if(facebookCampaignIdList != null && facebookCampaignIdList.size() > 0) {
-                            facebookCampaignIdsStr = Utils.getStrForListDistinctByAttrWithCommmas(facebookCampaignIdList, "campaign_id", true);
+                            facebookCampaignIdsStr = Utils.getStrForListDistinctByAttrWithCommmas(facebookCampaignIdList, "campaign_id");
                         }
 
                         //根据图片路径匹配Adwords系列
@@ -78,7 +79,7 @@ public class ImageMaterialAnalysisReport extends HttpServlet {
                                 " AND create_time < '" + tomorrow + "' AND image_path LIKE '%" + imagePath + "%'";
                         List<JSObject> adwordsCampaignIdList = DB.findListBySql(sql);
                         if(adwordsCampaignIdList != null && adwordsCampaignIdList.size() > 0) {
-                            adwordsCampaignIdsStr = Utils.getStrForListDistinctByAttrWithCommmas(adwordsCampaignIdList, "campaign_id", true);
+                            adwordsCampaignIdsStr = Utils.getStrForListDistinctByAttrWithCommmas(adwordsCampaignIdList, "campaign_id");
                         }
                         facebookCampaignIdsStr = facebookCampaignIdsStr == null ? "noData" : facebookCampaignIdsStr;
                         adwordsCampaignIdsStr = adwordsCampaignIdsStr == null ? "noData" : adwordsCampaignIdsStr;

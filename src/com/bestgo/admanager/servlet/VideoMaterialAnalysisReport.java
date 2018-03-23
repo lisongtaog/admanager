@@ -20,6 +20,7 @@ import java.util.List;
  * Author: mengjun
  * Date: 2018/3/18 23:57
  * Desc: 视频素材分析报告
+ * 暂未使用，使用前需测试！！！！！！
  */
 @WebServlet(name = "VideoMaterialAnalysisReport",urlPatterns = "/video_material_analysis_report/*")
 public class VideoMaterialAnalysisReport extends HttpServlet {
@@ -68,7 +69,7 @@ public class VideoMaterialAnalysisReport extends HttpServlet {
                                 " AND create_time < '" + tomorrow + "' AND video_file_path LIKE '%" + videoPath + "%'";
                         List<JSObject> facebookCampaignIdList = DB.findListBySql(sql);
                         if(facebookCampaignIdList != null && facebookCampaignIdList.size() > 0) {
-                            facebookCampaignIdsStr = Utils.getStrForListDistinctByAttrWithCommmas(facebookCampaignIdList, "campaign_id", true);
+                            facebookCampaignIdsStr = Utils.getStrForListDistinctByAttrWithCommmas(facebookCampaignIdList, "campaign_id");
                         }
 
                         //根据视频路径匹配Adwords系列

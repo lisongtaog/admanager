@@ -54,7 +54,7 @@ public class CountryRevenueSpend extends HttpServlet {
                 List<JSObject> campaignIdFJSObjectList = DB.findListBySql(sqlCTRF);
 
                 if(campaignIdFJSObjectList != null && campaignIdFJSObjectList.size()>0){
-                    String campaignIdFListStr = Utils.getStrForListDistinctByAttrWithCommmas(campaignIdFJSObjectList,"campaign_id",true);
+                    String campaignIdFListStr = Utils.getStrForListDistinctByAttrWithCommmas(campaignIdFJSObjectList,"campaign_id");
                     String sqlA = "select country_code, sum(total_spend) spend," +
                             "sum(total_installed) installed " +
                             "from web_ad_campaigns_country_history where date between '" + startTime + "' and '"
@@ -81,7 +81,7 @@ public class CountryRevenueSpend extends HttpServlet {
                 String sqlCTRA = "select campaign_id from web_ad_campaign_tag_admob_rel where tag_id = " + tag_id;
                 List<JSObject> campaignIdAJSObjectList = DB.findListBySql(sqlCTRA);
                 if(campaignIdAJSObjectList != null && campaignIdAJSObjectList.size()>0){
-                    String campaignIdAListStr = Utils.getStrForListDistinctByAttrWithCommmas(campaignIdAJSObjectList,"campaign_id",true);
+                    String campaignIdAListStr = Utils.getStrForListDistinctByAttrWithCommmas(campaignIdAJSObjectList,"campaign_id");
 
                     String sqlB = "select country_code, sum(total_spend) spend," +
                                 "sum(total_installed) installed " +
