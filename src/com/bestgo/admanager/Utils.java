@@ -173,7 +173,7 @@ public class Utils {
         for(JSObject j : list){
             if(j.hasObjectData()){
                 String str = j.get(attr);
-                if(str == "" || str == null || str.equals("''") || str.equals("\"\"")) {
+                if(str == null || str == "" || str.equals("''")) {
                     continue;
                 }else {
                     set.add(str);
