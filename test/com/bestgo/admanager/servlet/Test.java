@@ -21,16 +21,8 @@ import static sun.plugin.cache.FileVersion.regEx;
 public class Test {
 
     public static void main(String[] args) {
-        String aaa = "\\.";
-        System.out.println(aaa.replaceAll("\"",""));
-//        List<JSObject> list = new ArrayList<>();
-//        JSObject js = new JSObject();
-//        js.put("aaaa","ww");
-//        list.add(js);
-//        js = new JSObject();
-//        js.put("aaaa","");
-//        list.add(js);
-//        js = new JSObject();
+        String sss = DateUtil.addDay("2018-03-24",-3,"yyyy-MM-dd");
+        System.out.println(sss);
 //        js.put("aaaa","");
 //        list.add(js);
 //        String aaaa = Utils.getStrForListDistinctByAttrWithCommmas(list, "aaaa");

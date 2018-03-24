@@ -171,21 +171,22 @@ public class Utils {
         Set<String> set = new HashSet<>();
         String returnStr = "";
         for(JSObject j : list){
-            if(j.hasObjectData()) set.add(j.get(attr));
+            if(j.hasObjectData()){
+                String str = j.get(attr);
+                if(str == "" || str == null || str.equals("''") || str.equals("\"\"")) {
+                    continue;
+                }else {
+                    set.add(str);
+                }
+            }
         }
 
         if(set.size() == 1){
             for(String s : set){
-                if(s == null || s == "") {
-                    continue;
-                }
                 return "'" + s + "'";
             }
         }else{
             for(String s : set){
-                if(s == null || s == "") {
-                    continue;
-                }
                 returnStr += "'" +s + "',";
             }
             if(returnStr.length() > 0){
