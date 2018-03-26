@@ -58,8 +58,7 @@ public class Query extends HttpServlet {
         }
         try {
             JsonArray arr = new JsonArray();
-            if ("false".equals(adwordsCheck) && "false".equals(facebookCheck)) {
-                if (sorter > 0) {
+            if (sorter > 0) {
                     ArrayList<CampaignsSummary> campaignsSummaryList = new ArrayList<>();
                     String sqlTag = "select t.id,t.tag_name,google_package_id from web_tag t LEFT JOIN web_facebook_app_ids_rel air ON t.tag_name = air.tag_name";
                     List<JSObject> tagList = DB.findListBySql(sqlTag);
@@ -72,21 +71,55 @@ public class Query extends HttpServlet {
 
                         JsonObject admob = fetchOneAppDataSummary(id, startTime, endTime, true,sameTime);
                         JsonObject facebook = fetchOneAppDataSummary(id, startTime, endTime, false,sameTime);
-                        campaignsSummary.total_impressions = admob.get("total_impressions").getAsDouble() + facebook.get("total_impressions").getAsDouble();
-                        if (campaignsSummary.total_impressions == 0) {
-                            continue;
-                        }
-                        campaignsSummary.total_spend = admob.get("total_spend").getAsDouble() + facebook.get("total_spend").getAsDouble();
-                        if(sameTime){
-                            campaignsSummary.end_time_total_spend = campaignsSummary.total_spend;
-                        }else{
-                            JsonObject admob1 = fetchOneAppDataSummary(id, endTime, endTime, true,true);
-                            JsonObject facebook1 = fetchOneAppDataSummary(id, endTime, endTime, false,true);
-                            campaignsSummary.end_time_total_spend = Utils.trimDouble(admob1.get("total_spend").getAsDouble() + facebook1.get("total_spend").getAsDouble(), 0);
+
+                        if("false".equals(adwordsCheck) && "false".equals(facebookCheck)){
+                            campaignsSummary.total_impressions = admob.get("total_impressions").getAsDouble() + facebook.get("total_impressions").getAsDouble();
+                            if (campaignsSummary.total_impressions == 0) {
+                                continue;
+                            }
+                            campaignsSummary.total_spend = admob.get("total_spend").getAsDouble() + facebook.get("total_spend").getAsDouble();
+                            if(sameTime){
+                                campaignsSummary.end_time_total_spend = campaignsSummary.total_spend;
+                            }else{
+                                JsonObject admob1 = fetchOneAppDataSummary(id, endTime, endTime, true,true);
+                                JsonObject facebook1 = fetchOneAppDataSummary(id, endTime, endTime, false,true);
+                                campaignsSummary.end_time_total_spend = Utils.trimDouble(admob1.get("total_spend").getAsDouble() + facebook1.get("total_spend").getAsDouble(), 0);
+                            }
+
+                            campaignsSummary.total_installed = admob.get("total_installed").getAsDouble() + facebook.get("total_installed").getAsDouble();
+                            campaignsSummary.total_click = admob.get("total_click").getAsDouble() + facebook.get("total_click").getAsDouble();
+                        }else if("true".equals(adwordsCheck) && "false".equals(facebookCheck)){
+                            campaignsSummary.total_impressions = admob.get("total_impressions").getAsDouble();
+                            if (campaignsSummary.total_impressions == 0) {
+                                continue;
+                            }
+                            campaignsSummary.total_spend = admob.get("total_spend").getAsDouble();
+                            if(sameTime){
+                                campaignsSummary.end_time_total_spend = campaignsSummary.total_spend;
+                            }else{
+                                JsonObject admob1 = fetchOneAppDataSummary(id, endTime, endTime, true,true);
+                                campaignsSummary.end_time_total_spend = Utils.trimDouble(admob1.get("total_spend").getAsDouble(),0);
+                            }
+
+                            campaignsSummary.total_installed = admob.get("total_installed").getAsDouble();
+                            campaignsSummary.total_click = admob.get("total_click").getAsDouble();
+                        }else if("false".equals(adwordsCheck) && "true".equals(facebookCheck)){
+                            campaignsSummary.total_impressions = facebook.get("total_impressions").getAsDouble();
+                            if (campaignsSummary.total_impressions == 0) {
+                                continue;
+                            }
+                            campaignsSummary.total_spend = facebook.get("total_spend").getAsDouble();
+                            if(sameTime){
+                                campaignsSummary.end_time_total_spend = campaignsSummary.total_spend;
+                            }else{
+                                JsonObject facebook1 = fetchOneAppDataSummary(id, endTime, endTime, false,true);
+                                campaignsSummary.end_time_total_spend = Utils.trimDouble(facebook1.get("total_spend").getAsDouble(), 0);
+                            }
+
+                            campaignsSummary.total_installed = facebook.get("total_installed").getAsDouble();
+                            campaignsSummary.total_click = facebook.get("total_click").getAsDouble();
                         }
 
-                        campaignsSummary.total_installed = admob.get("total_installed").getAsDouble() + facebook.get("total_installed").getAsDouble();
-                        campaignsSummary.total_click = admob.get("total_click").getAsDouble() + facebook.get("total_click").getAsDouble();
                         campaignsSummary.total_ctr = campaignsSummary.total_impressions > 0 ? campaignsSummary.total_click / campaignsSummary.total_impressions : 0;
                         campaignsSummary.total_cpa = campaignsSummary.total_installed > 0 ? campaignsSummary.total_spend / campaignsSummary.total_installed : 0;
                         campaignsSummary.total_cvr = campaignsSummary.total_click > 0 ? campaignsSummary.total_installed / campaignsSummary.total_click : 0;
@@ -166,7 +199,7 @@ public class Query extends HttpServlet {
                         }
                     }
                     json.add("data", arr);
-                } else {   //这里是sorter=0 的条件时,默认也是0
+            } else {   //这里是sorter=0 的条件时,默认也是0
                     String sqlTag = "SELECT t.id,t.tag_name,google_package_id from web_tag t LEFT JOIN web_facebook_app_ids_rel air ON t.tag_name = air.tag_name ORDER BY t.tag_name";
                     List<JSObject> tagList = DB.findListBySql(sqlTag);
                     JsonObject admob = null;
@@ -269,23 +302,7 @@ public class Query extends HttpServlet {
                     }
                     json.add("data", arr);
                 }
-            } else {     //这里是adwordsCheck和facebookCheck至少有一个被选中的条件时
-                String sqlTag = "select id,tag_name from web_tag ORDER BY tag_name";
-                List<JSObject> tagList = DB.findListBySql(sqlTag);
-                for (int i = 0; i < tagList.size(); i++) {
-                    long id = tagList.get(i).get("id");
-                    String tagName = tagList.get(i).get("tag_name");
-                    JsonObject jsonObject = fetchOneAppDataSummary(id, startTime, endTime, "true".equals(adwordsCheck),sameTime);
-                    double total_impression = jsonObject.get("total_impressions").getAsDouble();
-                    if (total_impression == 0) {
-                        continue;
-                    }
-
-                    jsonObject.addProperty("name", tagName);
-                    arr.add(jsonObject);
-                }
-            }
-            json.add("data", arr);
+            //json.add("data", arr);
 
             json.addProperty("ret", 1);
             json.addProperty("message", "执行成功");
