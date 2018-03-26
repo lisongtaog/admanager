@@ -423,7 +423,7 @@
     var IndexBidding = <%=bidding%>;
 </script>
 
-<script src="js/campaign_create.js?t=20180118"></script>
+<script src="js/campaign_create.js?t=20180326"></script>
 
 </body>
 </html>

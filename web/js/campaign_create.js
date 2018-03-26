@@ -59,7 +59,7 @@ function generateFacebookCampaignName(params) {
     if (typeof params.gender !== 'undefined') {
         dims.push(params.gender);
     } else {
-        dims.push($('#selectGender').val());
+        dims.push(gender);
     }
     if (params.age) {
         dims.push(params.age);
@@ -963,7 +963,8 @@ function indexInitFormData(isIndexCreate,campaign_id) {
 
                     $('#inputCampaignName').val(campaignData.campaign_name);
 
-                    $("#selectGender").val(campaignData.gender);
+                    $("#selectGender").val(campaignData.gender.split(','));
+                    $("#selectGender").trigger('change');
                     $("#inputAge").val(campaignData.age);
 
                     var imageTrimed = campaignData.image_path.replace(/home\/\w+\/\w+\/\w+\//,"");
