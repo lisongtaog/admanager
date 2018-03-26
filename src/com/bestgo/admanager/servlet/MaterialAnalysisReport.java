@@ -270,10 +270,6 @@ public class MaterialAnalysisReport extends HttpServlet {
                         }
                     }
 
-                    java.lang.System.out.println("groupOneCampaignsStr= " + groupOneCampaignsStr);
-                    java.lang.System.out.println("groupTwoCampaignsStr= " + groupTwoCampaignsStr);
-                    java.lang.System.out.println("groupThreeCampaignsStr= " + groupThreeCampaignsStr);
-                    java.lang.System.out.println("groupFourCampaignsStr= " + groupFourCampaignsStr);
                     if("''".equals(groupOneCampaignsStr) || groupOneCampaignsStr == ""){
                         paramStr += ",0,0,0,0";
                     }else {

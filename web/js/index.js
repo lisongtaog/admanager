@@ -366,33 +366,20 @@ function setDataSummary(data) {
     var total_incoming = 0;
     var keyset = ["name", "total_spend","endTime_total_spend", "total_revenue", "endTime_total_revenue","total_installed", "total_impressions", "total_click",
         "total_ctr", "total_cpa", "total_cvr","ecpm","incoming"];
-    //后台传来的数组里每个JSON对象元素的属性排列顺序是一定的，但是按接下来的取法不必计较这个顺序
+
     //total_spend是每20分钟抓一次，total_revenue是每小时抓一次
 
-    var d = new Date(); //创建一个Date对象
+    var d = new Date(); //创建一个Date对象:这个对象返回创建时的本机系统时间
     var localTime = d.getTime();
-    var localOffset = d.getTimezoneOffset()*60000; //获得当地时间与UTC偏移的毫秒数
+    var localOffset = d.getTimezoneOffset()*60000; //获得当地时间与UTC（1970）偏移的毫秒数
     var utc = localTime + localOffset; //utc即GMT时间
-    var offset = 8; //北京时间，东八区
-    var Los = utc - (3600000*offset);    //得到美西时间 Date类型
+    var offset = 8; //美西时间，西八区差值
+    var Los = utc - (3600000*offset);    //得到相应美西时间 Date类型
     var nd = new Date(Los);
     var westTime = nd.getHours();  //返回美西时间的小时数
+    westTime = westTime - 1;
     var minutes = nd.getMinutes();
-    if(minutes != 0 && minutes != 20 && minutes != 40)
-        if(minutes > 0 && minutes <20){
-           var f_hours = 0;
-        }else if(minutes  >20 && minutes < 40){
-           f_hours = 1/3;
-        }else{
-           f_hours = 2/3;
-        }
-    else
-        switch(minutes){
-            case 0: f_hours = 1;break;
-            case 20: f_hours = 1/3;break;
-            case 40: f_hours = 2/3;break;
-        }
-    var d_hours = westTime;   //得到北京时间与美西时间相差小时数
+    var d_minutes = westTime*60 + minutes;   //得到北京时间与美西时间相差小时数
 
 
     $('#results_body > tr').remove();
@@ -421,11 +408,11 @@ function setDataSummary(data) {
             var key = keyset[j];
             if(key == "endTime_total_spend"){
                 var endTime_total_spend = data[i][key]; //取当前数组成员 属性名为key 的属性值
-                var expected_total_spend = parseInt(endTime_total_spend/d_hours*24);
+                var expected_total_spend = parseInt(endTime_total_spend/d_minutes*24*60);
                 con = expected_total_spend;
             }else if(key == "endTime_total_revenue"){
                 var endTime_total_revenue = data[i][key];
-                var expected_total_revenue = parseInt(endTime_total_revenue/(d_hours + f_hours)* 24);
+                var expected_total_revenue = parseInt(endTime_total_revenue/d_minutes*24*60);
                 con = expected_total_revenue;
             }else{
                 if(key == 'total_spend'){     //对total_spend 条目进行颜色处理

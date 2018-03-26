@@ -141,8 +141,8 @@ public class Query extends HttpServlet {
                                 int warningLevel = one.get("warning_level");             //指标warning_level 仅仅与endTime有关
                                 j.addProperty("warning_level", warningLevel);
                             }
-                            j.addProperty("total_spend", Utils.trimDouble(cs.end_time_total_spend, 0));
-                            j.addProperty("endTime_total_spend", Utils.trimDouble(cs.total_spend, 0));
+                            j.addProperty("total_spend", Utils.trimDouble(cs.total_spend, 0));
+                            j.addProperty("endTime_total_spend", Utils.trimDouble(cs.end_time_total_spend, 0));
                             j.addProperty("endTime_total_revenue", Utils.trimDouble(cs.end_time_total_revenue, 0));
                             j.addProperty("total_installed", cs.total_installed);
                             j.addProperty("total_impressions", cs.total_impressions);
