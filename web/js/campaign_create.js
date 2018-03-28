@@ -32,7 +32,7 @@ function getExplodeParams(params, explodeParam) {
  * @param {{region: string, gender: string, age: string, bidding: string}}
  *
  **/
-//以下拼凑 系列名称 字符串
+//以下在Facebook表单的"广告系列名称"中拼凑 系列名称 字符串
 function generateFacebookCampaignName(params) {
     if (!params) {
         params = {};
@@ -88,7 +88,8 @@ function generateFacebookCampaignName(params) {
 
     var videoPath = $('#inputVideoPath').val();
     if (videoPath != "") {
-        dims.push("视频");
+        var videoTrimed = videoPath.replace(/\/.+\//,"");
+        dims.push("视频"+ videoTrimed);
     } else {
         var imagePath = $('#inputImagePath').val();
         dims.push(imagePath);
@@ -857,6 +858,9 @@ $('#selectAppAdmob').change(function () {
     return false;
 });
 
+$("#inputVideoPath").change(function(){
+    generateFacebookCampaignName();
+});
 
 $('#selectRegion,#selectAdvertGroupId').change(function () {
     if (isAutoCreate && !firstInitForm) {
@@ -940,17 +944,17 @@ function indexInitFormData(isIndexCreate,campaign_id) {
             }else{
                 if (campaignData.flag == "facebook") {
                     $('#checkFacebook').prop('checked', true); //“Facebook广告”：prop()，设置属性checked为true
-                    $('#checkAutoCreate').prop('checked', true);   //“设置为自动创建”
+                    $('#checkAutoCreate').prop('checked', true);
 
 
                     $('#selectApp').val(campaignData.app_name);
 
-                    $('#selectAccount').val(campaignData.account_id);  //val()方法大多用于input元素
+                    $('#selectAccount').val(campaignData.account_id);
                     $('#selectAccount').trigger('change');
 
                     $("#inputCreateCount").val(1);
 
-                    $('#selectRegion').val(campaignData.country_region.split(','));
+                    $('#selectRegion').val(campaignData.country_region.split(',')); //这里的val()方法用于设置多个值
                     $('#selectRegion').trigger('change');
 
                     $('#inputBudget').val(IndexBudget);
@@ -1100,6 +1104,8 @@ function initFormData() {
 //在并非国家分析报告创建也非首页创建的情况下，执行由app_name自动补充图片和视频路径
 if(!isIndexCreate && !isAutoCreate){
     $("#selectApp").change(function() {
+        $("#inputImagePath").val("");
+        $("#inputVideoPath").val("");
         $('#checkFacebook').click();
         var checkFacebook = $("#checkFacebook").prop("checked");
         if (checkFacebook) {
@@ -1119,6 +1125,7 @@ if(!isIndexCreate && !isAutoCreate){
                         $("#inputImagePath").autocomplete({
                             source:image_path
                         });
+                        $("#inputImagePath").val(image_path[0]);
                     }
                     var video_path = [];
                     if(data.video_array != null && data.video_array.length >0){
@@ -1131,12 +1138,14 @@ if(!isIndexCreate && !isAutoCreate){
                         $("#inputVideoPath").autocomplete({
                             source:video_path
                         });
+                        $("#inputVideoPath").val(video_path[0]);
                     }
                 }
             }, "json");
         }
     });
     $("#selectAppAdmob").change(function(){
+        $("#inputImagePath").val("");
         $('#checkAdmob').click();
         var checkAdmob = $("#checkAdmob").prop("checked");
         if (checkAdmob) {
@@ -1155,6 +1164,7 @@ if(!isIndexCreate && !isAutoCreate){
                         $("#inputImagePathAdmob").autocomplete({
                             source:image_path
                         });
+                        $("#inputImagePathAdmob").val(image_path[0]);
                     }
                 }, "json");
         }
