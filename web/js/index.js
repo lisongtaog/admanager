@@ -491,6 +491,10 @@ function setData(data) {
             if (field == 'budget' || field == 'bidding') {
                 td.text(field_value / 100);
             } else if (field == 'spend') {
+                var currSpend = one['spend'];
+                if(currSpend > (one['budget'] * 9 / 1000)){
+                    td.addClass("danhuangse");
+                }
                 td.text(field_value + " / " + totalSpend);
             } else if(field == 'un_rate' || field == 'open_rate'){
                 if(field_value == -100000){
