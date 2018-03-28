@@ -417,6 +417,7 @@ public class QueryByMulConditions extends HttpServlet {
                             j.addProperty("spend",c.spend);
                             j.addProperty("ctr",c.ctr);
                             j.addProperty("cpa",c.cpa);
+                            j.addProperty("open_cpa",c.open_cpa);
                             j.addProperty("cvr",c.cvr);
                             j.addProperty("un_rate",c.un_rate);
                             j.addProperty("open_rate",c.open_rate);
@@ -1015,6 +1016,7 @@ public class QueryByMulConditions extends HttpServlet {
                 double click = Utils.convertDouble(one.get("click"), 0);
                 double ctr = impressions > 0 ? click / impressions : 0;
                 double cpa = installed > 0 ? spend / installed : 0;
+                double openCpa = openRate == 0 ? 0 : cpa / openRate;
                 double cvr = click > 0 ? installed / click : 0;
 
                 JSObject js = countryCampaignspendMap.get(campaignId);
@@ -1049,6 +1051,7 @@ public class QueryByMulConditions extends HttpServlet {
                 d.addProperty("click", click);
                 d.addProperty("ctr", Utils.trimDouble(ctr,3));
                 d.addProperty("cpa", Utils.trimDouble(cpa,3));
+                d.addProperty("open_cpa", Utils.trimDouble(openCpa,3));
                 d.addProperty("cvr", Utils.trimDouble(cvr,3));
                 d.addProperty("un_rate", Utils.trimDouble(unRate,3));
                 d.addProperty("open_rate", Utils.trimDouble(openRate,3));
@@ -1107,6 +1110,7 @@ public class QueryByMulConditions extends HttpServlet {
                 d.addProperty("click", 0);
                 d.addProperty("ctr", 0);
                 d.addProperty("cpa", 0);
+                d.addProperty("open_cpa", 0);
                 d.addProperty("cvr", 0);
                 d.addProperty("un_rate", -100000);
                 d.addProperty("open_rate", -100000);
@@ -1158,6 +1162,7 @@ public class QueryByMulConditions extends HttpServlet {
         public double ctr;
         public double cpa;
         public double cvr;
+        public double open_cpa;
         public double un_rate;
         public double open_rate;
         public double campaign_spends;

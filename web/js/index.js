@@ -284,6 +284,7 @@ function init() {
                             "<th>总安装<span sorterId=\"6\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
                             "<th>总点击<span sorterId=\"7\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
                             "<th>CPA<span sorterId=\"8\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
+                            "<th>OCPA</th>" +
                             "<th>CTR<span sorterId=\"9\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
                             "<th>CVR<span sorterId=\"10\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
                             "<th>UnRate<span sorterId=\"11\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
@@ -463,7 +464,7 @@ function setData(data) {
         var tr = $('<tr></tr>');
         var countryCheck = $('#countryCheck').is(':checked');
         var keyset = ["campaign_id", "account_id", "short_name", "campaign_name", "create_time",
-            "status", "budget", "bidding", "spend", "installed", "click", "cpa", "ctr", "cvr","un_rate","open_rate"];
+            "status", "budget", "bidding", "spend", "installed", "click", "cpa", "open_cpa", "ctr", "cvr","un_rate","open_rate"];
         var modifyColumns = ["campaign_name", "budget", "bidding"];
         if (countryCheck) {
             keyset = ["country_name",
