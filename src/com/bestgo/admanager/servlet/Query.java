@@ -88,7 +88,7 @@ public class Query extends HttpServlet {
 
                             campaignsSummary.total_installed = admob.get("total_installed").getAsDouble() + facebook.get("total_installed").getAsDouble();
                             campaignsSummary.total_click = admob.get("total_click").getAsDouble() + facebook.get("total_click").getAsDouble();
-                        }else if("true".equals(adwordsCheck) && "false".equals(facebookCheck)){
+                        }else if("true".equals(adwordsCheck)){
                             campaignsSummary.total_impressions = admob.get("total_impressions").getAsDouble();
                             if (campaignsSummary.total_impressions == 0) {
                                 continue;
@@ -103,7 +103,7 @@ public class Query extends HttpServlet {
 
                             campaignsSummary.total_installed = admob.get("total_installed").getAsDouble();
                             campaignsSummary.total_click = admob.get("total_click").getAsDouble();
-                        }else if("false".equals(adwordsCheck) && "true".equals(facebookCheck)){
+                        }else if("true".equals(facebookCheck)){
                             campaignsSummary.total_impressions = facebook.get("total_impressions").getAsDouble();
                             if (campaignsSummary.total_impressions == 0) {
                                 continue;
@@ -207,44 +207,77 @@ public class Query extends HttpServlet {
                     for (JSObject tagJSObject : tagList) {
                         long id = tagJSObject.get("id");
                         String tagName = tagJSObject.get("tag_name");
-                        admob = fetchOneAppDataSummary(id, startTime, endTime, true,sameTime);
-                        facebook = fetchOneAppDataSummary(id, startTime, endTime, false,sameTime);
-                        double total_impressions = admob.get("total_impressions").getAsDouble() + facebook.get("total_impressions").getAsDouble();
-                        if (total_impressions == 0) {
-                            continue;
+                        double total_impressions = 0;
+                        double total_spend = 0;
+                        double total_installed = 0;
+                        double total_click = 0;
+
+                        if(facebookCheck.equals("false") && adwordsCheck.equals("false")){
+                            admob = fetchOneAppDataSummary(id, startTime, endTime, true,sameTime);
+                            facebook = fetchOneAppDataSummary(id, startTime, endTime, false,sameTime);
+                            total_impressions = admob.get("total_impressions").getAsDouble() + facebook.get("total_impressions").getAsDouble();
+                            if (total_impressions == 0) {
+                                continue;
+                            }
+                            total_spend = admob.get("total_spend").getAsDouble() + facebook.get("total_spend").getAsDouble();
+                            total_installed = admob.get("total_installed").getAsDouble() + facebook.get("total_installed").getAsDouble();
+                            total_click = admob.get("total_click").getAsDouble() + facebook.get("total_click").getAsDouble();
+                        }else if(facebookCheck.equals("true")){
+                            facebook = fetchOneAppDataSummary(id, startTime, endTime, false,sameTime);
+                            total_impressions = facebook.get("total_impressions").getAsDouble();
+                            if (total_impressions == 0) {
+                                continue;
+                            }
+                            total_spend =  facebook.get("total_spend").getAsDouble();
+                            total_installed =  facebook.get("total_installed").getAsDouble();
+                            total_click =  facebook.get("total_click").getAsDouble();
+                        }else if(adwordsCheck.equals("true")){
+                            admob = fetchOneAppDataSummary(id, startTime, endTime, true,sameTime);
+                            total_impressions = admob.get("total_impressions").getAsDouble();
+                            if (total_impressions == 0) {
+                                continue;
+                            }
+                            total_spend = admob.get("total_spend").getAsDouble();
+                            total_installed = admob.get("total_installed").getAsDouble();
+                            total_click = admob.get("total_click").getAsDouble();
                         }
-                        double total_spend = admob.get("total_spend").getAsDouble() + facebook.get("total_spend").getAsDouble();
+
                         double endTime_total_spend = 0;
                         if(sameTime){
                             endTime_total_spend = total_spend;
                         }else{
-                            JsonObject admob1 = fetchOneAppDataSummary(id, endTime, endTime, true,true);
-                            JsonObject facebook1 = fetchOneAppDataSummary(id, endTime, endTime, false,true);
-                            endTime_total_spend = admob1.get("total_spend").getAsDouble() + facebook1.get("total_spend").getAsDouble();
+                            if(facebookCheck.equals("false") && adwordsCheck.equals("false")){
+                                JsonObject admob1 = fetchOneAppDataSummary(id, endTime, endTime, true,true);
+                                JsonObject facebook1 = fetchOneAppDataSummary(id, endTime, endTime, false,true);
+                                endTime_total_spend = admob1.get("total_spend").getAsDouble() + facebook1.get("total_spend").getAsDouble();
+                            }else if(facebookCheck.equals("true")){
+                                JsonObject facebook1 = fetchOneAppDataSummary(id, endTime, endTime, false,true);
+                                endTime_total_spend = facebook1.get("total_spend").getAsDouble();
+                            }else if(adwordsCheck.equals("true")){
+                                JsonObject admob1 = fetchOneAppDataSummary(id, endTime, endTime, true,true);
+                                endTime_total_spend = admob1.get("total_spend").getAsDouble();
+                            }
                         }
 
-
-                        double total_installed = admob.get("total_installed").getAsDouble() + facebook.get("total_installed").getAsDouble();
-                        double total_click = admob.get("total_click").getAsDouble() + facebook.get("total_click").getAsDouble();
                         double total_ctr = total_impressions > 0 ? total_click / total_impressions : 0;
                         double total_cpa = total_installed > 0 ? total_spend / total_installed : 0;
                         double total_cvr = total_click > 0 ? total_installed / total_click : 0;
 
-                        //这行之前的JsonObject admob 是个从表里取出的JSON对象，经下面一系列addProperty的操作后，变为存储处理好的值的JSON对象
-                        admob.addProperty("total_spend", Utils.trimDouble(total_spend, 0));
-                        admob.addProperty("endTime_total_spend", Utils.trimDouble(endTime_total_spend, 0));
-                        admob.addProperty("total_installed", total_installed);
-                        admob.addProperty("total_impressions", total_impressions);
-                        admob.addProperty("total_click", total_click);
-                        admob.addProperty("total_ctr", Utils.trimDouble(total_ctr, 3));
-                        admob.addProperty("total_cpa", Utils.trimDouble(total_cpa, 3));
-                        admob.addProperty("total_cvr", Utils.trimDouble(total_cvr, 3));
-                        admob.addProperty("name", tagName);
+                        JsonObject j = new JsonObject();
+                        j.addProperty("endTime_total_spend", Utils.trimDouble(endTime_total_spend, 0));
+                        j.addProperty("total_spend", Utils.trimDouble(total_spend, 0));
+                        j.addProperty("total_installed", total_installed);
+                        j.addProperty("total_impressions", total_impressions);
+                        j.addProperty("total_click", total_click);
+                        j.addProperty("total_ctr", Utils.trimDouble(total_ctr, 3));
+                        j.addProperty("total_cpa", Utils.trimDouble(total_cpa, 3));
+                        j.addProperty("total_cvr", Utils.trimDouble(total_cvr, 3));
+                        j.addProperty("name", tagName);
                         String sql = "select warning_level from  web_app_logs where app_name = '" + tagName + "' and log_date = '" + endTime + "'";
                         JSObject one = DB.findOneBySql(sql);
                         if (one.hasObjectData()) {
                             int warningLevel = one.get("warning_level");
-                            admob.addProperty("warning_level", warningLevel);
+                            j.addProperty("warning_level", warningLevel);
                         }
 
                         //计算这个应用的总营收和最后一天的营收
@@ -281,14 +314,14 @@ public class Query extends HttpServlet {
                             //14行悬浮窗：用一个静态方法FourteenData 来生成一个用于返回的数组 fourteen_arr,
 //                            fourteen_arr = FourteenData(id,endTime,googlePackageId);
                         }
-                        admob.addProperty("endTime_total_revenue", Utils.trimDouble(endTimeTotalRevenue, 0));
-                        admob.addProperty("total_revenue", Utils.trimDouble(totalRevenue, 0));
+                        j.addProperty("endTime_total_revenue", Utils.trimDouble(endTimeTotalRevenue, 0));
+                        j.addProperty("total_revenue", Utils.trimDouble(totalRevenue, 0));
 
                         //计算ECPM和incoming
                         double ecpm = totalRevenue * 1000 / total_impressions;
                         double incoming = totalRevenue - total_spend;
-                        admob.addProperty("ecpm",Utils.trimDouble(ecpm,3));
-                        admob.addProperty("incoming",Utils.trimDouble(incoming,0));
+                        j.addProperty("ecpm",Utils.trimDouble(ecpm,3));
+                        j.addProperty("incoming",Utils.trimDouble(incoming,0));
 
 
                         //在admob里添加14天数据
@@ -298,7 +331,7 @@ public class Query extends HttpServlet {
 //                        admob.addProperty("cvr_14", fourteen_arr[3]);
 //                        admob.addProperty("revenue_14", fourteen_arr[4]);
 
-                        arr.add(admob);
+                        arr.add(j);
                     }
                     json.add("data", arr);
                 }
@@ -840,11 +873,11 @@ public class Query extends HttpServlet {
         public double incoming;
     }
 
-    static class FourteenDays {
-        public String one_day_revenue_for_fourteen_days = "";
-        public String one_day_spend_for_fourteen_days = "";
-        public String one_day_installed_for_fourteen_days = "";
-        public String one_day_cpa_for_fourteen_days = "";
-        public String one_day_cvr_for_fourteen_days = "";
-    }
+//    static class FourteenDays {
+//        public String one_day_revenue_for_fourteen_days = "";
+//        public String one_day_spend_for_fourteen_days = "";
+//        public String one_day_installed_for_fourteen_days = "";
+//        public String one_day_cpa_for_fourteen_days = "";
+//        public String one_day_cvr_for_fourteen_days = "";
+//    }
 }

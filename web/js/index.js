@@ -444,13 +444,13 @@ function setDataSummary(data) {
         var str = "总花费: " + total_spend + " 总安装: " + total_installed +
             " 总展示: " + total_impressions + " 总点击: " + total_click +
             " CTR: " + total_ctr + " CPA: " + total_cpa + " CVR: " + total_cvr +
-            " 总营收: "+ total_revenue + " Incoming in total: " + total_incoming;
+            " 总营收: "+ total_revenue + " Incoming: " + total_incoming;
         $('#total_result').text(str);
     }else{
         var str = "总花费: " + total_spend + "  总营收: " + total_revenue + " 总安装: " + total_installed +
             " 总展示: " + total_impressions + " 总点击: " + total_click +
             " CTR: " + total_ctr + " CPA: " + total_cpa + " CVR: " + total_cvr +
-            " 总营收: "+ total_revenue + " Incoming in total: " + total_incoming;
+            " 总营收: "+ total_revenue + " Incoming: " + total_incoming;
         $('#total_result').text(str);
     }
 
@@ -1063,7 +1063,3 @@ function bindQueryZero() {
 init();
 bindQueryZero();
 bindBatchModifyOperation();
-
-if(countryRevenueSpendReturn == "false"){
-    $('#btnSummary').click();
-}

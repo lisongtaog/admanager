@@ -88,7 +88,7 @@ function generateFacebookCampaignName(params) {
 
     var videoPath = $('#inputVideoPath').val();
     if (videoPath != "") {
-        var videoTrimed = videoPath.replace(/\/.+\//,"");
+        var videoTrimed = videoPath.substring(videoPath.lastIndexOf("/")+1,videoPath.length);
         dims.push("视频"+ videoTrimed);
     } else {
         var imagePath = $('#inputImagePath').val();
@@ -138,6 +138,8 @@ function generateAdmobCampaignName(params) {
         dims.push($('#inputBiddingAdmob').val());
     }
 
+    var imagePath = $('#inputImagePathAdmob').val();
+    dims.push(imagePath);
 
     dims.push(now.getFullYear() + "" + (now.getMonth() + 1) + "" + now.getDate());
 

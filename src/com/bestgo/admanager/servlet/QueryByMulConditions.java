@@ -71,22 +71,49 @@ public class QueryByMulConditions extends HttpServlet {
                 if (countryCode != null && countryCode != "") {
                     countryCheck = "false";
                 }
+
+                JsonArray array = null;
+                double total_spend = 0;
+                double total_installed = 0;
+                double total_impressions = 0;
+                double total_click = 0;
+
+                //如果【Facebook】和【Adwords】都未选中，则要一起统计
                 if ("false".equals(adwordsCheck) && "false".equals(facebookCheck)) {
                     JsonObject admob = fetchOneAppData(id, tag,startTime, endTime, true, "true".equals(countryCheck), countryCode,likeCampaignName,campaignCreateTime,countryMap,totalInstallComparisonValue, "true".equals(containsNoDataCampaignCheck),countryCode,cpaComparisonValue,biddingComparisonValue,totalInstallOperator,cpaOperator,beforeThreeDays);
                     JsonObject facebook = fetchOneAppData(id, tag,startTime, endTime,false, "true".equals(countryCheck), countryCode,likeCampaignName,campaignCreateTime,countryMap,totalInstallComparisonValue, "true".equals(containsNoDataCampaignCheck),countryName,cpaComparisonValue,biddingComparisonValue,totalInstallOperator,cpaOperator,beforeThreeDays);
-                    double total_spend = admob.get("total_spend").getAsDouble() + facebook.get("total_spend").getAsDouble();
-                    double total_installed = admob.get("total_installed").getAsDouble() + facebook.get("total_installed").getAsDouble();
-                    double total_impressions = admob.get("total_impressions").getAsDouble() + facebook.get("total_impressions").getAsDouble();
-                    double total_click = admob.get("total_click").getAsDouble() + facebook.get("total_click").getAsDouble();
-                    double total_ctr = total_impressions > 0 ? total_click / total_impressions : 0;
-                    double total_cpa = total_installed > 0 ? total_spend / total_installed : 0;
-                    double total_cvr = total_click > 0 ? total_installed / total_click : 0;
-
-                    JsonArray array = admob.getAsJsonArray("array");
+                    total_spend = admob.get("total_spend").getAsDouble() + facebook.get("total_spend").getAsDouble();
+                    total_installed = admob.get("total_installed").getAsDouble() + facebook.get("total_installed").getAsDouble();
+                    total_impressions = admob.get("total_impressions").getAsDouble() + facebook.get("total_impressions").getAsDouble();
+                    total_click = admob.get("total_click").getAsDouble() + facebook.get("total_click").getAsDouble();
+                    array = admob.getAsJsonArray("array");
                     JsonArray array1 = facebook.getAsJsonArray("array");
                     array.addAll(array1);
-                    Gson gson = new Gson();
-                    if(sorter > 0 && "false".equals(countryCheck)){
+
+                }else if ("true".equals(adwordsCheck)) { //如果只选中【Adwords】
+                    JsonObject admob = fetchOneAppData(id, tag,startTime, endTime, true, "true".equals(countryCheck), countryCode,likeCampaignName,campaignCreateTime,countryMap,totalInstallComparisonValue, "true".equals(containsNoDataCampaignCheck),countryCode,cpaComparisonValue,biddingComparisonValue,totalInstallOperator,cpaOperator,beforeThreeDays);
+                    total_spend = admob.get("total_spend").getAsDouble();
+                    total_installed = admob.get("total_installed").getAsDouble();
+                    total_impressions = admob.get("total_impressions").getAsDouble();
+                    total_click = admob.get("total_click").getAsDouble();
+                    array = admob.getAsJsonArray("array");
+
+                }else{ //如果只选中【Facebook】
+                    JsonObject facebook = fetchOneAppData(id, tag,startTime, endTime,false, "true".equals(countryCheck), countryCode,likeCampaignName,campaignCreateTime,countryMap,totalInstallComparisonValue, "true".equals(containsNoDataCampaignCheck),countryName,cpaComparisonValue,biddingComparisonValue,totalInstallOperator,cpaOperator,beforeThreeDays);
+                    total_spend = facebook.get("total_spend").getAsDouble();
+                    total_installed = facebook.get("total_installed").getAsDouble();
+                    total_impressions = facebook.get("total_impressions").getAsDouble();
+                    total_click = facebook.get("total_click").getAsDouble();
+                    array = facebook.getAsJsonArray("array");
+                }
+                double total_ctr = total_impressions > 0 ? total_click / total_impressions : 0;
+                double total_cpa = total_installed > 0 ? total_spend / total_installed : 0;
+                double total_cvr = total_click > 0 ? total_installed / total_click : 0;
+                Gson gson = new Gson();
+
+                //如果【细分到国家】未选中
+                if("false".equals(countryCheck)){
+                    if(sorter > 0){
                         List<Campaigns> campaignsList = gson.fromJson(array, new TypeToken<List<Campaigns>>() {}.getType());
                         switch (sorter){
                             case 1:
@@ -425,39 +452,14 @@ public class QueryByMulConditions extends HttpServlet {
                             j.addProperty("network",c.network);
                             jsonArray.add(j);
                         }
-                        jsonObject.addProperty("total_spend", Utils.trimDouble(total_spend,0));
-                        jsonObject.addProperty("total_installed", total_installed);
-                        jsonObject.addProperty("total_impressions", total_impressions);
-                        jsonObject.addProperty("total_click", total_click);
-                        jsonObject.addProperty("total_ctr", Utils.trimDouble(total_ctr,3));
-                        jsonObject.addProperty("total_cpa", Utils.trimDouble(total_cpa,3));
-                        jsonObject.addProperty("total_cvr", Utils.trimDouble(total_cvr,3));
                         jsonObject.add("array",jsonArray);
                     }else{
-                        admob.addProperty("total_spend", Utils.trimDouble(total_spend,0));
-                        admob.addProperty("total_installed", total_installed);
-                        admob.addProperty("total_impressions", total_impressions);
-                        admob.addProperty("total_click", total_click);
-                        admob.addProperty("total_ctr", Utils.trimDouble(total_ctr,3));
-                        admob.addProperty("total_cpa", Utils.trimDouble(total_cpa,3));
-                        admob.addProperty("total_cvr", Utils.trimDouble(total_cvr,3));
-                        jsonObject = admob;
+                        jsonObject.add("array",array);
                     }
 
-
-                } else {
-                    if("true".equals(adwordsCheck)){
-                        jsonObject = fetchOneAppData(id, tag,startTime, endTime, true, "true".equals(countryCheck), countryCode,likeCampaignName,campaignCreateTime,countryMap,totalInstallComparisonValue, "true".equals(containsNoDataCampaignCheck),countryCode,cpaComparisonValue,biddingComparisonValue,totalInstallOperator,cpaOperator,beforeThreeDays);
-
-                    }else{
-                        jsonObject = fetchOneAppData(id, tag,startTime, endTime, false, "true".equals(countryCheck), countryCode,likeCampaignName,campaignCreateTime,countryMap,totalInstallComparisonValue, "true".equals(containsNoDataCampaignCheck),countryName,cpaComparisonValue,biddingComparisonValue,totalInstallOperator,cpaOperator,beforeThreeDays);
-
-                    }
-                }
-                if ("true".equals(countryCheck)) {
-                    JsonArray array = jsonObject.getAsJsonArray("array");
+                } else { //如果【细分到国家】被选中
                     HashMap<String, CountryRecord> dataSets = new HashMap<>();
-                    for (int i = 0; i < array.size(); i++) {
+                    for (int i = 0,len = array.size();i < len; i++) {
                         JsonObject one = array.get(i).getAsJsonObject();
                         String currCountryName = "";
                         if (one.get("country_name").isJsonNull()) {
@@ -747,6 +749,13 @@ public class QueryByMulConditions extends HttpServlet {
 
                     jsonObject.add("array", newArr);
                 }
+                jsonObject.addProperty("total_spend", Utils.trimDouble(total_spend,0));
+                jsonObject.addProperty("total_installed", total_installed);
+                jsonObject.addProperty("total_impressions", total_impressions);
+                jsonObject.addProperty("total_click", total_click);
+                jsonObject.addProperty("total_ctr", Utils.trimDouble(total_ctr,3));
+                jsonObject.addProperty("total_cpa", Utils.trimDouble(total_cpa,3));
+                jsonObject.addProperty("total_cvr", Utils.trimDouble(total_cvr,3));
                 json.add("data", jsonObject);
 
                 json.addProperty("ret", 1);
@@ -765,7 +774,29 @@ public class QueryByMulConditions extends HttpServlet {
     }
 
 
-
+    /**
+     * 统计Adwords或Facebook其中一个的数据
+     * @param tagId 标签ID
+     * @param tagName 标签名称
+     * @param startTime 开始日期
+     * @param endTime  结束日期
+     * @param admobCheck  true,表示只计算Adwords的；false，表示只计算Facebook的
+     * @param countryCheck  【细分到国家】的按钮是否被选中
+     * @param countryCode  页面传参进来的国家代号
+     * @param likeCampaignName  模糊查询的系列名称
+     * @param campaignCreateTime 系列创建日期
+     * @param countryMap 国家名称与代号的Map
+     * @param totalInstallComparisonValue 总安装比较值
+     * @param containsNoDataCampaignCheck 【查询无数据的系列】按钮是否被选中
+     * @param country  页面传参进来的国家代号或国家名称；如果是Adwords，则内部传入是countryCode;如果是Facebook，则内部传入countryName
+     * @param cpaComparisonValue  cpa比较值
+     * @param biddingComparisonValue 出价比较值
+     * @param totalInstallOperator  总安装的条件符号
+     * @param cpaOperator cpa的条件符号
+     * @param beforeThreeDays  endTime的三天前，不包括endTime
+     * @return
+     * @throws Exception
+     */
     private JsonObject fetchOneAppData(long tagId, String tagName, String startTime, String endTime, boolean admobCheck, boolean countryCheck, String countryCode,String likeCampaignName,String campaignCreateTime,HashMap<String ,String> countryMap,String totalInstallComparisonValue, boolean containsNoDataCampaignCheck,String country,String cpaComparisonValue,String biddingComparisonValue,String totalInstallOperator,String cpaOperator,String beforeThreeDays) throws Exception {
         String webAdCampaignTagRelTable = "web_ad_campaign_tag_rel";
         String webAdCampaignsTable = "web_ad_campaigns";
@@ -971,7 +1002,6 @@ public class QueryByMulConditions extends HttpServlet {
                 double openRate = 0;
 
                 if(admobCheck){
-//                    String sqlQuery = "select COUNT(id) as uninstall_count from ad_campaign_user_date_admob_rel where campaign_id = '" + campaignId + "' and uninstall_date is NOT NULL and ";
                     String sqlQuery = "SELECT COUNT(id) AS uninstall_count FROM ad_campaign_user_date_admob_rel " +
                                       " WHERE campaign_id = '" + campaignId + "' AND uninstall_date IS NOT NULL " +
                                       " AND query_date BETWEEN '2018-02-11' AND '" + beforeThreeDays + "' ";
