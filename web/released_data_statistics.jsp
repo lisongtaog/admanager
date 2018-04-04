@@ -859,7 +859,6 @@
                 }
             }
         }
-        $("#btnSearch").click();
     }
     init();
 

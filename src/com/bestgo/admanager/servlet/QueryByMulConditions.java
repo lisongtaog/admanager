@@ -2,6 +2,8 @@ package com.bestgo.admanager.servlet;
 
 import com.bestgo.admanager.DateUtil;
 import com.bestgo.admanager.Utils;
+import com.bestgo.admanager.bean.Campaigns;
+import com.bestgo.admanager.bean.CountryRecord;
 import com.bestgo.common.database.services.DB;
 import com.bestgo.common.database.utils.JSObject;
 import com.google.gson.Gson;
@@ -1001,35 +1003,35 @@ public class QueryByMulConditions extends HttpServlet {
                 //系列开启率 = 系列安装数量 / 系列总安装(随着数据量的增加，将来这里必须提前算出来！！！！！)
                 double openRate = 0;
 
-                if(admobCheck){
-                    String sqlQuery = "SELECT COUNT(id) AS uninstall_count FROM ad_campaign_user_date_admob_rel " +
-                                      " WHERE campaign_id = '" + campaignId + "' AND uninstall_date IS NOT NULL " +
-                                      " AND query_date BETWEEN '2018-02-11' AND '" + beforeThreeDays + "' ";
-                    JSObject oneQ = DB.findOneBySql(sqlQuery);
-                    long uninstallCount = 0;
-                    long installCount = 0;
-                    if(oneQ.hasObjectData()){
-                        uninstallCount = oneQ.get("uninstall_count");
-                    }
-                    sqlQuery = "SELECT COUNT(id) as install_count FROM ad_campaign_user_date_admob_rel " +
-                            " WHERE campaign_id = '" + campaignId + "'" +
-                            " AND query_date BETWEEN '2018-02-11' AND '" + beforeThreeDays + "' ";
-                    oneQ = DB.findOneBySql(sqlQuery);
-                    if(oneQ.hasObjectData()){
-                        installCount = oneQ.get("install_count");
-                        unRate = installCount == 0 ? 0 : ((double)uninstallCount / installCount);
-                    }
-                    sqlQuery = "SELECT sum(ch.total_installed) as total_installeds " +
-                               " FROM web_ad_campaigns_admob c, web_ad_campaigns_history_admob ch " +
-                               " WHERE c.campaign_id=ch.campaign_id  AND c.campaign_id = '" + campaignId + "'" +
-                               " AND c.status != 'removed' " +
-                               " AND date between '2018-02-11' AND '" + beforeThreeDays + "'";
-                    oneQ = DB.findOneBySql(sqlQuery);
-                    if(oneQ.hasObjectData()){
-                        double totalInstalleds = Utils.convertDouble(oneQ.get("total_installeds"),0);
-                        openRate = totalInstalleds == 0 ? 0 : ((double)installCount / totalInstalleds);
-                    }
-                }
+//                if(admobCheck){
+//                    String sqlQuery = "SELECT COUNT(id) AS uninstall_count FROM ad_campaign_user_date_admob_rel " +
+//                                      " WHERE campaign_id = '" + campaignId + "' AND uninstall_date IS NOT NULL " +
+//                                      " AND query_date BETWEEN '2018-02-11' AND '" + beforeThreeDays + "' ";
+//                    JSObject oneQ = DB.findOneBySql(sqlQuery);
+//                    long uninstallCount = 0;
+//                    long installCount = 0;
+//                    if(oneQ.hasObjectData()){
+//                        uninstallCount = oneQ.get("uninstall_count");
+//                    }
+//                    sqlQuery = "SELECT COUNT(id) as install_count FROM ad_campaign_user_date_admob_rel " +
+//                            " WHERE campaign_id = '" + campaignId + "'" +
+//                            " AND query_date BETWEEN '2018-02-11' AND '" + beforeThreeDays + "' ";
+//                    oneQ = DB.findOneBySql(sqlQuery);
+//                    if(oneQ.hasObjectData()){
+//                        installCount = oneQ.get("install_count");
+//                        unRate = installCount == 0 ? 0 : ((double)uninstallCount / installCount);
+//                    }
+//                    sqlQuery = "SELECT sum(ch.total_installed) as total_installeds " +
+//                               " FROM web_ad_campaigns_admob c, web_ad_campaigns_history_admob ch " +
+//                               " WHERE c.campaign_id=ch.campaign_id  AND c.campaign_id = '" + campaignId + "'" +
+//                               " AND c.status != 'removed' " +
+//                               " AND date between '2018-02-11' AND '" + beforeThreeDays + "'";
+//                    oneQ = DB.findOneBySql(sqlQuery);
+//                    if(oneQ.hasObjectData()){
+//                        double totalInstalleds = Utils.convertDouble(oneQ.get("total_installeds"),0);
+//                        openRate = totalInstalleds == 0 ? 0 : ((double)installCount / totalInstalleds);
+//                    }
+//                }
 
 
 
@@ -1162,41 +1164,6 @@ public class QueryByMulConditions extends HttpServlet {
         jsonObject.addProperty("total_cpa", Utils.trimDouble(total_cpa,3));
         jsonObject.addProperty("total_cvr", Utils.trimDouble(total_cvr,3));
         return jsonObject;
-    }
-
-    class CountryRecord {
-        public String country_name;
-        public double impressions;
-        public double installed;
-        public double click;
-        public double spend;
-        public double ctr;
-        public double cpa;
-        public double cvr;
-        public double un_rate;
-    }
-    class Campaigns {
-        public String campaign_id;
-        public String account_id;
-        public String short_name;
-        public String campaign_name;
-        public String status;
-        public String create_time;
-        public String country_code;
-        public double budget;
-        public double bidding;
-        public double impressions;
-        public double installed;
-        public double click;
-        public double spend;
-        public double ctr;
-        public double cpa;
-        public double cvr;
-        public double open_cpa;
-        public double un_rate;
-        public double open_rate;
-        public double campaign_spends;
-        public String network;
     }
 
 }

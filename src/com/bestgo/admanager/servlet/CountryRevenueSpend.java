@@ -2,6 +2,7 @@ package com.bestgo.admanager.servlet;
 
 import com.bestgo.admanager.OperationResult;
 import com.bestgo.admanager.Utils;
+import com.bestgo.admanager.bean.CountryRecord;
 import com.bestgo.common.database.services.DB;
 import com.bestgo.common.database.utils.JSObject;
 import com.google.gson.JsonArray;
@@ -193,15 +194,6 @@ public class CountryRevenueSpend extends HttpServlet {
             logger.error(ex.getMessage(), ex);
         }
         response.getWriter().write(json.toString());
-    }
-
-    class CountryRecord {
-        public String country_code;
-        public double installed;
-        public double spend;
-        public double cpa;
-        public double revenue;
-        public double incoming;//收益减去花费
     }
 
 }

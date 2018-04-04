@@ -2,6 +2,7 @@ package com.bestgo.admanager.servlet;
 
 import com.bestgo.admanager.DateUtil;
 import com.bestgo.admanager.Utils;
+import com.bestgo.admanager.bean.CampaignsSummary;
 import com.bestgo.common.database.services.DB;
 import com.bestgo.common.database.utils.JSObject;
 import com.google.gson.JsonArray;
@@ -511,7 +512,7 @@ public class Query extends HttpServlet {
 
 
     //以下封装了用于首页数据排序的方法
-    private static void sorting (ArrayList<CampaignsSummary> campaignsSummaryList,int sorter){
+    private void sorting (ArrayList<CampaignsSummary> campaignsSummaryList,int sorter){
         if (campaignsSummaryList != null && campaignsSummaryList.size() > 0) {
             switch (sorter) {
                 case 70:
@@ -852,25 +853,6 @@ public class Query extends HttpServlet {
                     break;
             }
         }
-    }
-
-    class CampaignsSummary {
-        public String name;
-        public double total_spend;
-        public double seven_days_total_spend;
-        public double end_time_total_spend;
-        public double end_time_total_revenue;
-        public double total_installed;
-        public double total_impressions;
-        public double total_click;
-        public double total_ctr;
-        public double total_cpa;
-        public double total_cvr;
-        public double total_revenue;
-        public double seven_days_total_revenue;
-        public String network;
-        public double ecpm;
-        public double incoming;
     }
 
 //    static class FourteenDays {

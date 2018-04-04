@@ -4,6 +4,8 @@ import com.bestgo.admanager.Config;
 import com.bestgo.admanager.DateUtil;
 import com.bestgo.admanager.OperationResult;
 import com.bestgo.admanager.Utils;
+import com.bestgo.admanager.bean.BatchChangeItem;
+import com.bestgo.admanager.bean.ReduceCostItem;
 import com.bestgo.common.database.services.DB;
 import com.bestgo.common.database.utils.JSObject;
 import com.google.gson.Gson;
@@ -808,28 +810,6 @@ public class Campaign extends HttpServlet {
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         doPost(request, response);
-    }
-
-    class BatchChangeItem {
-        public Boolean enabled;
-        public String network;
-        public String campaignId;
-        public String accountId;
-        public String campaignName;
-        public double budget;
-        public double bidding;
-        public String excludedCountry;
-        public int success;
-    }
-
-    class ReduceCostItem {
-        public String campaignId;
-        public String appName;
-        public int enabled = -1;
-        public double reduceCost;
-
-        public Set<String> countryRemoved = new HashSet<>();
-        public Set<String> countryExcluded = new HashSet<>();
     }
 
     private OperationResult updateCampaign(String id, String campaignName, String status, String budget, String bidding, String tags) {
