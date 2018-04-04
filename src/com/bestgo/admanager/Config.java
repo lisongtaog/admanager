@@ -146,7 +146,7 @@ public class Config {
         regionLanguageRelMap.put("Yemen","Arabic");
         regionLanguageRelMap.put("Mauritania","Arabic");
         regionLanguageRelMap.put("Myanmar","Burmese");
-        regionLanguageRelMap.put("Myanmar(Burma)","Burmese");
+        regionLanguageRelMap.put("Myanmar (Burma)","Burmese");
         regionLanguageRelMap.put("Ghana","English");
         regionLanguageRelMap.put("Pakistan","Urdu");
         regionLanguageRelMap.put("Kenya","Swahili");
