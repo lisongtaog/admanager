@@ -887,7 +887,7 @@ public class QueryByMulConditions extends HttpServlet {
                 for(JSObject j : listCampaignSpend4CountryCode){
                     countryCampaignspendMap.put(j.get("campaign_id"),j);
                 }
-                sql = "select campaign_id, a.account_id,short_name, campaign_name, a.status, create_time, budget, bidding, spend, installed, impressions, click" +
+                sql = "select campaign_id, a.account_id,short_name, campaign_name, a.status, create_time, budget, bidding, spend, installed, impressions, click,cpa" +
                         " from (" +
                         "select ch.campaign_id, account_id, campaign_name,c.status, create_time, c.budget, c.bidding, sum(ch.total_spend) as spend, " +
                         "sum(ch.total_installed) as installed, sum(ch.total_impressions) as impressions,sum(ch.total_click) as click, " +
@@ -923,7 +923,7 @@ public class QueryByMulConditions extends HttpServlet {
                     }
                 }
             }else if (countryCheck) {
-                sql = "select campaign_id, country_code, a.account_id,short_name, campaign_name, a.status, create_time, budget, bidding, spend, installed, impressions, click" +
+                sql = "select campaign_id, country_code, a.account_id,short_name, campaign_name, a.status, create_time, budget, bidding, spend, installed, impressions, click,cpa" +
                         " from (" +
                         "select ch.campaign_id, country_code, account_id, campaign_name,c.status, create_time, c.budget, c.bidding, sum(ch.total_spend) as spend, " +
                         "sum(ch.total_installed) as installed, sum(ch.total_impressions) as impressions, " +
@@ -937,7 +937,7 @@ public class QueryByMulConditions extends HttpServlet {
                         ") a left join " + webAccountIdTable + " b on a.account_id = b.account_id";
                 list = DB.findListBySql(sql);
             }else{
-                sql = "select campaign_id, a.account_id,short_name, campaign_name, a.status, create_time, budget, bidding, spend, installed, impressions, click" +
+                sql = "select campaign_id, a.account_id,short_name, campaign_name, a.status, create_time, budget, bidding, spend, installed, impressions, click,cpa" +
                         " from (" +
                         "select ch.campaign_id, account_id, campaign_name,c.status, create_time, c.budget, c.bidding, sum(ch.total_spend) as spend, " +
                         "sum(ch.total_installed) as installed, sum(ch.total_impressions) as impressions, " +
@@ -998,7 +998,8 @@ public class QueryByMulConditions extends HttpServlet {
                 double installed = Utils.convertDouble(one.get("installed"), 0);
                 String campaignId = one.get("campaign_id");
                 double spend = Utils.convertDouble(one.get("spend"), 0);
-                double cpa = installed > 0 ? spend / installed : 0;
+                double cpa = Utils.convertDouble(one.get("cpa"), 0);
+//                double cpa = installed > 0 ? spend / installed : 0;
 
                 //目前只有Adwords能收集到unRate和openRate
                 if(admobCheck){
