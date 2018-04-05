@@ -496,10 +496,12 @@ function setData(data) {
                     td.addClass("danhuangse");
                 }
                 td.text(field_value + " / " + totalSpend);
-            } else if(field == 'un_rate' || field == 'open_rate'){
+            } else if(field == 'un_rate' || field == 'open_rate' || field == 'open_cpa'){
                 if(field_value == -100000){
                     td.text("--");
-                }else{
+                } else if(field_value == 0){
+                    td.text("");
+                } else{
                     td.text(field_value);
                 }
             }else{
