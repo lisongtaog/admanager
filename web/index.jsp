@@ -46,6 +46,9 @@
         .danhuangse{
             color: #ffb74d;
         }
+        .td_left_border {
+            border-left: #daff92 solid 1px;
+        }
     </style>
 </head>
 <body>

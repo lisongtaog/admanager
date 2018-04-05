@@ -484,7 +484,7 @@ function setData(data) {
                     break;
                 }
             }
-            var td = $('<td></td>');
+            var td = $("<td class='td_left_border'></td>");
             var field = keyset[j];
             var field_value = one[field];
 
@@ -513,9 +513,10 @@ function setData(data) {
 
             tr.append(td);
         }
-        //这里增加“新建”按钮——————————————————————————————
+
+        //这里增加【新建】按钮
         if(!countryCheck){
-            var btn = $('<input type="button" value="新建">');   //临时创建了一个变量btn，“新建”键
+            var btn = $('<input type="button" value="新建">');   //临时创建了一个变量btn，【新建】键
             btn.data("campaign_id", one['campaign_id']);    //给当前这个键增加键值对
             btn.data("budget",one['budget']);
             btn.data("bidding",one['bidding']);
@@ -530,7 +531,6 @@ function setData(data) {
             });
         }
         tr.append(btn);
-        //——————————————————————————————————————————
 
         if(one["impressions"] == 0){
             tr.addClass("lilac");
