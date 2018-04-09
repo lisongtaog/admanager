@@ -41,20 +41,18 @@ public class ReleasedDataStatistics extends HttpServlet {
         if (path.matches("/query_released_data_statistics")) {
             JsonArray jsonArray = new JsonArray();
             try {
-                String sqlG = "select team_name,category_name,t.id,t.tag_name,anticipated_incoming,anticipated_revenue,google_package_id " +
-                        "from web_ad_category_team ct, web_ad_tag_category tc, web_tag t, web_facebook_app_ids_rel air " +
-                        "where tc.id = t.tag_category_id and ct.id = tc.team_id and t.tag_name = air.tag_name " +
+                String sql = "select team_name,category_name,t.tag_name,anticipated_incoming,anticipated_revenue " +
+                        "from web_ad_category_team ct, web_ad_tag_category tc, web_tag t " +
+                        "where tc.id = t.tag_category_id and ct.id = tc.team_id " +
                         ((likeTeamName == "") ? " " : " and team_name like '%" + likeTeamName + "%' ") +
                         ((likeCategoryName == "") ? " " : " and category_name like '%" + likeCategoryName + "%' ") +
                         " ORDER BY ct.id,tc.id,t.id ";
-                List<JSObject> listTag = DB.findListBySql(sqlG);
+                List<JSObject> listTag = DB.findListBySql(sql);
                 if (listTag != null && listTag.size() > 0) {
                     for (JSObject t : listTag) {
                         if (t.hasObjectData()) {
                             String teamName = t.get("team_name");
                             String categoryName = t.get("category_name");
-                            String google_package_id = t.get("google_package_id");
-                            long tagId = t.get("id");
                             JsonObject d = new JsonObject();
                             d.addProperty("team_name", teamName);
                             d.addProperty("category_name", categoryName);
@@ -65,40 +63,19 @@ public class ReleasedDataStatistics extends HttpServlet {
                             d.addProperty("anticipated_incoming", anticipatedIncoming);
                             d.addProperty("anticipated_revenue", anticipatedRevenue);
                             for (int i = 0; i > -7; i--) {
-                                String date = DateUtil.addDay(endTime, i, "yyyy-MM-dd");
-                                sqlG = "select sum(ch.total_spend) as spend " +
-                                        " from web_ad_campaigns c, web_ad_campaigns_history ch, " +
-                                        "(select distinct campaign_id from web_ad_campaign_tag_rel where tag_id = " + tagId + ") rt " +
-                                        "where rt.campaign_id = ch.campaign_id and c.campaign_id = ch.campaign_id " +
-                                        "and date = '" + date + "' " +
-                                        "and c.status != 'removed'";
-                                JSObject x = DB.findOneBySql(sqlG);
-                                double totalSpend = 0;
-                                if (x.hasObjectData()) {
-                                    totalSpend = Utils.convertDouble(x.get("spend"), 0);
-                                }
-                                sqlG = "select sum(ch.total_spend) as spend " +
-                                        " from web_ad_campaigns_admob c, web_ad_campaigns_history_admob ch, " +
-                                        "(select distinct campaign_id from web_ad_campaign_tag_admob_rel where tag_id = " + tagId + ") rt " +
-                                        "where rt.campaign_id = ch.campaign_id and c.campaign_id = ch.campaign_id " +
-                                        "and date = '" + date + "' " +
-                                        "and c.status != 'removed'";
-                                x = DB.findOneBySql(sqlG);
-                                if (x.hasObjectData()) {
-                                    totalSpend += Utils.convertDouble(x.get("spend"), 0);
-                                }
                                 double totalRevenue = 0;
-
-                                if (google_package_id != "") {
-                                    sqlG = "select sum(revenue) as revenues " +
-                                            "from web_ad_country_analysis_report_history where app_id = '"
-                                            + google_package_id + "' and date = '" + date + "'";
-                                    x = DB.findOneBySql(sqlG);
-                                    if (x.hasObjectData()) {
-                                        totalRevenue = Utils.convertDouble(x.get("revenues"), 0);
-                                    }
+                                double totalSpend = 0;
+                                double totalIncoming = 0;
+                                String date = DateUtil.addDay(endTime, i, "yyyy-MM-dd");
+                                sql = "SELECT incoming,spend,revenue FROM web_ad_tag_released_data_statistics " +
+                                      "WHERE team_name = '" + teamName + "' AND date = '" + date +"' " +
+                                      "AND category_name = '" + categoryName + "' AND tag_name = '" + tagName + "'";
+                                JSObject one = DB.findOneBySql(sql);
+                                if(one.hasObjectData()){
+                                    totalIncoming = one.get("incoming");
+                                    totalSpend = one.get("spend");
+                                    totalRevenue = one.get("revenue");
                                 }
-                                double totalIncoming = totalRevenue - totalSpend;
                                 d.addProperty("total_revenue" + i, Utils.trimDouble(totalRevenue, 0));
                                 d.addProperty("total_spend" + i, Utils.trimDouble(totalSpend, 0));
                                 d.addProperty("total_incoming" + i, Utils.trimDouble(totalIncoming, 0));
