@@ -375,6 +375,25 @@
 
     }
 
+    $('#inputTranslate').click(function () {
+        var title = $("#inputTitle").val();
+        var message = $("#inputMessage").val();
+        var googleCodeFrom = "en";
+        var googleCodeTo = $("#inputTranslate").val();
+        $.post('https://translation.googleapis.com/language/translate/v2?key=AIzaSyBALihNeToXheg4Iw2E7C8FafHpfAwNdWE', {
+            target: googleCodeTo,
+            format: "text",
+            source: googleCodeFrom,
+            q: title
+        }, function(data) {
+            if (data && data.ret == 1) {
+                $("#new_account_dlg").modal("hide");
+                location.reload();
+            } else {
+                admanager.showCommonDlg("错误", data.message);
+            }
+        }, 'json');
+    });
     init();
 
     $('#btnInsertAdmob').click(function() {

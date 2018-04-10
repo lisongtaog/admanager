@@ -335,7 +335,13 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.4/js/select2.min.js"></script>
 <script src="js/layer/layer.js" ></script>
 <script>
-    var languageList = ["", "Albanian","Amharic","Arabic","Armenian","Azerbaijani","Bengali","Bosnian","Bulgarian","Burmese","Catalan","Chinese","Croatian","Czech","Danish","Dutch","English","Estonian","Finnish","Filipino","French","German","Georgian","Greek","Hungarian", "Hindi","Hebrew","Icelandic","Indonesian","Italian","Japanese","Korean","Kyrgyz","Lao","Latvian","Lithuanian","Luxembourgish","Macedonian","Malagasy","Malay","Mongolian","Nepali","Pashto","Polish","Portuguese","Romanian","Russian","Samoan","Serbian","Sinhala","Slovak","Slovenian", "Somali","Spanish","Swahili","Swedish","Tajik","Thai","Norwegian","Traditional","Turkish","Ukrainian","Urdu","Uzbek","Vietnamese"];
+    var languageList = ["", "Albanian","Amharic","Arabic","Armenian","Azerbaijani","Bengali","Bosnian","Bulgarian",
+        "Burmese","Catalan","Chinese","Croatian","Czech","Danish","Dutch","English","Estonian","Finnish","Filipino",
+        "French","German","Georgian","Greek","Hungarian", "Hindi","Hebrew","Icelandic","Indonesian","Italian","Japanese",
+        "Korean","Kyrgyz","Lao","Latvian","Lithuanian","Luxembourgish","Macedonian","Malagasy","Malay","Mongolian",
+        "Nepali","Pashto","Polish","Portuguese","Romanian","Russian","Samoan","Serbian","Sinhala","Slovak","Slovenian",
+        "Somali","Spanish","Swahili","Swedish","Tajik","Thai","Norwegian","Traditional","Turkish",
+        "Ukrainian","Urdu","Uzbek","Vietnamese"];
 
     var appList = [];
 

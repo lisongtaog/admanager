@@ -295,4 +295,88 @@ public class Config {
         regionLanguageRelMap.put("Mayotte","French");
         return regionLanguageRelMap;
     }
+
+
+    /**
+     * 语言与ISO-639-1 Code的对照表
+     * @return Map集合
+     */
+    public static Map<String, String> getLanguageAndCodeRelMap() {
+        Map<String, String> languageAndCodeRelMap = new HashMap<>();
+
+        languageAndCodeRelMap.put("Afrikaans", "en");
+        languageAndCodeRelMap.put("Albanian", "sq");
+        languageAndCodeRelMap.put("Amharic", "am");
+        languageAndCodeRelMap.put("Arabic", "ar");
+        languageAndCodeRelMap.put("Armenian", "hy");
+        languageAndCodeRelMap.put("Azeerbaijani", "az");
+        languageAndCodeRelMap.put("Basque", "eu");
+        languageAndCodeRelMap.put("Belarusian", "be");
+        languageAndCodeRelMap.put("Bengali", "bn");
+        languageAndCodeRelMap.put("Bosnian", "bs");
+        languageAndCodeRelMap.put("Bulgarian", "bg");
+        languageAndCodeRelMap.put("Catalan", "ca");
+        languageAndCodeRelMap.put("Chinese", "zh-CN");
+        languageAndCodeRelMap.put("Corsican", "co");
+        languageAndCodeRelMap.put("Croatian", "hr");
+        languageAndCodeRelMap.put("Czech", "cs");
+        languageAndCodeRelMap.put("Danish", "da");
+        languageAndCodeRelMap.put("Dutch", "nl");
+        languageAndCodeRelMap.put("English", "en");
+        languageAndCodeRelMap.put("Esperanto", "eo");
+        languageAndCodeRelMap.put("Estonian", "et");
+        languageAndCodeRelMap.put("Finnish", "fi");
+        languageAndCodeRelMap.put("French", "fr");
+        languageAndCodeRelMap.put("Frisian", "fy");
+        languageAndCodeRelMap.put("Galician", "gl");
+        languageAndCodeRelMap.put("Georgian", "ka");
+        languageAndCodeRelMap.put("German", "de");
+        languageAndCodeRelMap.put("Greek", "el");
+        languageAndCodeRelMap.put("Gujarati", "gu");
+        languageAndCodeRelMap.put("Haitian Creole", "ht");
+        languageAndCodeRelMap.put("Hebrew", "iw");
+        languageAndCodeRelMap.put("Hindi", "hi");
+        languageAndCodeRelMap.put("Hungarian", "hu");
+        languageAndCodeRelMap.put("Hungarian", "hu");
+        languageAndCodeRelMap.put("Icelandic", "is");
+        languageAndCodeRelMap.put("Indonesian", "id");
+        languageAndCodeRelMap.put("Italian", "it");
+        languageAndCodeRelMap.put("Japanese", "ja");
+        languageAndCodeRelMap.put("Korean", "ko");
+        languageAndCodeRelMap.put("Kyrgyz", "ky");
+        languageAndCodeRelMap.put("Lao", "lo");
+        languageAndCodeRelMap.put("Latvian", "lv");
+        languageAndCodeRelMap.put("Lithuanian", "lt");
+        languageAndCodeRelMap.put("Luxembourgish", "lb");
+        languageAndCodeRelMap.put("Macedonian", "mk");
+        languageAndCodeRelMap.put("Malagasy", "mg");
+        languageAndCodeRelMap.put("Malay", "ms");
+        languageAndCodeRelMap.put("Mongolian", "mn");
+        languageAndCodeRelMap.put("Nepali", "ne");
+        languageAndCodeRelMap.put("Pashto", "ps");
+        languageAndCodeRelMap.put("Polish", "pl");
+        languageAndCodeRelMap.put("Portuguese", "pt");
+        languageAndCodeRelMap.put("Romanian", "ro");
+        languageAndCodeRelMap.put("Russian", "ru");
+        languageAndCodeRelMap.put("Samoan", "sm");
+        languageAndCodeRelMap.put("Serbian", "sr");
+        languageAndCodeRelMap.put("Sinhala", "si");
+        languageAndCodeRelMap.put("Slovak", "sk");
+        languageAndCodeRelMap.put("Slovenian", "sl");
+        languageAndCodeRelMap.put("Somali", "so");
+        languageAndCodeRelMap.put("Spanish", "es");
+        languageAndCodeRelMap.put("Swahili", "sw");
+        languageAndCodeRelMap.put("Swedish", "sv");
+        languageAndCodeRelMap.put("Tajik", "tg");
+        languageAndCodeRelMap.put("Thai", "th");
+        languageAndCodeRelMap.put("Norwegian", "no");
+        languageAndCodeRelMap.put("Traditional", "zh-TW");
+        languageAndCodeRelMap.put("Turkish", "tr");
+        languageAndCodeRelMap.put("Ukrainian", "uk");
+        languageAndCodeRelMap.put("Urdu", "ur");
+        languageAndCodeRelMap.put("Uzbek", "uz");
+        languageAndCodeRelMap.put("Vietnamese", "vi");
+
+        return languageAndCodeRelMap;
+    }
 }

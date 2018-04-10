@@ -38,16 +38,25 @@ public class AppActivityDaily extends HttpServlet{
         JsonArray array = new JsonArray();
         String message = "";
         if(path.startsWith("/create")){
-            String sql = "REPLACE INTO web_ad_write_app_daily_record (tag_name,date,content)" +
-                         "VALUES ('"+ tagName + "','" + theDate +"','" + content +"')";
+            String sql = "SELECT COUNT(id) AS if WHERE tag_name = '"+tagName+"' AND date='"+theDate+"'";
+            long ifDataExist = 0;
+            try{
+                ifDataExist = DB.findOneBySql(sql).get("if");
+            }catch(Exception e){
+                e.printStackTrace();
+            }
+            if(ifDataExist>0){
+                sql = "UPDATE web_ad_write_app_daily_record SET content='"+content+"'WHERE tag_name = '"+tagName+"' AND date='"+theDate+"'";
+            }else{
+                sql = "INSERT INTO web_ad_write_app_daily_record (tag_name,date,content)" +
+                        "VALUES ('"+ tagName + "','" + theDate +"','" + content +"')";
+            }
             try{
                 DB.updateBySql(sql);
                 message = "日志创建成功！";
-                json.addProperty("flag",1);
                 json.addProperty("message",message);
             }catch(Exception e){
                 message = e.getMessage();
-                json.addProperty("flag",0);
                 json.addProperty("message",message);
             }
             response.setCharacterEncoding("utf-8");

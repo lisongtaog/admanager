@@ -1,4 +1,6 @@
-
+var endDate = $("#inputEndDate").val();
+var startDate = $("#inputStartDate").val();
+var tagName = $("input[id='inputSearch']").val();
 
 //拆分日期
 function gDate(datestr){
@@ -43,16 +45,16 @@ $("#btnSearch").click(function(){
         result_body.append(tr);
 
         //创建一个用于存放textarea的行
-        var textarea_tr = $("<tr></tr>");
+        var textarea_tr = $("<tr id='textarea_tr'></tr>");
         var daily_td =  $("<td style='vertical-align:center'>日志创建</td>");
         textarea_tr.append(daily_td);
         for(var count=0;count<dateCount;count++){
             var date_textarea_td = $("<td></td>");
             var text_input_tr = $("<tr></tr>");
-            var text_input = $("<textarea id=\'inputContent"+count+"\'></textarea>") //该CSS待调
+            var text_input = $("<textarea id=\'inputContent"+count+"\' style='width:300px;height:100px'></textarea>")
             text_input_tr.append(text_input);
             var btn_tr = $("<tr></tr>");
-            var delete_btn = $("<button id=\'deleteContent"+count+"\' class=\'del_btn btn-default\'>清除</button>");  //该按钮绑定清空操作
+            var delete_btn = $("<button id=\'deleteContent"+count+"\' class=\'del_btn btn-default\'>清空</button>");  //该按钮绑定清空操作
             var create_btn = $("<button id=\'createContent"+count+"\' class=\'cre_btn btn-default\'>更新</button>");  //该按钮绑定插入操作
             btn_tr.append(create_btn);
             btn_tr.append(delete_btn);
@@ -114,15 +116,17 @@ $("#btnSearch").click(function(){
         },"json");
 });
 
-//清除输入框的操作
-$(".del_btn").click(function(){
+/* 事件委托：事件绑定到父元素，等事件触发后再寻找相匹配的子元素
+ * 坑：注意父元素绑定——在JS执行以前的 DOM元素上绑定，才能不受动态元素的影响
+ */
+$("#results_body").on('click','.del_btn',function(){
     var this_id = $(this).attr("id");
     var del_trim = this_id.replace(/deleteContent/,"");
     $("#inputContent"+del_trim).val(""); //清空当前按钮对应的textarea
 });
 
 //更新数据库表web_ad_write_app_daily_record的操作
-$(".cre_btn").click(function(){
+$("#results_body").on('click','.cre_btn',function(){
     var this_id = $(this).attr("id");
     var cre_trim = this_id.replace(/createContent/,"");
     var creation = $("#inputContent"+cre_trim).val();
@@ -130,15 +134,17 @@ $(".cre_btn").click(function(){
     if(confirm(msg) === true){
         //日期的处理
         var this_date = endDate.split("-"); //分割日期字符串
-        var theDate = new Date(Number(now['0']),Number(now['1']),Number(now['2']));
+        var theDate = new Date(Number(this_date['0']),Number(this_date['1']),Number(this_date['2']));
         theDate.setDate(theDate.getDate()-cre_trim); //得到新日期Date类型
         var year = theDate.getFullYear();
         var month = theDate.getMonth()<9 ? "0"+ theDate.getMonth() : ""+ theDate.getMonth();
-        var day = theDate.getDate()<10 ? "0"+(theDate.getDate()+1) : ""+(theDate.getDate()+1);
+        var day = theDate.getDate()<10 ? "0"+(theDate.getDate()) : ""+(theDate.getDate());
         this_date = year +"-"+ month + "-" + day;
+        var tagName = $("input[id='inputSearch']").val();
         $.post("app_activity_daily/create",{
             content:creation ,
-            thisDate:this_date
+            this_date:this_date,
+            tagName:tagName
         },function(data){  //这里的data是一个信息
             alert(data["message"]);
         },"json")
