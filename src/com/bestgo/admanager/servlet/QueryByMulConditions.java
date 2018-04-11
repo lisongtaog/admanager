@@ -1018,43 +1018,6 @@ public class QueryByMulConditions extends HttpServlet {
                         d.addProperty("open_rate", Utils.trimDouble(openRate,3));
                     }
                 }
-//                if(admobCheck){
-//                    String sqlQuery = "SELECT COUNT(id) AS uninstall_count FROM ad_campaign_user_date_admob_rel " +
-//                                      " WHERE campaign_id = '" + campaignId + "' AND uninstall_date IS NOT NULL " +
-//                                      " AND query_date BETWEEN '2018-02-11' AND '" + beforeThreeDays + "' ";
-//                    JSObject oneQ = DB.findOneBySql(sqlQuery);
-//                    long uninstallCount = 0;
-//                    long installCount = 0;
-//                    if(oneQ.hasObjectData()){
-//                        uninstallCount = oneQ.get("uninstall_count");
-//                    }
-//                    sqlQuery = "SELECT COUNT(id) as install_count FROM ad_campaign_user_date_admob_rel " +
-//                            " WHERE campaign_id = '" + campaignId + "'" +
-//                            " AND query_date BETWEEN '2018-02-11' AND '" + beforeThreeDays + "' ";
-//                    oneQ = DB.findOneBySql(sqlQuery);
-//                    if(oneQ.hasObjectData()){
-//                        installCount = oneQ.get("install_count");
-//
-//                        //系列卸载率 = 系列卸载数量 / 系列安装数量
-//                        double unRate = installCount == 0 ? 0 : ((double)uninstallCount / installCount);
-//                        d.addProperty("un_rate", Utils.trimDouble(unRate,3));
-//                    }
-//                    sqlQuery = "SELECT sum(ch.total_installed) as total_installeds " +
-//                               " FROM web_ad_campaigns_admob c, web_ad_campaigns_history_admob ch " +
-//                               " WHERE c.campaign_id=ch.campaign_id  AND c.campaign_id = '" + campaignId + "'" +
-//                               " AND c.status != 'removed' " +
-//                               " AND date between '2018-02-11' AND '" + beforeThreeDays + "'";
-//                    oneQ = DB.findOneBySql(sqlQuery);
-//                    if(oneQ.hasObjectData()){
-//                        double totalInstalleds = Utils.convertDouble(oneQ.get("total_installeds"),0);
-//
-//                        //系列开启率 = 系列安装数量 / 系列总安装
-//                        double openRate = totalInstalleds == 0 ? 0 : ((double)installCount / totalInstalleds);
-//                        double openCpa = openRate == 0 ? 0 : cpa / openRate;
-//                        d.addProperty("open_cpa", Utils.trimDouble(openCpa,3));
-//                        d.addProperty("open_rate", Utils.trimDouble(openRate,3));
-//                    }
-//                }
 
                 String short_name = one.get("short_name");
                 String account_id = one.get("account_id");

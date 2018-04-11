@@ -38,10 +38,10 @@ public class AppActivityDaily extends HttpServlet{
         JsonArray array = new JsonArray();
         String message = "";
         if(path.startsWith("/create")){
-            String sql = "SELECT COUNT(id) AS if WHERE tag_name = '"+tagName+"' AND date='"+theDate+"'";
+            String sql = "SELECT COUNT(id) AS if_exist FROM web_ad_write_app_daily_record WHERE tag_name = '"+tagName+"' AND date='"+theDate+"'";
             long ifDataExist = 0;
             try{
-                ifDataExist = DB.findOneBySql(sql).get("if");
+                ifDataExist = DB.findOneBySql(sql).get("if_exist");
             }catch(Exception e){
                 e.printStackTrace();
             }
@@ -52,8 +52,12 @@ public class AppActivityDaily extends HttpServlet{
                         "VALUES ('"+ tagName + "','" + theDate +"','" + content +"')";
             }
             try{
-                DB.updateBySql(sql);
-                message = "日志创建成功！";
+                boolean creation_success = DB.updateBySql(sql);
+                if(creation_success){
+                    message = "日志创建成功！";
+                }else{
+                    message = "创建过程访问数据库失败！";
+                }
                 json.addProperty("message",message);
             }catch(Exception e){
                 message = e.getMessage();

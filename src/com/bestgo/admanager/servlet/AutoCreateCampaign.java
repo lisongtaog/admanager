@@ -202,7 +202,7 @@ public class AutoCreateCampaign extends HttpServlet {
 
     static String[] FB_CAMPAIGN_FIELDS = {"id", "app_name", "create_count", "account_id", "country_region", "explode_country",
     "excluded_region", "language", "age", "explode_age", "gender", "explode_gender", "detail_target", "user_os", "user_devices",
-    "campaign_name", "bugdet", "bidding", "explode_bidding", "max_cpa", "title", "message", "image_path", "create_time", "update_time", "enabled","video_path"};
+    "campaign_name", "bugdet", "bidding", "explode_bidding", "max_cpa", "title", "message", "image_path", "create_time", "update_time", "enabled","video_path","group_id"};
 
     public static JSObject facebookFetchById(String id) {
         try {
