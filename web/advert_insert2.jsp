@@ -387,8 +387,7 @@
             q: title
         }, function(data) {
             if (data && data.ret == 1) {
-                $("#new_account_dlg").modal("hide");
-                location.reload();
+
             } else {
                 admanager.showCommonDlg("错误", data.message);
             }

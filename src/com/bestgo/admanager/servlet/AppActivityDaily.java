@@ -74,13 +74,31 @@ public class AppActivityDaily extends HttpServlet{
                 Date end = date_format.parse(endDate);
                 long days_between = (end.getTime()-start.getTime())/1000/3600/24 + 1;
 
-                //先建立国家为条件的循环(已确保List里的国家一定是表web_ad_system_app_daily_record_result里出现过的)
+                //这里用于回显手写日志：最外层对应键content_array
+                JsonArray handwrite_content = new JsonArray();
+                for(int j = 0;j<days_between;j++){
+                    JsonObject content_key_value = new JsonObject();
+                    String thisDate = DateUtil.addDay(endDate,-j,"yyyy-MM-dd");
+                    sql = "SELECT content FROM web_ad_write_app_daily_record WHERE tag_name = '"+tagName+"'AND date='"+thisDate+"'";
+                    JSObject content_from_table = DB.findOneBySql(sql);
+                    if(content_from_table.hasObjectData()){
+                        String content_value = content_from_table.get("content");
+                        content_key_value.addProperty("content",content_value);
+                    }else{
+                        String content_value = "(今日没有记录)";
+                        content_key_value.addProperty("content",content_value);
+                    }
+                    handwrite_content.add(content_key_value);
+                }
+
+                // 这里用于显示系统操作日志，最外层对应键 country_array
+                // 先建立国家为条件的循环(已确保List里的国家一定是表web_ad_system_app_daily_record_result里出现过的)
                 for(JSObject country_for:countryCode){
                     String this_country_code = country_for.get("country_code");
-                    JsonArray arrayMiddle = new JsonArray(); //每个国家循环创建一次，确保每次都会释放
-                    JsonObject jsonMiddle = new JsonObject();
+                    JsonArray arrayMiddle = new JsonArray(); //每个国家循环创建一次，仅用于存放单国家不同日期的数组
                     //按日期列表遍历（从后往前）
                     for(int i=0;i<days_between;i++ ){
+                        JsonObject jsonMiddle = new JsonObject(); //确保每次添进arrayMiddle里的数据都是新的，而不会随着引用的改变而改变
                         String thisDate = DateUtil.addDay(endDate,-i,"yyyy-MM-dd");
                         sql = "SELECT campaign_id,content FROM web_ad_system_app_daily_record_result WHERE tag_name='"
                                 +tagName+"' AND date='"+thisDate+"' AND country_code='"+this_country_code+"'";
@@ -91,17 +109,16 @@ public class AppActivityDaily extends HttpServlet{
                             for(JSObject campaign_record_for:campaignRecord){
                                 String campaign_id = "[" + campaign_record_for.get("campaign_id") + "]";
                                 String content_string = campaign_record_for.get("content");
-                                campaign_data += (campaign_id + content_string + "<br><br>"); //梦君说的substring用索引去掉最后一个逗号，加上换行
+                                campaign_data += (campaign_id + content_string + "<br><br>");
 
                                 //jsonInside.addProperty("campaign_id",campaign_id);
                                 //jsonInside.addProperty("content",content_string);
                                 //arrayInside.add(jsonInside);
                             }
-                            jsonMiddle.addProperty("campaign_data",campaign_data);
+                            jsonMiddle.addProperty("campaign_data"+i,campaign_data);
                             //jsonMiddle.addProperty("date",thisDate);
                         }else{
-                            jsonMiddle.addProperty("campaign_data",""); //确保没有数据也会占一个数组位
-                            continue;
+                            jsonMiddle.addProperty("campaign_data"+i,"");
                         }
                         arrayMiddle.add(jsonMiddle);
                     }
@@ -111,8 +128,10 @@ public class AppActivityDaily extends HttpServlet{
                     jsonHere.add("date_data",arrayMiddle);
                     array.add(jsonHere); 
                 }
+                json.add("content_array",handwrite_content);
+                json.add("country_array",array);
                 response.setCharacterEncoding("utf-8");
-                response.getWriter().write(array.toString());
+                response.getWriter().write(json.toString());
 
             }catch(Exception e){
                 e.printStackTrace();

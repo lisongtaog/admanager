@@ -15,7 +15,7 @@ $("#btnSearch").click(function(){
     var endDate = $("#inputEndDate").val();
     var startDate = $("#inputStartDate").val();
     var tagName = $("input[id='inputSearch']").val();
-    var result_body = $("<table border=\"1\" cellspacing=\"0\" cellpadding=\"5\"></table>");
+    var result_body = $("<table border=\"1\" cellspacing=\"0\" cellpadding=\"5\" style='border-collapse:separate'></table>");
     $("#results_body").empty(); //清空原有数据
     //用于动态回显查询到的日志
     $.post("app_activity_daily/search",{
@@ -48,10 +48,17 @@ $("#btnSearch").click(function(){
         var textarea_tr = $("<tr id='textarea_tr'></tr>");
         var daily_td =  $("<td style='vertical-align:center'>日志创建</td>");
         textarea_tr.append(daily_td);
+        var contentArray = data["content_array"]; //得到手写日志的json数组
         for(var count=0;count<dateCount;count++){
+            var handwrite_content = contentArray[count]["content"];
             var date_textarea_td = $("<td></td>");
             var text_input_tr = $("<tr></tr>");
             var text_input = $("<textarea id=\'inputContent"+count+"\' style='width:300px;height:100px'></textarea>")
+            if(handwrite_content != "(今日没有记录)"){
+                text_input.val(handwrite_content);
+            }else{
+                text_input.attr("placeholder",handwrite_content);
+            }
             text_input_tr.append(text_input);
             var btn_tr = $("<tr></tr>");
             var delete_btn = $("<button id=\'deleteContent"+count+"\' class=\'del_btn btn-default\'>清空</button>");  //该按钮绑定清空操作
@@ -73,40 +80,24 @@ $("#btnSearch").click(function(){
             country_tr_head.append("<td>应用日活动记录</td>");
         }
         result_body.append(country_tr_head);
- /*       for(count=0;count<dateCount;count++){
-            var country_tr_head_about_date = $("<td>系列ID</td><td>系统操作</td>");
-            country_tr_head.append(country_tr_head_about_date);
-        }*/
 
         //填充国家行（包括各天下的系列ID和系统操作）
-        if(data.length>0){
-            for(var i=0;i<data.length;i++){
-                var one = data[i];  //array[i]
+        var countryArray = data["country_array"]; //得到各国家系统操作日志
+        if(countryArray.length>0){
+            for(var i=0;i<countryArray.length;i++){
+                var one = countryArray[i];  //array[i]
                 var country_tr = $("<tr></tr>"); //一个国家建一行
                 var country = one["country_name"];
                 var countryName = $("<td>"+country+"</td>");
                 country_tr.append(countryName);
                 var date_data = one["date_data"];  //得到arrayMiddle数组
 
-                //以日期作循环填充
+                //以日期作循环填充日志单元格
                 for(var j=0;j<date_data.length;j++){
-                    var date_td = $("<td></td>"); //一个日期创一格
+                    var date_td = $("<td style='empty-cells: show'></td>"); //一个日期创一格
                     var two = date_data[j];   //得到arrayMiddle[j]
-                    var campaign_data = two["campaign_data"]; //直接得到拼接字符串内容
+                    var campaign_data = two["campaign_data"+j]; //直接得到拼接字符串内容
                     date_td.append(campaign_data);
-
-                    //循环里完成单日期小格里 campaign_id ，content 填充
-                    /*
-                    for(var k=0;k<campaign_data.length;k++){
-                        var three = campaign_data[k]; //得到arrayInside[k]
-                        var campaign_data_tr = $("<tr></tr>");
-                        var campaign_id_td = $("<td>"+three["campaign_id"]+"</td>");
-                        var content_td = $("<td>"+three["content"]+"</td>");
-                        campaign_data_tr.append(campaign_id_td);
-                        campaign_data_tr.append(content_td);
-                        date_td.append(campaign_data_tr);
-                    }
-                    */
                     country_tr.append(date_td);
                 }
                 result_body.append(country_tr); //每个国家行插入完毕后，添加到result_body里

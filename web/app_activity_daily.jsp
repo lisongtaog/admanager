@@ -144,7 +144,7 @@
         var now = new Date(new Date().getTime() - 86400 * 1000); //得到一个该行代码运行时的时间
         var defaultYear = now.getFullYear();
         var defaultMonth = now.getMonth()<9 ? "0"+ (now.getMonth()+1) : ""+(now.getMonth()+1);
-        var defaultDate = now.getDay()<10 ? "0"+(now.getDate()) : ""+now.getDate();
+        var defaultDate = now.getDate()<10 ? "0"+(now.getDate()) : ""+now.getDate();
         $('#inputStartDate').val(defaultYear + "-" + defaultMonth + "-" + defaultDate);
         $('#inputEndDate').val(defaultYear + "-" + defaultMonth + "-" + defaultDate);
 
