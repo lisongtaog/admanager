@@ -191,7 +191,7 @@ public class CountryAnalysisReport extends HttpServlet {
                                 String everyDayRevenueForFourteenDays = "";
                                 String everyDayEcpmForFourteenDays = "";
                                 String everyDayCpaForFourteenDays = "";
-                                String everyDayCpaDevEcpmForFourteenDays = "";
+                                String everyDayCpaDivEcpmForFourteenDays = "";
                                 String everyDayIncomingForFourteenDays = "";
                                 for(JSObject one : listCR){
                                     if(one.hasObjectData()){
@@ -204,7 +204,7 @@ public class CountryAnalysisReport extends HttpServlet {
                                         double revenue = Utils.convertDouble(one.get("revenue"), 0);
                                         double ecpm = Utils.convertDouble(one.get("ecpm"), 0);
                                         double cpa = Utils.convertDouble(one.get("cpa"), 0);
-                                        double cpaDevEcpm = ecpm == 0 ? 0 : cpa / ecpm;
+                                        double cpaDivEcpm = ecpm == 0 ? 0 : cpa / ecpm;
                                         double incoming = revenue - cost;
                                         everyDayCostForFourteenDays += date + "("+ (int)cost + ")" + "\n";
                                         everyDayPurchasedUserForFourteenDays +=  date + "("+ (int)purchasedUser + ")" + "\n";
@@ -214,7 +214,7 @@ public class CountryAnalysisReport extends HttpServlet {
                                         everyDayRevenueForFourteenDays +=  date + "("+ (int)revenue + ")" + "\n";
                                         everyDayEcpmForFourteenDays +=  date + "("+ Utils.trimDouble(ecpm,3) + ")" + "\n";
                                         everyDayCpaForFourteenDays +=  date + "("+ Utils.trimDouble(cpa,3) + ")" + "\n";
-                                        everyDayCpaDevEcpmForFourteenDays +=  date + "("+ Utils.trimDouble(cpaDevEcpm,3) + ")" + "\n";
+                                        everyDayCpaDivEcpmForFourteenDays +=  date + "("+ Utils.trimDouble(cpaDivEcpm,3) + ")" + "\n";
                                         everyDayIncomingForFourteenDays +=  date + "("+ (int)incoming + ")" + "\n";
                                     }
                                 }
@@ -265,7 +265,7 @@ public class CountryAnalysisReport extends HttpServlet {
 
                                 double cpa = Utils.convertDouble(j.get("cpa"),0);
                                 double incoming = Utils.convertDouble(j.get("incoming"),0);
-                                double cpaDevEcpm = (ecpm == 0) ? 0 : (cpa / ecpm);
+                                double cpaDivEcpm = (ecpm == 0) ? 0 : (cpa / ecpm);
 
                                 sql = "SELECT avg(pi) as avg_pi FROM web_ad_country_analysis_report_history_by_date " +
                                         "WHERE app_id = '" + appId + "' AND country_code = '" + countryCode + "' AND date BETWEEN '" + beforeTenDay + "' AND '" + beforeFourDay + "'";
@@ -293,7 +293,7 @@ public class CountryAnalysisReport extends HttpServlet {
                                 d.addProperty("revenues", Utils.trimDouble(revenues,0));
                                 d.addProperty("pi", Utils.trimDouble(pi,3));
                                 d.addProperty("ecpm", Utils.trimDouble(ecpm,3));
-                                d.addProperty("cpa_dev_ecpm", Utils.trimDouble(cpaDevEcpm,3));
+                                d.addProperty("cpa_div_ecpm", Utils.trimDouble(cpaDivEcpm,3));
                                 d.addProperty("seven_days_costs", Utils.trimDouble(sevenDaysCosts,0));
                                 d.addProperty("seven_days_incoming", Utils.trimDouble(sevenDaysIncoming,0));
                                 d.addProperty("seven_days_revenues", Utils.trimDouble(sevenDaysRevenues,0));
@@ -308,7 +308,7 @@ public class CountryAnalysisReport extends HttpServlet {
                                 d.addProperty("every_day_pi_for_fourteen_days", everyDayPiForFourteenDays);
                                 d.addProperty("every_day_ecpm_for_fourteen_days", everyDayEcpmForFourteenDays);
                                 d.addProperty("every_day_cpa_for_fourteen_days", everyDayCpaForFourteenDays);
-                                d.addProperty("every_day_cpa_dev_ecpm_for_fourteen_days", everyDayCpaDevEcpmForFourteenDays);
+                                d.addProperty("every_day_cpa_div_ecpm_for_fourteen_days", everyDayCpaDivEcpmForFourteenDays);
                                 d.addProperty("every_day_incoming_for_fourteen_days", everyDayIncomingForFourteenDays);
 
                                 d.addProperty("a_cpa", Utils.trimDouble(aCpa,3));

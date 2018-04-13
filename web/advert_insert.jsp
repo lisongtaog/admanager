@@ -51,122 +51,58 @@
         </div>
     </div>
 
-    <div id="moreCountryDlg" class="modal fade" tabindex="-1" role="dialog">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title" id="dlg_title">输入国家，每行一个</h4>
-                </div>
-                <div class="modal-body">
-                    <form id="modify_form" class="form-horizontal" action="#" autocomplete="off">
-                        <div class="form-group">
-                            <label for="inputCountryAlias" class="col-sm-2 control-label">国家缩写</label>
-                            <div class="col-sm-10">
-                                <input id="inputCountryAlias" style="width:100%;" />
-                            </div>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
-                    <button type="button" class="btn btn-primary">确定</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <form class="form-horizontal" action="#" id="formFacebook">
         <div class="form-group">
             <label for="selectApp" class="col-sm-2 control-label">应用</label>
-            <div class="col-sm-10">
+            <div class="col-sm-3">
                 <select class="form-control" id="selectApp">
                 </select>
             </div>
-        </div>
-        <div class="form-group">
-            <label for="selectLanguage" class="col-sm-2 control-label">语言</label>
-            <div class="col-sm-10">
-                <select class="form-control" id="selectLanguage">
-                </select>
-            </div>
+            <label>广告语组合：</label><select id="selectAdvertGroupId"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select>
         </div><br>
 
         <div class="form-group">
-            <label for="inputGroupOne" class="col-sm-2 control-label">组合</label>
-            <div class="col-sm-1">
-                <input type="text" value="1" readonly id="inputGroupOne" style="width: 10px;">
+            <label for="inputTitle" class="col-sm-2 control-label">英语<br>广告标题</label>
+            <div class="col-sm-7">
+                <input class="form-control" id="inputTitle" />
             </div>
         </div>
         <div class="form-group">
+            <label for="inputMessage" class="col-sm-2 control-label">英语<br>广告语</label>
+            <div class="col-sm-7">
+                <input class="form-control" id="inputMessage" />
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-sm-7" style="text-align:center">
+                <input type="submit" class="btn btn-primary" id="btnInsert_English" value="保存原文"/>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="selectLanguage" class="col-sm-2 control-label">语言</label>
+            <div class="col-sm-3">
+                <select class="form-control" id="selectLanguage"></select>
+            </div>
+            <input type="button" class="btn btn-primary" id="inputTranslate" value="翻译"/>
+        </div><br>
+
+        <div class="form-group">
             <label for="inputTitle11" class="col-sm-2 control-label">广告标题</label>
-            <div class="col-sm-10">
+            <div class="col-sm-7">
                 <input class="form-control" id="inputTitle11" />
             </div>
         </div>
         <div class="form-group">
             <label for="inputMessage11" class="col-sm-2 control-label">广告语</label>
-            <div class="col-sm-10">
+            <div class="col-sm-7">
                 <input class="form-control" id="inputMessage11" />
             </div>
         </div>
         <div class="form-group">
-            <label for="inputGroupTwo" class="col-sm-2 control-label">组合</label>
-            <div class="col-sm-2">
-                <input type="text" value="2" readonly id="inputGroupTwo" style="width: 20px;">
-            </div>
-        </div>
-        <div class="form-group">
-            <label for="inputTitle22" class="col-sm-2 control-label">广告标题</label>
-            <div class="col-sm-10">
-                <input class="form-control" id="inputTitle22" />
-            </div>
-        </div>
-        <div class="form-group">
-            <label for="inputMessage22" class="col-sm-2 control-label">广告语</label>
-            <div class="col-sm-10">
-                <input class="form-control" id="inputMessage22" />
-            </div>
-        </div>
-        <div class="form-group">
-            <label for="inputGroupThree" class="col-sm-2 control-label">组合</label>
-            <div class="col-sm-3">
-                <input type="text" value="3" readonly id="inputGroupThree" style="width: 30px;">
-            </div>
-        </div>
-        <div class="form-group">
-            <label for="inputTitle33" class="col-sm-2 control-label">广告标题</label>
-            <div class="col-sm-10">
-                <input class="form-control" id="inputTitle33" />
-            </div>
-        </div>
-        <div class="form-group">
-            <label for="inputMessage33" class="col-sm-2 control-label">广告语</label>
-            <div class="col-sm-10">
-                <input class="form-control" id="inputMessage33" />
-            </div>
-        </div>
-        <div class="form-group">
-            <label for="inputGroupFour" class="col-sm-2 control-label">组合</label>
-            <div class="col-sm-4">
-                <input type="text" value="4" readonly id="inputGroupFour" style="width: 40px;">
-            </div>
-        </div>
-        <div class="form-group">
-            <label for="inputTitle44" class="col-sm-2 control-label">广告标题</label>
-            <div class="col-sm-10">
-                <input class="form-control" id="inputTitle44" />
-            </div>
-        </div>
-        <div class="form-group">
-            <label for="inputMessage44" class="col-sm-2 control-label">广告语</label>
-            <div class="col-sm-10">
-                <input class="form-control" id="inputMessage44" />
-            </div>
-        </div>
-        <div class="form-group">
-            <div class="col-sm-10" style="text-align: center">
-                <input type="submit" class="btn btn-primary" id="btnInsert" value="保存"/>
+            <div class="col-sm-7" style="text-align: center">
+                <input type="submit" class="btn btn-primary" id="btnInsert_Translation" value="保存译文"/>
             </div>
         </div>
     </form>
@@ -176,146 +112,86 @@
 
         <div class="form-group">
             <label for="selectAppAdmob" class="col-sm-2 control-label">应用</label>
-            <div class="col-sm-10">
+            <div class="col-sm-3">
                 <select class="form-control" id="selectAppAdmob">
-
                 </select>
+            </div>
+            <label>广告语组合：</label>
+            <select id="selectAdvertGroupIdAdmob">
+                <option value="1">&nbsp1&nbsp</option><option value="2">&nbsp2&nbsp</option><option value="3">&nbsp3&nbsp</option><option value="4">&nbsp4&nbsp</option>
+            </select>
+        </div><br>
+
+        <div class="form-group">
+            <label for="inputMessageAdmob1" class="col-sm-2 control-label">英语广告语1</label>
+            <div class="col-sm-7">
+                <input class="form-control" id="inputMessageAdmob1" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="inputMessageAdmob2" class="col-sm-2 control-label">英语广告语2</label>
+            <div class="col-sm-7">
+                <input class="form-control" id="inputMessageAdmob2" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="inputMessageAdmob3" class="col-sm-2 control-label">英语广告语3</label>
+            <div class="col-sm-7">
+                <input class="form-control" id="inputMessageAdmob3" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="inputMessageAdmob4" class="col-sm-2 control-label">英语广告语4</label>
+            <div class="col-sm-7">
+                <input class="form-control" id="inputMessageAdmob4" />
             </div>
         </div>
 
         <div class="form-group">
-            <label for="selectLanguageAdmob" class="col-sm-2 control-label">语言</label>
-            <div class="col-sm-10">
-                <select class="form-control" id="selectLanguageAdmob">
-                </select>
+            <div class="col-sm-7" style="text-align: center">
+                <input type="submit" class="btn btn-primary" id="btnInsertAdmob_English" value="保存原文"/>
             </div>
         </div>
 
         <div class="form-group">
-            <label for="inputGroupOneAdmob10" class="col-sm-2 control-label">组合</label>
-            <div class="col-sm-4">
-                <input type="text" value="1" readonly id="inputGroupOneAdmob10" style="width: 10px;">
+            <label for="selectLanguage" class="col-sm-2 control-label">语言</label>
+            <div class="col-sm-3">
+                <select class="form-control" id="selectLanguageAdmob"></select>
             </div>
-        </div>
+            <input type="button" class="btn btn-primary" id="inputTranslateAdmob" value="翻译"/>
+        </div><br>
+
         <div class="form-group">
             <label for="inputMessageAdmob11" class="col-sm-2 control-label">广告语1</label>
-            <div class="col-sm-10">
+            <div class="col-sm-7">
                 <input class="form-control" id="inputMessageAdmob11" />
             </div>
         </div>
+
         <div class="form-group">
             <label for="inputMessageAdmob12" class="col-sm-2 control-label">广告语2</label>
-            <div class="col-sm-10">
+            <div class="col-sm-7">
                 <input class="form-control" id="inputMessageAdmob12" />
             </div>
         </div>
+
         <div class="form-group">
             <label for="inputMessageAdmob13" class="col-sm-2 control-label">广告语3</label>
-            <div class="col-sm-10">
+            <div class="col-sm-7">
                 <input class="form-control" id="inputMessageAdmob13" />
             </div>
         </div>
+
         <div class="form-group">
             <label for="inputMessageAdmob14" class="col-sm-2 control-label">广告语4</label>
-            <div class="col-sm-10">
+            <div class="col-sm-7">
                 <input class="form-control" id="inputMessageAdmob14" />
             </div>
         </div>
-        <div class="form-group">
-            <label for="inputGroupOneAdmob20" class="col-sm-2 control-label">组合</label>
-            <div class="col-sm-4">
-                <input type="text" value="2" readonly id="inputGroupOneAdmob20" style="width: 20px;">
-            </div>
-        </div>
-        <div class="form-group">
-            <label for="inputMessageAdmob21" class="col-sm-2 control-label">广告语1</label>
-            <div class="col-sm-10">
-                <input class="form-control" id="inputMessageAdmob21" />
-            </div>
-        </div>
-        <div class="form-group">
-            <label for="inputMessageAdmob22" class="col-sm-2 control-label">广告语2</label>
-            <div class="col-sm-10">
-                <input class="form-control" id="inputMessageAdmob22" />
-            </div>
-        </div>
-        <div class="form-group">
-            <label for="inputMessageAdmob23" class="col-sm-2 control-label">广告语3</label>
-            <div class="col-sm-10">
-                <input class="form-control" id="inputMessageAdmob23" />
-            </div>
-        </div>
-        <div class="form-group">
-            <label for="inputMessageAdmob24" class="col-sm-2 control-label">广告语4</label>
-            <div class="col-sm-10">
-                <input class="form-control" id="inputMessageAdmob24" />
-            </div>
-        </div>
 
         <div class="form-group">
-            <label for="inputGroupOneAdmob30" class="col-sm-2 control-label">组合</label>
-            <div class="col-sm-4">
-                <input type="text" value="3" readonly id="inputGroupOneAdmob30" style="width: 30px;">
-            </div>
-        </div>
-        <div class="form-group">
-            <label for="inputMessageAdmob31" class="col-sm-2 control-label">广告语1</label>
-            <div class="col-sm-10">
-                <input class="form-control" id="inputMessageAdmob31" />
-            </div>
-        </div>
-        <div class="form-group">
-            <label for="inputMessageAdmob32" class="col-sm-2 control-label">广告语2</label>
-            <div class="col-sm-10">
-                <input class="form-control" id="inputMessageAdmob32" />
-            </div>
-        </div>
-        <div class="form-group">
-            <label for="inputMessageAdmob33" class="col-sm-2 control-label">广告语3</label>
-            <div class="col-sm-10">
-                <input class="form-control" id="inputMessageAdmob33" />
-            </div>
-        </div>
-        <div class="form-group">
-            <label for="inputMessageAdmob34" class="col-sm-2 control-label">广告语4</label>
-            <div class="col-sm-10">
-                <input class="form-control" id="inputMessageAdmob34" />
-            </div>
-        </div>
-        <div class="form-group">
-            <label for="inputGroupOneAdmob40" class="col-sm-2 control-label">组合</label>
-            <div class="col-sm-4">
-                <input type="text" value="4" readonly id="inputGroupOneAdmob40" style="width: 40px;">
-            </div>
-        </div>
-        <div class="form-group">
-            <label for="inputMessageAdmob41" class="col-sm-2 control-label">广告语1</label>
-            <div class="col-sm-10">
-                <input class="form-control" id="inputMessageAdmob41" />
-            </div>
-        </div>
-        <div class="form-group">
-            <label for="inputMessageAdmob42" class="col-sm-2 control-label">广告语2</label>
-            <div class="col-sm-10">
-                <input class="form-control" id="inputMessageAdmob42" />
-            </div>
-        </div>
-        <div class="form-group">
-            <label for="inputMessageAdmob43" class="col-sm-2 control-label">广告语3</label>
-            <div class="col-sm-10">
-                <input class="form-control" id="inputMessageAdmob43" />
-            </div>
-        </div>
-        <div class="form-group">
-            <label for="inputMessageAdmob44" class="col-sm-2 control-label">广告语4</label>
-            <div class="col-sm-10">
-                <input class="form-control" id="inputMessageAdmob44" />
-            </div>
-        </div>
-
-        <div class="form-group">
-            <div class="col-sm-10" style="text-align: center">
-                <input type="submit" class="btn btn-primary" id="btnInsertAdmob" value="保存"/>
+            <div class="col-sm-7" style="text-align: center">
+                <input type="submit" class="btn btn-primary" id="btnInsertAdmob_Translation" value="保存译文"/>
             </div>
         </div>
     </form>
@@ -334,8 +210,10 @@
 <script src="jqueryui/jquery-ui.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.4/js/select2.min.js"></script>
 <script src="js/layer/layer.js" ></script>
+<script type="text/javascript" src="js\language-name-code-dict.js"></script>
 <script>
-    var languageList = ["", "Albanian","Amharic","Arabic","Armenian","Azerbaijani","Bengali","Bosnian","Bulgarian",
+
+    var languageList = ["", "Albanian","Amharic","Arabic","Armenian","Azeerbaijani","Bengali","Bosnian","Bulgarian",
         "Burmese","Catalan","Chinese","Croatian","Czech","Danish","Dutch","English","Estonian","Finnish","Filipino",
         "French","German","Georgian","Greek","Hungarian", "Hindi","Hebrew","Icelandic","Indonesian","Italian","Japanese",
         "Korean","Kyrgyz","Lao","Latvian","Lithuanian","Luxembourgish","Macedonian","Malagasy","Malay","Mongolian",
@@ -343,12 +221,12 @@
         "Somali","Spanish","Swahili","Swedish","Tajik","Thai","Norwegian","Traditional","Turkish",
         "Ukrainian","Urdu","Uzbek","Vietnamese"];
 
-    var appList = [];
-
+    //界面加载好以后初始化的数据
     function init() {
         $("li[role='presentation']:eq(9)").addClass("active");
         $('.select2').select2();
 
+        //这个类btn-more在本jsp页里已经找不到了
         $('.btn-more').click(function() {
             var id = $(this).attr('id');
             var targetId = '';
@@ -391,12 +269,12 @@
         });
 
 
-
         languageList.forEach(function (one) {
             $('#selectLanguage').append($("<option>" + one + "</option>"));
             $('#selectLanguageAdmob').append($("<option>" + one + "</option>"));
         });
 
+        //连着三个post用于往【应用】下拉列表里动态添加选项
         $.post('system/fb_app_id_rel/query', {
             word: '',
         }, function(data) {
@@ -433,6 +311,7 @@
             }
         }, 'json');
 
+        //以下连着两个用于判定是否隐藏表单
         $('#checkAdmob').click(function () {
             if ($('#checkAdmob').prop('checked')) {
                 $('#formFacebook').hide();
@@ -447,94 +326,165 @@
         });
 
         $('#formAdmob').hide();
-
-
     }
-
     init();
 
-    $('#btnInsertAdmob').click(function() {
+    //翻译接口(应用了回调函数)
+    function translate(googleCodeTo,googleCodeFrom,text,value){
+        $.post('https://translation.googleapis.com/language/translate/v2?key=AIzaSyBALihNeToXheg4Iw2E7C8FafHpfAwNdWE', {
+            target: googleCodeTo,
+            format: "text",
+            source: googleCodeFrom,
+            q: text
+        }, function(data) {
+            var translation =  data["data"]["translations"][0]["translatedText"];
+            value(translation);  //value是一个函数式参数，translation是要传入供 value()使用的参数
+        }, 'json');
+    }
+
+    //facebook form【翻译】按钮的事件绑定
+    $('#inputTranslate').click(function () {
+        var title = $("#inputTitle").val();
+        var message = $("#inputMessage").val();
+        var language = $("#selectLanguage").val();
+        var googleCodeFrom = "en";
+        var googleCodeTo = ""; //查语言的code
+        function findCode(item){
+            var languageKey = item["language"];
+            if(languageKey == language){
+                googleCodeTo = item["code"];
+                return;
+            }else{
+                return;
+            }
+        }
+        LanguageListNameCode.forEach(findCode);
+        translate(googleCodeTo,googleCodeFrom,title,function(text){
+            $("#inputTitle11").val(text);   //这一段匿名函数方法即回调函数本身
+        });
+        translate(googleCodeTo,googleCodeFrom,message,function(text){
+            $("#inputMessage11").val(text);
+        });
+    });
+
+    //Admob form【翻译】按钮的事件绑定
+    $('#inputTranslateAdmob').click(function () {
+        var message1 = $("#inputMessageAdmob1").val();
+        var message2 = $("#inputMessageAdmob2").val();
+        var message3 = $("#inputMessageAdmob3").val();
+        var message4 = $("#inputMessageAdmob4").val();
+        var message = [message1,message2,message3,message4];
+        var language = $("#selectLanguageAdmob").val();
+        var googleCodeFrom = "en";
+        var googleCodeTo = ""; //查语言的code
+        function findCode(item){
+            var languageKey = item["language"];
+            if(languageKey == language){
+                googleCodeTo = item["code"];
+                return;
+            }else{
+                return;
+            }
+        }
+        LanguageListNameCode.forEach(findCode);
+        for(var j=1;j<=4;j++){
+            (function(j){
+                var theMessage = message[j-1];
+                translate(googleCodeTo,googleCodeFrom,theMessage,function(text){
+                    $("#inputMessageAdmob1"+j).val(text);
+                });
+            })(j);
+        }
+    });
+
+    /* admob表单的【保存原文】按钮
+     */
+    $("#btnInsertAdmob_English").click(function(){
         var appName = $('#selectAppAdmob').val();
         var language = $('#selectLanguageAdmob').val();
-        var message11 = $('#inputMessageAdmob11').val();
-        var message12 = $('#inputMessageAdmob12').val();
-        var message13 = $('#inputMessageAdmob13').val();
-        var message14 = $('#inputMessageAdmob14').val();
-        var message21 = $('#inputMessageAdmob21').val();
-        var message22 = $('#inputMessageAdmob22').val();
-        var message23 = $('#inputMessageAdmob23').val();
-        var message24 = $('#inputMessageAdmob24').val();
-        var message31 = $('#inputMessageAdmob31').val();
-        var message32 = $('#inputMessageAdmob32').val();
-        var message33 = $('#inputMessageAdmob33').val();
-        var message34 = $('#inputMessageAdmob34').val();
-        var message41 = $('#inputMessageAdmob41').val();
-        var message42 = $('#inputMessageAdmob42').val();
-        var message43 = $('#inputMessageAdmob43').val();
-        var message44 = $('#inputMessageAdmob44').val();
-
-        $.post("advert_admob/save_advert_admob", {
+        var groupNumber = $("#selectAdvertGroupIdAdmob").val();
+        var message1 = $("#inputMessageAdmob1").val();
+        var message2 = $("#inputMessageAdmob2").val();
+        var message3 = $("#inputMessageAdmob3").val();
+        var message4 = $("#inputMessageAdmob4").val();
+        var version = "English";
+        $.post("advert_admob/save_advert_admob",{
             appName: appName,
             language: language,
-            message11: message11,
-            message12: message12,
-            message13: message13,
-            message14: message14,
-            message21: message21,
-            message22: message22,
-            message23: message23,
-            message24: message24,
-            message31: message31,
-            message32: message32,
-            message33: message33,
-            message34: message34,
-            message41: message41,
-            message42: message42,
-            message43: message43,
-            message44: message44
-        }, function (data) {
+            groupNumber:groupNumber,
+            message1: message1,
+            message2: message2,
+            message3: message3,
+            message4: message4,
+            version:version
+        },function(data){
             if (data && data.ret == 1) {
                 if(data.existData == "true"){
-                    layer.tips("更新记录成功","#btnInsertAdmob",{tips:1,time:3000});
+                    layer.tips("更新记录成功","#btnInsertAdmob_English",{tips:1,time:3000});
                 }else{
-                    layer.tips("添加记录成功","#btnInsertAdmob",{tips:1,time:3000});
+                    layer.tips("添加记录成功","#btnInsertAdmob_English",{tips:1,time:3000});
                 }
             } else {
                 admanager.showCommonDlg("提示", data.message);
             }
-        }, "json");
-        return false;
+        },"json")
+        return false;  //为什么要返回false?
     });
 
+    /* admob表单的【保存译文】按钮
+     */
+    $("#btnInsertAdmob_Translation").click(function(){
+        var appName = $('#selectAppAdmob').val();
+        var language = $('#selectLanguageAdmob').val();
+        var groupNumber = $("#selectAdvertGroupIdAdmob").val();
+        var message11 = $("#inputMessageAdmob11").val();
+        var message12 = $("#inputMessageAdmob12").val();
+        var message13 = $("#inputMessageAdmob13").val();
+        var message14 = $("#inputMessageAdmob14").val();
+        var version = "Translation";
+        $.post("advert_admob/save_advert_admob",{
+            appName: appName,
+            language: language,
+            groupNumber:groupNumber,
+            message1: message11,
+            message2: message12,
+            message3: message13,
+            message4: message14,
+            version:version
+        },function(data){
+            if (data && data.ret == 1) {
+                if(data.existData == "true"){
+                    layer.tips("更新记录成功","#btnInsertAdmob_Translation",{tips:1,time:3000});
+                }else{
+                    layer.tips("添加记录成功","#btnInsertAdmob_Translation",{tips:1,time:3000});
+                }
+            } else {
+                admanager.showCommonDlg("提示", data.message);
+            }
+        },"json")
+    });
 
-    $('#btnInsert').click(function () {
+    //facebook表单的【保存译文】按钮  记得改id为btnInsert_English
+    $('#btnInsert_Translation').click(function () {
         var appName = $('#selectApp').val();
         var language = $('#selectLanguage').val();
+        var groupNumber = $("#selectAdvertGroupId").val();
         var title11 = $('#inputTitle11').val();
         var message11 = $('#inputMessage11').val();
-        var title22 = $('#inputTitle22').val();
-        var message22 = $('#inputMessage22').val();
-        var title33 = $('#inputTitle33').val();
-        var message33 = $('#inputMessage33').val();
-        var title44 = $('#inputTitle44').val();
-        var message44 = $('#inputMessage44').val();
+        var version = "Translation";
         $.post("advert/save_advert_facebook", {
             appName: appName,
             language: language,
-            title11: title11,
-            message11: message11,
-            title22: title22,
-            message22: message22,
-            title33: title33,
-            message33: message33,
-            title44: title44,
-            message44: message44
+            groupNumber:groupNumber,
+            title: title11,
+            message: message11,
+            version:version
         }, function (data) {
             if (data && data.ret == 1) {
                 if(data.existData == "true"){
-                    layer.tips("更新记录成功","#btnInsert",{tips:1,time:3000});
+                    layer.tips("更新记录成功","##btnInsert_Translation",{tips:1,time:3000});
                 }else{
-                    layer.tips("添加记录成功","#btnInsert",{tips:1,time:3000});
+                    layer.tips("添加记录成功","##btnInsert_Translation",{tips:1,time:3000});
                 }
             } else {
                 admanager.showCommonDlg("提示", data.message);
@@ -543,153 +493,100 @@
         return false;
     });
 
-    $('#selectApp,#selectLanguage').change(function () {
-        $('#inputTitle11').val("");
-        $('#inputMessage11').val("");
-        $('#inputTitle22').val("");
-        $('#inputMessage22').val("");
-        $('#inputTitle33').val("");
-        $('#inputMessage33').val("");
-        $('#inputTitle44').val("");
-        $('#inputMessage44').val("");
-        var appName = $("#selectApp").val();
-        var language = $("#selectLanguage").val();
-        if(language != null &&  language.length > 0){
-            $.post("advert/query_before_insertion", {
-                appName: appName,
-                language: language
-            }, function (data) {
-                if (data && data.ret == 1) {
-                    var arr = data.array;
-                    for(var i =0;i< arr.length;i++){
-                        var one = arr[i];
-                        if(one['group_id'] == 1){
-                            $('#inputTitle11').val(one['title']);
-                            $('#inputMessage11').val(one['message']);
-                        }else if(one['group_id'] == 2){
-                            $('#inputTitle22').val(one['title']);
-                            $('#inputMessage22').val(one['message']);
-                        }else if(one['group_id'] == 3){
-                            $('#inputTitle33').val(one['title']);
-                            $('#inputMessage33').val(one['message']);
-                        }else if(one['group_id'] == 4){
-                            $('#inputTitle44').val(one['title']);
-                            $('#inputMessage44').val(one['message']);
-                        }
-
-                    }
-                } else {
-                    $('#inputTitle11').val("");
-                    $('#inputMessage11').val("");
-                    $('#inputTitle22').val("");
-                    $('#inputMessage22').val("");
-                    $('#inputTitle33').val("");
-                    $('#inputMessage33').val("");
-                    $('#inputTitle44').val("");
-                    $('#inputMessage44').val("");
+    //facebook表单的【保存原文】按钮
+    $('#btnInsert_English').click(function () {
+        var appName = $('#selectApp').val();
+        var language = $('#selectLanguage').val();
+        var groupNumber = $("#selectAdvertGroupId").val();
+        var title = $('#inputTitle').val();
+        var message = $('#inputMessage').val();
+        var version = "English";
+        $.post("advert/save_advert_facebook", {
+            appName: appName,
+            language: language,
+            groupNumber:groupNumber,
+            title: title,
+            message: message,
+            version:version
+        }, function (data) {
+            if (data && data.ret == 1) {
+                if(data.existData == "true"){
+                    layer.tips("更新记录成功","#btnInsert_English",{tips:1,time:3000});
+                }else{
+                    layer.tips("添加记录成功","#btnInsert_English",{tips:1,time:3000});
                 }
-            }, "json");
-        }else{
-            $('#inputTitle11').val("");
-            $('#inputMessage11').val("");
-            $('#inputTitle22').val("");
-            $('#inputMessage22').val("");
-            $('#inputTitle33').val("");
-            $('#inputMessage33').val("");
-            $('#inputTitle44').val("");
-            $('#inputMessage44').val("");
-        }
+            } else {
+                admanager.showCommonDlg("提示", data.message);
+            }
+        }, "json");
         return false;
     });
 
-    $('#selectAppAdmob,#selectLanguageAdmob').change(function () {
+    //facebook 表单 当【应用】【语言】【广告语组合】三项的内容改变时
+    $('#selectApp,#selectLanguage,#selectAdvertGroupId').change(function () {
+        $('#inputTitle11').val("");
+        $('#inputMessage11').val("");
+        var appName = $("#selectApp").val();
+        var language = $("#selectLanguage").val();
+        var groupNumber = $("#selectAdvertGroupId").val();
+        $.post("advert/query_before_insertion", {
+            appName: appName,
+            language: language,
+            groupNumber:groupNumber
+        }, function (data) {
+            if (data && data.ret == 1) {
+                //只要后台有任何数据返回
+                $('#inputTitle').val(data.title);
+                $('#inputMessage').val(data.message);
+                $('#inputTitle11').val(data.title_translation);
+                $('#inputMessage11').val(data.message_translation);
+            }else{
+                $('#inputTitle').val("");
+                $('#inputMessage').val("");
+                $('#inputTitle11').val("");
+                $('#inputMessage11').val("");
+            }
+        }, "json");
+        return false;
+    });
+
+    // admob 表单，功能同上
+    $('#selectAppAdmob,#selectLanguageAdmob,#selectAdvertGroupIdAdmob').change(function () {
         $('#inputMessageAdmob11').val("");
         $('#inputMessageAdmob12').val("");
         $('#inputMessageAdmob13').val("");
         $('#inputMessageAdmob14').val("");
-        $('#inputMessageAdmob21').val("");
-        $('#inputMessageAdmob22').val("");
-        $('#inputMessageAdmob23').val("");
-        $('#inputMessageAdmob24').val("");
-        $('#inputMessageAdmob31').val("");
-        $('#inputMessageAdmob32').val("");
-        $('#inputMessageAdmob33').val("");
-        $('#inputMessageAdmob34').val("");
-        $('#inputMessageAdmob41').val("");
-        $('#inputMessageAdmob42').val("");
-        $('#inputMessageAdmob43').val("");
-        $('#inputMessageAdmob44').val("");
         var appNameAdmob = $("#selectAppAdmob").val();
         var languageAdmob = $("#selectLanguageAdmob").val();
-        if(languageAdmob != null &&  languageAdmob.length > 0){
-            $.post("advert_admob/query_before_admob_insert", {
-                appNameAdmob: appNameAdmob,
-                languageAdmob: languageAdmob
-            }, function (data) {
-                if (data && data.ret == 1) {
-                    var arr = data.array;
-                    for(var i =0;i< arr.length;i++){
-                        var one = arr[i];
-                        if(one['group_id'] == 1){
-                            $('#inputMessageAdmob11').val(one['message1']);
-                            $('#inputMessageAdmob12').val(one['message2']);
-                            $('#inputMessageAdmob13').val(one['message3']);
-                            $('#inputMessageAdmob14').val(one['message4']);
-                        } else if(one['group_id'] == 2){
-                            $('#inputMessageAdmob21').val(one['message1']);
-                            $('#inputMessageAdmob22').val(one['message2']);
-                            $('#inputMessageAdmob23').val(one['message3']);
-                            $('#inputMessageAdmob24').val(one['message4']);
-                        }else if(one['group_id'] == 3){
-                            $('#inputMessageAdmob31').val(one['message1']);
-                            $('#inputMessageAdmob32').val(one['message2']);
-                            $('#inputMessageAdmob33').val(one['message3']);
-                            $('#inputMessageAdmob34').val(one['message4']);
-                        }else if(one['group_id'] == 4){
-                            $('#inputMessageAdmob41').val(one['message1']);
-                            $('#inputMessageAdmob42').val(one['message2']);
-                            $('#inputMessageAdmob43').val(one['message3']);
-                            $('#inputMessageAdmob44').val(one['message4']);
-                        }
-                    }
-
-                } else {
-                    $('#inputMessageAdmob11').val("");
-                    $('#inputMessageAdmob12').val("");
-                    $('#inputMessageAdmob13').val("");
-                    $('#inputMessageAdmob14').val("");
-                    $('#inputMessageAdmob21').val("");
-                    $('#inputMessageAdmob22').val("");
-                    $('#inputMessageAdmob23').val("");
-                    $('#inputMessageAdmob24').val("");
-                    $('#inputMessageAdmob31').val("");
-                    $('#inputMessageAdmob32').val("");
-                    $('#inputMessageAdmob33').val("");
-                    $('#inputMessageAdmob34').val("");
-                    $('#inputMessageAdmob41').val("");
-                    $('#inputMessageAdmob42').val("");
-                    $('#inputMessageAdmob43').val("");
-                    $('#inputMessageAdmob44').val("");
-                }
-            }, "json");
-        }else{
-            $('#inputMessageAdmob11').val("");
-            $('#inputMessageAdmob12').val("");
-            $('#inputMessageAdmob13').val("");
-            $('#inputMessageAdmob14').val("");
-            $('#inputMessageAdmob21').val("");
-            $('#inputMessageAdmob22').val("");
-            $('#inputMessageAdmob23').val("");
-            $('#inputMessageAdmob24').val("");
-            $('#inputMessageAdmob31').val("");
-            $('#inputMessageAdmob32').val("");
-            $('#inputMessageAdmob33').val("");
-            $('#inputMessageAdmob34').val("");
-            $('#inputMessageAdmob41').val("");
-            $('#inputMessageAdmob42').val("");
-            $('#inputMessageAdmob43').val("");
-            $('#inputMessageAdmob44').val("");
-        }
+        var groupNumberAdmob = $("#selectAdvertGroupIdAdmob").val();
+        //无论如何都发送请求
+        $.post("advert_admob/query_before_admob_insert", {
+            appNameAdmob: appNameAdmob,
+            languageAdmob: languageAdmob,
+            groupNumberAdmob: groupNumberAdmob
+        }, function (data) {
+            if (data && data.ret == 1) {
+                //只要后台有任何数据返回
+                $('#inputMessageAdmob1').val(data.message1_en);
+                $('#inputMessageAdmob2').val(data.message2_en);
+                $('#inputMessageAdmob3').val(data.message3_en);
+                $('#inputMessageAdmob4').val(data.message4_en);
+                $('#inputMessageAdmob11').val(data.message1);
+                $('#inputMessageAdmob12').val(data.message2);
+                $('#inputMessageAdmob13').val(data.message3);
+                $('#inputMessageAdmob14').val(data.message4);
+            } else {
+                //没有数据返回
+                $('#inputMessageAdmob1').val("");
+                $('#inputMessageAdmob2').val("");
+                $('#inputMessageAdmob3').val("");
+                $('#inputMessageAdmob4').val("");
+                $('#inputMessageAdmob11').val("");
+                $('#inputMessageAdmob12').val("");
+                $('#inputMessageAdmob13').val("");
+                $('#inputMessageAdmob14').val("");
+            }
+        }, "json");
         return false;
     });
 </script>

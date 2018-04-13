@@ -4,7 +4,6 @@ import com.bestgo.admanager.OperationResult;
 import com.bestgo.admanager.Utils;
 import com.bestgo.common.database.services.DB;
 import com.bestgo.common.database.utils.JSObject;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import org.apache.log4j.Logger;
 
@@ -13,8 +12,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.*;
-import java.util.*;
+import java.io.IOException;
 
 @WebServlet(name = "Advert", urlPatterns = "/advert/*")
 public class Advert extends HttpServlet {
@@ -27,56 +25,38 @@ public class Advert extends HttpServlet {
         if (path.startsWith("/save_advert_facebook")) {
             String appName = request.getParameter("appName");
             String language = request.getParameter("language");
-            String[] titleArr = new String[4];
-            String[] messageArr = new String[4];
-            titleArr[0] = request.getParameter("title11");
-            messageArr[0] = request.getParameter("message11");
-            titleArr[1] = request.getParameter("title22");
-            messageArr[1] = request.getParameter("message22");
-            titleArr[2] = request.getParameter("title33");
-            messageArr[2] = request.getParameter("message33");
-            titleArr[3] = request.getParameter("title44");
-            messageArr[3] = request.getParameter("message44");
-            String sql = "select group_id from web_ad_descript_dict where app_name='" + appName + "' and language = '" + language + "'";
-            List<JSObject> list = fetchData(sql);
+            String groupNumber = request.getParameter("groupNumber");
+            String title = request.getParameter("title");
+            String message = request.getParameter("message");
+            String saveVersion = request.getParameter("version");  //仅在把保存部分用于判断
+            try{
+                if(saveVersion.equals("English")){
+                    language = "English";
+                }
+            }catch(Exception e){
+                e.printStackTrace();
+            }
+            String sql = "select group_id from web_ad_descript_dict where app_name='" + appName + "' and language = '" + language + "'and group_id = '"+groupNumber+"'";
+            JSObject item = fetchOneData(sql);
             OperationResult result = new OperationResult();
             try {
-                if(list != null && list.size() > 0){
-                    HashSet<Integer> set = new HashSet<>();
-                    for(JSObject j : list){
-                        Integer i = j.get("group_id");
-                        set.add(i);
-                    }
-                    for(int i=1;i<=4;i++){
-                        if(set.contains(i)){
-                            DB.update("web_ad_descript_dict")
-                                    .put("title", titleArr[i-1])
-                                    .put("message", messageArr[i-1])
-                                    .where(DB.filter().whereEqualTo("app_name", appName))
-                                    .and(DB.filter().whereEqualTo("language", language))
-                                    .and(DB.filter().whereEqualTo("group_id", i))
-                                    .execute();
-                        }else{
-                            DB.insert("web_ad_descript_dict")
-                                    .put("language", language)
-                                    .put("title", titleArr[i-1])
-                                    .put("message", messageArr[i-1])
-                                    .put("group_id", i)
-                                    .put("app_name", appName)
-                                    .execute();
-                        }
-                    }
+                if(item.hasObjectData()){
+                    DB.update("web_ad_descript_dict")
+                            .put("title", title)
+                            .put("message", message)
+                            .where(DB.filter().whereEqualTo("app_name", appName))
+                            .and(DB.filter().whereEqualTo("language", language))
+                            .and(DB.filter().whereEqualTo("group_id", groupNumber))
+                            .execute();
                     json.addProperty("existData","true");
                 }else{
-                    for(int i=1;i<=4;i++){
-                        DB.insert("web_ad_descript_dict")
-                                .put("language", language)
-                                .put("title", titleArr[i-1])
-                                .put("message", messageArr[i-1])
-                                .put("group_id", i)
-                                .put("app_name", appName)
-                                .execute();
-                    }
+                    DB.insert("web_ad_descript_dict")
+                            .put("language", language)
+                            .put("title", title)
+                            .put("message",message)
+                            .put("group_id", groupNumber)
+                            .put("app_name", appName)
+                            .execute();
                     json.addProperty("existData","false");
                 }
                 result.result = true;
@@ -89,26 +69,40 @@ public class Advert extends HttpServlet {
         } else if (path.startsWith("/query_before_insertion")) {
             String appName = request.getParameter("appName");
             String language = request.getParameter("language");
-            List<JSObject> list =null;
+            String groupNumber = request.getParameter("groupNumber");
+            JSObject item_translation = new JSObject();
+            JSObject item_english = new JSObject();
             try {
-                if(appName != "" && language != ""){
-                    String sql = "select group_id,title,message from web_ad_descript_dict where app_name = '" + appName + "' and language = '" + language + "'";
-                    list = DB.findListBySql(sql);
+                if(appName != null && language != null){
 
+                    String sql = "select title,message from web_ad_descript_dict where app_name = '"
+                            + appName + "' and language = '" + language + "'and group_id='"+groupNumber+"'";
+                    item_translation = DB.findOneBySql(sql);
+                    sql = "select title,message from web_ad_descript_dict where app_name = '"
+                            + appName + "' and language = 'English'and group_id='"+groupNumber+"'";
+                    item_english  = DB.findOneBySql(sql);
                 }
-                if(list != null && list.size()>0){
-                    JsonArray array = new JsonArray();
-                    for(JSObject one: list){
-                        JsonObject j = new JsonObject();
-                        String title = one.get("title");
-                        String message = one.get("message");
-                        int groupId = one.get("group_id");
-                        j.addProperty("title", title);
-                        j.addProperty("group_id", groupId);
-                        j.addProperty("message", message);
-                        array.add(j);
+                if(item_translation.hasObjectData() || item_english.hasObjectData()){
+                    //返回用于【英语广告标题】【英语广告语】【广告语标题】【广告语】回显的数据
+                    if(item_english.hasObjectData()){
+                        String title = item_english.get("title");
+                        String message = item_english.get("message");
+                        json.addProperty("title", title);
+                        json.addProperty("message", message);
+                    }else{
+                        json.addProperty("title", "");
+                        json.addProperty("message", "");
                     }
-                    json.add("array",array);
+                    if(item_translation.hasObjectData()){
+                        String title_translation = item_translation.get("title");
+                        String message_translation = item_translation.get("message");
+                        json.addProperty("title_translation", title_translation);
+                        json.addProperty("message_translation", message_translation);
+                    }else{
+                        json.addProperty("title_translation", "");
+                        json.addProperty("message_translation","");
+                    }
+
                     json.addProperty("ret", 1);
                 }
 
@@ -125,14 +119,14 @@ public class Advert extends HttpServlet {
         doPost(request, response);
     }
 
-    public static List<JSObject> fetchData(String sql) {
-        List<JSObject> list = new ArrayList<>();
+    public static JSObject fetchOneData(String sql) {
+        JSObject item = new JSObject();
         try {
-            return DB.findListBySql(sql);
+            return DB.findOneBySql(sql);
         } catch (Exception ex) {
             Logger logger = Logger.getRootLogger();
             logger.error(ex.getMessage(), ex);
         }
-        return list;
+        return item;
     }
 }

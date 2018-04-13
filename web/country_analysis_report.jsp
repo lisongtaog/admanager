@@ -210,7 +210,7 @@
         var len = arr.length;
         var one;
         var keyset = ["costs","seven_days_costs", "purchased_users", "installed", "uninstalled_rate", "users",
-            "active_users", "revenues","seven_days_revenues","pi", "ecpm","cpa","a_cpa","cpa_dev_ecpm", "incoming",
+            "active_users", "revenues","seven_days_revenues","pi", "ecpm","cpa","a_cpa","cpa_div_ecpm", "incoming",
             "seven_days_incoming","rt","thirty_days_active_user", "thirty_days_active_user_mul_arpu"];
         for (var i = 0; i < len; i++) {
             one = arr[i];
@@ -240,8 +240,8 @@
                     td = $('<td title="'+ one['every_day_ecpm_for_fourteen_days'] + '"></td>');
                 }else if('cpa' == key){
                     td = $('<td title="'+ one['every_day_cpa_for_fourteen_days'] + '"></td>');
-                }else if('cpa_dev_ecpm' == key){
-                    td = $('<td title="'+ one['every_day_cpa_dev_ecpm_for_fourteen_days'] + '"></td>');
+                }else if('cpa_div_ecpm' == key){
+                    td = $('<td title="'+ one['every_day_cpa_div_ecpm_for_fourteen_days'] + '"></td>');
                 }else if('incoming' == key){
                     td = $('<td title="'+ one['every_day_incoming_for_fourteen_days'] + '"></td>');
                     if(r < 0){

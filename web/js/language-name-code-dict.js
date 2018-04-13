@@ -1,4 +1,4 @@
-var LanguageList=[{"language":"Albanian","code":"sq"},{"language":"Amharic","code":"am"},{"language":"Arabic","code":"ar"},
+var LanguageListNameCode=[{"language":"Albanian","code":"sq"},{"language":"Amharic","code":"am"},{"language":"Arabic","code":"ar"},
 {"language":"Armenian","code":"hy"},{"language":"Azeerbaijani","code":"az"},{"language":"Bengali","code":"bn"},
 {"language":"Bosnian","code":"bs"},{"language":"Bulgarian","code":"bg"},{"language":"Burmese","code":"my"},
 {"language":"Catalan","code":"ca"},{"language":"Chinese","code":"zh-CN"},{"language":"Croatian","code":"hr"},
@@ -19,4 +19,4 @@ var LanguageList=[{"language":"Albanian","code":"sq"},{"language":"Amharic","cod
     {"language":"Swahili","code":"sw"}, {"language":"Swedish","code":"sv"}, {"language":"Tajik","code":"tg"},
     {"language":"Thai","code":"th"}, {"language":"Norwegian","code":"no"}, {"language":"Traditional","code":"zh-TW"},
     {"language":"Turkish","code":"tr"}, {"language":"Ukrainian","code":"uk"}, {"language":"Urdu","code":"ur"},
-    {"language":"Uzbek","code":"uz"}, {"language":"Vietnamese","code":"vi"}];
+    {"language":"Uzbek","code":"uz"}, {"language":"Vietnamese","code":"vi"}]
