@@ -2,7 +2,7 @@
 <%@ page import="com.bestgo.common.database.utils.JSObject" %>
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.ArrayList" %>
-<%@ page import="com.bestgo.admanager.servlet.Rules" %>
+<%@ page import="com.bestgo.admanager.servlet.RulesAdmob" %>
 
 
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
@@ -11,7 +11,7 @@
 
 <html>
   <head>
-    <title>Facebook规则</title>
+    <title>Admob规则</title>
   </head>
   <body>
 
@@ -43,7 +43,7 @@
         <%
           List<JSObject> data = new ArrayList<>();
           long totalPage = 0;
-          long count = Rules.count();
+          long count = RulesAdmob.count();
           int index = Utils.parseInt(request.getParameter("page_index"), 0);
           int size = Utils.parseInt(request.getParameter("page_size"), 20);
           totalPage = count / size + (count % size == 0 ? 0 : 1);
@@ -51,7 +51,7 @@
           int preIndex = index > 0 ? index-1 : 0;
           int nextPage = index < totalPage - 1 ? index+1 : index;
 
-          data = Rules.fetchData(index, size);
+          data = RulesAdmob.fetchData(index, size);
         %>
 
         <%
@@ -72,12 +72,12 @@
       <nav aria-label="Page navigation">
         <ul class="pagination">
           <li>
-            <a href="rules.jsp?page_index=<%=preIndex%>" aria-label="Previous">
+            <a href="rules_admob.jsp?page_index=<%=preIndex%>" aria-label="Previous">
               <span aria-hidden="true">上一页</span>
             </a>
           </li>
           <li>
-            <a href="rules.jsp?page_index=<%=nextPage%>" aria-label="Next">
+            <a href="rules_admob.jsp?page_index=<%=nextPage%>" aria-label="Next">
               <span aria-hidden="true">下一页</span>
             </a>
           </li>
@@ -133,7 +133,7 @@
   <script type="text/javascript">
     var modifyType = 'new';
     var id;
-    $("li[role='presentation']:eq(6)").addClass("active");
+    $("li[role='presentation']:eq(16)").addClass("active");
 
     $("#btn_add_new_rule").click(function() {
       modifyType = 'new';
@@ -161,7 +161,7 @@
       var ruleContent = $("#inputRuleContent").val();
 
       if (modifyType == 'new') {
-        $.post('rules/create', {
+        $.post('rules_admob/create', {
           ruleType: ruleType,
           ruleContent: ruleContent
         }, function(data) {
@@ -173,7 +173,7 @@
           }
         }, 'json');
       } else if (modifyType == 'update') {
-        $.post('rules/update', {
+        $.post('rules_admob/update', {
           id: id,
           ruleType: ruleType,
           ruleContent: ruleContent
@@ -186,7 +186,7 @@
           }
         }, 'json');
       } else if (modifyType == 'delete') {
-        $.post('rules/delete', {
+        $.post('rules_admob/delete', {
           id: id,
           ruleType: ruleType,
           ruleContent: ruleContent
@@ -258,7 +258,7 @@
 
     $('#btnQuery').click(function() {
       var query = $('#inputQueryText').val();
-      $.post('rules/query', {
+      $.post('rules_admob/query', {
         text: query,
       }, function(data) {
         if (data && data.ret == 1) {

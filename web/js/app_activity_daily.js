@@ -92,11 +92,25 @@ $("#btnSearch").click(function(){
                 country_tr.append(countryName);
                 var date_data = one["date_data"];  //得到arrayMiddle数组
 
-                //以日期作循环填充日志单元格
-                for(var j=0;j<date_data.length;j++){
+                //以日期作循环填充日志单元格（从endDate到startDate）
+                for(var j=0;j<date_data.length-1;j++){
                     var date_td = $("<td style='empty-cells: show'></td>"); //一个日期创一格
-                    var two = date_data[j];   //得到arrayMiddle[j]
+                    var two = date_data[j];   //得到arrayMiddle[j],该数组的长度实际比天数还多一天
                     var campaign_data = two["campaign_data"+j]; //直接得到拼接字符串内容
+                    var statusData = two["status"+j];
+                    var yesterdayStatusData = date_data[j+1]["status"+(j+1)];
+                    var openOrCreate = two["exist_open_create"+j];
+
+                    //如果当天处于系列全关状态
+                    if(statusData == 2) {
+                        statusData = "#ce8483";   //某种红色
+                        date_td.css("background",statusData);
+                    }
+                    //如果昨天处于系列全关，而当天有新建或开启操作
+                    if(yesterdayStatusData === 2 && openOrCreate === 1){
+                        statusData = "#b2dba1";
+                        date_td.css("background",statusData); //某种绿色
+                    }
                     date_td.append(campaign_data);
                     country_tr.append(date_td);
                 }

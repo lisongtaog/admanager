@@ -25,7 +25,7 @@
     <li role="presentation"><a href="country_active_user_report.jsp">活跃用户报告</a></li>
 
         <%-- 6 --%>
-    <li role="presentation"><a href="rules.jsp">规则</a></li>
+    <li role="presentation"><a href="rules.jsp">Facebook规则</a></li>
     <li role="presentation"><a href="query.jsp">查询</a></li>
 
         <%-- 8 --%>
@@ -45,6 +45,7 @@
 
         <%-- 15 --%>
     <li role="presentation"><a href="material_analysis_report.jsp">素材分析报告</a></li>
+    <li role="presentation"><a href="rules_admob.jsp">Admob规则</a></li>
 </ul>
 </body>
 </html>

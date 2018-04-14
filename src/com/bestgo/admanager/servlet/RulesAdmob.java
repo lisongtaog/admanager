@@ -18,11 +18,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by jikai on 5/31/17.
- * 有关Facebook的规则
+ * 有关Adwords的规则
  */
-@WebServlet(name = "Rules", urlPatterns = {"/rules/*"})
-public class Rules extends HttpServlet {
+@WebServlet(name = "RulesAdmob", urlPatterns = {"/rules_admob/*"})
+public class RulesAdmob extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         if (!Utils.isAdmin(request, response)) return;
 
@@ -78,7 +77,7 @@ public class Rules extends HttpServlet {
     public static List<JSObject> fetchData(int index, int size) {
         List<JSObject> list = new ArrayList<>();
         try {
-            return DB.scan("web_ad_rules").select("id", "rule_type", "rule_content").limit(size).start(index * size).orderByAsc("id").execute();
+            return DB.scan("web_ad_rules_admob").select("id", "rule_type", "rule_content").limit(size).start(index * size).orderByAsc("id").execute();
         } catch (Exception ex) {
             Logger logger = Logger.getRootLogger();
             logger.error(ex.getMessage(), ex);
@@ -89,7 +88,7 @@ public class Rules extends HttpServlet {
     public static List<JSObject> fetchData(String query) {
         List<JSObject> list = new ArrayList<>();
         try {
-            return DB.scan("web_ad_rules").select("id", "rule_type", "rule_content").where(DB.filter().whereLikeTo("rule_content", "%" + query + "%")).orderByAsc("id").execute();
+            return DB.scan("web_ad_rules_admob").select("id", "rule_type", "rule_content").where(DB.filter().whereLikeTo("rule_content", "%" + query + "%")).orderByAsc("id").execute();
         } catch (Exception ex) {
             Logger logger = Logger.getRootLogger();
             logger.error(ex.getMessage(), ex);
@@ -99,7 +98,7 @@ public class Rules extends HttpServlet {
 
     public static long count() {
         try {
-            JSObject object = DB.simpleScan("web_ad_rules").select(DB.func(DB.COUNT, "id")).execute();
+            JSObject object = DB.simpleScan("web_ad_rules_admob").select(DB.func(DB.COUNT, "id")).execute();
             return object.get("count(id)");
         } catch (Exception ex) {
             Logger logger = Logger.getRootLogger();
@@ -112,7 +111,7 @@ public class Rules extends HttpServlet {
         OperationResult ret = new OperationResult();
 
         try {
-            DB.delete("web_ad_rules").where(DB.filter().whereEqualTo("id", id)).execute();
+            DB.delete("web_ad_rules_admob").where(DB.filter().whereEqualTo("id", id)).execute();
 
             ret.result = true;
             ret.message = "执行成功";
@@ -130,7 +129,7 @@ public class Rules extends HttpServlet {
         OperationResult ret = new OperationResult();
 
         try {
-            DB.insert("web_ad_rules").put("rule_type", ruleType)
+            DB.insert("web_ad_rules_admob").put("rule_type", ruleType)
                     .put("rule_content", ruleContent).execute();
 
             ret.result = true;
@@ -149,7 +148,7 @@ public class Rules extends HttpServlet {
         OperationResult ret = new OperationResult();
 
         try {
-            DB.update("web_ad_rules").put("rule_type", ruleType)
+            DB.update("web_ad_rules_admob").put("rule_type", ruleType)
                     .put("rule_content", ruleContent)
                     .where(DB.filter().whereEqualTo("id", id)).execute();
 

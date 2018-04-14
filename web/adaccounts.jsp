@@ -11,7 +11,7 @@
 
 <html>
   <head>
-    <title>广告账号管理</title>
+    <title>Facebook广告账号管理</title>
   </head>
   <body>
 
@@ -27,12 +27,10 @@
 
     <table>
       <tr>
-        <td ><a href="adaccounts.jsp" target="_blank" style="font-weight:bold">&nbsp;&nbsp;广告账号管理&nbsp;&nbsp;</a></td>
+        <td ><a href="adaccounts_admob.jsp" target="_blank"> &nbsp;&nbsp;Admob广告账号管理 &nbsp;&nbsp;</a></td>
+        <td ><a href="campaigns.jsp" target="_blank"> &nbsp;&nbsp;  Facebook广告系列管理 &nbsp;&nbsp;  </a></td>
 
-        <td ><a href="adaccounts_admob.jsp" target="_blank"> &nbsp;&nbsp;广告账号管理(AdMob) &nbsp;&nbsp;</a></td>
-        <td ><a href="campaigns.jsp" target="_blank"> &nbsp;&nbsp;  广告系列管理 &nbsp;&nbsp;  </a></td>
-
-        <td ><a href="campaigns_admob.jsp" target="_blank">  &nbsp;&nbsp; 广告系列管理(AdMob) &nbsp;&nbsp;  </a></td>
+        <td ><a href="campaigns_admob.jsp" target="_blank">  &nbsp;&nbsp; Admob广告系列管理 &nbsp;&nbsp;  </a></td>
         <td ><a href="tags.jsp" target="_blank"> &nbsp;&nbsp;  标签管理  &nbsp;&nbsp; </a></td>
       </tr>
     </table>

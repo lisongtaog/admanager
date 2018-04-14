@@ -25,12 +25,15 @@ public class AppActivityDaily extends HttpServlet{
     protected void doGet(HttpServletRequest request, HttpServletResponse response)throws ServletException,IOException{
         doPost(request,response);
     }
+    /*
+
+     */
     protected void doPost(HttpServletRequest request,HttpServletResponse response)throws ServletException,IOException{
         String content = request.getParameter("content");
         String tagName = request.getParameter("tagName");
         String startDate = request.getParameter("startDate");
         String endDate = request.getParameter("endDate");
-        String theDate = request.getParameter("this_date");
+        String theDate = request.getParameter("this_date");  //用于手写日志存储
         String path = request.getPathInfo();
         JsonObject json = new JsonObject();
         //JsonObject jsonInside = new JsonObject();
@@ -100,31 +103,56 @@ public class AppActivityDaily extends HttpServlet{
                 for(JSObject country_for:countryCode){
                     String this_country_code = country_for.get("country_code");
                     JsonArray arrayMiddle = new JsonArray(); //每个国家循环创建一次，仅用于存放单国家不同日期的数组
-                    //按日期列表遍历（从后往前）
-                    for(int i=0;i<days_between;i++ ){
+                    //按日期列表遍历（从 endDate 到 startDate-1）
+                    for(int i=0;i<=days_between;i++ ){
                         JsonObject jsonMiddle = new JsonObject(); //确保每次添进arrayMiddle里的数据都是新的，而不会随着引用的改变而改变
                         String thisDate = DateUtil.addDay(endDate,-i,"yyyy-MM-dd");
-                        sql = "SELECT campaign_id,content FROM web_ad_system_app_daily_record_result WHERE tag_name='"
-                                +tagName+"' AND date='"+thisDate+"' AND country_code='"+this_country_code+"'";
-                        List<JSObject> campaignRecord = DB.findListBySql(sql);
-                        if(campaignRecord.size()>0){
-                            String campaign_data = "";
-                            //循环用于拼接 系列ID 和 系统操作 内容的字符串
-                            for(JSObject campaign_record_for:campaignRecord){
-                                String campaign_id = "[" + campaign_record_for.get("campaign_id") + "]";
-                                String content_string = campaign_record_for.get("content");
-                                campaign_data += (campaign_id + content_string + "<br><br>");
-
-                                //jsonInside.addProperty("campaign_id",campaign_id);
-                                //jsonInside.addProperty("content",content_string);
-                                //arrayInside.add(jsonInside);
+                        //创建用于标示当天某国家是否有【新建】或【开启】操作的变量
+                        int exist_open_create_flag = 0;
+                        if(i<days_between){
+                            sql = "SELECT campaign_id,content,exist_open_create FROM web_ad_system_app_daily_record_result WHERE tag_name='"
+                                    +tagName+"' AND date='"+thisDate+"' AND country_code='"+this_country_code+"'";
+                            List<JSObject> campaignRecord = DB.findListBySql(sql);
+                            if(campaignRecord.size()>0){
+                                String campaign_data = "";
+                                //循环用于拼接 系列ID 和 系统操作 内容的字符串
+                                for(JSObject campaign_record_for:campaignRecord){
+                                    String campaign_id = "[" + campaign_record_for.get("campaign_id") + "]";
+                                    String content_string = campaign_record_for.get("content");
+                                    int exist_open_create = campaign_record_for.get("exist_open_create");
+                                    if(exist_open_create ==1){
+                                        exist_open_create_flag = exist_open_create;
+                                    }
+                                    campaign_data += (campaign_id + content_string + "<br><br>");
+                                }
+                                jsonMiddle.addProperty("campaign_data"+i,campaign_data);
+                                jsonMiddle.addProperty("exist_open_create"+i,exist_open_create_flag);
+                                //jsonMiddle.addProperty("date",thisDate);
+                            }else{
+                                jsonMiddle.addProperty("campaign_data"+i,"");
                             }
-                            jsonMiddle.addProperty("campaign_data"+i,campaign_data);
-                            //jsonMiddle.addProperty("date",thisDate);
+                            //接下来查询 国家+日期+标签 得到是否全关停的状态，使用键值对 status i: 1 或 2
+                            sql = "SELECT is_all_closed from web_ad_tag_country_status WHERE tag_name='"+tagName
+                                    +"'AND country_code='"+this_country_code+"'AND date='"+thisDate+"'";
+                            JSObject statusData = DB.findOneBySql(sql);
+                            long status = 1;
+                            if(statusData.hasObjectData()){
+                                status = statusData.get("is_all_closed");
+                            }
+                            jsonMiddle.addProperty("status"+i,status);
+                            arrayMiddle.add(jsonMiddle);
                         }else{
-                            jsonMiddle.addProperty("campaign_data"+i,"");
+                            //在startDate的前一天再添加一个关于 全关状态 的键值对
+                            sql = "SELECT is_all_closed from web_ad_tag_country_status WHERE tag_name='"+tagName
+                                    +"'AND country_code='"+this_country_code+"'AND date='"+thisDate+"'";
+                            JSObject statusData = DB.findOneBySql(sql);
+                            long status = 1;
+                            if(statusData.hasObjectData()){
+                                status = statusData.get("is_all_closed");
+                            }
+                            jsonMiddle.addProperty("status"+i,status);
+                            arrayMiddle.add(jsonMiddle);
                         }
-                        arrayMiddle.add(jsonMiddle);
                     }
                     String this_country_name = country_for.get("country_name");
                     JsonObject jsonHere = new JsonObject();

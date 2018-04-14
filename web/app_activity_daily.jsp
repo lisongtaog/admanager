@@ -57,7 +57,7 @@
             color: #9d56ff;
         }
         .blue {
-            color: #0f0;
+            color:#0f0;
         }
         .yellow{
             color: #ffa17a;
