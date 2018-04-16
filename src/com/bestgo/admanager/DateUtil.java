@@ -59,11 +59,13 @@ public class DateUtil {
 
     /**
      * 获取美国当前日期
+     *  夏令时 GMT-7:00
+     *  其他时 GMT-8:00
      * @return 日期字符串
      */
     public static String getUSANowDate() {
         Calendar calendar = Calendar.getInstance();
-        calendar.setTimeZone(TimeZone.getTimeZone("GMT-8:00"));
+        calendar.setTimeZone(TimeZone.getTimeZone("GMT-7:00"));
         String date = String.format("%d-%d-%d", calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH));
         return date;
     }

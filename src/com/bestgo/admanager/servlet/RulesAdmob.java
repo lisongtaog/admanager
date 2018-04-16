@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 有关Adwords的规则
+ * 有关Adwords的规则,暂停使用，目前规则已经由两个表并成一个表
  */
 @WebServlet(name = "RulesAdmob", urlPatterns = {"/rules_admob/*"})
 public class RulesAdmob extends HttpServlet {

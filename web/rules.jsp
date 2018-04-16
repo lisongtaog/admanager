@@ -11,7 +11,7 @@
 
 <html>
   <head>
-    <title>Facebook规则</title>
+    <title>规则</title>
   </head>
   <body>
 
