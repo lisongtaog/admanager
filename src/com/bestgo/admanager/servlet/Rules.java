@@ -19,7 +19,7 @@ import java.util.List;
 
 /**
  * Created by jikai on 5/31/17.
- * 有关Facebook的规则
+ * 目前web_rules包含了Facebook和Adwords两个的所有规则
  */
 @WebServlet(name = "Rules", urlPatterns = {"/rules/*"})
 public class Rules extends HttpServlet {

@@ -104,6 +104,7 @@
                 <select class="form-control" id="inputRuleType">
                   <option value="1">类型1（监控广告系列）</option>
                   <option value="2">类型2（监控应用）</option>
+                  <option value="3">类型3（监控国家）</option>
                 </select>
               </div>
             </div>
