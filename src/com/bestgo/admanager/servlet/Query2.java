@@ -289,8 +289,7 @@ public class Query2 extends HttpServlet {
                 ",sum(ch.total_click) as click from " + webAdCampaignsTable + " c, " + webAdCampaignsHistoryTable + " ch, " +
                 "(select distinct campaign_id from " + webAdCampaignTagRelTable + " where tag_id = " + tagId + ") rt " +
                 "where rt.campaign_id = ch.campaign_id and c.campaign_id = ch.campaign_id " +
-                "and date between '" + startTime + "' and '" + endTime + "' " +
-                "and c.status != 'removed' ";
+                "and date between '" + startTime + "' and '" + endTime + "'";
         JSObject one = DB.findOneBySql(sql);
 
         JsonObject jsonObject = new JsonObject();
@@ -372,8 +371,7 @@ public class Query2 extends HttpServlet {
                     ",sum(ch.total_click) as click from " + webAdCampaignsTable + " c, " + webAdCampaignsHistoryTable + " ch, " +
                     "(select distinct campaign_id from " + webAdCampaignTagRelTable + " where tag_id = " + tagId + ") rt " +
                     "where rt.campaign_id = ch.campaign_id and c.campaign_id = ch.campaign_id " +
-                    "and date = '" + DayCount + "'" +
-                    "and c.status != 'removed' ";
+                    "and date = '" + DayCount + "'";
             JSObject one = DB.findOneBySql(sql);
             double total_installed = Utils.convertDouble(one.get("installed"), 0);
             double total_spend = Utils.convertDouble(one.get("spend"), 0);

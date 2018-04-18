@@ -185,7 +185,7 @@ public class QueryNotExistData extends HttpServlet {
                         " from " + webAdCampaignsTable + " c, " + webAdCampaignsHistoryTable + " ch " +
                         "where c.campaign_id = ch.campaign_id " +
                         "and date between '" + startTime + "' and '" + endTime + "' " +
-                        "and c.status != 'removed' and c.campaign_id in (" + campaignIds + ") " +
+                        "and c.campaign_id in (" + campaignIds + ") " +
                         "group by ch.campaign_id having impressions > 0 ) a ";
             }else{
                 sql = "select campaign_id, impressions from ( " +
@@ -194,7 +194,7 @@ public class QueryNotExistData extends HttpServlet {
                         " from " + webAdCampaignsTable + " c, " + webAdCampaignsCountryHistoryTable + " ch " +
                         "where c.campaign_id = ch.campaign_id " +
                         "and date between '" + startTime + "' and '" + endTime + "' " +
-                        "and c.status != 'removed' and c.campaign_id in (" + campaignIds + ") " +
+                        "and c.campaign_id in (" + campaignIds + ") " +
                         "group by ch.campaign_id having impressions > 0 ) a ";
             }
             listHasData = DB.findListBySql(sql);

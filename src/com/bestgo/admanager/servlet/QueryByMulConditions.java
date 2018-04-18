@@ -880,7 +880,7 @@ public class QueryByMulConditions extends HttpServlet {
                         " where c.campaign_id = ch.campaign_id " +
                         ((likeCampaignName == "" || likeCampaignName == null) ? " " : " and campaign_name like '%" + likeCampaignName +"%' " )  +
                         " and date between '" + startTime + "' and '" + endTime + "' " +
-                        " and c.status != 'removed' and ch.campaign_id in (" + campaignIds + ")" +
+                        " and ch.campaign_id in (" + campaignIds + ")" +
                         " group by ch.campaign_id";
                 listCampaignSpend4CountryCode = DB.findListBySql(sql);
 
@@ -896,7 +896,7 @@ public class QueryByMulConditions extends HttpServlet {
                         "where c.campaign_id=ch.campaign_id and country_code= '" + countryCode + "' " +
                         ((likeCampaignName == "" || likeCampaignName == null) ? " " : " and campaign_name like '%" + likeCampaignName +"%' " )  +
                         " and date between '" + startTime + "' and '" + endTime + "' " +
-                        " and c.status != 'removed' and c.campaign_id in (" + campaignIds + ")" +
+                        " and c.campaign_id in (" + campaignIds + ")" +
                         " group by ch.campaign_id " + havingField +
                         ") a left join " + webAccountIdTable + " b on a.account_id = b.account_id";
 
@@ -932,7 +932,7 @@ public class QueryByMulConditions extends HttpServlet {
                         "where c.campaign_id=ch.campaign_id " +
                         ((likeCampaignName == null || likeCampaignName == "") ? " " : " and campaign_name like '%" + likeCampaignName +"%' " )  +
                         " and date between '" + startTime + "' and '" + endTime + "' " +
-                        " and c.status != 'removed' and c.campaign_id in (" + campaignIds + ")" +
+                        " and c.campaign_id in (" + campaignIds + ")" +
                         " group by ch.campaign_id, country_code " + havingField +
                         ") a left join " + webAccountIdTable + " b on a.account_id = b.account_id";
                 list = DB.findListBySql(sql);
@@ -946,7 +946,7 @@ public class QueryByMulConditions extends HttpServlet {
                         "where c.campaign_id=ch.campaign_id " +
                         ((likeCampaignName == "" || likeCampaignName == null) ? " " : " and campaign_name like '%" + likeCampaignName +"%' " )  +
                         " and date between '" + startTime + "' and '" + endTime + "' " +
-                        " and c.status != 'removed' and c.campaign_id in (" + campaignIds + ")" +
+                        " and c.campaign_id in (" + campaignIds + ")" +
                         " group by ch.campaign_id "  + havingField +
                         ") a left join " + webAccountIdTable + " b on a.account_id = b.account_id";
                 list = DB.findListBySql(sql);

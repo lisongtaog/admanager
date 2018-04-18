@@ -17,7 +17,7 @@ import java.io.IOException;
 import java.util.*;
 
 /**
- * 7天的汇总
+ * 7天的汇总,暂无使用！！！
  */
 @WebServlet(name = "QuerySummary", urlPatterns = {"/query_summary"}, asyncSupported = true)
 public class QuerySummary extends HttpServlet {
