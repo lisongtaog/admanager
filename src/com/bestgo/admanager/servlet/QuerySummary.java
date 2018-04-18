@@ -58,7 +58,7 @@ public class QuerySummary extends HttpServlet {
                         "(select distinct campaign_id from web_ad_campaign_tag_rel where tag_id = " + tagId + ") rt " +
                         "where rt.campaign_id = ch.campaign_id and c.campaign_id = ch.campaign_id " +
                         "and date between '" + beforeSevenDay + "' and '" + now + "' " +
-                        "and c.status != 'removed' GROUP BY date";
+                        "GROUP BY date";
                 List<JSObject> list = null;
                 try {
                     list = DB.findListBySql(sql);
@@ -75,7 +75,7 @@ public class QuerySummary extends HttpServlet {
                             "(select distinct campaign_id from web_ad_campaign_tag_admob_rel where tag_id = " + tagId + ") rt " +
                             "where rt.campaign_id = ch.campaign_id and c.campaign_id = ch.campaign_id " +
                             "and date between '" + beforeSevenDay + "' and '" + now + "' " +
-                            "and c.status != 'removed' GROUP BY date";
+                            "GROUP BY date";
                     list = DB.findListBySql(sql);
                     if(list != null && list.size() >0){
                         for(JSObject s : list){
@@ -588,8 +588,7 @@ public class QuerySummary extends HttpServlet {
                 ",sum(ch.total_click) as click from " + webAdCampaignsTable + " c, " + webAdCampaignsHistoryTable + " ch, " +
                 "(select distinct campaign_id from " + webAdCampaignTagRelTable + " where tag_id = " + tagId + ") rt " +
                 "where rt.campaign_id = ch.campaign_id and c.campaign_id = ch.campaign_id " +
-                "and date between '" + startTime + "' and '" + endTime + "' " +
-                "and c.status != 'removed' ";
+                "and date between '" + startTime + "' and '" + endTime + "'";
         JSObject one = DB.findOneBySql(sql);
 
         JsonObject jsonObject = new JsonObject();
@@ -644,8 +643,7 @@ public class QuerySummary extends HttpServlet {
                         "from web_ad_campaigns_admob c, web_ad_campaigns_history_admob ch, " +
                         "(select distinct campaign_id from web_ad_campaign_tag_admob_rel where tag_id = " + tagId + ") rt " +
                         "where rt.campaign_id = ch.campaign_id and c.campaign_id = ch.campaign_id " +
-                        "and date = '" + date + "' " +
-                        "and c.status != 'removed' ";
+                        "and date = '" + date + "'";
                 JSObject one = null;
                 try {
                     one = DB.findOneBySql(sql);
@@ -666,8 +664,7 @@ public class QuerySummary extends HttpServlet {
                         "from web_ad_campaigns c, web_ad_campaigns_history ch, " +
                         "(select distinct campaign_id from web_ad_campaign_tag_rel where tag_id = " + tagId + ") rt " +
                         "where rt.campaign_id = ch.campaign_id and c.campaign_id = ch.campaign_id " +
-                        "and date = '" + date + "' " +
-                        "and c.status != 'removed' ";
+                        "and date = '" + date + "'";
                 JSObject one = null;
                 try {
                     one = DB.findOneBySql(sql);

@@ -52,8 +52,7 @@ public class ProjectTeamTotalRevenueAndTotalCost extends HttpServlet {
                                         " from web_ad_campaigns c, web_ad_campaigns_history ch, " +
                                         "(select distinct campaign_id from web_ad_campaign_tag_rel where tag_id = " + tagId + ") rt " +
                                         "where rt.campaign_id = ch.campaign_id and c.campaign_id = ch.campaign_id " +
-                                        "and date between '" + startDate + "' and '" + endDate + "' " +
-                                        "and c.status != 'removed'";
+                                        "and date between '" + startDate + "' and '" + endDate + "'";
                                 JSObject x = DB.findOneBySql(sqlG);
                                 if (x.hasObjectData()) {
                                     totalSpends += Utils.convertDouble(x.get("spend"), 0);
@@ -62,8 +61,7 @@ public class ProjectTeamTotalRevenueAndTotalCost extends HttpServlet {
                                         " from web_ad_campaigns_admob c, web_ad_campaigns_history_admob ch, " +
                                         "(select distinct campaign_id from web_ad_campaign_tag_admob_rel where tag_id = " + tagId + ") rt " +
                                         "where rt.campaign_id = ch.campaign_id and c.campaign_id = ch.campaign_id " +
-                                        "and date between '" + startDate + "' and '" + endDate + "' " +
-                                        "and c.status != 'removed'";
+                                        "and date between '" + startDate + "' and '" + endDate + "'";
                                 x = DB.findOneBySql(sqlG);
                                 if (x.hasObjectData()) {
                                     totalSpends += Utils.convertDouble(x.get("spend"), 0);
