@@ -101,7 +101,11 @@ public class Campaign extends HttpServlet {
                     result.message = "预算不能为空";
                 } else if (bidding.isEmpty()) {
                     result.message = "出价不能为空";
-                } else {
+                }else if(gender == null) {
+                    result.message = "性别不能为空";
+                }else if(region.isEmpty()){
+                    result.message = "国家不能为空";
+                }else {
                     double dBidding = Utils.parseDouble(bidding, 0);
                     Double maxBiddingDouble = tagMaxBiddingRelationMap.get(appName);
                     if(maxBiddingDouble == null){
@@ -154,6 +158,7 @@ public class Campaign extends HttpServlet {
                     }
                 }
 
+                //result.result = true;
                 if (result.result) {
                     Calendar calendar = Calendar.getInstance();
                     String campaignNameOld = campaignName + "_";

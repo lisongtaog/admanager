@@ -296,7 +296,11 @@ public class AutoCreateCampaign extends HttpServlet {
                 result.message = "预算不能为空";
             } else if (bidding.isEmpty()) {
                 result.message = "出价不能为空";
-            } else {
+            }else if(gender == null){
+                result.message = "性别不能为空";
+            }else if(region.isEmpty()){
+                result.message = "国家不能为空";
+            }else {
                 double dBidding = Utils.parseDouble(bidding, 0);
                 Double maxBiddingDouble = Campaign.tagMaxBiddingRelationMap.get(appName);
                 if (maxBiddingDouble != null && maxBiddingDouble != 0 && dBidding > maxBiddingDouble) {
@@ -342,7 +346,7 @@ public class AutoCreateCampaign extends HttpServlet {
                 }
             }
 
-
+//            result.result = true;   //测完删
             if (result.result) {
                 if (campaignName.length() > 100) {
                     campaignName = campaignName.substring(0, 100);
@@ -452,6 +456,14 @@ public class AutoCreateCampaign extends HttpServlet {
             if (bidding.isEmpty()) {
                 result.result = false;
                 result.message = "出价不能为空";
+            }
+            if(gender == null){
+                result.result = false;
+                result.message = "性别不能为空";
+            }
+            if(region.isEmpty()){
+                result.result = false;
+                result.message = "国家不能为空";
             }
             double dBidding = Utils.parseDouble(bidding, 0);
             if (dBidding >= 0.5) {
@@ -589,7 +601,7 @@ public class AutoCreateCampaign extends HttpServlet {
         return 0;
     }
 
-    private OperationResult adwordsCampaignCreate(HttpServletRequest request) {
+    private OperationResult  adwordsCampaignCreate(HttpServletRequest request) {
         OperationResult result = new OperationResult();
         try {
             String appName = request.getParameter("appName");
@@ -649,7 +661,6 @@ public class AutoCreateCampaign extends HttpServlet {
                     }
                 }
             }
-
             if (result.result) {
                 String s = String.valueOf(System.currentTimeMillis());
                 campaignName = campaignName+"_"+s.substring(s.length() - 6, s.length());

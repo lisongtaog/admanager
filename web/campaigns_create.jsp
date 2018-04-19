@@ -244,14 +244,20 @@
         </div>
         <div class="form-group">
             <label for="inputImagePath" class="col-sm-2 control-label">图片路径</label>
-            <div class="col-sm-10">
+            <div class="col-sm-8">
                 <input class="form-control" id="inputImagePath"/>
+            </div>
+            <div class="col-sm-2">
+                <label title="选中后每个选项创建一个或多个广告系列"><input type="checkbox" class="form-check-input" id="inputImageExplode">分离到系列</label>
             </div>
         </div>
         <div class="form-group">
             <label for="inputVideoPath" class="col-sm-2 control-label">视频路径</label>
-            <div class="col-sm-10">
+            <div class="col-sm-8">
                 <input class="form-control" id="inputVideoPath" />
+            </div>
+            <div class="col-sm-2">
+                <label title="选中后每个选项创建一个或多个广告系列"><input type="checkbox" class="form-check-input" id="inputVideoExplode">分离到系列</label>
             </div>
         </div>
         <div class="form-group">
@@ -384,8 +390,11 @@
         </div>
         <div class="form-group">
             <label for="inputImagePath" class="col-sm-2 control-label">图片路径</label>
-            <div class="col-sm-10">
+            <div class="col-sm-8">
                 <input class="form-control" id="inputImagePathAdmob" />
+            </div>
+            <div class="col-sm-2">
+                <label title="选中后每个选项创建一个或多个广告系列"><input type="checkbox" class="form-check-input" id="inputImageAdmobExplode">分离到系列</label>
             </div>
         </div>
         <div class="form-group">
