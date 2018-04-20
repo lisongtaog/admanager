@@ -831,7 +831,8 @@ public class QueryByMulConditions extends HttpServlet {
         String campaignIds = "";
         if(campaignCreateTime != null && campaignCreateTime != ""){
             List<JSObject> campaignIdJSObjectList = new ArrayList<>();
-            String sqlQuery = "select campaign_id from "+adCampaignsTable+" where app_name = '"+ tagName +"' and create_time like '" + campaignCreateTime + "%'";
+            String afterCampaignCreateTime = DateUtil.addDay(campaignCreateTime,1,"yyyy-MM-dd");
+            String sqlQuery = "select campaign_id from "+adCampaignsTable+" where app_name = '"+ tagName +"' and create_time >= '" + campaignCreateTime + "' and create_time < '" + afterCampaignCreateTime + "'";
             campaignIdJSObjectList  = DB.findListBySql(sqlQuery);
 
             if(campaignIdJSObjectList != null && campaignIdJSObjectList.size()>0){
