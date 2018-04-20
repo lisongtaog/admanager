@@ -904,12 +904,12 @@ public class QueryByMulConditions extends HttpServlet {
                 list = DB.findListBySql(sql);
                 if(containsNoDataCampaignCheck){
                     if(admobCheck){
-                        sql = "SELECT c.campaign_id, c.account_id, short_name, c.campaign_name, c.create_time, c.status, budget, c.bidding, c.total_spend " +
+                        sql = "SELECT c.campaign_id, c.account_id, short_name, c.campaign_name, c.create_time, budget, c.bidding, c.total_spend " +
                                 " FROM " + adCampaignsTable + " a, " + webAdCampaignsTable + " c, " + webAccountIdTable + " b WHERE a.campaign_id = c.campaign_id " +
                                 " AND c.account_id = b.account_id AND c.status = '" + openStatus + "' AND a.country_region = '" + country + "' AND app_name = '" + tagName + "' " +
                                 ((likeCampaignName == "" || likeCampaignName == null) ? " " : " and c.campaign_name like '%" + likeCampaignName +"%' " );
                     }else{
-                        sql = "SELECT c.campaign_id, c.account_id, short_name, c.campaign_name, c.create_time, c.status, budget, c.bidding, c.total_spend " +
+                        sql = "SELECT c.campaign_id, c.account_id, short_name, c.campaign_name, c.create_time, budget, c.bidding, c.total_spend " +
                                 " FROM " + adCampaignsTable + " a, " + webAdCampaignsTable + " c, " + webAccountIdTable + " b WHERE a.campaign_id = c.campaign_id " +
                                 " AND c.account_id = b.account_id AND b.status = 1 " +
                                 " AND c.status = '" + openStatus + "' AND a.country_region = '" + country + "' AND app_name = '" + tagName + "' " +
@@ -1091,7 +1091,6 @@ public class QueryByMulConditions extends HttpServlet {
                 String short_name = one.get("short_name");
                 String account_id = one.get("account_id");
                 String campaign_name = one.get("campaign_name");
-                String status = one.get("status");
                 String create_time = one.get("create_time").toString();
                 create_time = create_time.substring(0,create_time.length()-5);
                 String country_code = one.get("country_code");
@@ -1111,7 +1110,7 @@ public class QueryByMulConditions extends HttpServlet {
                 d.addProperty("short_name", short_name);
                 d.addProperty("account_id", account_id);
                 d.addProperty("campaign_name", campaign_name);
-                d.addProperty("status", status);
+                d.addProperty("status", openStatus);
                 d.addProperty("create_time", create_time);
                 d.addProperty("country_code", country_code);
                 d.addProperty("country_name", countryMap.get(country_code));
