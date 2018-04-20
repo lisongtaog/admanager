@@ -342,7 +342,7 @@ public class Campaign extends HttpServlet {
             }
         } else if (path.startsWith("/query_status")) {
             try {
-                Calendar calendar = Calendar.getInstance();
+                /*Calendar calendar = Calendar.getInstance();
                 String startDate = String.format("%d-%02d-%02d 00:00:00",
                         calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH));
                 String endDate = String.format("%d-%02d-%02d 23:59:59",
@@ -527,7 +527,7 @@ public class Campaign extends HttpServlet {
 
                 yesterdayData.addProperty("count", yesterdayCount);
                 yesterdayData.addProperty("total_spend", totalSpend);
-                yesterdayData.addProperty("total_installed", totalInstalled);
+                yesterdayData.addProperty("total_installed", totalInstalled);*/
 
                 String[] fields = {"id", "campaign_name", "failed_count", "last_error_message"};
                 JsonArray array = new JsonArray();
@@ -553,10 +553,10 @@ public class Campaign extends HttpServlet {
                     one.addProperty("network", "AdWords");
                     array.add(one);
                 }
-                json.addProperty("today_create_count", count);
+//                json.addProperty("today_create_count", count);
                 json.add("data", array);
-                json.add("yesterdayData", yesterdayData);
-                json.add("reduceArr", reduceArr);
+//                json.add("yesterdayData", yesterdayData);
+//                json.add("reduceArr", reduceArr);
                 json.addProperty("ret", 1);
             } catch (Exception ex) {
                 ex.printStackTrace();
