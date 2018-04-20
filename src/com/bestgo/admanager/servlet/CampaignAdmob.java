@@ -103,7 +103,8 @@ public class CampaignAdmob extends HttpServlet {
                             maxBiddingDouble = Utils.convertDouble(one.get("max_bidding"),0);
                             tagMaxBiddingRelationMap.put(appName,maxBiddingDouble);
                         }
-                    } else {
+                    }
+                    if (maxBiddingDouble == null || maxBiddingDouble == 0) {
                         maxBiddingDouble = 0.01;
                     }
                     if (maxBiddingDouble != null && maxBiddingDouble != 0 && dBidding > maxBiddingDouble) {
