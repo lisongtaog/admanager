@@ -79,6 +79,7 @@
             <th>Revenue</th>
             <th>ECPM</th>
             <th>PI</th>
+            <th>ARPU</th>
             <th>CPA</th>
             <th>ACpa</th>
             <th>Incoming</th>
@@ -146,6 +147,7 @@
                     "<th>Revenue<span sorterId=\"1039\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
                     "<th>7daysRevenue</th>" +
                     "<th>PI</th>" +
+                    "<th>ARPU</th>" +
                     "<th>ECPM<span sorterId=\"1040\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
                     "<th>CPA<span sorterId=\"1041\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
                     "<th>ACpa</th>" +
@@ -210,7 +212,7 @@
         var len = arr.length;
         var one;
         var keyset = ["costs","seven_days_costs", "purchased_users", "installed", "uninstalled_rate", "users",
-            "active_users", "revenues","seven_days_revenues","pi", "ecpm","cpa","a_cpa","cpa_div_ecpm", "incoming",
+            "active_users", "revenues","seven_days_revenues","pi", "arpu", "ecpm","cpa","a_cpa","cpa_div_ecpm", "incoming",
             "seven_days_incoming","rt","thirty_days_active_user", "thirty_days_active_user_mul_arpu"];
         for (var i = 0; i < len; i++) {
             one = arr[i];
@@ -236,6 +238,8 @@
                     td = $('<td title="'+ one['every_day_revenue_for_fourteen_days'] + '"></td>');
                 }else if('pi' == key){
                     td = $('<td title="'+ one['every_day_pi_for_fourteen_days'] + '"></td>');
+                }else if('arpu' == key){
+                    td = $('<td></td>');
                 }else if('ecpm' == key){
                     td = $('<td title="'+ one['every_day_ecpm_for_fourteen_days'] + '"></td>');
                 }else if('cpa' == key){

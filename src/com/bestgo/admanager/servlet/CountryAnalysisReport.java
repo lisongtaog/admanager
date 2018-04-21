@@ -267,6 +267,8 @@ public class CountryAnalysisReport extends HttpServlet {
                                 double incoming = Utils.convertDouble(j.get("incoming"),0);
                                 double cpaDivEcpm = (ecpm == 0) ? 0 : (cpa / ecpm);
 
+                                double arpu = activeUsers > 0 ? revenues / activeUsers : 0;
+
                                 sql = "SELECT avg(pi) as avg_pi FROM web_ad_country_analysis_report_history_by_date " +
                                         "WHERE app_id = '" + appId + "' AND country_code = '" + countryCode + "' AND date BETWEEN '" + beforeTenDay + "' AND '" + beforeFourDay + "'";
                                 oneC = DB.findOneBySql(sql);
@@ -292,6 +294,7 @@ public class CountryAnalysisReport extends HttpServlet {
                                 d.addProperty("active_users", activeUsers);
                                 d.addProperty("revenues", Utils.trimDouble(revenues,0));
                                 d.addProperty("pi", Utils.trimDouble(pi,3));
+                                d.addProperty("arpu", Utils.trimDouble(arpu,3));
                                 d.addProperty("ecpm", Utils.trimDouble(ecpm,3));
                                 d.addProperty("cpa_div_ecpm", Utils.trimDouble(cpaDivEcpm,3));
                                 d.addProperty("seven_days_costs", Utils.trimDouble(sevenDaysCosts,0));
