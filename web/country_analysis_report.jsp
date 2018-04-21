@@ -145,6 +145,7 @@
                     "<th>TotalUser<span sorterId=\"1037\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
                     "<th>ActiveUser<span sorterId=\"1038\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
                     "<th>Revenue<span sorterId=\"1039\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
+                    "<th>revenue/installed</th>" +
                     "<th>7daysRevenue</th>" +
                     "<th>PI</th>" +
                     "<th>ARPU</th>" +
@@ -212,7 +213,7 @@
         var len = arr.length;
         var one;
         var keyset = ["costs","seven_days_costs", "purchased_users", "installed", "uninstalled_rate", "users",
-            "active_users", "revenues","seven_days_revenues","pi", "arpu", "ecpm","cpa","a_cpa","cpa_div_ecpm", "incoming",
+            "active_users", "revenues", "revenue/installed","seven_days_revenues","pi", "arpu", "ecpm","cpa","a_cpa","cpa_div_ecpm", "incoming",
             "seven_days_incoming","rt","thirty_days_active_user", "thirty_days_active_user_mul_arpu"];
         for (var i = 0; i < len; i++) {
             one = arr[i];
