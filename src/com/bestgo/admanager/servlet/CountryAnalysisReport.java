@@ -147,7 +147,7 @@ public class CountryAnalysisReport extends HttpServlet {
                                 oneC = DB.findOneBySql(sql);
                                 double sevenDaysAvgARPU = 0;
                                 if(oneC.hasObjectData()){
-                                    sevenDaysAvgARPU = oneC.get("seven_days_avg_arpu");
+                                    sevenDaysAvgARPU = Utils.convertDouble(oneC.get("seven_days_avg_arpu"),0);
                                 }
                                 double thirtyDaysActiveUserMulARPU = thirtyDaysActiveUser * sevenDaysAvgARPU;
 
