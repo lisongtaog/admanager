@@ -114,9 +114,9 @@ public class Campaign extends HttpServlet {
                             maxBiddingDouble = Utils.convertDouble(one.get("max_bidding"),0);
                             tagMaxBiddingRelationMap.put(appName,maxBiddingDouble);
                         }
-                    }
-                    if (maxBiddingDouble == null || maxBiddingDouble == 0) {
-                        maxBiddingDouble = 0.01;
+                        if (maxBiddingDouble == null || maxBiddingDouble == 0) {
+                            maxBiddingDouble = 0.01;
+                        }
                     }
                     if (maxBiddingDouble != null && maxBiddingDouble != 0 && dBidding > maxBiddingDouble) {
                         result.message = "bidding超过了本应用的最大出价,   " + bidding + " > " + maxBiddingDouble;
@@ -161,7 +161,7 @@ public class Campaign extends HttpServlet {
                     }
                 }
 
-                //result.result = true;
+                result.result = true;
                 if (result.result) {
                     Calendar calendar = Calendar.getInstance();
                     String campaignNameOld = campaignName + "_";
@@ -221,7 +221,6 @@ public class Campaign extends HttpServlet {
                                     for (File file : uploadVideos) {
                                         String fileAbsolutePath = file.getAbsolutePath();
                                         String fileName = fileAbsolutePath.toLowerCase();
-//                                    String xxx = file.getAbsolutePath().replaceAll("\\\\","/");
                                         if (fileName.endsWith("mp4") || fileName.endsWith("mov") || fileName.endsWith("gif")) {
                                             video_file_path = fileAbsolutePath;
                                         }else if (fileName.endsWith("jpg") || fileName.endsWith("jpeg") || fileName.endsWith("png")) {
@@ -245,37 +244,6 @@ public class Campaign extends HttpServlet {
                                         ", bidding="+ bidding + ", bugdet="+ bugdet + ", bidding="+ bidding + ", title="+ title + ", message="+ message +
                                         ", app_name="+ appName + ", age="+ age +", gender="+ gender + ", user_devices="+ userDevice + ", detail_target="+interest);
                             }
-
-//                            if(genId >0){
-//                                try {
-//                                    String[] split = region.split(",");
-//                                    String countryNamesStr = "";
-//                                    for(int k=0,ee=split.length;k<ee;k++){
-//                                        countryNamesStr += "'" + split[k] + "',";
-//                                    }
-//                                    if(countryNamesStr != null && countryNamesStr.length()>0){
-//                                        countryNamesStr = countryNamesStr.substring(0,countryNamesStr.length()-1);
-//                                    }
-//                                    String sql = "select country_code from app_country_code_dict where country_name in ("+countryNamesStr+")";
-//                                    List<JSObject> countryCodeJSObjectList = DB.findListBySql(sql);
-//                                    for(JSObject m: countryCodeJSObjectList){
-//                                        String countryCodeStr = m.get("country_code");
-//                                        DB.insert("web_ad_campaign_operation_log")
-//                                                .put("operation_date", now)
-//                                                .put("app_name",appName)
-//                                                .put("country_code", countryCodeStr)
-//                                                .put("campaign_name",campaignName)
-//                                                .put("enabled",1)
-//                                                .put("bidding",bidding)
-//                                                .execute();
-//                                    }
-//
-//
-//
-//                                } catch (Exception e) {
-//                                    e.printStackTrace();
-//                                }
-//                            }
 
                         }
                     }
@@ -345,7 +313,7 @@ public class Campaign extends HttpServlet {
             }
         } else if (path.startsWith("/query_status")) {
             try {
-                /*Calendar calendar = Calendar.getInstance();
+                Calendar calendar = Calendar.getInstance();
                 String startDate = String.format("%d-%02d-%02d 00:00:00",
                         calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH));
                 String endDate = String.format("%d-%02d-%02d 23:59:59",
@@ -530,7 +498,7 @@ public class Campaign extends HttpServlet {
 
                 yesterdayData.addProperty("count", yesterdayCount);
                 yesterdayData.addProperty("total_spend", totalSpend);
-                yesterdayData.addProperty("total_installed", totalInstalled);*/
+                yesterdayData.addProperty("total_installed", totalInstalled);
 
                 String[] fields = {"id", "campaign_name", "failed_count", "last_error_message"};
                 JsonArray array = new JsonArray();
@@ -556,10 +524,10 @@ public class Campaign extends HttpServlet {
                     one.addProperty("network", "AdWords");
                     array.add(one);
                 }
-//                json.addProperty("today_create_count", count);
+                json.addProperty("today_create_count", count);
                 json.add("data", array);
-//                json.add("yesterdayData", yesterdayData);
-//                json.add("reduceArr", reduceArr);
+                json.add("yesterdayData", yesterdayData);
+                json.add("reduceArr", reduceArr);
                 json.addProperty("ret", 1);
             } catch (Exception ex) {
                 ex.printStackTrace();

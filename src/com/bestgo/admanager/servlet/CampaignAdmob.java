@@ -103,9 +103,9 @@ public class CampaignAdmob extends HttpServlet {
                             maxBiddingDouble = Utils.convertDouble(one.get("max_bidding"),0);
                             tagMaxBiddingRelationMap.put(appName,maxBiddingDouble);
                         }
-                    }
-                    if (maxBiddingDouble == null || maxBiddingDouble == 0) {
-                        maxBiddingDouble = 0.01;
+                        if (maxBiddingDouble == null || maxBiddingDouble == 0) {
+                            maxBiddingDouble = 0.01;
+                        }
                     }
                     if (maxBiddingDouble != null && maxBiddingDouble != 0 && dBidding > maxBiddingDouble) {
                         result.message = "bidding超过了本应用的最大出价,   " + bidding + " > " + maxBiddingDouble;

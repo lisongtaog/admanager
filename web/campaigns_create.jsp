@@ -32,6 +32,8 @@
     }
 
     String type = request.getParameter("type");
+
+    //以下是从 campaigns_auto_create.jsp 传来的参数
     boolean isAutoCreate = "auto_create".equals(type);
     String network = request.getParameter("network");
     ArrayList<String> networks = new ArrayList<>();

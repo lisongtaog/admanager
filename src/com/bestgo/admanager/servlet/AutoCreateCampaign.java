@@ -24,7 +24,7 @@ import java.util.*;
 
 /**
  * Created by jikai on 12/10/17.
- * 这个有BUG，投放组暂时没有用到，如果用时，必须测试！！！
+ * 自动创建系列
  */
 @WebServlet(name = "AutoCreateCampaign", urlPatterns = "/auto_create_campaign/*")
 public class AutoCreateCampaign extends HttpServlet {
@@ -346,7 +346,6 @@ public class AutoCreateCampaign extends HttpServlet {
                 }
             }
 
-//            result.result = true;   //测完删
             if (result.result) {
                 if (campaignName.length() > 100) {
                     campaignName = campaignName.substring(0, 100);
@@ -412,6 +411,7 @@ public class AutoCreateCampaign extends HttpServlet {
             String campaignName = request.getParameter("campaignName");
             String bugdet = request.getParameter("bugdet");
             String maxCPA = request.getParameter("maxCPA");
+            String groupId = request.getParameter("groupId");
             String title = request.getParameter("title");
             String message = request.getParameter("message");
             String imagePath = request.getParameter("imagePath");
@@ -500,6 +500,7 @@ public class AutoCreateCampaign extends HttpServlet {
                         .put("bidding", bidding)
                         .put("explode_bidding", Boolean.parseBoolean(explodeBidding) ? 1 : 0)
                         .put("max_cpa", maxCPA)
+                        .put("group_id", groupId)
                         .put("title", title)
                         .put("message", message)
                         .put("image_path", imagePath)
@@ -718,6 +719,7 @@ public class AutoCreateCampaign extends HttpServlet {
             String campaignName = request.getParameter("campaignName");
             String bugdet = request.getParameter("bugdet");
             String maxCPA = request.getParameter("maxCPA");
+            String groupId = request.getParameter("groupId");
             String message1 = request.getParameter("message1");
             String message2 = request.getParameter("message2");
             String message3 = request.getParameter("message3");
@@ -801,6 +803,7 @@ public class AutoCreateCampaign extends HttpServlet {
                         .put("message4", message4)
                         .put("explode_bidding", Boolean.parseBoolean(explodeBidding) ? 1 : 0)
                         .put("max_cpa", maxCPA)
+                        .put("group_id", groupId)
                         .put("image_path", imagePath)
                         .put("update_time", DateUtil.getNowTime())
                         .where(DB.filter().whereEqualTo("id", id))

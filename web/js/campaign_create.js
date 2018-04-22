@@ -416,7 +416,7 @@ function init() {
         }
     });
 
-    $('#formAdmob').hide();  //默认隐藏
+    $('#formAdmob').hide();
     //以下用于读取admob表单数据（手动输入时）
     $('#btnCreateAdmob').click(function () {
         var appName = $('#selectAppAdmob').val();
@@ -468,16 +468,26 @@ function init() {
                 values: [region.join(",")]
             })
         }
-        if (!$("#inputBiddingAdmobExplode").prop("checked") && bidding.indexOf(",") !== -1) {
+
+        if(isAutoCreate && modifyRecordId>0){
+            $("#inputBiddingAdmobExplode").prop("checked",false);
+        }else if (!$("#inputBiddingAdmobExplode").prop("checked") && bidding.indexOf(",") !== -1) {
             admanager.showCommonDlg("错误", "不分离的情况下不允许出价多选");
             return false;
         }
-        explodeList.push({
-            key: 'bidding',
-            values: bidding.split(",").map(function (x) {
-                return x.trim();
-            })
-        });
+        if($("#inputBiddingAdmobExplode").prop("checked")){
+            explodeList.push({
+                key: 'bidding',
+                values: bidding.split(",").map(function (x) {
+                    return x.trim();
+                })
+            });
+        }else{
+            explodeList.push({
+                key: 'bidding',
+                values: [bidding]
+            });
+        }
         //处理图片路径
         if($("#inputImageAdmobExplode").prop("checked")) {
             var valueList = imagePath.trim().replace(/,$/, "").split(",");    //确保正确地切分为数组
@@ -518,25 +528,17 @@ function init() {
             message4: message4,
 //            imagePath: imagePath
         }
-
-        var requestPool = [];
-        explodeParams.forEach(function (p) {
-            var cloned = $.extend({}, baseParam);
-            $.extend(cloned, p);
-            cloned.campaignName = generateAdmobCampaignName({
-                bidding: p.bidding,
-                region: p.region,
-                imagePath:p.imagePath
-            });
-            requestPool.push(cloned);
-        });
 //弹一个进度条出来
         var onlyAutoCreateCheck = $('#onlyCheckAdmobAutoCreate').prop('checked');
         if (onlyAutoCreateCheck) {
             var onlyAutoRequestPool = [];
             var explodeCountry = $("#selectRegionAdmobExplode").prop("checked");  //这两个量是选中【仅设为自动创建】特有的
             var explodeBidding = $("#inputBiddingAdmobExplode").prop("checked");
-            var autoCreateParams = $.extend({}, baseParam);
+            var url = "auto_create_campaign/adwords/create";
+            if (isAutoCreate && modifyRecordId > 0) {
+                baseParam.id = modifyRecordId;   //这个是另外新增的字段
+                url = "auto_create_campaign/adwords/modify";
+            }
             explodeParams.forEach(function (p) {
                 var onlyAutoCloned = $.extend({}, baseParam);
                 $.extend(onlyAutoCloned, p);
@@ -549,13 +551,7 @@ function init() {
                 onlyAutoCloned.explodeBidding = explodeBidding;
                 onlyAutoRequestPool.push(onlyAutoCloned);
             });
-            var url = "auto_create_campaign/adwords/create";
-            // var messageBody = "创建成功";
-            if (isAutoCreate && modifyRecordId > 0) {
-                autoCreateParams.id = modifyRecordId;
-                url = "auto_create_campaign/adwords/modify";
-                messageBody = "更新成功";
-            }
+            // 以下if是使用 campaigns_create.jsp页面传来的数据决定新的url 和 参数id
             batchRequest(onlyAutoRequestPool, function (param, onSuccess, onFail) {
                 //fake
                 console.log("start.. ", param);
@@ -566,13 +562,23 @@ function init() {
                         onFail(data.message)
                     }
                 }, "json");
-
             }, function (errorLog) {
                 //[仅设置为自动创建]队列全部处理完成
                 alert("仅自动创建队列处理完毕");
             });
 
-        } else {
+        }else {
+            var requestPool = [];
+            explodeParams.forEach(function (p) {
+                var cloned = $.extend({}, baseParam);
+                $.extend(cloned, p);
+                cloned.campaignName = generateAdmobCampaignName({
+                    bidding: p.bidding,
+                    region: p.region,
+                    imagePath:p.imagePath
+                });
+                requestPool.push(cloned);
+            });
             var bFinished = false;
             batchRequest(requestPool, function (param, onSuccess, onFail) {  //param是怎么传递进去的
                 //fake
@@ -597,53 +603,54 @@ function init() {
                 //队列全部处理完成
                 var checked = $('#checkAdmobAutoCreate').prop('checked');
                 if (checked && !bFinished && errorLog && errorLog.length == 0) {
-                    bFinished = true;
+                    // bFinished = true;
+                    var onlyAutoRequestPool = [];
                     var explodeCountry = $("#selectRegionAdmobExplode").prop("checked");
                     var explodeBidding = $("#inputBiddingAdmobExplode").prop("checked");
-                    var autoCreateParams = $.extend({}, baseParam);
-                    autoCreateParams.region = region.join(",");
-                    autoCreateParams.bidding = bidding;
-                    autoCreateParams.explodeCountry = explodeCountry;
-                    autoCreateParams.explodeBidding = explodeBidding;
-                    autoCreateParams.campaignName = $('#inputCampaignNameAdmob').val();
+                    explodeParams.forEach(function (p) {
+                        var onlyAutoCloned = $.extend({}, baseParam);
+                        $.extend(onlyAutoCloned, p);
+                        onlyAutoCloned.campaignName = generateAdmobCampaignName({  //动态生成系列名字
+                            bidding: p.bidding,
+                            region: p.region,
+                            imagePath:p.imagePath
+                        });
+                        onlyAutoCloned.explodeCountry = explodeCountry;
+                        onlyAutoCloned.explodeBidding = explodeBidding;
+                        onlyAutoRequestPool.push(onlyAutoCloned);
+                    });
                     var url = "auto_create_campaign/adwords/create";
-                    var messageBody = "创建成功";
+                    // var messageBody = "创建成功";
                     if (isAutoCreate && modifyRecordId > 0) {
-                        autoCreateParams.id = modifyRecordId;
+                        baseParam.id = modifyRecordId;
                         url = "auto_create_campaign/adwords/modify";
-                        messageBody = "更新成功";
                     }
-                    $.post(url, autoCreateParams, function (data) {
-                        if (data && data.ret == 1) {
-                            admanager.showCommonDlg("提示", messageBody, function () {
-                            });
-                        } else {
-                            admanager.showCommonDlg("提示", data.message, function () {
-                            });
-                        }
-                    }, "json");
-                }
+                    batchRequest(onlyAutoRequestPool, function (param, onSuccess, onFail) {
+                        //fake
+                        console.log("start.. ", param);
+                        $.post(url, param, function (data) {
+                            if (data && data.ret == 1) {
+                                onSuccess()
+                            } else {
+                                onFail(data.message)
+                            }
+                        }, "json");
 
+                    }, function (errorLog) {
+                        //[设置为自动创建]队列全部处理完成
+                        if(isAutoCreate && modifyRecordId>0){
+                            alert("更新队列处理完毕")
+                        }else{
+                            alert("自动创建队列处理完毕");
+                        }
+                    });
+                }
             });
         }
 
         return false;
     });
-
-    $('#formFacebook input, #formFacebook select').change(function () {
-//            标签名_地理位置&性别&年龄&设备&操作系统_语言_账号_广告图路径
-        if ($(this).attr('id') == 'inputCampaignName') return;
-        $('#inputCampaignName').val(generateFacebookCampaignName());
-    });
-
-    $('#formAdmob input, #formAdmob select').change(function () {
-//            标签名_地理位置&语言&出价_创建时间
-        if ($(this).attr('id') == 'inputCampaignNameAdmob') return;
-
-        $('#inputCampaignNameAdmob').val(generateAdmobCampaignName());
-    });
-
-    //以下触发读取表单数据的行为
+    //以下触发读取facebook表单数据的行为
     $('#btnCreate').click(function () {
         var appName = $('#selectApp').val();
         var selectOptions = $('#selectAccount option:selected');
@@ -720,8 +727,10 @@ function init() {
                 values: [userDevice]
             })
         }
-
-        if (($("#selectGenderExplode").prop("checked")==false) && gender.length > 1) {
+        //确保在从 campaigns_auto_create.jsp 跳转的情况下允许性别多选
+        if(isAutoCreate && modifyRecordId>0){
+            $("#selectGender").prop("checked",false);
+        }else if(($("#selectGenderExplode").prop("checked")==false) && gender.length > 1) {
             admanager.showCommonDlg("错误", "不分离的情况下不允许性别多选");
             return false;
         }
@@ -735,7 +744,7 @@ function init() {
         }else{
             explodeList.push({
                 key: 'gender',
-                values: gender
+                values: [gender.join(",")]
             });
         }
 
@@ -743,22 +752,40 @@ function init() {
             admanager.showCommonDlg("错误", "不分离的情况下不允许年龄多选");
             return false;
         }
-        explodeList.push({
-            key: 'age',
-            values: age.split(",").map(function (x) { //这里的x是什么参数？
-                return x.trim();
-            })
-        });
-        if (!$("#inputBiddingExplode").prop("checked") && bidding.indexOf(",") !== -1) {
+        if($("#inputAgeExplode").prop("checked")){
+            explodeList.push({
+                key: 'age',
+                values: age.split(",").map(function (x) {
+                    return x.trim();
+                })
+            });
+        }else{
+            explodeList.push({
+                key: 'age',
+                values: [age]
+            });
+        }
+
+        if(isAutoCreate && modifyRecordId>0){
+            $("#inputBiddingExplode").prop("checked",false);
+        }else if (!$("#inputBiddingExplode").prop("checked") && bidding.indexOf(",") !== -1) {
             admanager.showCommonDlg("错误", "不分离的情况下不允许出价多选");
             return false;
         }
-        explodeList.push({
-            key: 'bidding',
-            values: bidding.split(",").map(function (x) {
-                return x.trim();
-            })
-        });
+        if($("#inputBiddingExplode").prop("checked")){
+            explodeList.push({
+                key: 'bidding',
+                values: bidding.split(",").map(function (x) {
+                    return x.trim();
+                })
+            });
+        }else{
+            explodeList.push({
+                key: 'bidding',
+                values: [bidding]
+            });
+        }
+
         //处理图片和视频路径的多选
         if($("#inputImageExplode").prop("checked")){
             var valueList = imagePath.trim().replace(/,$/, "").split(",");
@@ -815,28 +842,9 @@ function init() {
             groupId: groupId,
             title: title,
             message: message,
- //           imagePath: imagePath,
- //           videoPath: videoPath
+            //           imagePath: imagePath,
+            //           videoPath: videoPath
         };
-
-        var requestPool = [];
-
-        explodeParams.forEach(function (p) {    //拆分好的键值对数组
-            var cloned = $.extend({}, baseParam);
-            $.extend(cloned, p);
-            cloned.campaignName = generateFacebookCampaignName({
-                age: p.age,
-                gender: p.gender,
-                bidding: p.bidding,
-                region: p.region,
-                userOs: p.userOs,
-                userDevice: p.userDevice,
-                imagePath:p.imagePath,
-                videoPath:p.videoPath
-            });
-            requestPool.push(cloned);
-        });
-
         var onlyAutoCreateCheck = $('#onlyCheckAutoCreate').prop('checked');
         if (onlyAutoCreateCheck) {
             var onlyAutoRequestPool = [];
@@ -844,13 +852,11 @@ function init() {
             var explodeAge = $("#inputAgeExplode").prop("checked");
             var explodeGender = $("#selectGenderExplode").prop("checked");
             var explodeBidding = $("#inputBiddingExplode").prop("checked");
-            var autoCreateParams = $.extend({}, baseParam);
             var url = "auto_create_campaign/facebook/create";
             if (isAutoCreate && modifyRecordId > 0) {
-                autoCreateParams.id = modifyRecordId;
+                baseParam.id = modifyRecordId;
                 url = "auto_create_campaign/facebook/modify";
             }
-            // var messageBody = "创建成功";
             explodeParams.forEach(function (p) {
                 var onlyAutoCloned = $.extend({}, baseParam);
                 $.extend(onlyAutoCloned, p);
@@ -875,7 +881,7 @@ function init() {
                 console.log("start.. ", param);
                 $.post(url, param, function (data) {
                     if (data && data.ret == 1) {
-                        onSuccess()
+                        onSuccess();
                     } else {
                         onFail(data.message)
                     }
@@ -883,11 +889,30 @@ function init() {
 
             }, function (errorLog) {
                 //[仅设置为自动创建]队列全部处理完成
-                alert("自动创建队列处理完毕");
+                if(isAutoCreate && modifyRecordId > 0){
+                    alert("更新队列处理完毕");
+                }else{
+                    alert("自动创建队列处理完毕");
+                }
             });
-
         } else {
 //弹一个进度条出来
+            var requestPool = [];
+            explodeParams.forEach(function (p) {    //拆分好的键值对数组
+                var cloned = $.extend({}, baseParam);
+                $.extend(cloned, p);
+                cloned.campaignName = generateFacebookCampaignName({
+                    age: p.age,
+                    gender: p.gender,
+                    bidding: p.bidding,
+                    region: p.region,
+                    userOs: p.userOs,
+                    userDevice: p.userDevice,
+                    imagePath:p.imagePath,
+                    videoPath:p.videoPath
+                });
+                requestPool.push(cloned);
+            });
             var bFinished = false;
             batchRequest(requestPool, function (param, onSuccess, onFail) {
                 //fake
@@ -957,6 +982,18 @@ function init() {
         return false;
     });
 
+    //以下两个change用于随输入随时生成系列名称
+    $('#formFacebook input, #formFacebook select').change(function () {
+//            标签名_地理位置&性别&年龄&设备&操作系统_语言_账号_广告图路径
+        if ($(this).attr('id') == 'inputCampaignName') return;
+        $('#inputCampaignName').val(generateFacebookCampaignName());
+    });
+    $('#formAdmob input, #formAdmob select').change(function () {
+//            标签名_地理位置&语言&出价_创建时间
+        if ($(this).attr('id') == 'inputCampaignNameAdmob') return;
+
+        $('#inputCampaignNameAdmob').val(generateAdmobCampaignName());
+    });
 
 }
 //执行初始化的方法
@@ -976,7 +1013,6 @@ $('#selectApp').change(function () {
 
     return false;
 });
-
 
 $('#selectAppAdmob').change(function () {
     var appNameAdmob = $('#selectAppAdmob').val();
@@ -1114,6 +1150,100 @@ $("#inputVideoPath,#inputImagePath,#inputImagePathAdmob").change(function(){
     }
 });
 
+/*
+ * 该方法用于campaigns_auto_create.jsp与country_analysis_report.jsp页面传来 isAutoCreate 参数时执行
+ * 在isAutoCreate情况下，需要 modifyNetwork以及 modifyRecordId
+ * 这三个参数是由 campaigns_auto_create.jsp页面传来，用于自动填写选项
+ * 此方法仅在campaign_create.js 的 function init(){}内的三个post中调用
+ */
+function initFormData() {
+    if (isAutoCreate) {
+        $.post('auto_create_campaign/' + modifyNetwork + '/query_by_id', {
+            id: modifyRecordId
+        }, function (data) {
+            if (data && data.ret == 1) {
+                console.log(data);
+                if (modifyNetwork == 'facebook') {
+                    $('#checkFacebook').prop('checked', true);
+                    $('#checkFacebook').click();
+
+                    var campaignData = data.data;
+                    var accountIds = campaignData.account_id.split(",");
+                    $('#selectApp').val(campaignData.app_name);
+                    $('#selectAccount').val(accountIds);
+                    $('#selectAccount').trigger('change');
+                    $("#inputCreateCount").val(campaignData.create_count);
+                    $('#selectRegion').val(campaignData.country_region.split(','));
+                    $('#selectRegion').trigger('change');
+                    $('#selectRegionExplode').prop('checked', campaignData.explode_country == 1);
+                    $('#selectRegionUnselected').val(campaignData.excluded_region.split(','));
+                    $('#selectRegionUnselected').trigger('change');
+                    $('#selectLanguage').val(campaignData.language);
+                    $('#inputAge').val(campaignData.age);
+                    $('#inputAgeExplode').prop('checked', campaignData.explode_age == 1);
+                    $('#selectGender').val(campaignData.gender.split(','));
+                    $('#selectGender').trigger('change');
+                    $('#selectGenderExplode').prop('checked', campaignData.explode_gender == 1);
+                    $('#inputInterest').val(campaignData.detail_target);
+                    $('#selectUserOs').val(campaignData.user_os.split(','));
+                    $('#selectUserOs').trigger('change');
+                    $('#inputUserDevices').val(campaignData.user_devices);
+                    $('#inputBudget').val(campaignData.bugdet);
+                    $('#inputBidding').val(campaignData.bidding);
+                    $('#inputBiddingExplode').prop('checked', campaignData.explode_bidding == 1);
+                    $('#inputMaxCpa').val(campaignData.max_cpa);
+                    $('#inputTitle').val(campaignData.title);
+                    $('#inputMessage').val(campaignData.message);
+                    var imageTrimed = campaignData.image_path.replace(/home\/\w+\/\w+\/\w+\//,"");
+                    $('#inputImagePath').val(imageTrimed);
+                    $('#inputCampaignName').val(campaignData.campaign_name);
+
+                    $('#btnCreate').val('更新');
+                    $(".form-check-input").prop("checked",false);
+                    $(".form-check-input").prop("disabled",true);
+                    $("#onlyCheckAutoCreate").prop("checked",true);
+                    $("#onlyCheckAutoCreate").prop("disabled",true);
+                    $("#checkAutoCreate").prop("disabled",true);
+                } else {
+                    $('#checkAdmob').prop('checked', true);
+                    $('#checkAdmob').click();
+
+                    var campaignData = data.data;
+                    var accountIds = campaignData.account_id.split(",");
+                    $('#selectAppAdmob').val(campaignData.app_name);
+                    $('#selectAccountAdmob').val(accountIds);
+                    $('#selectAccountAdmob').trigger('change');
+                    $("#inputCreateCountAdmob").val(campaignData.create_count);
+                    $('#selectRegionAdmob').val(campaignData.country_region.split(','));
+                    $('#selectRegionAdmob').trigger('change');
+                    $('#selectRegionAdmobExplode').prop('checked', campaignData.explode_country == 1);
+                    $('#selectRegionUnselectedAdmob').val(campaignData.excluded_region.split(','));
+                    $('#selectRegionUnselectedAdmob').trigger('change');
+                    $('#selectLanguageAdmob').val(campaignData.language);
+                    $('#inputBudgetAdmob').val(campaignData.bugdet);
+                    $('#inputBiddingAdmob').val(campaignData.bidding);
+                    $('#inputBiddingAdmobExplode').prop('checked', campaignData.explode_bidding == 1);
+                    $('#inputMaxCpaAdmob').val(campaignData.max_cpa);
+                    $('#inputMessage1').val(campaignData.message1);
+                    $('#inputMessage2').val(campaignData.message2);
+                    $('#inputMessage3').val(campaignData.message3);
+                    $('#inputMessage4').val(campaignData.message4);
+                    var imageTrimed = campaignData.image_path.replace(/home\/\w+\/\w+\/\w+\//,"");
+                    $('#inputImagePathAdmob').val(imageTrimed);
+                    $('#inputCampaignNameAdmob').val(campaignData.campaign_name);
+
+                    $('#btnCreateAdmob').val('更新');
+                    $(".form-check-input").prop("checked",false);
+                    $(".form-check-input").prop("disabled",true);
+                    $("#onlyCheckAdmobAutoCreate").prop("checked",true);
+                    $("#onlyCheckAdmobAutoCreate").prop("disabled",true);
+                    $("#checkAdmobAutoCreate").prop("disabled",true);
+                }
+            }
+        }, "json");
+    }
+}
+
 //从（暂定）index2.jsp 或 index.jsp传来的参数进行各表单的自动填充
 function indexInitFormData(isIndexCreate,campaign_id) {
     if (isIndexCreate) {
@@ -1205,86 +1335,7 @@ if(isIndexCreate && campaign_id){
     indexInitFormData(isIndexCreate,campaign_id);
 }
 
-//在isAutoCreate情况下，需要 modifyNetwork以及 modifyRecordId ，此方法仅在前面 init() 内的三个post中调用
-function initFormData() {
-    if (isAutoCreate) {
-        $.post('auto_create_campaign/' + modifyNetwork + '/query_by_id', {
-            id: modifyRecordId
-        }, function (data) {
-            if (data && data.ret == 1) {
-                console.log(data);
-                if (modifyNetwork == 'facebook') {
-                    $('#checkFacebook').prop('checked', true);
-                    $('#checkFacebook').click();
-                    $('#checkAutoCreate').prop('checked', true);
-
-                    var campaignData = data.data;
-                    var accountIds = campaignData.account_id.split(",");
-                    $('#selectApp').val(campaignData.app_name);
-                    $('#selectAccount').val(accountIds);
-                    $('#selectAccount').trigger('change');
-                    $("#inputCreateCount").val(campaignData.create_count);
-                    $('#selectRegion').val(campaignData.country_region.split(','));
-                    $('#selectRegion').trigger('change');
-                    $('#selectRegionExplode').prop('checked', campaignData.explode_country == 1);
-                    $('#selectRegionUnselected').val(campaignData.excluded_region.split(','));
-                    $('#selectRegionUnselected').trigger('change');
-                    $('#selectLanguage').val(campaignData.language);
-                    $('#inputAge').val(campaignData.age);
-                    $('#inputAgeExplode').prop('checked', campaignData.explode_age == 1);
-                    $('#selectGender').val(campaignData.gender.split(','));
-                    $('#selectGender').trigger('change');
-                    $('#selectGenderExplode').prop('checked', campaignData.explode_gender == 1);
-                    $('#inputInterest').val(campaignData.detail_target);
-                    $('#selectUserOs').val(campaignData.user_os.split(','));
-                    $('#selectUserOs').trigger('change');
-                    $('#inputUserDevices').val(campaignData.user_devices);
-                    $('#inputBudget').val(campaignData.bugdet);
-                    $('#inputBidding').val(campaignData.bidding);
-                    $('#inputBiddingExplode').prop('checked', campaignData.explode_bidding == 1);
-                    $('#inputMaxCpa').val(campaignData.max_cpa);
-                    $('#inputTitle').val(campaignData.title);
-                    $('#inputMessage').val(campaignData.message);
-                    var imageTrimed = campaignData.image_path.replace(/home\/\w+\/\w+\/\w+\//,"");
-                    $('#inputImagePath').val(imageTrimed);
-                    $('#inputCampaignName').val(campaignData.campaign_name);
-
-                    $('#btnCreate').val('更新');
-                } else {
-                    $('#checkAdmob').prop('checked', true);
-                    $('#checkAdmob').click();
-                    $('#checkAdmobAutoCreate').prop('checked', true);
-                    var campaignData = data.data;
-                    var accountIds = campaignData.account_id.split(",");
-                    $('#selectAppAdmob').val(campaignData.app_name);
-                    $('#selectAccountAdmob').val(accountIds);
-                    $('#selectAccountAdmob').trigger('change');
-                    $("#inputCreateCountAdmob").val(campaignData.create_count);
-                    $('#selectRegionAdmob').val(campaignData.country_region.split(','));
-                    $('#selectRegionAdmob').trigger('change');
-                    $('#selectRegionAdmobExplode').prop('checked', campaignData.explode_country == 1);
-                    $('#selectRegionUnselectedAdmob').val(campaignData.excluded_region.split(','));
-                    $('#selectRegionUnselectedAdmob').trigger('change');
-                    $('#selectLanguageAdmob').val(campaignData.language);
-                    $('#inputBudgetAdmob').val(campaignData.bugdet);
-                    $('#inputBiddingAdmob').val(campaignData.bidding);
-                    $('#inputBiddingAdmobExplode').prop('checked', campaignData.explode_bidding == 1);
-                    $('#inputMaxCpaAdmob').val(campaignData.max_cpa);
-                    $('#inputMessage1').val(campaignData.message1);
-                    $('#inputMessage2').val(campaignData.message2);
-                    $('#inputMessage3').val(campaignData.message3);
-                    $('#inputMessage4').val(campaignData.message4);
-                    var imageTrimed = campaignData.image_path.replace(/home\/\w+\/\w+\/\w+\//,"");
-                    $('#inputImagePathAdmob').val(imageTrimed);
-                    $('#inputCampaignNameAdmob').val(campaignData.campaign_name);
-                    $('#btnCreateAdmob').val('更新');
-                }
-            }
-        }, "json");
-    }
-}
-
-//在并非国家分析报告创建也非首页创建的情况下，执行由app_name自动补充图片和视频路径
+//在并非country_analysis_report.jsp 创建、非campaign_auto_create.jsp 创建、非首页创建的情况下，执行由app_name自动补充图片和视频路径
 if(!isIndexCreate && !isAutoCreate){
     $("#selectApp").change(function() {
         $("#inputImagePath").val("");
