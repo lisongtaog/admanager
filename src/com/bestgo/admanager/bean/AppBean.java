@@ -5,7 +5,7 @@ package com.bestgo.admanager.bean;
  * Date: 2018/4/3 20:37
  * Desc: 系列汇总字段
  */
-public class CampaignsSummary {
+public class AppBean {
     public String name;
     public double total_spend;
     public double seven_days_total_spend;
@@ -22,4 +22,5 @@ public class CampaignsSummary {
     public String network;
     public double ecpm;
     public double incoming;
+    public int warningLevel;
 }

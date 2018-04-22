@@ -1,8 +1,7 @@
 package com.bestgo.admanager.servlet;
 
-import com.bestgo.admanager.DateUtil;
 import com.bestgo.admanager.Utils;
-import com.bestgo.admanager.bean.CampaignsSummary;
+import com.bestgo.admanager.bean.AppBean;
 import com.bestgo.common.database.services.DB;
 import com.bestgo.common.database.utils.JSObject;
 import com.google.gson.JsonArray;
@@ -60,70 +59,70 @@ public class Query extends HttpServlet {
         try {
             JsonArray arr = new JsonArray();
             if (sorter > 0) {
-                    ArrayList<CampaignsSummary> campaignsSummaryList = new ArrayList<>();
+                    ArrayList<AppBean> appBeanList = new ArrayList<>();
                     String sqlTag = "select t.id,t.tag_name,google_package_id from web_tag t LEFT JOIN web_facebook_app_ids_rel air ON t.tag_name = air.tag_name";
                     List<JSObject> tagList = DB.findListBySql(sqlTag);
 
 
                     for (JSObject tagJSObject : tagList) {
-                        CampaignsSummary campaignsSummary = new CampaignsSummary();
+                        AppBean appBean = new AppBean();
                         long id = tagJSObject.get("id");
-                        campaignsSummary.name = tagJSObject.get("tag_name");
+                        appBean.name = tagJSObject.get("tag_name");
 
                         JsonObject admob = fetchOneAppDataSummary(id, startTime, endTime, true,sameTime);
                         JsonObject facebook = fetchOneAppDataSummary(id, startTime, endTime, false,sameTime);
 
                         if("false".equals(adwordsCheck) && "false".equals(facebookCheck)){
-                            campaignsSummary.total_impressions = admob.get("total_impressions").getAsDouble() + facebook.get("total_impressions").getAsDouble();
-                            if (campaignsSummary.total_impressions == 0) {
+                            appBean.total_impressions = admob.get("total_impressions").getAsDouble() + facebook.get("total_impressions").getAsDouble();
+                            if (appBean.total_impressions == 0) {
                                 continue;
                             }
-                            campaignsSummary.total_spend = admob.get("total_spend").getAsDouble() + facebook.get("total_spend").getAsDouble();
+                            appBean.total_spend = admob.get("total_spend").getAsDouble() + facebook.get("total_spend").getAsDouble();
                             if(sameTime){
-                                campaignsSummary.end_time_total_spend = campaignsSummary.total_spend;
+                                appBean.end_time_total_spend = appBean.total_spend;
                             }else{
                                 JsonObject admob1 = fetchOneAppDataSummary(id, endTime, endTime, true,true);
                                 JsonObject facebook1 = fetchOneAppDataSummary(id, endTime, endTime, false,true);
-                                campaignsSummary.end_time_total_spend = Utils.trimDouble(admob1.get("total_spend").getAsDouble() + facebook1.get("total_spend").getAsDouble(), 0);
+                                appBean.end_time_total_spend = Utils.trimDouble(admob1.get("total_spend").getAsDouble() + facebook1.get("total_spend").getAsDouble(), 0);
                             }
 
-                            campaignsSummary.total_installed = admob.get("total_installed").getAsDouble() + facebook.get("total_installed").getAsDouble();
-                            campaignsSummary.total_click = admob.get("total_click").getAsDouble() + facebook.get("total_click").getAsDouble();
+                            appBean.total_installed = admob.get("total_installed").getAsDouble() + facebook.get("total_installed").getAsDouble();
+                            appBean.total_click = admob.get("total_click").getAsDouble() + facebook.get("total_click").getAsDouble();
                         }else if("true".equals(adwordsCheck)){
-                            campaignsSummary.total_impressions = admob.get("total_impressions").getAsDouble();
-                            if (campaignsSummary.total_impressions == 0) {
+                            appBean.total_impressions = admob.get("total_impressions").getAsDouble();
+                            if (appBean.total_impressions == 0) {
                                 continue;
                             }
-                            campaignsSummary.total_spend = admob.get("total_spend").getAsDouble();
+                            appBean.total_spend = admob.get("total_spend").getAsDouble();
                             if(sameTime){
-                                campaignsSummary.end_time_total_spend = campaignsSummary.total_spend;
+                                appBean.end_time_total_spend = appBean.total_spend;
                             }else{
                                 JsonObject admob1 = fetchOneAppDataSummary(id, endTime, endTime, true,true);
-                                campaignsSummary.end_time_total_spend = Utils.trimDouble(admob1.get("total_spend").getAsDouble(),0);
+                                appBean.end_time_total_spend = Utils.trimDouble(admob1.get("total_spend").getAsDouble(),0);
                             }
 
-                            campaignsSummary.total_installed = admob.get("total_installed").getAsDouble();
-                            campaignsSummary.total_click = admob.get("total_click").getAsDouble();
+                            appBean.total_installed = admob.get("total_installed").getAsDouble();
+                            appBean.total_click = admob.get("total_click").getAsDouble();
                         }else if("true".equals(facebookCheck)){
-                            campaignsSummary.total_impressions = facebook.get("total_impressions").getAsDouble();
-                            if (campaignsSummary.total_impressions == 0) {
+                            appBean.total_impressions = facebook.get("total_impressions").getAsDouble();
+                            if (appBean.total_impressions == 0) {
                                 continue;
                             }
-                            campaignsSummary.total_spend = facebook.get("total_spend").getAsDouble();
+                            appBean.total_spend = facebook.get("total_spend").getAsDouble();
                             if(sameTime){
-                                campaignsSummary.end_time_total_spend = campaignsSummary.total_spend;
+                                appBean.end_time_total_spend = appBean.total_spend;
                             }else{
                                 JsonObject facebook1 = fetchOneAppDataSummary(id, endTime, endTime, false,true);
-                                campaignsSummary.end_time_total_spend = Utils.trimDouble(facebook1.get("total_spend").getAsDouble(), 0);
+                                appBean.end_time_total_spend = Utils.trimDouble(facebook1.get("total_spend").getAsDouble(), 0);
                             }
 
-                            campaignsSummary.total_installed = facebook.get("total_installed").getAsDouble();
-                            campaignsSummary.total_click = facebook.get("total_click").getAsDouble();
+                            appBean.total_installed = facebook.get("total_installed").getAsDouble();
+                            appBean.total_click = facebook.get("total_click").getAsDouble();
                         }
 
-                        campaignsSummary.total_ctr = campaignsSummary.total_impressions > 0 ? campaignsSummary.total_click / campaignsSummary.total_impressions : 0;
-                        campaignsSummary.total_cpa = campaignsSummary.total_installed > 0 ? campaignsSummary.total_spend / campaignsSummary.total_installed : 0;
-                        campaignsSummary.total_cvr = campaignsSummary.total_click > 0 ? campaignsSummary.total_installed / campaignsSummary.total_click : 0;
+                        appBean.total_ctr = appBean.total_impressions > 0 ? appBean.total_click / appBean.total_impressions : 0;
+                        appBean.total_cpa = appBean.total_installed > 0 ? appBean.total_spend / appBean.total_installed : 0;
+                        appBean.total_cvr = appBean.total_click > 0 ? appBean.total_installed / appBean.total_click : 0;
                         String google_package_id = tagJSObject.get("google_package_id");
                         if (google_package_id != null && google_package_id != "") {
                             if(sameTime){
@@ -132,8 +131,8 @@ public class Query extends HttpServlet {
                                         + google_package_id + "' and date = '" + endTime + "'";
                                 JSObject oneR = DB.findOneBySql(sqlR);
                                 if (oneR.hasObjectData()) {
-                                    campaignsSummary.total_revenue = Utils.convertDouble(oneR.get("revenues"), 0);
-                                    campaignsSummary.end_time_total_revenue = campaignsSummary.total_revenue;
+                                    appBean.total_revenue = Utils.convertDouble(oneR.get("revenues"), 0);
+                                    appBean.end_time_total_revenue = appBean.total_revenue;
                                 }
                             }else{
                                 String sqlR = "select sum(revenue) as revenues " +
@@ -142,14 +141,14 @@ public class Query extends HttpServlet {
 
                                 JSObject oneR = DB.findOneBySql(sqlR);
                                 if (oneR.hasObjectData()) {
-                                    campaignsSummary.total_revenue = Utils.convertDouble(oneR.get("revenues"), 0);
+                                    appBean.total_revenue = Utils.convertDouble(oneR.get("revenues"), 0);
                                 }
                                 sqlR = "select sum(revenue) as revenues " +
                                         "from web_ad_country_analysis_report_history where app_id = '"
                                         + google_package_id + "' and date = '" + endTime + "'";
                                 oneR = DB.findOneBySql(sqlR);
                                 if (oneR.hasObjectData()) {
-                                    campaignsSummary.end_time_total_revenue = Utils.trimDouble(Utils.convertDouble(oneR.get("revenues"), 0), 0);
+                                    appBean.end_time_total_revenue = Utils.trimDouble(Utils.convertDouble(oneR.get("revenues"), 0), 0);
                                 }
                             }
 
@@ -157,16 +156,16 @@ public class Query extends HttpServlet {
 //                            fourteen_arr = FourteenData(id, google_package_id, endTime);
 
                             //计算ECPM和Incoming
-                            campaignsSummary.ecpm = campaignsSummary.total_revenue * 1000 / campaignsSummary.total_impressions;
-                            campaignsSummary.incoming = campaignsSummary.total_revenue - campaignsSummary.total_spend;
+                            appBean.ecpm = appBean.total_revenue * 1000 / appBean.total_impressions;
+                            appBean.incoming = appBean.total_revenue - appBean.total_spend;
                         }
-                        campaignsSummaryList.add(campaignsSummary);
+                        appBeanList.add(appBean);
                     }
 
-                    sorting(campaignsSummaryList,sorter);
+                    sorting(appBeanList,sorter);
 
-                    if (campaignsSummaryList != null && campaignsSummaryList.size() > 0) {
-                        for (CampaignsSummary cs : campaignsSummaryList) {
+                    if (appBeanList != null && appBeanList.size() > 0) {
+                        for (AppBean cs : appBeanList) {
                             JsonObject j = new JsonObject();
                             j.addProperty("name", cs.name);
                             String sql = "select warning_level from  web_app_logs where app_name = '" + cs.name + "' and log_date = '" + endTime + "'";
@@ -509,13 +508,13 @@ public class Query extends HttpServlet {
 
 
     //以下封装了用于首页数据排序的方法
-    private void sorting (ArrayList<CampaignsSummary> campaignsSummaryList,int sorter){
-        if (campaignsSummaryList != null && campaignsSummaryList.size() > 0) {
+    private void sorting (ArrayList<AppBean> appBeanList, int sorter){
+        if (appBeanList != null && appBeanList.size() > 0) {
             switch (sorter) {
                 case 70:
-                    Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
+                    Collections.sort(appBeanList, new Comparator<AppBean>() {
                         @Override
-                        public int compare(CampaignsSummary a, CampaignsSummary b) {
+                        public int compare(AppBean a, AppBean b) {
                             if (a.total_spend > b.total_spend) {
                                 return 1;
                             } else if (a.total_spend < b.total_spend) {
@@ -527,9 +526,9 @@ public class Query extends HttpServlet {
                     });
                     break;
                 case 1070:
-                    Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
+                    Collections.sort(appBeanList, new Comparator<AppBean>() {
                         @Override
-                        public int compare(CampaignsSummary a, CampaignsSummary b) {
+                        public int compare(AppBean a, AppBean b) {
                             if (a.total_spend < b.total_spend) {
                                 return 1;
                             } else if (a.total_spend > b.total_spend) {
@@ -541,9 +540,9 @@ public class Query extends HttpServlet {
                     });
                     break;
                 case 71:
-                    Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
+                    Collections.sort(appBeanList, new Comparator<AppBean>() {
                         @Override
-                        public int compare(CampaignsSummary a, CampaignsSummary b) {
+                        public int compare(AppBean a, AppBean b) {
                             if (a.seven_days_total_spend > b.seven_days_total_spend) {
                                 return 1;
                             } else if (a.seven_days_total_spend < b.seven_days_total_spend) {
@@ -555,9 +554,9 @@ public class Query extends HttpServlet {
                     });
                     break;
                 case 1071:
-                    Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
+                    Collections.sort(appBeanList, new Comparator<AppBean>() {
                         @Override
-                        public int compare(CampaignsSummary a, CampaignsSummary b) {
+                        public int compare(AppBean a, AppBean b) {
                             if (a.seven_days_total_spend < b.seven_days_total_spend) {
                                 return 1;
                             } else if (a.seven_days_total_spend > b.seven_days_total_spend) {
@@ -569,9 +568,9 @@ public class Query extends HttpServlet {
                     });
                     break;
                 case 72:
-                    Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
+                    Collections.sort(appBeanList, new Comparator<AppBean>() {
                         @Override
-                        public int compare(CampaignsSummary a, CampaignsSummary b) {
+                        public int compare(AppBean a, AppBean b) {
                             if (a.total_revenue > b.total_revenue) {
                                 return 1;
                             } else if (a.total_revenue < b.total_revenue) {
@@ -583,9 +582,9 @@ public class Query extends HttpServlet {
                     });
                     break;
                 case 1072:
-                    Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
+                    Collections.sort(appBeanList, new Comparator<AppBean>() {
                         @Override
-                        public int compare(CampaignsSummary a, CampaignsSummary b) {
+                        public int compare(AppBean a, AppBean b) {
                             if (a.total_revenue < b.total_revenue) {
                                 return 1;
                             } else if (a.total_revenue > b.total_revenue) {
@@ -597,9 +596,9 @@ public class Query extends HttpServlet {
                     });
                     break;
                 case 73:
-                    Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
+                    Collections.sort(appBeanList, new Comparator<AppBean>() {
                         @Override
-                        public int compare(CampaignsSummary a, CampaignsSummary b) {
+                        public int compare(AppBean a, AppBean b) {
                             if (a.seven_days_total_revenue > b.seven_days_total_revenue) {
                                 return 1;
                             } else if (a.seven_days_total_revenue < b.seven_days_total_revenue) {
@@ -611,9 +610,9 @@ public class Query extends HttpServlet {
                     });
                     break;
                 case 1073:
-                    Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
+                    Collections.sort(appBeanList, new Comparator<AppBean>() {
                         @Override
-                        public int compare(CampaignsSummary a, CampaignsSummary b) {
+                        public int compare(AppBean a, AppBean b) {
                             if (a.seven_days_total_revenue < b.seven_days_total_revenue) {
                                 return 1;
                             } else if (a.seven_days_total_revenue > b.seven_days_total_revenue) {
@@ -625,9 +624,9 @@ public class Query extends HttpServlet {
                     });
                     break;
                 case 74:
-                    Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
+                    Collections.sort(appBeanList, new Comparator<AppBean>() {
                         @Override
-                        public int compare(CampaignsSummary a, CampaignsSummary b) {
+                        public int compare(AppBean a, AppBean b) {
                             if (a.total_installed > b.total_installed) {
                                 return 1;
                             } else if (a.total_installed < b.total_installed) {
@@ -639,9 +638,9 @@ public class Query extends HttpServlet {
                     });
                     break;
                 case 1074:
-                    Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
+                    Collections.sort(appBeanList, new Comparator<AppBean>() {
                         @Override
-                        public int compare(CampaignsSummary a, CampaignsSummary b) {
+                        public int compare(AppBean a, AppBean b) {
                             if (a.total_installed < b.total_installed) {
                                 return 1;
                             } else if (a.total_installed > b.total_installed) {
@@ -653,9 +652,9 @@ public class Query extends HttpServlet {
                     });
                     break;
                 case 75:
-                    Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
+                    Collections.sort(appBeanList, new Comparator<AppBean>() {
                         @Override
-                        public int compare(CampaignsSummary a, CampaignsSummary b) {
+                        public int compare(AppBean a, AppBean b) {
                             if (a.total_impressions > b.total_impressions) {
                                 return 1;
                             } else if (a.total_impressions < b.total_impressions) {
@@ -667,9 +666,9 @@ public class Query extends HttpServlet {
                     });
                     break;
                 case 1075:
-                    Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
+                    Collections.sort(appBeanList, new Comparator<AppBean>() {
                         @Override
-                        public int compare(CampaignsSummary a, CampaignsSummary b) {
+                        public int compare(AppBean a, AppBean b) {
                             if (a.total_impressions < b.total_impressions) {
                                 return 1;
                             } else if (a.total_impressions > b.total_impressions) {
@@ -681,9 +680,9 @@ public class Query extends HttpServlet {
                     });
                     break;
                 case 76:
-                    Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
+                    Collections.sort(appBeanList, new Comparator<AppBean>() {
                         @Override
-                        public int compare(CampaignsSummary a, CampaignsSummary b) {
+                        public int compare(AppBean a, AppBean b) {
                             if (a.total_click > b.total_click) {
                                 return 1;
                             } else if (a.total_click < b.total_click) {
@@ -695,9 +694,9 @@ public class Query extends HttpServlet {
                     });
                     break;
                 case 1076:
-                    Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
+                    Collections.sort(appBeanList, new Comparator<AppBean>() {
                         @Override
-                        public int compare(CampaignsSummary a, CampaignsSummary b) {
+                        public int compare(AppBean a, AppBean b) {
                             if (a.total_click < b.total_click) {
                                 return 1;
                             } else if (a.total_click > b.total_click) {
@@ -709,9 +708,9 @@ public class Query extends HttpServlet {
                     });
                     break;
                 case 77:
-                    Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
+                    Collections.sort(appBeanList, new Comparator<AppBean>() {
                         @Override
-                        public int compare(CampaignsSummary a, CampaignsSummary b) {
+                        public int compare(AppBean a, AppBean b) {
                             if (a.total_ctr > b.total_ctr) {
                                 return 1;
                             } else if (a.total_ctr < b.total_ctr) {
@@ -723,9 +722,9 @@ public class Query extends HttpServlet {
                     });
                     break;
                 case 1077:
-                    Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
+                    Collections.sort(appBeanList, new Comparator<AppBean>() {
                         @Override
-                        public int compare(CampaignsSummary a, CampaignsSummary b) {
+                        public int compare(AppBean a, AppBean b) {
                             if (a.total_ctr < b.total_ctr) {
                                 return 1;
                             } else if (a.total_ctr > b.total_ctr) {
@@ -737,9 +736,9 @@ public class Query extends HttpServlet {
                     });
                     break;
                 case 78:
-                    Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
+                    Collections.sort(appBeanList, new Comparator<AppBean>() {
                         @Override
-                        public int compare(CampaignsSummary a, CampaignsSummary b) {
+                        public int compare(AppBean a, AppBean b) {
                             if (a.total_cpa > b.total_cpa) {
                                 return 1;
                             } else if (a.total_cpa < b.total_cpa) {
@@ -751,9 +750,9 @@ public class Query extends HttpServlet {
                     });
                     break;
                 case 1078:
-                    Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
+                    Collections.sort(appBeanList, new Comparator<AppBean>() {
                         @Override
-                        public int compare(CampaignsSummary a, CampaignsSummary b) {
+                        public int compare(AppBean a, AppBean b) {
                             if (a.total_cpa < b.total_cpa) {
                                 return 1;
                             } else if (a.total_cpa > b.total_cpa) {
@@ -765,9 +764,9 @@ public class Query extends HttpServlet {
                     });
                     break;
                 case 79:
-                    Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
+                    Collections.sort(appBeanList, new Comparator<AppBean>() {
                         @Override
-                        public int compare(CampaignsSummary a, CampaignsSummary b) {
+                        public int compare(AppBean a, AppBean b) {
                             if (a.total_cvr > b.total_cvr) {
                                 return 1;
                             } else if (a.total_cvr < b.total_cvr) {
@@ -779,9 +778,9 @@ public class Query extends HttpServlet {
                     });
                     break;
                 case 1079:
-                    Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
+                    Collections.sort(appBeanList, new Comparator<AppBean>() {
                         @Override
-                        public int compare(CampaignsSummary a, CampaignsSummary b) {
+                        public int compare(AppBean a, AppBean b) {
                             if (a.total_cvr < b.total_cvr) {
                                 return 1;
                             } else if (a.total_cvr > b.total_cvr) {
@@ -793,9 +792,9 @@ public class Query extends HttpServlet {
                     });
                     break;
                 case 80:
-                    Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
+                    Collections.sort(appBeanList, new Comparator<AppBean>() {
                         @Override
-                        public int compare(CampaignsSummary a, CampaignsSummary b) {
+                        public int compare(AppBean a, AppBean b) {
                             if (a.ecpm > b.ecpm) {
                                 return 1;
                             } else if (a.ecpm < b.ecpm) {
@@ -807,9 +806,9 @@ public class Query extends HttpServlet {
                     });
                     break;
                 case 1080:
-                    Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
+                    Collections.sort(appBeanList, new Comparator<AppBean>() {
                         @Override
-                        public int compare(CampaignsSummary a, CampaignsSummary b) {
+                        public int compare(AppBean a, AppBean b) {
                             if (a.ecpm < b.ecpm) {
                                 return 1;
                             } else if (a.ecpm > b.ecpm) {
@@ -821,9 +820,9 @@ public class Query extends HttpServlet {
                     });
                     break;
                 case 81:
-                    Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
+                    Collections.sort(appBeanList, new Comparator<AppBean>() {
                         @Override
-                        public int compare(CampaignsSummary a, CampaignsSummary b) {
+                        public int compare(AppBean a, AppBean b) {
                             if (a.incoming > b.incoming) {
                                 return 1;
                             } else if (a.incoming < b.incoming) {
@@ -835,9 +834,9 @@ public class Query extends HttpServlet {
                     });
                     break;
                 case 1081:
-                    Collections.sort(campaignsSummaryList, new Comparator<CampaignsSummary>() {
+                    Collections.sort(appBeanList, new Comparator<AppBean>() {
                         @Override
-                        public int compare(CampaignsSummary a, CampaignsSummary b) {
+                        public int compare(AppBean a, AppBean b) {
                             if (a.incoming < b.incoming) {
                                 return 1;
                             } else if (a.incoming > b.incoming) {
