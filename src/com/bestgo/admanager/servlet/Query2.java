@@ -39,45 +39,43 @@ public class Query2 extends HttpServlet {
         String endTime = request.getParameter("endTime");
 
         //当前页码字符串
-        String currentPageStr = request.getParameter("currentPage");
-        if(currentPageStr != "" && currentPageStr != null){
-            int currentPage = Utils.parseInt(currentPageStr,0);
-            //每页显示的条数
-            int pageSize = 10;
-
-            //判断开始日期和结束日期是否相同，默认为不同
-            boolean sameTime = false;
-            if(startTime.equals(endTime)){
-                sameTime = true;
-            }
-
-            String adwordsCheck = request.getParameter("adwordsCheck");
-            String facebookCheck = request.getParameter("facebookCheck");
-
-            try {
-
-                //---------
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                json.addProperty("ret", 0);
-                json.addProperty("message", ex.getMessage());
-                Logger logger = Logger.getRootLogger();
-                logger.error(ex.getMessage(), ex);
-            }
+        String pageNumStr = request.getParameter("pageNum");
+        int pageNum = 1;
+        if(pageNumStr != "" && pageNumStr != null){
+            pageNum = Utils.parseInt(pageNumStr,0);
         }
+        //每页显示的条数
+        int pageSize = 10;
 
-        response.getWriter().write(json.toString());
+        //判断开始日期和结束日期是否相同，默认为不同
+        boolean sameTime = false;
+        if(startTime.equals(endTime)){
+            sameTime = true;
+        }
+        String adwordsCheck = request.getParameter("adwordsCheck");
+        String facebookCheck = request.getParameter("facebookCheck");
+        try {
+            PageBean<AppBean> pageBean = FindAllWithPage(pageNum, pageSize, facebookCheck, adwordsCheck, startTime, endTime, sameTime);
+            request.setAttribute("pageBean",pageBean);
+            request.getRequestDispatcher("/index2.jsp").forward(request,response);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            json.addProperty("ret", 0);
+            json.addProperty("message", ex.getMessage());
+            Logger logger = Logger.getRootLogger();
+            logger.error(ex.getMessage(), ex);
+        }
     }
 
 
-    private PageBean<JSObject> findAllAppDataSummaryWithPage(int pageNum,int pageSize,String facebookCheck,String adwordsCheck,String startTime,String endTime,boolean sameTime) throws Exception {
+    private PageBean<AppBean> FindAllWithPage(int pageNum,int pageSize,String facebookCheck,String adwordsCheck,String startTime,String endTime,boolean sameTime) throws Exception {
         JsonObject json = new JsonObject();
         JsonArray arr = new JsonArray();
         String sql = "SELECT COUNT(id) AS record_count FROM web_tag";
         JSObject one = DB.findOneBySql(sql);
 
         //总记录数
-        int totalRecord = one.get("record_count");
+        Long totalRecord = one.get("record_count");
         sql = "SELECT t.id,t.tag_name,google_package_id from web_tag t LEFT JOIN web_facebook_app_ids_rel air ON t.tag_name = air.tag_name " +
                 "ORDER BY t.tag_name LIMIT "+ (pageNum - 1) * pageSize + "," + pageSize;
         List<JSObject> tagList = DB.findListBySql(sql);
@@ -85,10 +83,11 @@ public class Query2 extends HttpServlet {
 
         json.addProperty("ret", 1);
         json.addProperty("message", "执行成功");
-        PageBean<AppBean> pageBean = new PageBean<AppBean>(pageNum,pageSize,totalRecord);
+        PageBean<AppBean> pageBean = new PageBean<AppBean>(pageNum,pageSize,totalRecord.intValue());
 
-        fetchAllAppDataSummary(tagList,startTime,endTime,facebookCheck,adwordsCheck,sameTime);
-        return null;
+        List<AppBean> appBeanList = fetchAllAppDataSummary(tagList, startTime, endTime, facebookCheck, adwordsCheck, sameTime);
+        pageBean.setList(appBeanList);
+        return pageBean;
     }
 
 

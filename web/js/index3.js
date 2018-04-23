@@ -321,19 +321,21 @@ function init() {
         $('#btnSearch').click();
     }
 
-
     $('#btnSummary').click(function () {
         var startTime = $('#inputStartTime').val();
         var endTime = $('#inputEndTime').val();
         var adwordsCheck = $('#adwordsCheck').is(':checked');  //is是一个方法的标签名
         var facebookCheck = $('#facebookCheck').is(':checked');
-
-        $.post('query2', {
+        var preIndex = $("#preIndex").val();
+        var nextIndex = $("#nextIndex").val();
+        $.post('query3', {
             summary: true,
             startTime: startTime,
             endTime: endTime,
             adwordsCheck: adwordsCheck,
             facebookCheck: facebookCheck,
+            preIndex: preIndex,
+            nextIndex: nextIndex
         }, function (data) {
             if (data && data.ret == 1) {
                 $('#result_header').html("<tr><th>应用名称</th><th>总花费<span sorterId=\"70\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>预计总花费<span sorterId=\"71\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
@@ -342,9 +344,51 @@ function init() {
                     "<th>总点击<span sorterId=\"76\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>CTR<span sorterId=\"77\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
                     "<th>CPA<span sorterId=\"78\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>CVR<span sorterId=\"79\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>"+
                     "<th>ECPM<span sorterId=\"80\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>Incoming<span sorterId=\"81\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th></tr>");
+                $("#totalPage").text("共"+data.total_page + "页");
+                // $("#preIndex")[0].href = "index3.jsp?page_index=" + data.pre_index;
+                // $("#nextIndex")[0].href = "index3.jsp?page_index=" + data.next_index;
+                $("#preIndex").val(data.pre_index);
+                $("#nextIndex").val(data.next_index);
+                data = data.arr;
+                setDataSummary(data);
+                bindSortOpSummary();
+            } else {
+                admanager.showCommonDlg("错误", data.message);
+            }
+        }, 'json');
+    });
 
-
-                data = data.data; //这里把返回数据里的 data属性 的值给了变量data，即变量data 是Query.java里的 arr[{},{},...,{}]
+}
+function summary(){
+    $('#btnSummary').click(function () {
+        var startTime = $('#inputStartTime').val();
+        var endTime = $('#inputEndTime').val();
+        var adwordsCheck = $('#adwordsCheck').is(':checked');  //is是一个方法的标签名
+        var facebookCheck = $('#facebookCheck').is(':checked');
+        var preIndex = $("#preIndex").val();
+        var nextIndex = $("#nextIndex").val();
+        $.post('query3', {
+            summary: true,
+            startTime: startTime,
+            endTime: endTime,
+            adwordsCheck: adwordsCheck,
+            facebookCheck: facebookCheck,
+            preIndex: preIndex,
+            nextIndex: nextIndex
+        }, function (data) {
+            if (data && data.ret == 1) {
+                $('#result_header').html("<tr><th>应用名称</th><th>总花费<span sorterId=\"70\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>预计总花费<span sorterId=\"71\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
+                    "<th>总营收<span sorterId=\"72\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>预计总营收<span sorterId=\"73\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
+                    "<th>总安装<span sorterId=\"74\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>总展示<span sorterId=\"75\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
+                    "<th>总点击<span sorterId=\"76\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>CTR<span sorterId=\"77\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
+                    "<th>CPA<span sorterId=\"78\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>CVR<span sorterId=\"79\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>"+
+                    "<th>ECPM<span sorterId=\"80\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>Incoming<span sorterId=\"81\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th></tr>");
+                $("#totalPage").text("共"+data.total_page + "页");
+                // $("#preIndex")[0].href = "index3.jsp?page_index=" + data.pre_index;
+                // $("#nextIndex")[0].href = "index3.jsp?page_index=" + data.next_index;
+                $("#preIndex").val(data.pre_index);
+                $("#nextIndex").val(data.next_index);
+                data = data.arr;
                 setDataSummary(data);
                 bindSortOpSummary();
             } else {
@@ -547,6 +591,7 @@ function setData(data) {
 //                tr.append(td);
         }
         $('#results_body').append(tr);
+
     }
     bindOp();
 }
@@ -615,7 +660,7 @@ function bindSortOpSummary() {
         var endTime = $('#inputEndTime').val();
         var adwordsCheck = $('#adwordsCheck').is(':checked');
         var facebookCheck = $('#facebookCheck').is(':checked');
-        $.post('query2', {
+        $.post('query3', {
             startTime: startTime,
             endTime: endTime,
             adwordsCheck: adwordsCheck,

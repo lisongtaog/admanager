@@ -151,51 +151,25 @@
         <tbody id="results_body">
         </tbody>
     </table>
-    <%-- 构建分页导航 --%>
-    共有${requestScope.pageBean.totalRecord}个员工，共${requestScope.pageBean.totalPage }页，当前为${requestScope.pageBean.pageNum}页
-    <br/>
-    <a href="${pageContext.request.contextPath}/FindAllWithPage?pageNum=1">首页</a>
-    <%--如果当前页为第一页时，就没有上一页这个超链接显示 --%>
-    <c:if test="${requestScope.pageBean.pageNum ==1}">
-        <c:forEach begin="${requestScope.pageBean.start}" end="${requestScope.pageBean.end}" step="1" var="i">
-            <c:if test="${requestScope.pageBean.pageNum == i}">
-                ${i}
-            </c:if>
-            <c:if test="${requestScope.pageBean.pageNum != i}">
-                <a href="${pageContext.request.contextPath}/FindAllWithPage?pageNum=${i}">${i}</a>
-            </c:if>
-        </c:forEach>
-        <a href="${pageContext.request.contextPath}/FindAllWithPage?pageNum=${requestScope.pageBean.pageNum+1}">下一页</a>
-    </c:if>
-
-    <%--如果当前页不是第一页也不是最后一页，则有上一页和下一页这个超链接显示 --%>
-    <c:if test="${requestScope.pageBean.pageNum > 1 && requestScope.pageBean.pageNum < requestScope.pageBean.totalPage}">
-        <a href="${pageContext.request.contextPath}/FindAllWithPage?pageNum=${requestScope.pageBean.pageNum-1}">上一页</a>
-        <c:forEach begin="${requestScope.pageBean.start}" end="${requestScope.pageBean.end}" step="1" var="i">
-            <c:if test="${requestScope.pageBean.pageNum == i}">
-                ${i}
-            </c:if>
-            <c:if test="${requestScope.pageBean.pageNum != i}">
-                <a href="${pageContext.request.contextPath}/FindAllWithPage?pageNum=${i}">${i}</a>
-            </c:if>
-        </c:forEach>
-        <a href="${pageContext.request.contextPath}/FindAllWithPage?pageNum=${requestScope.pageBean.pageNum+1}">下一页</a>
-    </c:if>
-
-    <%-- 如果当前页是最后一页，则只有上一页这个超链接显示，下一页没有 --%>
-    <c:if test="${requestScope.pageBean.pageNum == requestScope.pageBean.totalPage}">
-        <a href="${pageContext.request.contextPath}/FindAllWithPage?pageNum=${requestScope.pageBean.pageNum-1}">上一页</a>
-        <c:forEach begin="${requestScope.pageBean.start}" end="${requestScope.pageBean.end}" step="1" var="i">
-            <c:if test="${requestScope.pageBean.pageNum == i}">
-                ${i}
-            </c:if>
-            <c:if test="${requestScope.pageBean.pageNum != i}">
-                <a href="${pageContext.request.contextPath}/FindAllWithPage?pageNum=${i}">${i}</a>
-            </c:if>
-        </c:forEach>
-    </c:if>
-    <%--尾页 --%>
-    <a href="${pageContext.request.contextPath}/FindAllWithPage?pageNum=${requestScope.pageBean.totalPage}">尾页</a>
+    <nav aria-label="Page navigation">
+        <ul class="pagination">
+            <li>
+                <span id="totalPage"></span>
+            </li>
+            <li>
+                <%--<a id="preIndex" aria-label="Previous">--%>
+                    <%--<span aria-hidden="true"></span>--%>
+                <%--</a>--%>
+                <button id="preIndex" onclick="summary()">上一页</button>
+            </li>
+            <li>
+                <%--<a id="nextIndex" aria-label="Next">--%>
+                    <%--<span aria-hidden="true">下一页</span>--%>
+                <%--</a>--%>
+                <button id="nextIndex" onclick="summary()">下一页</button>
+            </li>
+        </ul>
+    </nav>
     <div style="text-align: center">
         <input id="btnModifySubmit" type="button" class="btn btn-primary" value="提交修改"/>
     </div>
@@ -256,7 +230,7 @@
 <script src="jqueryui/jquery-ui.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.4/js/select2.min.js"></script>
 <script src="js/country-name-code-dict.js"></script>
-<script src="js/index2.js?t=20180125"></script>
+<script src="js/index3.js?t=20180125"></script>
 
 <script>
     $("li[role='presentation']:eq(0)").addClass("active");
