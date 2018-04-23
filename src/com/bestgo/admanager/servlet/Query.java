@@ -63,7 +63,6 @@ public class Query extends HttpServlet {
                     String sqlTag = "select t.id,t.tag_name,google_package_id from web_tag t LEFT JOIN web_facebook_app_ids_rel air ON t.tag_name = air.tag_name";
                     List<JSObject> tagList = DB.findListBySql(sqlTag);
 
-
                     for (JSObject tagJSObject : tagList) {
                         AppBean appBean = new AppBean();
                         long id = tagJSObject.get("id");

@@ -155,7 +155,6 @@
                     "<th>ACpa</th>" +
                     "<th>CPA/ECPM</th>" +
                     "<th>Incoming<span sorterId=\"1042\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
-
                     "<th>RT</th>" +
                     "<th>30DaysActiveUser</th>" +
                     "<th>30DaysActiveUser*ARPU</th></tr>");
