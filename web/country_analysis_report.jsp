@@ -138,15 +138,16 @@
             if(data && data.ret == 1){
                 $('#result_header').html("<tr><th>国家</th>" +
                     "<th>Cost<span sorterId=\"1031\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
-                    "<th>7daysCost</th>" +
                     "<th>PurchasedUser<span sorterId=\"1033\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
                     "<th>Installed<span sorterId=\"1034\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
                     "<th>UninstalledRate</th>" +
                     "<th>TotalUser<span sorterId=\"1037\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
                     "<th>ActiveUser<span sorterId=\"1038\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
                     "<th>Revenue<span sorterId=\"1039\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
-                    "<th>revenue/installed</th>" +
+                    "<th>Revenue/Installed</th>" +
+                    "<th>7daysCost</th>" +
                     "<th>7daysRevenue</th>" +
+                    "<th>7daysIncoming</th>" +
                     "<th>PI</th>" +
                     "<th>ARPU</th>" +
                     "<th>ECPM<span sorterId=\"1040\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
@@ -154,7 +155,7 @@
                     "<th>ACpa</th>" +
                     "<th>CPA/ECPM</th>" +
                     "<th>Incoming<span sorterId=\"1042\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
-                    "<th>7daysIncoming</th>" +
+
                     "<th>RT</th>" +
                     "<th>30DaysActiveUser</th>" +
                     "<th>30DaysActiveUser*ARPU</th></tr>");
@@ -212,9 +213,10 @@
         var arr = data.array;
         var len = arr.length;
         var one;
-        var keyset = ["costs","seven_days_costs", "purchased_users", "installed", "uninstalled_rate", "users",
-            "active_users", "revenues", "revenue/installed","seven_days_revenues","pi", "arpu", "ecpm","cpa","a_cpa","cpa_div_ecpm", "incoming",
-            "seven_days_incoming","rt","thirty_days_active_user", "thirty_days_active_user_mul_arpu"];
+        var keyset = ["costs","purchased_users", "installed", "uninstalled_rate", "users",
+            "active_users", "revenues", "revenue/installed","seven_days_costs", "seven_days_revenues",
+            "seven_days_incoming","pi", "arpu", "ecpm","cpa","a_cpa","cpa_div_ecpm", "incoming",
+            "rt","thirty_days_active_user", "thirty_days_active_user_mul_arpu"];
         for (var i = 0; i < len; i++) {
             one = arr[i];
             var tr = $('<tr></tr>');
