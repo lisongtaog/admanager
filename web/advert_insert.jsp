@@ -58,7 +58,7 @@
                 <select class="form-control" id="selectApp">
                 </select>
             </div>
-            <label>广告语组合：</label><select id="selectAdvertGroupId"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select>
+            <label>广告语组合：</label><select id="selectAdvertGroupId"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option></select>
         </div><br>
 
         <div class="form-group">
@@ -118,7 +118,7 @@
             </div>
             <label>广告语组合：</label>
             <select id="selectAdvertGroupIdAdmob">
-                <option value="1">&nbsp1&nbsp</option><option value="2">&nbsp2&nbsp</option><option value="3">&nbsp3&nbsp</option><option value="4">&nbsp4&nbsp</option>
+                <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option>
             </select>
         </div><br>
 
