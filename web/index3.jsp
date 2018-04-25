@@ -154,19 +154,15 @@
     <nav aria-label="Page navigation">
         <ul class="pagination">
             <li>
-                <span id="totalPage"></span>
-            </li>
-            <li>
-                <%--<a id="preIndex" aria-label="Previous">--%>
-                    <%--<span aria-hidden="true"></span>--%>
-                <%--</a>--%>
-                <button id="preIndex" onclick="summary()">上一页</button>
-            </li>
-            <li>
-                <%--<a id="nextIndex" aria-label="Next">--%>
-                    <%--<span aria-hidden="true">下一页</span>--%>
-                <%--</a>--%>
-                <button id="nextIndex" onclick="summary()">下一页</button>
+                <span id="Page">第
+                    <span><input type="text" id="pageNow"></span>
+                    <span>/</span>
+                    <span id="totalPage"></span>页
+                    <button id="goToPage">go</button>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <button id="preIndex">上一页</button>
+                    <button id="nextIndex">下一页</button>
+                </span>
             </li>
         </ul>
     </nav>

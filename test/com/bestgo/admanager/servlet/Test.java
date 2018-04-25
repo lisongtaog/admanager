@@ -21,8 +21,19 @@ import static sun.plugin.cache.FileVersion.regEx;
 public class Test {
 
     public static void main(String[] args) {
-        String sss = DateUtil.addDay("2018-03-24",-3,"yyyy-MM-dd");
-        System.out.println(sss);
+        Random random = new Random();
+        for(int i=0;i<3;i++){
+            String r = String.valueOf(random.nextInt());
+            r = r.substring(3,r.length());
+            System.out.println(r);
+
+        }
+        System.out.println("================================");
+        String s = String.valueOf(System.currentTimeMillis());
+        s = s.substring(4,s.length());
+        String r2 = String.valueOf(random.nextInt());
+        System.out.println(s);
+        System.out.println(r2);
 //        js.put("aaaa","");
 //        list.add(js);
 //        String aaaa = Utils.getStrForListDistinctByAttrWithCommmas(list, "aaaa");
