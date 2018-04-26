@@ -1,7 +1,7 @@
 package com.bestgo.admanager.servlet;
 
-import com.bestgo.admanager.DateUtil;
-import com.bestgo.admanager.Utils;
+import com.bestgo.admanager.utils.DateUtil;
+import com.bestgo.admanager.utils.Utils;
 import com.bestgo.admanager.bean.Campaigns;
 import com.bestgo.admanager.bean.CountryRecord;
 import com.bestgo.common.database.services.DB;

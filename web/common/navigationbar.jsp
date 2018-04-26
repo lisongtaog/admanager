@@ -10,6 +10,7 @@
     <title>Title</title>
 </head>
 <body>
+<span style="color: #a94442;">欢迎【${sessionScope.nickname}】登录</span>
 <ul class="nav nav-pills">
 
     <%-- 下标从0开始 --%>

@@ -1,6 +1,6 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
-<%@ page import="com.bestgo.admanager.Utils" %>
+<%@ page import="com.bestgo.admanager.utils.Utils" %>
 <%@ page import="com.bestgo.common.database.utils.JSObject" %>
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.ArrayList" %>

@@ -1,4 +1,4 @@
-package com.bestgo.admanager;
+package com.bestgo.admanager.utils;
 
 import java.sql.Timestamp;
 import java.text.ParseException;

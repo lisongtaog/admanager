@@ -1,4 +1,4 @@
-package com.bestgo.admanager;
+package com.bestgo.admanager.utils;
 
 import com.bestgo.common.database.services.DB;
 import com.bestgo.common.database.utils.JSObject;

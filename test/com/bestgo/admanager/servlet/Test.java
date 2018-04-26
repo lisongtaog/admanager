@@ -1,22 +1,9 @@
 package com.bestgo.admanager.servlet;
 
-import com.bestgo.admanager.DateUtil;
-import com.bestgo.admanager.Utils;
-import com.bestgo.common.database.services.DB;
-import com.bestgo.common.database.utils.JSObject;
-import com.sun.org.apache.xpath.internal.SourceTree;
-import jdk.nashorn.internal.scripts.JS;
-
-import java.io.File;
-import java.io.UnsupportedEncodingException;
 import java.lang.System;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import static sun.plugin.cache.FileVersion.regEx;
 
 public class Test {
 

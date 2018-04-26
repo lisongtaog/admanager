@@ -1,9 +1,9 @@
 package com.bestgo.admanager.servlet;
 
 import com.bestgo.admanager.Config;
-import com.bestgo.admanager.DateUtil;
+import com.bestgo.admanager.utils.DateUtil;
 import com.bestgo.admanager.OperationResult;
-import com.bestgo.admanager.Utils;
+import com.bestgo.admanager.utils.Utils;
 import com.bestgo.admanager.bean.BatchChangeItem;
 import com.bestgo.admanager.bean.ReduceCostItem;
 import com.bestgo.common.database.services.DB;

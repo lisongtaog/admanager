@@ -1,6 +1,6 @@
 package com.bestgo.admanager.servlet;
 
-import com.bestgo.admanager.Utils;
+import com.bestgo.admanager.utils.Utils;
 import com.bestgo.admanager.bean.AppBean;
 import com.bestgo.admanager.bean.PageBean;
 import com.bestgo.common.database.services.DB;

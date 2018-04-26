@@ -3,7 +3,7 @@
 <%@ page import="com.bestgo.common.database.utils.JSObject" %>
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.ArrayList" %>
-<%@ page import="com.bestgo.admanager.Utils" %>
+<%@ page import="com.bestgo.admanager.utils.Utils" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 
 <html>

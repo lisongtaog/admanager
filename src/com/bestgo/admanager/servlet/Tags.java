@@ -1,8 +1,8 @@
 package com.bestgo.admanager.servlet;
 
-import com.bestgo.admanager.DateUtil;
+import com.bestgo.admanager.utils.DateUtil;
 import com.bestgo.admanager.OperationResult;
-import com.bestgo.admanager.Utils;
+import com.bestgo.admanager.utils.Utils;
 import com.bestgo.common.database.services.DB;
 import com.bestgo.common.database.utils.JSObject;
 import com.google.gson.JsonArray;
