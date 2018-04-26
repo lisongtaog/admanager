@@ -161,7 +161,6 @@ public class Campaign extends HttpServlet {
                     }
                 }
 
-                result.result = true;
                 if (result.result) {
                     Calendar calendar = Calendar.getInstance();
                     String campaignNameOld = campaignName + "_";

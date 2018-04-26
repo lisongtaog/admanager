@@ -364,18 +364,30 @@ public class Query extends HttpServlet {
             webAdCampaignsHistoryTable = "web_ad_campaigns_history_admob";
         }
 
+//        String sql = "select sum(ch.total_spend) as spend, " +
+//                "sum(ch.total_installed) as installed, sum(ch.total_impressions) as impressions " +
+//                ",sum(ch.total_click) as click from " + webAdCampaignsTable + " c, " + webAdCampaignsHistoryTable + " ch, " +
+//                "(select distinct campaign_id from " + webAdCampaignTagRelTable + " where tag_id = " + tagId + ") rt " +
+//                "where rt.campaign_id = ch.campaign_id and c.campaign_id = ch.campaign_id " +
+//                "and date between '" + startTime + "' and '" + endTime + "'";
         String sql = "select sum(ch.total_spend) as spend, " +
                 "sum(ch.total_installed) as installed, sum(ch.total_impressions) as impressions " +
-                ",sum(ch.total_click) as click from " + webAdCampaignsTable + " c, " + webAdCampaignsHistoryTable + " ch, " +
+                ",sum(ch.total_click) as click from " + webAdCampaignsHistoryTable + " ch, " +
                 "(select distinct campaign_id from " + webAdCampaignTagRelTable + " where tag_id = " + tagId + ") rt " +
-                "where rt.campaign_id = ch.campaign_id and c.campaign_id = ch.campaign_id " +
+                "where rt.campaign_id = ch.campaign_id " +
                 "and date between '" + startTime + "' and '" + endTime + "'";
         if(sameTime){
+//            sql = "select sum(ch.total_spend) as spend, " +
+//                    "sum(ch.total_installed) as installed, sum(ch.total_impressions) as impressions " +
+//                    ",sum(ch.total_click) as click from " + webAdCampaignsTable + " c, " + webAdCampaignsHistoryTable + " ch, " +
+//                    "(select distinct campaign_id from " + webAdCampaignTagRelTable + " where tag_id = " + tagId + ") rt " +
+//                    "where rt.campaign_id = ch.campaign_id and c.campaign_id = ch.campaign_id " +
+//                    "and date = '" + endTime + "'";
             sql = "select sum(ch.total_spend) as spend, " +
                     "sum(ch.total_installed) as installed, sum(ch.total_impressions) as impressions " +
-                    ",sum(ch.total_click) as click from " + webAdCampaignsTable + " c, " + webAdCampaignsHistoryTable + " ch, " +
+                    ",sum(ch.total_click) as click from " + webAdCampaignsHistoryTable + " ch, " +
                     "(select distinct campaign_id from " + webAdCampaignTagRelTable + " where tag_id = " + tagId + ") rt " +
-                    "where rt.campaign_id = ch.campaign_id and c.campaign_id = ch.campaign_id " +
+                    "where rt.campaign_id = ch.campaign_id " +
                     "and date = '" + endTime + "'";
         }
         JSObject one = DB.findOneBySql(sql);
