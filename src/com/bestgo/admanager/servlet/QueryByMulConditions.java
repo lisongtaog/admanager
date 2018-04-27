@@ -1012,23 +1012,23 @@ public class QueryByMulConditions extends HttpServlet {
                 double cpa = Utils.convertDouble(one.get("cpa"), 0);
 
                 //目前只有Adwords能收集到unRate和openRate
-//                if(admobCheck){
-//                    String sqlQuery = "SELECT un_rate,open_rate FROM web_ad_campaign_un_rate_open_rate_admob " +
-//                            "WHERE campaign_id = '" + campaignId + "' AND date = '" + beforeThreeDays + "'";
-//                    JSObject oneQ = DB.findOneBySql(sqlQuery);
-//                    if(oneQ.hasObjectData()){
-//
-//                        //系列卸载率 = 系列卸载数量 / 系列安装数量
-//                        double unRate = Utils.convertDouble(oneQ.get("un_rate"),0);
-//                        d.addProperty("un_rate", Utils.trimDouble(unRate,3));
-//
-//                        //系列开启率 = 系列安装数量 / 系列总安装
-//                        double openRate = Utils.convertDouble(oneQ.get("open_rate"),0);
-//                        double openCpa = openRate == 0 ? 0 : cpa / openRate;
-//                        d.addProperty("open_cpa", Utils.trimDouble(openCpa,3));
-//                        d.addProperty("open_rate", Utils.trimDouble(openRate,3));
-//                    }
-//                }
+                if(admobCheck){
+                    String sqlQuery = "SELECT un_rate,open_rate FROM web_ad_campaign_un_rate_open_rate_admob " +
+                            "WHERE campaign_id = '" + campaignId + "' AND date = '" + beforeThreeDays + "'";
+                    JSObject oneQ = DB.findOneBySql(sqlQuery);
+                    if(oneQ.hasObjectData()){
+
+                        //系列卸载率 = 系列卸载数量 / 系列安装数量
+                        double unRate = Utils.convertDouble(oneQ.get("un_rate"),0);
+                        d.addProperty("un_rate", Utils.trimDouble(unRate,3));
+
+                        //系列开启率 = 系列安装数量 / 系列总安装
+                        double openRate = Utils.convertDouble(oneQ.get("open_rate"),0);
+                        double openCpa = openRate == 0 ? 0 : cpa / openRate;
+                        d.addProperty("open_cpa", Utils.trimDouble(openCpa,3));
+                        d.addProperty("open_rate", Utils.trimDouble(openRate,3));
+                    }
+                }
 
                 String short_name = one.get("short_name");
                 String account_id = one.get("account_id");
