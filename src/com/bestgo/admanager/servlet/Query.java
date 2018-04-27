@@ -60,7 +60,7 @@ public class Query extends HttpServlet {
             JsonArray arr = new JsonArray();
             if (sorter > 0) {
                     ArrayList<AppBean> appBeanList = new ArrayList<>();
-                    String sqlTag = "select t.id,t.tag_name,google_package_id from web_tag t LEFT JOIN web_facebook_app_ids_rel air ON t.tag_name = air.tag_name";
+                    String sqlTag = "SELECT t.id,t.tag_name,google_package_id FROM web_tag t,web_facebook_app_ids_rel air WHERE t.tag_name = air.tag_name";
                     List<JSObject> tagList = DB.findListBySql(sqlTag);
 
                     for (JSObject tagJSObject : tagList) {
@@ -356,20 +356,11 @@ public class Query extends HttpServlet {
     //以下是在 startTime和endTime之间取一堆值初始化
     private JsonObject fetchOneAppDataSummary(long tagId, String startTime, String endTime, boolean admobCheck,boolean sameTime) throws Exception {
         String webAdCampaignTagRelTable = "web_ad_campaign_tag_rel";
-        String webAdCampaignsTable = "web_ad_campaigns";
         String webAdCampaignsHistoryTable = "web_ad_campaigns_history";
         if (admobCheck) {
             webAdCampaignTagRelTable = "web_ad_campaign_tag_admob_rel";
-            webAdCampaignsTable = "web_ad_campaigns_admob";
             webAdCampaignsHistoryTable = "web_ad_campaigns_history_admob";
         }
-
-//        String sql = "select sum(ch.total_spend) as spend, " +
-//                "sum(ch.total_installed) as installed, sum(ch.total_impressions) as impressions " +
-//                ",sum(ch.total_click) as click from " + webAdCampaignsTable + " c, " + webAdCampaignsHistoryTable + " ch, " +
-//                "(select distinct campaign_id from " + webAdCampaignTagRelTable + " where tag_id = " + tagId + ") rt " +
-//                "where rt.campaign_id = ch.campaign_id and c.campaign_id = ch.campaign_id " +
-//                "and date between '" + startTime + "' and '" + endTime + "'";
         String sql = "select sum(ch.total_spend) as spend, " +
                 "sum(ch.total_installed) as installed, sum(ch.total_impressions) as impressions " +
                 ",sum(ch.total_click) as click from " + webAdCampaignsHistoryTable + " ch, " +
@@ -377,12 +368,6 @@ public class Query extends HttpServlet {
                 "where rt.campaign_id = ch.campaign_id " +
                 "and date between '" + startTime + "' and '" + endTime + "'";
         if(sameTime){
-//            sql = "select sum(ch.total_spend) as spend, " +
-//                    "sum(ch.total_installed) as installed, sum(ch.total_impressions) as impressions " +
-//                    ",sum(ch.total_click) as click from " + webAdCampaignsTable + " c, " + webAdCampaignsHistoryTable + " ch, " +
-//                    "(select distinct campaign_id from " + webAdCampaignTagRelTable + " where tag_id = " + tagId + ") rt " +
-//                    "where rt.campaign_id = ch.campaign_id and c.campaign_id = ch.campaign_id " +
-//                    "and date = '" + endTime + "'";
             sql = "select sum(ch.total_spend) as spend, " +
                     "sum(ch.total_installed) as installed, sum(ch.total_impressions) as impressions " +
                     ",sum(ch.total_click) as click from " + webAdCampaignsHistoryTable + " ch, " +
