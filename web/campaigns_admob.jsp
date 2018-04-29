@@ -232,9 +232,9 @@
         if(this.name == "false"){
             $('#btnNotExistTagAdmobSearch').css("background-color","red");
             this.name = "true";
-            $.post('campaign_admob/selectCampaingnWhereNotExistTagAdmob',function(data) {
+            $('.table tbody > tr').remove();
+            $.post('campaign_admob/query_campaigns_not_exist_tag',function(data) {
                 if (data && data.ret == 1) {
-                    $('.table tbody > tr').remove();
                     setData(data.data);
                     bindOp();
                 } else {

@@ -304,7 +304,7 @@ public class CampaignAdmob extends HttpServlet {
                 }
                 json.add("data", array);
             }
-        }else if (path.startsWith("/selectCampaingnWhereNotExistTagAdmob")) {
+        }else if (path.startsWith("/query_campaigns_not_exist_tag")) {
             JsonArray array = new JsonArray();
             String sqlCampaignIds = "select campaign_id from web_ad_campaign_tag_admob_rel";
 
