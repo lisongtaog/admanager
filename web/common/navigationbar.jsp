@@ -10,7 +10,29 @@
     <title>Title</title>
 </head>
 <body>
-<span style="color: #a94442;">欢迎【${sessionScope.nickname}】登录</span>
+<div id="navbar" class="navbar-collapse collapse">
+    <ul class="nav navbar-nav navbar-right">
+        <li style="padding-top:8px;">
+            <div class="btn-group">
+                <button type="button" class="btn btn-default btn-success dropdown-toggle" data-toggle="dropdown">
+                    <i class="glyphicon glyphicon-user"></i> ${sessionScope.nickname} <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu" role="menu">
+                    <li><a href="#"><i class="glyphicon glyphicon-cog"></i> 个人设置</a></li>
+                    <li><a href="#"><i class="glyphicon glyphicon-comment"></i> 消息</a></li>
+                    <li class="divider"></li>
+                    <li><a href="login.jsp"><i class="glyphicon glyphicon-off"></i> 退出系统</a></li>
+                </ul>
+            </div>
+        </li>
+        <li style="margin-left:10px;padding-top:8px;">
+            <button type="button" class="btn btn-default btn-danger">
+                <span class="glyphicon glyphicon-question-sign"></span> 帮助
+            </button>
+        </li>
+    </ul>
+</div>
+
 <ul class="nav nav-pills">
 
     <%-- 下标从0开始 --%>
