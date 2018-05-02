@@ -6,6 +6,7 @@ import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
 import javax.servlet.annotation.WebServlet;
 
+import com.bestgo.admanager.CPAHistory;
 import org.apache.log4j.PropertyConfigurator;
 
 import com.bestgo.common.database.MySqlHelper;
@@ -19,8 +20,11 @@ public class ServletListener implements ServletContextListener {
 	}
 
 	public void contextInitialized(ServletContextEvent arg0) {
-		initLog4J(arg0.getServletContext());
+		ServletContext context = arg0.getServletContext();
+		initLog4J(context);
 		MySqlHelper.init();
+		String f = context.getRealPath("/") + "/WEB-INF/app_cpa_history.csv";
+		CPAHistory.loadFromFile(f);
 	}
 
 	private void initLog4J(ServletContext context){

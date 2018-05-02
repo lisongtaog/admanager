@@ -1,5 +1,6 @@
 package com.bestgo.admanager.servlet;
 
+import com.bestgo.admanager.CPAHistory;
 import com.bestgo.admanager.utils.DateUtil;
 import com.bestgo.admanager.utils.Utils;
 import com.bestgo.common.database.services.DB;
@@ -14,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -294,6 +296,13 @@ public class CountryAnalysisReport extends HttpServlet {
                                 d.addProperty("active_users", activeUsers);
                                 d.addProperty("revenues", Utils.trimDouble(revenues,0));
                                 d.addProperty("revenue/installed", installed > 0 ? Utils.trimDouble(revenues/installed, 2) : 0);
+                                HashMap<String, CPAHistory.CPAItem> history = CPAHistory.historyMaps.get(appId);
+                                double rpi = 0;
+                                if (history != null) {
+                                    CPAHistory.CPAItem item = history.get(countryCode);
+                                    if (item != null) rpi = item.rpi;
+                                }
+                                d.addProperty("revenue_per_install", Utils.trimDouble(rpi, 2));
                                 d.addProperty("pi", Utils.trimDouble(pi,3));
                                 d.addProperty("arpu", Utils.trimDouble(arpu,3));
                                 d.addProperty("ecpm", Utils.trimDouble(ecpm,3));

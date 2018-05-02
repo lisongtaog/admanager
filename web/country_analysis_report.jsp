@@ -151,6 +151,7 @@
                     "<th>PI</th>" +
                     "<th>ARPU</th>" +
                     "<th>ECPM<span sorterId=\"1040\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
+                    "<th>成本价</th>" +
                     "<th>CPA<span sorterId=\"1041\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
                     "<th>ACpa</th>" +
                     "<th>CPA/ECPM</th>" +
@@ -213,8 +214,8 @@
         var len = arr.length;
         var one;
         var keyset = ["costs","purchased_users", "installed", "uninstalled_rate", "users",
-            "active_users", "revenues", "revenue/installed","seven_days_costs", "seven_days_revenues",
-            "seven_days_incoming","pi", "arpu", "ecpm","cpa","a_cpa","cpa_div_ecpm", "incoming",
+            "active_users", "revenues", "revenue/installed", "seven_days_costs", "seven_days_revenues",
+            "seven_days_incoming","pi", "arpu", "ecpm", "revenue_per_install","cpa","a_cpa","cpa_div_ecpm", "incoming",
             "rt","thirty_days_active_user", "thirty_days_active_user_mul_arpu"];
         for (var i = 0; i < len; i++) {
             one = arr[i];
