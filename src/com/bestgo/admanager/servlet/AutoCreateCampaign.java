@@ -218,17 +218,23 @@ public class AutoCreateCampaign extends HttpServlet {
     public static List<JSObject> facebookFetchData(String word,String tagName,String countryName) {
         List<JSObject> list = new ArrayList<>();
         try {
-            if(word != null && tagName == "" && countryName == ""){
+            if (tagName!="" && countryName== "" && (word==""||word==null)) {
                 return DB.scan("ad_campaigns_auto_create").select(FB_CAMPAIGN_FIELDS)
-                        .where(DB.filter().whereLikeTo("campaign_name", "%" + word + "%")).orderByAsc("id").execute();
-            }else if(word != null && word!= "" && tagName!="" ){
+                        .where(DB.filter().whereEqualTo("app_name",tagName)).orderByAsc("id").execute();
+            }else if(tagName != "" && countryName!= "" && (word==""||word==null)){
+                return DB.scan("ad_campaigns_auto_create").select(FB_CAMPAIGN_FIELDS)
+                        .where(DB.filter().whereEqualTo("app_name",tagName))
+                        .and(DB.filter().whereEqualTo("country_region",countryName))
+                        .orderByAsc("id").execute();
+            }else if(tagName!=""  && word != null && word!= "" && countryName==""){
                 return DB.scan("ad_campaigns_auto_create").select(FB_CAMPAIGN_FIELDS)
                         .where(DB.filter().whereEqualTo("app_name",tagName))
                         .and(DB.filter().whereLikeTo("campaign_name", "%" + word + "%"))
                         .orderByAsc("id").execute();
-            }else if(tagName != "" && countryName!= ""){
+            }else if(tagName != "" && word != null && word!= "" && countryName!=""){
                 return DB.scan("ad_campaigns_auto_create").select(FB_CAMPAIGN_FIELDS)
                         .where(DB.filter().whereEqualTo("app_name",tagName))
+                        .and(DB.filter().whereLikeTo("campaign_name", "%" + word + "%"))
                         .and(DB.filter().whereEqualTo("country_region",countryName))
                         .orderByAsc("id").execute();
             }
@@ -593,17 +599,23 @@ public class AutoCreateCampaign extends HttpServlet {
     public static List<JSObject> adwordsFetchData(String word,String tagName,String countryName) {
         List<JSObject> list = new ArrayList<>();
         try {
-            if(word != null && tagName=="" && countryName=="" ){
+            if (tagName!="" && countryName== "" && (word==""||word==null)) {
                 return DB.scan("ad_campaigns_admob_auto_create").select(ADWORDS_CAMPAIGN_FIELDS)
-                        .where(DB.filter().whereLikeTo("campaign_name", "%" + word + "%")).orderByAsc("id").execute();
-            }else if( word!=null && word!="" && tagName != ""){
+                        .where(DB.filter().whereEqualTo("app_name",tagName)).orderByAsc("id").execute();
+            }else if(tagName != "" && countryName!= "" && (word==""||word==null)){
                 return DB.scan("ad_campaigns_admob_auto_create").select(ADWORDS_CAMPAIGN_FIELDS)
-                        .where(DB.filter().whereLikeTo("campaign_name", "%" + word + "%"))
-                        .and(DB.filter().whereEqualTo("app_name",tagName))
+                        .where(DB.filter().whereEqualTo("app_name",tagName))
+                        .and(DB.filter().whereEqualTo("country_region",countryName))
                         .orderByAsc("id").execute();
-            }else if( tagName != "" && countryName!=""){
+            }else if(tagName!=""  && word != null && word!= "" && countryName==""){
                 return DB.scan("ad_campaigns_admob_auto_create").select(ADWORDS_CAMPAIGN_FIELDS)
-                        .where(DB.filter().whereEqualTo("app_name", tagName))
+                        .where(DB.filter().whereEqualTo("app_name",tagName))
+                        .and(DB.filter().whereLikeTo("campaign_name", "%" + word + "%"))
+                        .orderByAsc("id").execute();
+            }else if(tagName != "" && word != null && word!= "" && countryName!=""){
+                return DB.scan("ad_campaigns_admob_auto_create").select(ADWORDS_CAMPAIGN_FIELDS)
+                        .where(DB.filter().whereEqualTo("app_name",tagName))
+                        .and(DB.filter().whereLikeTo("campaign_name", "%" + word + "%"))
                         .and(DB.filter().whereEqualTo("country_region",countryName))
                         .orderByAsc("id").execute();
             }

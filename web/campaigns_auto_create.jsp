@@ -192,21 +192,6 @@
         source:regionArray
     });
 
-    $("#inputCampaignName").focusin(function(){
-        $("#inputCountry").val("");
-        $("#inputCountry").prop("disabled",true);
-    });
-    $("#inputCampaignName").focusout(function(){
-        $("#inputCountry").prop("disabled",false);
-    });
-
-    $("#inputCountry").focusin(function(){
-        $("#inputCampaignName").val("");
-        $("#inputCampaignName").prop("disabled",true);
-    });
-    $("#inputCountry").focusout(function(){
-        $("#inputCampaignName").prop("disabled",false);
-    });
 
     $('#btnSearch').click(function() {
       var query = $("#inputCampaignName").val();
@@ -222,19 +207,23 @@
               }
           });
       }
-      $.post('auto_create_campaign/<%=network%>/query', {
-          word: query,
-          country:country,
-          tagName:tagName
-      }, function(data) {
-        if (data && data.ret == 1) {
-          $('.table tbody > tr').remove();
-          setData(data.data);
-          bindOp();
-        } else {
-          admanager.showCommonDlg("错误", data.message);
-        }
-      }, 'json');
+      if(tagName == ""){
+          alert("标签名不能为空！");
+      }else{
+          $.post('auto_create_campaign/<%=network%>/query', {
+              word: query,
+              country:country,
+              tagName:tagName
+          }, function(data) {
+              if (data && data.ret == 1) {
+                  $('.table tbody > tr').remove();
+                  setData(data.data);
+                  bindOp();
+              } else {
+                  admanager.showCommonDlg("错误", data.message);
+              }
+          }, 'json');
+      }
     });
 
     function allChecked(){
@@ -370,47 +359,50 @@
 
     // 点击[开启]checkbox后往后台修改表
     function bindOp() {
-      $(".checkbox_campaign_enable").click(function() {
-        var tr = $(this).parents("tr");
-        var tds = tr.find('td');
-        var id = $(tds.get(0)).text();
+        $(".checkbox_campaign_enable").click(function() {
+            var checkbox = $(this);
+            if(checkbox.prop("checked")==false){
+                $(".all_checkbox_campaign_enable").prop("checked",false);
+            }
+            var tr = $(this).parents("tr");
+            var tds = tr.find('td');
+            var id = $(tds.get(0)).text();
 
-        var checked = $(this).prop('checked');
-        $.post('auto_create_campaign/<%=network%>/enable', {
-          id: id,
-          enable: checked,
-        }, function(data) {
-          if (data && data.ret == 1) {
-            admanager.showCommonDlg("成功", data.message);
-          } else {
-            admanager.showCommonDlg("错误", data.message);
-          }
-        }, 'json');
-
-      });
-
-      $(".link_delete").click(function() {
-        var tr = $(this).parents("tr");
-        var tds = tr.find('td');
-        var id = $(tds.get(0)).text();
-
-        $("#delete_dlg .btn-primary").unbind('click');
-        $("#delete_dlg .btn-primary").click(function() {
-          $('#delete_dlg').modal('hide');
-          setTimeout(function () {
-            $.post('auto_create_campaign/<%=network%>/delete', {
-              id: id
+            var checked = $(this).prop('checked');
+            $.post('auto_create_campaign/<%=network%>/enable', {
+                id: id,
+                enable: checked,
             }, function(data) {
-              if (data && data.ret == 1) {
-                tr.remove();
-                admanager.showCommonDlg("成功", data.message);
-              } else {
-                admanager.showCommonDlg("错误", data.message);
-              }
+                if (data && data.ret == 1) {
+                    admanager.showCommonDlg("成功", data.message);
+                } else {
+                    admanager.showCommonDlg("错误", data.message);
+                }
             }, 'json');
-          }, 10);
+
         });
-        $('#delete_dlg').modal('show');
+        $(".link_delete").click(function() {
+            var tr = $(this).parents("tr");
+            var tds = tr.find('td');
+            var id = $(tds.get(0)).text();
+
+            $("#delete_dlg .btn-primary").unbind('click');
+            $("#delete_dlg .btn-primary").click(function() {
+                $('#delete_dlg').modal('hide');
+                setTimeout(function () {
+                    $.post('auto_create_campaign/<%=network%>/delete', {
+                        id: id
+                    }, function(data) {
+                        if (data && data.ret == 1) {
+                            tr.remove();
+                            admanager.showCommonDlg("成功", data.message);
+                        } else {
+                            admanager.showCommonDlg("错误", data.message);
+                        }
+                    }, 'json');
+                }, 10);
+            });
+            $('#delete_dlg').modal('show');
       });
     }
     bindOp();
