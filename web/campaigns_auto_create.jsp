@@ -4,11 +4,18 @@
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="com.bestgo.admanager.servlet.AutoCreateCampaign" %>
 <%@ page import="java.lang.reflect.Array" %>
+<%@ page import="com.bestgo.admanager.servlet.Tags" %>
+<%@ page import="com.google.gson.JsonArray" %>
 
 
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<link rel="stylesheet" href="bootstrap/css/bootstrap.min.css" />
-<link rel="stylesheet" href="bootstrap/css/bootstrap-theme.min.css" />
+<link rel="stylesheet" href="bootstrap/css/bootstrap.min.css"/>
+<link rel="stylesheet" href="bootstrap/css/bootstrap-theme.min.css"/>
+<link rel="stylesheet" href="css/core.css"/>
+<link rel="stylesheet" href="css/bootstrap-tagsinput.css"/>
+<link rel="stylesheet" href="css/bootstrap-datetimepicker.css"/>
+<link rel="stylesheet" href="jqueryui/jquery-ui.css"/>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.4/css/select2.min.css" rel="stylesheet" />
 
 <html>
   <head>
@@ -34,10 +41,17 @@
           <input type="radio" name="optionsRadios" id="checkAdwords">
           AdWords 广告
         </label>
-        <input id="inputSearch" class="form-control" style="display: inline; width: auto;" type="text" />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <label for="tagName">标签</label>
+        <input id="tagName" form-control style="display: inline; width: auto;" type="text">
+        <label for="inputCampaignName">模糊系列名</label>
+        <input id="inputCampaignName" class="form-control" style="display: inline; width: auto;" type="text" />
+        <label for="inputCountry">国家</label>
+        <input id="inputCountry" form-control style="display: inline; width: auto;" type="text">
         <button id="btnSearch" class="btn btn-default glyphicon glyphicon-search"></button></div>
 
       <%
+        //先在首页显示一段信息
         List<JSObject> data = new ArrayList<>();
         long totalPage = 0;
         int preIndex = 0;
@@ -70,11 +84,19 @@
 
           data = AutoCreateCampaign.adwordsFetchData(index, size);
         }
+        //获取标签信息
+        List<JSObject> allTags = Tags.fetchAllTags();
+        JsonArray array = new JsonArray();
+        for (int i = 0; i < allTags.size(); i++) {
+          array.add((String) allTags.get(i).get("tag_name"));
+        }
       %>
 
       <table class="table">
         <thead>
-        <tr><th>序号</th><th>应用</th><th>国家</th><th>语言</th><th>系列名称</th><th>预算</th><th>出价</th><th>操作</th><th>开启</th></tr>
+        <tr><th>序号</th><th>应用</th><th>国家</th><th>语言</th><th>系列名称</th><th>预算</th><th>出价</th><th>操作</th>
+          <th>开启<input class="all_checkbox_campaign_enable" type= "checkbox" onclick="allChecked()"></th>
+        </tr>
         </thead>
         <tbody>
         <%
@@ -100,16 +122,16 @@
       <nav aria-label="Page navigation">
         <ul class="pagination">
           <li>
-            <a href="campaigns_auto_create.jsp?network=<%=network%>&page_index=<%=preIndex%>" aria-label="Previous">
+            <a class="changePage" href="campaigns_auto_create.jsp?network=<%=network%>&page_index=<%=preIndex%>" aria-label="Previous">
               <span aria-hidden="true">上一页</span>
             </a>
           </li>
           <li>
-            <a href="campaigns_auto_create.jsp?network=<%=network%>&page_index=<%=nextPage%>" aria-label="Next">
+            <a class="changePage" href="campaigns_auto_create.jsp?network=<%=network%>&page_index=<%=nextPage%>" aria-label="Next">
               <span aria-hidden="true">下一页</span>
             </a>
           </li>
-          <li>
+          <li id="total_page">
             共<%=totalPage%>页
           </li>
         </ul>
@@ -140,6 +162,8 @@
   <script src="js/jquery.js"></script>
   <script src="bootstrap/js/bootstrap.min.js"></script>
   <script src="js/core.js"></script>
+  <script src="js\country-name-code-dict.js"></script>
+  <script src="jqueryui/jquery-ui.min.js"></script>
 
   <script type="text/javascript">
     var network = "<%=network%>";
@@ -154,10 +178,54 @@
     $('#checkAdwords').click(function() {
       window.location.href = "campaigns_auto_create.jsp?network=adwords";
     });
+
+    var tags = <%=array.toString()%>;
+    $("#tagName").autocomplete({
+        source:tags
+    });
+    var regionArray = new Array();
+    regionList.forEach(function(region){
+        var countryName = region["name"];
+        regionArray.push(countryName);
+    });
+    $("#inputCountry").autocomplete({
+        source:regionArray
+    });
+
+    $("#inputCampaignName").focusin(function(){
+        $("#inputCountry").val("");
+        $("#inputCountry").prop("disabled",true);
+    });
+    $("#inputCampaignName").focusout(function(){
+        $("#inputCountry").prop("disabled",false);
+    });
+
+    $("#inputCountry").focusin(function(){
+        $("#inputCampaignName").val("");
+        $("#inputCampaignName").prop("disabled",true);
+    });
+    $("#inputCountry").focusout(function(){
+        $("#inputCampaignName").prop("disabled",false);
+    });
+
     $('#btnSearch').click(function() {
-      var query = $("#inputSearch").val();
+      var query = $("#inputCampaignName").val();
+      var country = $("#inputCountry").val();
+      var tagName = $("#tagName").val();
+      var network = "<%=network%>";
+      if(network =="adwords"){
+          regionList.forEach(function(a){
+              var countryName = a["name"];
+              if(countryName == country){
+                  country = a["country_code"];
+                  return;
+              }
+          });
+      }
       $.post('auto_create_campaign/<%=network%>/query', {
-        word: query
+          word: query,
+          country:country,
+          tagName:tagName
       }, function(data) {
         if (data && data.ret == 1) {
           $('.table tbody > tr').remove();
@@ -169,6 +237,52 @@
       }, 'json');
     });
 
+    function allChecked(){
+        var checked = $(".all_checkbox_campaign_enable").prop("checked");
+        if(checked){
+            //全部“开启”后
+            $(".checkbox_campaign_enable").prop("checked",true);
+            var list = $("tr:gt(0)");
+            var id_batch = "";
+            for(var i = 0;i<list.length;i++){
+                var temp = $(list[i]);
+                var id = temp.children("td").get(0).innerHTML;
+                id_batch += id+",";
+            }
+            id_batch = id_batch.replace(/(.*)(,)/,"$1");
+            $.post("auto_create_campaign/<%=network%>/enable",{
+                id_batch:id_batch,
+                enable:checked
+            },function(data){
+                if(data.ret==1){
+                    admanager.showCommonDlg("提示",data.message);
+                }else{
+                    admanager.showCommonDlg("提示",data.message);
+                }
+            });
+        }else{
+            //取消全部“开启”后
+            $(".checkbox_campaign_enable").prop("checked",false);
+            var list = $("tr:gt(0)");
+            var id_batch = "";
+            for(var i = 0;i<list.length;i++){
+                var temp = $(list[i]);
+                var id = temp.children("td").get(0).innerHTML;
+                id_batch += id+",";
+            }
+            id_batch = id_batch.replace(/(.*)(,)/,"$1");
+            $.post("auto_create_campaign/<%=network%>/enable",{
+                id_batch:id_batch,
+                enable:checked
+            },function(data){
+                if(data.ret==1){
+                    admanager.showCommonDlg("提示",data.message);
+                }else{
+                    admanager.showCommonDlg("提示",data.message);
+                }
+            });
+        }
+    }
     function setData(data) {
       for (var i = 0; i < data.length; i++) {
         var one = data[i];
@@ -201,8 +315,60 @@
         tr.append(td);
         $('.table tbody').append(tr);
       }
+      goToPage(1);
+      $(".changePage").hide();
     }
 
+    /**
+     * @param now 当前页码
+     * @param psize 一页显示的数量，在此函数内写死
+     */
+    function goToPage(now){
+        $("nav").empty();
+        var psize = 50;
+        var totalPage = 0;
+        var num = $("tbody tr").length;  //得到总行数
+        if((num/psize) > parseInt(num/psize)){
+            totalPage = parseInt(num/psize)+1;
+        }else{
+            totalPage = parseInt(num/psize);
+        }
+        var currentPage = now;
+        var start = (currentPage - 1) * psize;  //开始显示的行数-1
+        var end = currentPage * psize;  //结束行
+        end = (end > num) ? num : end;
+        var initRow = $("tbody tr");
+        var startRow = initRow;
+        if(start>0){
+            var startRow = $("tbody tr:gt("+start+")");
+        }
+        var endRow = $("tbody tr:gt("+end+")");
+        initRow.hide();
+        startRow.show();
+        endRow.hide();
+        var tempStr = "";
+        if (currentPage > 1) {
+            tempStr += "<a href=\"#\" onClick=\"goToPage(" + (currentPage - 1)+")\">上一页&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a>"
+            for (var j = 1; j <= totalPage; j++) {
+                tempStr += "<a href=\"#\" onClick=\"goToPage(" + j + ")\">" + j + "&nbsp;&nbsp;&nbsp;</a>"
+            }
+        } else {
+            tempStr += "上一页&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+            for (var j = 1; j <= totalPage; j++) {
+                tempStr += "<a href=\"#\" onClick=\"goToPage(" + j + ")\">" + j + "&nbsp;&nbsp;&nbsp;</a>"
+            }
+        }
+        if (currentPage < totalPage) {
+            tempStr += "<a href=\"#\" onClick=\"goToPage(" + (currentPage + 1)+")\">下一页&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a>";
+            for (var j = 1; j <= totalPage; j++) {
+            }
+        } else {
+            tempStr += "  下一页&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+        }
+        $("nav").append(tempStr);
+    }
+
+    // 点击[开启]checkbox后往后台修改表
     function bindOp() {
       $(".checkbox_campaign_enable").click(function() {
         var tr = $(this).parents("tr");
@@ -247,7 +413,6 @@
         $('#delete_dlg').modal('show');
       });
     }
-
     bindOp();
   </script>
   <script src="js/interlaced-color-change.js"></script>

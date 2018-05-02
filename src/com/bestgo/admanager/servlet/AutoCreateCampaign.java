@@ -51,9 +51,11 @@ public class AutoCreateCampaign extends HttpServlet {
                     break;
                 case "/query":
                     String word = request.getParameter("word");
-                    if (word != null) {
-                        JsonArray array = new JsonArray();
-                        List<JSObject> data = facebookFetchData(word);
+                    String tagName = request.getParameter("tagName"); //<input type="text">框内没有值时，默认有null值
+                    String countryName = request.getParameter("country");  //而jQuery.ui 的 autocomplete()方法，当框内没有值时，默认""
+                    JsonArray array = new JsonArray();
+                    List<JSObject> data = facebookFetchData(word,tagName,countryName);
+                    if(data.size()>0){
                         json.addProperty("ret", 1);
                         for (int i = 0; i < data.size(); i++) {
                             JsonObject one = new JsonObject();
@@ -78,8 +80,8 @@ public class AutoCreateCampaign extends HttpServlet {
                         result = new OperationResult();
                         result.result = true;
                         result.message = "执行成功";
+                        break;
                     }
-                    break;
                 case "/query_by_id":
                     String id = request.getParameter("id");
                     JSObject one = facebookFetchById(id);
@@ -124,34 +126,34 @@ public class AutoCreateCampaign extends HttpServlet {
                     break;
                 case "/query":
                     String word = request.getParameter("word");
-                    if (word != null) {
-                        JsonArray array = new JsonArray();
-                        List<JSObject> data = adwordsFetchData(word);
-                        json.addProperty("ret", 1);
-                        for (int i = 0; i < data.size(); i++) {
-                            JsonObject one = new JsonObject();
-                            Set<String> keySet = data.get(i).getKeys();
-                            for (String key : keySet) {
-                                Object value = data.get(i).get(key);
-                                if (value instanceof String) {
-                                    one.addProperty(key, (String) value);
-                                } else if (value instanceof Integer) {
-                                    one.addProperty(key, (Integer) value);
-                                } else if (value instanceof Long) {
-                                    one.addProperty(key, (Long) value);
-                                } else if (value instanceof Double) {
-                                    one.addProperty(key, Utils.trimDouble((Double) value,4));
-                                } else {
-                                    one.addProperty(key, value.toString());
-                                }
+                    String tagName = request.getParameter("tagName");
+                    String countryName = request.getParameter("country");
+                    JsonArray array = new JsonArray();
+                    List<JSObject> data = adwordsFetchData(word,tagName,countryName);
+                    json.addProperty("ret", 1);
+                    for (int i = 0; i < data.size(); i++) {
+                        JsonObject one = new JsonObject();
+                        Set<String> keySet = data.get(i).getKeys();
+                        for (String key : keySet) {
+                            Object value = data.get(i).get(key);
+                            if (value instanceof String) {
+                                one.addProperty(key, (String) value);
+                            } else if (value instanceof Integer) {
+                                one.addProperty(key, (Integer) value);
+                            } else if (value instanceof Long) {
+                                one.addProperty(key, (Long) value);
+                            } else if (value instanceof Double) {
+                                one.addProperty(key, Utils.trimDouble((Double) value,4));
+                            } else {
+                                one.addProperty(key, value.toString());
                             }
-                            array.add(one);
                         }
-                        json.add("data", array);
-                        result = new OperationResult();
-                        result.result = true;
-                        result.message = "执行成功";
+                        array.add(one);
                     }
+                    json.add("data", array);
+                    result = new OperationResult();
+                    result.result = true;
+                    result.message = "执行成功";
                     break;
                 case "/query_by_id":
                     String id = request.getParameter("id");
@@ -213,11 +215,24 @@ public class AutoCreateCampaign extends HttpServlet {
         return null;
     }
 
-    public static List<JSObject> facebookFetchData(String word) {
+    public static List<JSObject> facebookFetchData(String word,String tagName,String countryName) {
         List<JSObject> list = new ArrayList<>();
         try {
-            return DB.scan("ad_campaigns_auto_create").select(FB_CAMPAIGN_FIELDS)
-                    .where(DB.filter().whereLikeTo("campaign_name", "%" + word + "%")).orderByAsc("id").execute();
+            if(word != null && tagName == "" && countryName == ""){
+                return DB.scan("ad_campaigns_auto_create").select(FB_CAMPAIGN_FIELDS)
+                        .where(DB.filter().whereLikeTo("campaign_name", "%" + word + "%")).orderByAsc("id").execute();
+            }else if(word != null && word!= "" && tagName!="" ){
+                return DB.scan("ad_campaigns_auto_create").select(FB_CAMPAIGN_FIELDS)
+                        .where(DB.filter().whereEqualTo("app_name",tagName))
+                        .and(DB.filter().whereLikeTo("campaign_name", "%" + word + "%"))
+                        .orderByAsc("id").execute();
+            }else if(tagName != "" && countryName!= ""){
+                return DB.scan("ad_campaigns_auto_create").select(FB_CAMPAIGN_FIELDS)
+                        .where(DB.filter().whereEqualTo("app_name",tagName))
+                        .and(DB.filter().whereEqualTo("country_region",countryName))
+                        .orderByAsc("id").execute();
+            }
+
         } catch (Exception ex) {
             Logger logger = Logger.getRootLogger();
             logger.error(ex.getMessage(), ex);
@@ -536,13 +551,23 @@ public class AutoCreateCampaign extends HttpServlet {
         OperationResult result = new OperationResult();
         try {
             String id = request.getParameter("id");
+            String id_batch = request.getParameter("id_batch");
             String enable = request.getParameter("enable");
-            DB.update("ad_campaigns_auto_create")
-                    .put("enabled", "true".equals(enable) ? 1 : 0)
-                    .where(DB.filter().whereEqualTo("id", id))
-                    .execute();
-            result.result = true;
-            result.message = "操作成功";
+            if(id!=null){
+                DB.update("ad_campaigns_auto_create")
+                        .put("enabled", "true".equals(enable) ? 1 : 0)
+                        .where(DB.filter().whereEqualTo("id", id))
+                        .execute();
+                result.result = true;
+                result.message = "操作成功";
+            }else if(id_batch!=null){
+                String sql = "update ad_campaigns_auto_create set enabled = "+("true".equals(enable) ? 1 : 0)+
+                             " where id in("+id_batch+")";
+                DB.updateBySql(sql); //待测试是否真的存入
+                result.result = true;
+                result.message = "操作成功";
+            }
+
         } catch (Exception ex) {
             result.result = false;
             result.message = ex.getMessage();
@@ -565,11 +590,24 @@ public class AutoCreateCampaign extends HttpServlet {
         return null;
     }
 
-    public static List<JSObject> adwordsFetchData(String word) {
+    public static List<JSObject> adwordsFetchData(String word,String tagName,String countryName) {
         List<JSObject> list = new ArrayList<>();
         try {
-            return DB.scan("ad_campaigns_admob_auto_create").select(ADWORDS_CAMPAIGN_FIELDS)
-                    .where(DB.filter().whereLikeTo("campaign_name", "%" + word + "%")).orderByAsc("id").execute();
+            if(word != null && tagName=="" && countryName=="" ){
+                return DB.scan("ad_campaigns_admob_auto_create").select(ADWORDS_CAMPAIGN_FIELDS)
+                        .where(DB.filter().whereLikeTo("campaign_name", "%" + word + "%")).orderByAsc("id").execute();
+            }else if( word!=null && word!="" && tagName != ""){
+                return DB.scan("ad_campaigns_admob_auto_create").select(ADWORDS_CAMPAIGN_FIELDS)
+                        .where(DB.filter().whereLikeTo("campaign_name", "%" + word + "%"))
+                        .and(DB.filter().whereEqualTo("app_name",tagName))
+                        .orderByAsc("id").execute();
+            }else if( tagName != "" && countryName!=""){
+                return DB.scan("ad_campaigns_admob_auto_create").select(ADWORDS_CAMPAIGN_FIELDS)
+                        .where(DB.filter().whereEqualTo("app_name", tagName))
+                        .and(DB.filter().whereEqualTo("country_region",countryName))
+                        .orderByAsc("id").execute();
+            }
+
         } catch (Exception ex) {
             Logger logger = Logger.getRootLogger();
             logger.error(ex.getMessage(), ex);
@@ -836,13 +874,23 @@ public class AutoCreateCampaign extends HttpServlet {
         OperationResult result = new OperationResult();
         try {
             String id = request.getParameter("id");
+            String id_batch = request.getParameter("id_batch");
             String enable = request.getParameter("enable");
-            DB.update("ad_campaigns_admob_auto_create")
-                    .put("enabled", "true".equals(enable) ? 1 : 0)
-                    .where(DB.filter().whereEqualTo("id", id))
-                    .execute();
-            result.result = true;
-            result.message = "操作成功";
+            if(id!=null){
+                DB.update("ad_campaigns_admob_auto_create")
+                        .put("enabled", "true".equals(enable) ? 1 : 0)
+                        .where(DB.filter().whereEqualTo("id", id))
+                        .execute();
+                result.result = true;
+                result.message = "操作成功";
+            }else if(id_batch!=null){
+                String sql = "update ad_campaigns_admob_auto_create set enabled = "+("true".equals(enable) ? 1 : 0)+
+                             " where id in("+id_batch+")";
+                DB.updateBySql(sql);
+                result.result = true;
+                result.message = "操作成功";
+            }
+
         } catch (Exception ex) {
             result.result = false;
             result.message = ex.getMessage();

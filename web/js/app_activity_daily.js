@@ -16,6 +16,7 @@ $("#btnSearch").click(function(){
     var startDate = $("#inputStartDate").val();
     var tagName = $("input[id='inputSearch']").val();
     var result_body = $("<table border=\"1\" cellspacing=\"0\" cellpadding=\"5\" style='border-collapse:separate'></table>");
+    $("#btnSearch").prop("disabled",true);
     $("#results_body").empty(); //清空原有数据
     //用于动态回显查询到的日志
     $.post("app_activity_daily/search",{
@@ -24,6 +25,7 @@ $("#btnSearch").click(function(){
         tagName:tagName
     },function(data){
 //得到 startDate 和 endDate 之间所有的日期,并输出到表格头
+        $("#btnSearch").prop("disabled",false);
         var startTime = gDate(startDate);
         var endTime = gDate(endDate);
         var dateBetween = null;
