@@ -30,7 +30,7 @@ import java.util.*;
  */
 @WebServlet(name = "Campaign", urlPatterns = "/campaign/*")
 public class Campaign extends HttpServlet {
-    public static Map<String,Double> tagMaxBiddingRelationMap;
+    public static Map<String,Double> tagMaxBiddingRelationMap;   //声明了一个静态类，无属性，无方法，则Java会给它一个默认无参构造器
     static {
         if(tagMaxBiddingRelationMap == null){
             tagMaxBiddingRelationMap = new HashMap<>();
@@ -312,21 +312,28 @@ public class Campaign extends HttpServlet {
             }
         } else if (path.startsWith("/query_status")) {
             try {
-                Calendar calendar = Calendar.getInstance();
-                String startDate = String.format("%d-%02d-%02d 00:00:00",
-                        calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH));
-                String endDate = String.format("%d-%02d-%02d 23:59:59",
-                        calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH));
+                //注释掉的变量都是用不到的功能的冗余变量
+//                Calendar calendar = Calendar.getInstance();
+//                String startDate = String.format("%d-%02d-%02d 00:00:00",
+//                        calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH));
+//                String endDate = String.format("%d-%02d-%02d 23:59:59",
+//                        calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH));
 
-                calendar.add(Calendar.DAY_OF_MONTH, -1);
-                String yesterdayStart = String.format("%d-%02d-%02d 00:00:00",
-                        calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH));
-                String yesterdayEnd = String.format("%d-%02d-%02d 23:59:59",
-                        calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH));
+//                //测试用，测完后恢复取用的当天系统时间
+//                String startDate = "2018-04-02 00:00:00";
+//                String endDate = "2018-04-02 23:59:59";
 
+//                calendar.add(Calendar.DAY_OF_MONTH, -1);
+//                String yesterdayStart = String.format("%d-%02d-%02d 00:00:00",
+//                        calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH));
+//                String yesterdayEnd = String.format("%d-%02d-%02d 23:59:59",
+//                        calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH));
+
+                /*
                 long count = 0;
                 String sql = "select count(id) as cnt from ad_campaigns where create_time between '" + startDate + "' and '" + endDate + "'";
                 JSObject record = DB.findOneBySql(sql);
+                //@param count 统计当天一天内的活动系列（facebook & adwords）个数，但未发现用途
                 if (record.hasObjectData()) {
                     count = record.get("cnt");
                 }
@@ -335,11 +342,14 @@ public class Campaign extends HttpServlet {
                 if (record.hasObjectData()) {
                     count += (long)record.get("cnt");
                 }
+                */
 
+                /* 以下对 reduceCostItemHashMap 的处理是用不上的
                 Map<String, ReduceCostItem> reduceCostItemHashMap = new HashMap<>();
 
-                sql = "select campaign_id, network, enabled, excluded_country from web_ad_batch_change_campaigns where create_time between '" + startDate + "' and '" + endDate + "' and success=1";
+                String sql = "select campaign_id, network, enabled, excluded_country from web_ad_batch_change_campaigns where create_time between '" + startDate + "' and '" + endDate + "' and success=1";
                 List<JSObject> changeList = DB.findListBySql(sql);
+                //@param reduceCostItemHashMap 用于临时存放某个campaign_id在当天对应的活动，只保留该系列最新的活动
                 for (int i = 0; i < changeList.size(); i++) {
                     JSObject one = changeList.get(i);
                     int enabled = one.get("enabled");
@@ -353,7 +363,7 @@ public class Campaign extends HttpServlet {
                     if (item == null) {
                         item = new ReduceCostItem();
                         item.campaignId = campaignId;
-                        if (network.equals("admob")) {
+                        if (network.equals("admob")) {  //这对if/else用于匹配campaign_id对应的 tag_name
                             sql = "select tag_name from web_ad_campaign_tag_admob_rel, web_tag where campaign_id=? and tag_id=web_tag.id";
                             JSObject tagNameRecord = DB.findOneBySql(sql, campaignId);
                             item.appName = tagNameRecord.get("tag_name");
@@ -376,6 +386,7 @@ public class Campaign extends HttpServlet {
 
                 sql = "select campaign_id, country_code, total_spend from web_ad_campaigns_country_history where date between ? and ?";
                 List<JSObject> facebookHistory = DB.findListBySql(sql, yesterdayStart, yesterdayEnd);
+                //针对facebook昨天的历史对 reduceCostItemHashMap 进行参数修改
                 for (int i = 0; i < facebookHistory.size(); i++) {
                     JSObject one = facebookHistory.get(i);
                     String campaignId = one.get("campaign_id");
@@ -401,6 +412,7 @@ public class Campaign extends HttpServlet {
 
                 sql = "select campaign_id, country_code, total_spend from web_ad_campaigns_country_history_admob where date between ? and ?";
                 List<JSObject> adwordsHistory = DB.findListBySql(sql, yesterdayStart, yesterdayEnd);
+                //针对adwords昨天的历史对 reduceCostItemHashMap 进行参数修改
                 for (int i = 0; i < adwordsHistory.size(); i++) {
                     JSObject one = adwordsHistory.get(i);
                     String campaignId = one.get("campaign_id");
@@ -423,9 +435,12 @@ public class Campaign extends HttpServlet {
                         }
                     }
                 }
+                */
 
+                /*
+                //@param reduceCost 用于统计和临时存放某appName对应的cost，size较小
                 Map<String, Double> reduceCost = new HashMap<>();
-                for (ReduceCostItem item : reduceCostItemHashMap.values()) {
+                for (ReduceCostItem item : reduceCostItemHashMap.values()) { //reduceCostItemHashMap.values()得到某个campaign_id对应的value（ReduceCostItem类实例）
                     Double cost = reduceCost.get(item.appName);
                     if (cost == null) {
                         cost = 0.0;
@@ -435,7 +450,7 @@ public class Campaign extends HttpServlet {
                 }
 
                 JsonArray reduceArr = new JsonArray();
-                for (String key : reduceCost.keySet()) {
+                for (String key : reduceCost.keySet()) {   //把appName/cost的键值对放到一个数组里
                     JsonObject one = new JsonObject();
                     one.addProperty("appName", key);
                     one.addProperty("cost", Utils.trimDouble(reduceCost.get(key),3));
@@ -448,6 +463,7 @@ public class Campaign extends HttpServlet {
                 double totalInstalled = 0;
                 sql = "select count(id) as cnt from ad_campaigns where create_time between '" + yesterdayStart + "' and '" + yesterdayEnd + "' and success=1";
                 record = DB.findOneBySql(sql);
+                //@param yesterdayCount 用统计昨天的系列活动个次
                 if (record.hasObjectData()) {
                     yesterdayCount += (long)record.get("cnt");
                 }
@@ -498,7 +514,10 @@ public class Campaign extends HttpServlet {
                 yesterdayData.addProperty("count", yesterdayCount);
                 yesterdayData.addProperty("total_spend", totalSpend);
                 yesterdayData.addProperty("total_installed", totalInstalled);
+                */
 
+                //@param fields 这个才是用于campaign_status.jsp 的回显的重要数据
+                //@param array 用于存放facebook和adwords的具体错误信息的数组
                 String[] fields = {"id", "campaign_name", "failed_count", "last_error_message"};
                 JsonArray array = new JsonArray();
 
@@ -507,7 +526,7 @@ public class Campaign extends HttpServlet {
                 for (int i = 0; i < list.size(); i++) {
                     JsonObject one = new JsonObject();
                     for (int j = 0; j < fields.length; j++) {
-                        one.addProperty(fields[j], list.get(i).get(fields[j]).toString());
+                        one.addProperty(fields[j], list.get(i).get(fields[j]).toString());//把list里的键值对赋值给one
                     }
                     one.addProperty("network", "Facebook");
                     array.add(one);
@@ -523,10 +542,10 @@ public class Campaign extends HttpServlet {
                     one.addProperty("network", "AdWords");
                     array.add(one);
                 }
-                json.addProperty("today_create_count", count);
-                json.add("data", array);
-                json.add("yesterdayData", yesterdayData);
-                json.add("reduceArr", reduceArr);
+//                json.addProperty("today_create_count", count);
+                json.add("data", array);  //前端回显只用了这一条
+//                json.add("yesterdayData", yesterdayData);
+//                json.add("reduceArr", reduceArr);
                 json.addProperty("ret", 1);
             } catch (Exception ex) {
                 ex.printStackTrace();
