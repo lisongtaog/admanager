@@ -275,12 +275,22 @@ public class Campaign extends HttpServlet {
             json.addProperty("ret", result.result ? 1 : 0);
             json.addProperty("message", result.message);
         } else if (path.startsWith("/query_batch_change_status")) {
+            String pageNow = request.getParameter("pageNow");
+            int pageSize = 50;
+            int pageIdx = (Integer.parseInt(pageNow)-1)*pageSize;
             try {
+                String sql = "select count(id) as count from web_ad_batch_change_campaigns where success=0";
+                JSObject temp = DB.findOneBySql(sql);
+                long count = temp.get("count");
+                long totalPage = count/pageSize + (count % pageSize == 0 ? 0 : 1);
                 String[] fields = {"id", "network", "campaign_id", "campaign_name", "failed_count", "last_error_message"};
                 JsonArray array = new JsonArray();
-
-                List<JSObject> list = DB.scan("web_ad_batch_change_campaigns").select(fields)
-                        .where(DB.filter().whereEqualTo("success", 0)).execute();
+                sql = "SELECT id,network,campaign_id,campaign_name,failed_count,last_error_message FROM web_ad_batch_change_campaigns "+
+                             "WHERE success = 0 "+
+                             "LIMIT "+pageSize+" OFFSET "+pageIdx;
+//                List<JSObject> list = DB.scan("web_ad_batch_change_campaigns").select(fields)
+//                        .where(DB.filter().whereEqualTo("success", 0)).execute();
+                List<JSObject> list = DB.findListBySql(sql);
                 for (int i = 0; i < list.size(); i++) {
                     JsonObject one = new JsonObject();
                     for (int j = 0; j < fields.length; j++) {
@@ -306,6 +316,7 @@ public class Campaign extends HttpServlet {
                     array.add(one);
                 }
                 json.add("data", array);
+                json.addProperty("total_page",totalPage);
                 json.addProperty("ret", 1);
             } catch (Exception ex) {
                 ex.printStackTrace();
@@ -531,7 +542,7 @@ public class Campaign extends HttpServlet {
                 String page = request.getParameter("pageNow");
                 int pageSizeAlone = pageSize/2;
                 int pageInt = Integer.parseInt(page);
-                int pageIdx = pageInt-1;
+                int pageIdx = (pageInt-1)*pageSizeAlone;
 //                String[] fields = {"id", "campaign_name", "failed_count", "last_error_message"};
                 JsonArray array = new JsonArray();
 

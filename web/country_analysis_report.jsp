@@ -151,7 +151,7 @@
                     "<th>PI</th>" +
                     "<th>ARPU</th>" +
                     "<th>ECPM<span sorterId=\"1040\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
-                    "<th>成本价</th>" +
+                    "<th>成本价/2</th>" +
                     "<th>CPA<span sorterId=\"1041\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
                     "<th>ACpa</th>" +
                     "<th>CPA/ECPM</th>" +
@@ -254,6 +254,9 @@
                     if(r < 0){
                         td.addClass("red");
                     }
+                }
+                if('revenue_per_install' == key){
+                    r = r / 2;
                 }
                 td.text(r);
                 tr.append(td);

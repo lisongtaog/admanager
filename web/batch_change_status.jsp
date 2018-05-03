@@ -57,16 +57,36 @@
       </table>
     </div>
   </div>
+  <div>
+    <nav aria-label="Page navigation">
+      <ul class="pagination">
+        <li>
+                <span id="Page">第
+                    <span><input type="text" id="pageNow" style="width:40px"></span>
+                    <span>/</span>
+                    <span id="totalPage"></span>页
+                    <button id="goToPage">go</button>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <button id="preIndex">上一页</button>
+                    <button id="nextIndex">下一页</button>
+                </span>
+        </li>
+      </ul>
+    </nav>
+  </div>
 
   <script src="js/jquery.js"></script>
   <script src="bootstrap/js/bootstrap.min.js"></script>
 
   <script>
-    function fetchData() {
+    function fetchData(pageNow) {
       $.post('campaign/query_batch_change_status', {
+          pageNow:pageNow
       }, function(data) {
         if (data && data.ret == 1) {
-
+            var totalPage = data.total_page;
+            $("#totalPage").text(totalPage);
+            $("#pageNow").val(pageNow);
           $('.table tbody tr').remove();
           for (var i = 0; i < data.data.length; i++) {
             var one = data.data[i];
@@ -96,11 +116,28 @@
     }
 
 
-    setInterval(function() {
-      fetchData();
-    }, 1000 * 60);
+    // setInterval(function() {
+    //   fetchData();
+    // }, 1000 * 60);
 
-    fetchData();
+    fetchData(1);
+
+    //分页查询
+    $("#Page").on("click","button",function(){
+        var pageNow = 1;
+        var elementClicked = $(this).attr("id");
+        if(elementClicked == "goToPage"){
+            pageNow = parseInt($("#pageNow").val());
+        }else if(elementClicked == "preIndex"){
+            var page = parseInt($("#pageNow").val());
+            pageNow = page>1 ? page-1 : page;
+        }else if(elementClicked == "nextIndex"){
+            var page = parseInt($("#pageNow").val());
+            var totalPage = parseInt($("#totalPage").text());
+            pageNow = page < totalPage ? page+1 : totalPage;
+        }
+        fetchData(pageNow);
+    });
 
     $("#btnFiltrateError").click(function(){
         var likeLastErrorMessage = $("#inputLikeLastErrorMessage").val();
