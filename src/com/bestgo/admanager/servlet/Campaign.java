@@ -516,34 +516,65 @@ public class Campaign extends HttpServlet {
                 yesterdayData.addProperty("total_installed", totalInstalled);
                 */
 
+                String sqlInit = "select count(id) as count from ad_campaigns where success = 0 ";
+                JSObject temp = DB.findOneBySql(sqlInit);
+                long sum = temp.get("count");
+                sqlInit = "select count(id) as count from ad_campaigns_admob where success = 0 ";
+                temp = DB.findOneBySql(sqlInit);
+                long sum1 = temp.get("count");
+                sum += sum1;
+                int pageSize = 50;
+                long totalPage = sum/pageSize + (sum % pageSize == 0 ? 0 : 1);
+
                 //@param fields 这个才是用于campaign_status.jsp 的回显的重要数据
                 //@param array 用于存放facebook和adwords的具体错误信息的数组
-                String[] fields = {"id", "campaign_name", "failed_count", "last_error_message"};
+                String page = request.getParameter("pageNow");
+                int pageSizeAlone = pageSize/2;
+                int pageInt = Integer.parseInt(page);
+                int pageIdx = pageInt-1;
+//                String[] fields = {"id", "campaign_name", "failed_count", "last_error_message"};
                 JsonArray array = new JsonArray();
 
-                List<JSObject> list = DB.scan("ad_campaigns").select(fields)
-                        .where(DB.filter().whereEqualTo("success", 0)).execute();
+//                List<JSObject> list = DB.scan("ad_campaigns").select(fields)
+//                        .where(DB.filter().whereEqualTo("success", 0)).execute();
+
+                //分页还没做好 总页面回显 和 页数填写
+                List<JSObject> list = new ArrayList<JSObject>();
+                String sql = "SELECT id,campaign_name,failed_count,last_error_message FROM ad_campaigns "+
+                             "WHERE success = 0 "+
+                             "LIMIT "+pageSizeAlone+" OFFSET "+pageIdx;     //这一句是可以优化的
+                list = DB.findListBySql(sql);
                 for (int i = 0; i < list.size(); i++) {
                     JsonObject one = new JsonObject();
-                    for (int j = 0; j < fields.length; j++) {
-                        one.addProperty(fields[j], list.get(i).get(fields[j]).toString());//把list里的键值对赋值给one
-                    }
+//                    for (int j = 0; j < fields.length; j++) {
+//                        one.addProperty(fields[j], list.get(i).get(fields[j]).toString());//把list里的键值对赋值给one
+//                    }
+                    one.addProperty("id",list.get(i).get("id").toString());
+                    one.addProperty("campaign_name",list.get(i).get("campaign_name").toString());
+                    one.addProperty("failed_count",list.get(i).get("failed_count").toString());
+                    one.addProperty("last_error_message",list.get(i).get("last_error_message").toString());
                     one.addProperty("network", "Facebook");
                     array.add(one);
                 }
 
-                list = DB.scan("ad_campaigns_admob").select(fields)
-                        .where(DB.filter().whereEqualTo("success", 0)).execute();
+//                list = DB.scan("ad_campaigns_admob").select(fields)
+//                        .where(DB.filter().whereEqualTo("success", 0)).execute();
+                sql = "SELECT id,campaign_name,failed_count,last_error_message FROM ad_campaigns_admob "+
+                        "WHERE success = 0 "+
+                        "LIMIT "+pageSizeAlone+" OFFSET "+pageIdx;
+                list = DB.findListBySql(sql);
                 for (int i = 0; i < list.size(); i++) {
                     JsonObject one = new JsonObject();
-                    for (int j = 0; j < fields.length; j++) {
-                        one.addProperty(fields[j], list.get(i).get(fields[j]).toString());
-                    }
+                    one.addProperty("id",list.get(i).get("id").toString());
+                    one.addProperty("campaign_name",list.get(i).get("campaign_name").toString());
+                    one.addProperty("failed_count",list.get(i).get("failed_count").toString());
+                    one.addProperty("last_error_message",list.get(i).get("last_error_message").toString());
                     one.addProperty("network", "AdWords");
                     array.add(one);
                 }
 //                json.addProperty("today_create_count", count);
                 json.add("data", array);  //前端回显只用了这一条
+                json.addProperty("total_page",totalPage);
 //                json.add("yesterdayData", yesterdayData);
 //                json.add("reduceArr", reduceArr);
                 json.addProperty("ret", 1);

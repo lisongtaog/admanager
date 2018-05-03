@@ -47,15 +47,34 @@
       </table>
     </div>
   </div>
+  <div>
+    <nav aria-label="Page navigation">
+      <ul class="pagination">
+        <li>
+                <span id="Page">第
+                    <span><input type="text" id="pageNow" style="width:40px"></span>
+                    <span>/</span>
+                    <span id="totalPage"></span>页
+                    <button id="goToPage">go</button>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <button id="preIndex">上一页</button>
+                    <button id="nextIndex">下一页</button>
+                </span>
+        </li>
+      </ul>
+    </nav>
+  </div>
 
   <script src="js/jquery.js"></script>
   <script src="bootstrap/js/bootstrap.min.js"></script>
 
   <script>
-    function fetchData() {
-      $.post('campaign/query_status', {
-      }, function(data) {
-        if (data && data.ret == 1) {
+    function fetchData(pageNow) {
+
+        $.post('campaign/query_status', {
+            pageNow:pageNow
+        }, function(data) {
+            if (data && data.ret == 1) {
 //          $('#todayResult').text("今日创建系列数量: " + data.today_create_count + ", 昨天创建数量: " + data.yesterdayData.count
 //                  + ", 安装数: " + data.yesterdayData.total_installed + ", 花费: " + data.yesterdayData.total_spend);
 //          $('#reduceResult').html("");
@@ -64,40 +83,63 @@
 //            $('#reduceResult').append($("<li>" + one.appName + " : " + one.cost  + "</li>"));
 //          }
 
-          $('.table tbody tr').remove();
-          for (var i = 0; i < data.data.length; i++) {
-            var one = data.data[i];
-            var tr = $('<tr></tr>');
-            var td = $('<td></td>');
-            td.html("<input name='subChk' value= '" + one.id + "-"+ one.network + "' type='checkbox'/>");
-            tr.append(td);
-            td = $('<td></td>');
-            td.text(one.network);
-            tr.append(td);
-            td = $('<td></td>');
-            td.text(one.id);
-            tr.append(td);
-            td = $('<td></td>');
-            td.text(one.campaign_name);
-            tr.append(td);
-            td = $('<td></td>');
-            td.text(one.failed_count);
-            tr.append(td);
-            td = $('<td></td>');
-            td.text(one.last_error_message);
-            tr.append(td);
-            $('.table tbody').append(tr);
-          }
-        }
-      }, 'json');
+                var totalPage = data.total_page;
+                $("#totalPage").text(totalPage);
+                $("#pageNow").val(pageNow);
+                $('.table tbody tr').remove();
+                for (var i = 0; i < data.data.length; i++) {
+                    var one = data.data[i];
+                    var tr = $('<tr></tr>');
+                    var td = $('<td></td>');
+                    td.html("<input name='subChk' value= '" + one.id + "-"+ one.network + "' type='checkbox'/>");
+                    tr.append(td);
+                    td = $('<td></td>');
+                    td.text(one.network);
+                    tr.append(td);
+                    td = $('<td></td>');
+                    td.text(one.id);
+                    tr.append(td);
+                    td = $('<td></td>');
+                    td.text(one.campaign_name);
+                    tr.append(td);
+                    td = $('<td></td>');
+                    td.text(one.failed_count);
+                    tr.append(td);
+                    td = $('<td></td>');
+                    td.text(one.last_error_message);
+                    tr.append(td);
+                    $('.table tbody').append(tr);
+                }
+            }
+            //$("#totalPage").text()  待填入数据
+        }, 'json');
     }
 
-    setInterval(function() {
-      fetchData();
-    }, 1000 * 60);
+    //这个定时任务原本用于自动刷新
+    // setInterval(function() {
+    //   fetchData();
+    // }, 1000 * 60);
 
-    fetchData();
+    fetchData(1);
 
+    //分页查询
+    $("#Page").on("click","button",function(){
+        var pageNow = 1;
+        var elementClicked = $(this).attr("id");
+        if(elementClicked == "goToPage"){
+            pageNow = parseInt($("#pageNow").val());
+        }else if(elementClicked == "preIndex"){
+            var page = parseInt($("#pageNow").val());
+            pageNow = page>1 ? page-1 : page;
+        }else if(elementClicked == "nextIndex"){
+            var page = parseInt($("#pageNow").val());
+            var totalPage = parseInt($("#totalPage").text());
+            pageNow = page < totalPage ? page+1 : totalPage;
+        }
+        fetchData(pageNow);
+    });
+
+    //底下模糊筛选用于对前端已展示的“错误信息”一栏做模糊筛选
     $("#btnFiltrateError").click(function(){
         var likeLastErrorMessage = $("#inputLikeLastErrorMessage").val();
         if(likeLastErrorMessage == ""){
