@@ -102,7 +102,6 @@
             <input type="checkbox" name="adnetwork" id="adwordsCheck"/><label for="adwordsCheck">只显示AdWords</label>
             <input type="checkbox" id="countryCheck"/><label for="countryCheck">细分到国家</label>
             <input type="checkbox" name="filtrateCampaign" id="containsNoDataCampaignCheck"/><label for="containsNoDataCampaignCheck">包含无数据的系列</label>
-            <%--<input type="checkbox" name="filtrateCampaign" id="onlyQueryNoDataCampaignCheck"/><label for="onlyQueryNoDataCampaignCheck">只查询无数据的系列</label>--%>
 
             <div>
                 <label>花费比例</label><select id="selectCostOp"><option value="1">大于等于</option><option value="2" selected="true">小于等于</option></select>
@@ -113,7 +112,7 @@
 
                 <button id="btnSummary" class="btn btn-default">汇总数据</button>
                 <button id="btnModifyBatch" class="btn btn-default">批量修改</button>
-                <%--<button id="btnQueryNoData" class="btn btn-default">查询无数据的系列</button>--%>
+                <button id="btnQueryNoData" class="btn btn-default">查询无数据的系列</button>
                 <input type="button" class="btn btn-default" id="btnBatchChangeStatus" value="修改状态监控"/>
             </div>
 
@@ -151,51 +150,7 @@
         <tbody id="results_body">
         </tbody>
     </table>
-    <%-- 构建分页导航 --%>
-    共有${requestScope.pageBean.totalRecord}个员工，共${requestScope.pageBean.totalPage }页，当前为${requestScope.pageBean.pageNum}页
-    <br/>
-    <a href="${pageContext.request.contextPath}/FindAllWithPage?pageNum=1">首页</a>
-    <%--如果当前页为第一页时，就没有上一页这个超链接显示 --%>
-    <c:if test="${requestScope.pageBean.pageNum ==1}">
-        <c:forEach begin="${requestScope.pageBean.start}" end="${requestScope.pageBean.end}" step="1" var="i">
-            <c:if test="${requestScope.pageBean.pageNum == i}">
-                ${i}
-            </c:if>
-            <c:if test="${requestScope.pageBean.pageNum != i}">
-                <a href="${pageContext.request.contextPath}/FindAllWithPage?pageNum=${i}">${i}</a>
-            </c:if>
-        </c:forEach>
-        <a href="${pageContext.request.contextPath}/FindAllWithPage?pageNum=${requestScope.pageBean.pageNum+1}">下一页</a>
-    </c:if>
 
-    <%--如果当前页不是第一页也不是最后一页，则有上一页和下一页这个超链接显示 --%>
-    <c:if test="${requestScope.pageBean.pageNum > 1 && requestScope.pageBean.pageNum < requestScope.pageBean.totalPage}">
-        <a href="${pageContext.request.contextPath}/FindAllWithPage?pageNum=${requestScope.pageBean.pageNum-1}">上一页</a>
-        <c:forEach begin="${requestScope.pageBean.start}" end="${requestScope.pageBean.end}" step="1" var="i">
-            <c:if test="${requestScope.pageBean.pageNum == i}">
-                ${i}
-            </c:if>
-            <c:if test="${requestScope.pageBean.pageNum != i}">
-                <a href="${pageContext.request.contextPath}/FindAllWithPage?pageNum=${i}">${i}</a>
-            </c:if>
-        </c:forEach>
-        <a href="${pageContext.request.contextPath}/FindAllWithPage?pageNum=${requestScope.pageBean.pageNum+1}">下一页</a>
-    </c:if>
-
-    <%-- 如果当前页是最后一页，则只有上一页这个超链接显示，下一页没有 --%>
-    <c:if test="${requestScope.pageBean.pageNum == requestScope.pageBean.totalPage}">
-        <a href="${pageContext.request.contextPath}/FindAllWithPage?pageNum=${requestScope.pageBean.pageNum-1}">上一页</a>
-        <c:forEach begin="${requestScope.pageBean.start}" end="${requestScope.pageBean.end}" step="1" var="i">
-            <c:if test="${requestScope.pageBean.pageNum == i}">
-                ${i}
-            </c:if>
-            <c:if test="${requestScope.pageBean.pageNum != i}">
-                <a href="${pageContext.request.contextPath}/FindAllWithPage?pageNum=${i}">${i}</a>
-            </c:if>
-        </c:forEach>
-    </c:if>
-    <%--尾页 --%>
-    <a href="${pageContext.request.contextPath}/FindAllWithPage?pageNum=${requestScope.pageBean.totalPage}">尾页</a>
     <div style="text-align: center">
         <input id="btnModifySubmit" type="button" class="btn btn-primary" value="提交修改"/>
     </div>
@@ -256,7 +211,7 @@
 <script src="jqueryui/jquery-ui.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.4/js/select2.min.js"></script>
 <script src="js/country-name-code-dict.js"></script>
-<script src="js/index2.js?t=20180125"></script>
+<script src="js/index2.js?t=20180126"></script>
 
 <script>
     $("li[role='presentation']:eq(0)").addClass("active");
