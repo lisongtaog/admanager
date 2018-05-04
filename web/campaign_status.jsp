@@ -34,13 +34,18 @@
 
     <div class="panel panel-default">
       <div>
+        <%--这里还能再好看一点么--%>
         💚💜💙💖<input id="btnSetZero" type="button" value="置零" style="color: #2b542c">💚💜💙💖<input id="btnDelete" type="button" value="删除" style="color: #c08b5f">
-        💚💜💙💖<input type="text" id="inputLikeLastErrorMessage" /><input id="btnFiltrateError" type="button" value="模糊筛选" style="color: #4385c0">💚💜💙💖
       </div>
       <table class="table">
         <thead>
-        <tr><th>☆</th><th>网络</th><th>序号</th><th>系列名称</th><th>失败次数</th><th>错误信息</th></tr>
-        <tr><th><input type="checkbox" id="allChk"/></th><th>全选</th><th></th><th></th><th></th><th></th></tr>
+        <tr>
+          <th><input type="checkbox" id="allChk"></th><th>网络</th><th>序号</th><th>系列名称</th><th>失败次数</th>
+          <th>错误信息
+            <input type="text" id="inputLikeLastErrorMessage">
+            <button id="btnFiltrateError" class="btn btn-sm"><span class="glyphicon glyphicon-filter">模糊筛选</span></button>
+          </th>
+        </tr>
         </thead>
         <tbody>
         </tbody>
