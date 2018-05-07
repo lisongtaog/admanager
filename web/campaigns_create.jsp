@@ -231,22 +231,6 @@
                 <input class="form-control" id="inputMaxCpa" />
             </div>
         </div>
-        <label>广告语组合：</label><select id="selectAdvertGroupId">
-                                        <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option>
-                                        <option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option>
-                                   </select>
-        <div class="form-group">
-            <label for="inputTitle" class="col-sm-2 control-label">广告标题</label>
-            <div class="col-sm-10">
-                <input class="form-control" id="inputTitle" />
-            </div>
-        </div>
-        <div class="form-group">
-            <label for="inputMessage" class="col-sm-2 control-label">广告语</label>
-            <div class="col-sm-10">
-                <input class="form-control" id="inputMessage" />
-            </div>
-        </div>
         <div class="form-group">
             <label for="inputImagePath" class="col-sm-2 control-label">图片路径</label>
             <div class="col-sm-8">
@@ -271,6 +255,14 @@
                 <label><input type="checkbox" id="onlyCheckAutoCreate"/>仅设置为自动创建</label>
             </div>
         </div>
+        <br>
+        <table class="table table-hover" id="advertisement">
+            <thead>
+            <tr><th><span class="glyphicon glyphicon-info-sign" title="广告语暂时单选"></span></th>
+                <th>广告语组合</th><th>语言</th><th>广告语标题</th><th>广告语</th></tr>
+            </thead>
+            <tbody id="tbody_facebook"></tbody>
+        </table>
     </form>
 
 
@@ -368,34 +360,6 @@
                 <input class="form-control" id="inputMaxCpaAdmob" />
             </div>
         </div>
-        <label>广告语组合：</label><select id="selectAdvertGroupIdAdmob">
-        <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option>
-        <option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option>
-    </select>
-        <div class="form-group">
-            <label for="inputMessage" class="col-sm-2 control-label">广告语1</label>
-            <div class="col-sm-10">
-                <input class="form-control" id="inputMessage1" />
-            </div>
-        </div>
-        <div class="form-group">
-            <label for="inputMessage" class="col-sm-2 control-label">广告语2</label>
-            <div class="col-sm-10">
-                <input class="form-control" id="inputMessage2" />
-            </div>
-        </div>
-        <div class="form-group">
-            <label for="inputMessage" class="col-sm-2 control-label">广告语3</label>
-            <div class="col-sm-10">
-                <input class="form-control" id="inputMessage3" />
-            </div>
-        </div>
-        <div class="form-group">
-            <label for="inputMessage" class="col-sm-2 control-label">广告语4</label>
-            <div class="col-sm-10">
-                <input class="form-control" id="inputMessage4" />
-            </div>
-        </div>
         <div class="form-group">
             <label for="inputImagePath" class="col-sm-2 control-label">图片路径</label>
             <div class="col-sm-8">
@@ -411,6 +375,14 @@
                 <label><input type="checkbox" id="onlyCheckAdmobAutoCreate"/>仅设置为自动创建</label>
             </div>
         </div>
+        <br>
+        <table class="table table-hover" id="advertisement_admob">
+            <thead>
+            <tr><th><span class="glyphicon glyphicon-info-sign" title="广告语暂时单选"></span></th>
+                <th>广告语组合</th><th>语言</th><th>广告语1</th><th>广告语2</th><th>广告语3</th><th>广告语4</th></tr>
+            </thead>
+            <tbody id="tbody_admob"></tbody>
+        </table>
     </form>
 
 </div>
@@ -427,6 +399,7 @@
 <script src="js/bootstrap-datetimepicker.js"></script>
 <script src="jqueryui/jquery-ui.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.4/js/select2.min.js"></script>
+<script src="js/layer/layer.js" ></script>
 
 
 <script>
@@ -439,7 +412,7 @@
     var IndexBudget = <%=budget%>;
     var IndexBidding = <%=bidding%>;
 </script>
-
+<script src="js\campaign_create_init.js"></script>
 <script src="js/campaign_create.js?t=20180326"></script>
 
 </body>

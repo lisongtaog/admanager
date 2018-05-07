@@ -79,8 +79,17 @@ public class Campaign extends HttpServlet {
             String groupId = request.getParameter("groupId");
             String title = request.getParameter("title");
             String message = request.getParameter("message");
-            String imagePath = request.getParameter("imagePath");
-            String videoPath = request.getParameter("videoPath");
+            String identification = request.getParameter("identification");
+            String materialPath = request.getParameter("materialPath");
+            String imagePath = new String();
+            String videoPath = new String();
+            if(identification.equals("image")){
+                imagePath = materialPath;
+                videoPath = "";
+            }else if(identification.equals("video")){
+                videoPath =  materialPath;
+                imagePath = "";
+            }
 
             OperationResult result = new OperationResult();
             try {
@@ -161,6 +170,8 @@ public class Campaign extends HttpServlet {
                     }
                 }
 
+//                //test
+//                result.result=true;
                 if (result.result) {
                     Calendar calendar = Calendar.getInstance();
                     String campaignNameOld = campaignName + "_";
@@ -179,8 +190,6 @@ public class Campaign extends HttpServlet {
                             if (campaignName.length() > 100) {
                                 campaignName = campaignName.substring(0, 100);
                             }
-
-
                             long genId = DB.insert("ad_campaigns")
                                     .put("facebook_app_id", appId)
                                     .put("account_id", accountIdArr[j])

@@ -287,7 +287,6 @@ public class AutoCreateCampaign extends HttpServlet {
             String groupId = request.getParameter("groupId");
             String title = request.getParameter("title");
             String message = request.getParameter("message");
-            String imagePath = request.getParameter("imagePath");
             String region = request.getParameter("region");
             String age = request.getParameter("age");
             String gender = request.getParameter("gender");
@@ -296,7 +295,17 @@ public class AutoCreateCampaign extends HttpServlet {
             String explodeAge = request.getParameter("explodeAge");
             String explodeGender = request.getParameter("explodeGender");
             String explodeBidding = request.getParameter("explodeBidding");
-            String videoPath = request.getParameter("videoPath");
+            String identification = request.getParameter("identification");
+            String materialPath = request.getParameter("materialPath");
+            String imagePath = new String();
+            String videoPath = new String();
+            if(identification.equals("image")){
+                imagePath = materialPath;
+                videoPath = "";
+            }else if(identification.equals("video")){
+                videoPath =  materialPath;
+                imagePath = "";
+            }
 
             result.result = false;
             File imagesPath = null;
@@ -372,7 +381,7 @@ public class AutoCreateCampaign extends HttpServlet {
                 interest = (interest == null) ? "" : interest;
                 userOs = (userOs == null) ? "" : userOs;
                 userDevice = (userDevice == null) ? "" : userDevice;
-                long recordId = DB.insert("ad_campaigns_auto_create")
+                boolean record = DB.insert("ad_campaigns_auto_create")
                         .put("app_name", appName)
                         .put("create_count", Utils.parseInt(createCount, 0))
                         .put("account_id", accountId)
@@ -398,11 +407,11 @@ public class AutoCreateCampaign extends HttpServlet {
                         .put("image_path", imagePath)
                         .put("video_path", videoPath)
                         .put("create_time", DateUtil.getNowTime())
-                        .executeReturnId();
-                if (recordId > 0) {
+                        .execute();
+                if (record) {
                     result.result = true;
                     result.message = "创建成功";
-                } else {
+                }else {
                     result.result = false;
                     result.message = "创建失败";
                 }
@@ -443,7 +452,6 @@ public class AutoCreateCampaign extends HttpServlet {
             String explodeAge = request.getParameter("explodeAge");
             String explodeGender = request.getParameter("explodeGender");
             String explodeBidding = request.getParameter("explodeBidding");
-
 
             result.result = true;
             JSObject record = DB.simpleScan("web_system_config").select("config_value").where(DB.filter().whereEqualTo("config_key", "fb_image_path")).execute();
