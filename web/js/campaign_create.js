@@ -186,12 +186,13 @@ function batchRequest(params, send, onFinish) {
         setTimeout(function () {   //定时任务，直到 idx === param.length的时候 定时任务才结束
             idx++;
             if (idx === params.length) {
+                setTimeout(function(){
+                    $('#common_message_dialog').modal('hide');
+                },1500);
+                // console.log("你能看到我，说明执行了这个setTimeout（）");
                 admanager.showCommonDlg("完成", getFullLog(), function () {
                     onFinish(errLog);
                 });
-                setTimeout(function(){
-                    $('#common_message_dialog').modal('hide');
-                },3000);
                 return;
             }
             if(errLog.length>0){
@@ -323,16 +324,6 @@ if(!isIndexCreate && !isAutoCreate)  {
         }
     });
 }
-//单选广告语暂时点击绑定
-$("table").on("click","input",function(){
-    var idx = $(this).parent().index();
-    $(".check_group_admob, .check_group").prop("checked",false);
-    if($("#checkFacebook").prop("checked")){
-        $("#tbody_facebook tr:eq("+idx+")").children("input").prop("checked",true);
-    }else if($("#checkAdmob").prop("checked")){
-        $("#tbody_admob tr:eq("+idx+")").children("input").prop("checked",true);
-    }
-});
 
 //根据[国家地区][应用名称]回显已创建好的广告语
 $("#selectRegion").change(function () {
@@ -408,13 +399,24 @@ $("#selectRegionAdmob").change(function () {
                 admanager.showCommonDlg("Warning",data.message);
             }
         }, "json");
-    } else {
-        $("#inputMessage1").val("");
-        $("#inputMessage2").val("");
-        $("#inputMessage3").val("");
-        $("#inputMessage4").val("");
     }
     return false;
+});
+
+//两个表单广告语的全选
+$("#checkbox_facebook").click(function(){
+    if($("#checkbox_facebook").prop("checked")){
+        $(".check_group").prop("checked",true);
+    }else{
+        $(".check_group").prop("checked",false);
+    }
+});
+$("#checkbox_admob").click(function(){
+    if($("#checkbox_admob").prop("checked")){
+        $(".check_group_admob").prop("checked",true);
+    }else{
+        $(".check_group_admob").prop("checked",false);
+    }
 });
 
 //以下用于读取admob表单数据（手动输入时）
@@ -438,13 +440,18 @@ $('#btnCreateAdmob').click(function () {
     var bidding = $('#inputBiddingAdmob').val();
     var maxCPA = $('#inputMaxCpaAdmob').val();
 
-    //得到选中行
+    //得到选中行的广告语信息
     var checkedTr = $("#tbody_admob input:checked").parent();
-    var groupId = checkedTr.children("td:eq(0)").text();
-    var message1 =  checkedTr.children("td:eq(2)").text();
-    var message2 =  checkedTr.children("td:eq(3)").text();
-    var message3 =  checkedTr.children("td:eq(4)").text();
-    var message4 =  checkedTr.children("td:eq(5)").text();
+    var adsGroup = [];
+    checkedTr.each(function(idx){
+        var group = {};
+        group.groupId = $(this).children("td:eq(0)").text();
+        group.message1 = $(this).children("td:eq(2)").text();
+        group.message2 = $(this).children("td:eq(3)").text();
+        group.message3 = $(this).children("td:eq(4)").text();
+        group.message4 = $(this).children("td:eq(5)").text();
+        adsGroup.push(group);
+    });
 
     var imagePath = $('#inputImagePathAdmob').val();
 
@@ -471,7 +478,6 @@ $('#btnCreateAdmob').click(function () {
             values: [region.join(",")]
         })
     }
-
     if(isAutoCreate && modifyRecordId>0){
         $("#inputBiddingAdmobExplode").prop("checked",false);
     }else if (!$("#inputBiddingAdmobExplode").prop("checked") && bidding.indexOf(",") !== -1) {
@@ -505,6 +511,10 @@ $('#btnCreateAdmob').click(function () {
             values:[valueStr]
         });
     }
+    explodeList.push({
+        key:"adsGroup",
+        values:adsGroup
+    });
 
     var explodeParams = explodeList.length > 0 ? explodeList.reduce(function (params, explodeParam) {
         return getExplodeParams(params, explodeParam);
@@ -524,12 +534,6 @@ $('#btnCreateAdmob').click(function () {
         //bidding: bidding,
         gpPackageId: app.google_package_id,
         maxCPA: maxCPA,
-        groupId: groupId,
-        message1: message1,
-        message2: message2,
-        message3: message3,
-        message4: message4,
-//            imagePath: imagePath
     }
 //弹一个进度条出来
     var onlyAutoCreateCheck = $('#onlyCheckAdmobAutoCreate').prop('checked');
@@ -552,6 +556,11 @@ $('#btnCreateAdmob').click(function () {
             });
             onlyAutoCloned.explodeCountry = explodeCountry;
             onlyAutoCloned.explodeBidding = explodeBidding;
+            onlyAutoCloned.groupId = p.adsGroup.groupId;
+            onlyAutoCloned.message1 = p.adsGroup.message1;
+            onlyAutoCloned.message2 = p.adsGroup.message2;
+            onlyAutoCloned.message3 = p.adsGroup.message3;
+            onlyAutoCloned.message4 = p.adsGroup.message4;
             onlyAutoRequestPool.push(onlyAutoCloned);
         });
         // 以下if是使用 campaigns_create.jsp页面传来的数据决定新的url 和 参数id
@@ -580,6 +589,11 @@ $('#btnCreateAdmob').click(function () {
                 region: p.region,
                 imagePath:p.imagePath
             });
+            cloned.groupId = p.adsGroup.groupId;
+            cloned.message1 = p.adsGroup.message1;
+            cloned.message2 = p.adsGroup.message2;
+            cloned.message3 = p.adsGroup.message3;
+            cloned.message4 = p.adsGroup.message4;
             requestPool.push(cloned);
         });
         var bFinished = false;
@@ -620,6 +634,11 @@ $('#btnCreateAdmob').click(function () {
                     });
                     onlyAutoCloned.explodeCountry = explodeCountry;
                     onlyAutoCloned.explodeBidding = explodeBidding;
+                    onlyAutoCloned.groupId = p.adsGroup.groupId;
+                    onlyAutoCloned.message1 = p.adsGroup.message1;
+                    onlyAutoCloned.message2 = p.adsGroup.message2;
+                    onlyAutoCloned.message3 = p.adsGroup.message3;
+                    onlyAutoCloned.message4 = p.adsGroup.message4;
                     onlyAutoRequestPool.push(onlyAutoCloned);
                 });
                 var url = "auto_create_campaign/adwords/create";
@@ -678,11 +697,16 @@ $('#btnCreate').click(function () {
     var bidding = $('#inputBidding').val();
     var maxCPA = $('#inputMaxCpa').val();
 
-    //定位已经选了的广告系列
+    //定位已经选了的广告系列，存进数组
     var checkedTr = $("#tbody_facebook input:checked").parent();
-    var groupId = checkedTr.children("td:eq(0)").text();
-    var title = checkedTr.children("td:eq(2)").text();
-    var message = checkedTr.children("td:eq(3)").text();
+    var adsGroup = [];
+    checkedTr.each(function(idx){
+        var group = {};
+        group.groupId = $(this).children("td:eq(0)").text();
+        group.title = $(this).children("td:eq(2)").text();
+        group.message = $(this).children("td:eq(3)").text();
+        adsGroup.push(group);
+    });
 
     var imagePath = $('#inputImagePath').val();
     var videoPath = $('#inputVideoPath').val();
@@ -811,6 +835,10 @@ $('#btnCreate').click(function () {
                 values: [valueStr]
             });
         }
+        explodeListImage.push({
+            key:"adsGroup",
+            values:adsGroup
+        });
     }
     var explodeListVideo = [];
     if($("#inputVideoPath").val()||$("#inputVideoPath").prop("checked")){
@@ -926,6 +954,10 @@ $('#btnCreate').click(function () {
                 values: [valueStr]
             });
         }
+        explodeListVideo.push({
+            key:"adsGroup",
+            values:adsGroup
+        });
     }
 
     var explodeParamsImage = explodeListImage.length > 0 ? explodeListImage.reduce(function (params, explodeParam){
@@ -956,11 +988,6 @@ $('#btnCreate').click(function () {
         bugdet: bugdet,
         //bidding: bidding,
         maxCPA: maxCPA,
-        groupId: groupId,
-        title: title,
-        message: message,
-        //           imagePath: imagePath,
-        //           videoPath: videoPath
     };
     var onlyAutoCreateCheck = $('#onlyCheckAutoCreate').prop('checked');
     if (onlyAutoCreateCheck) {
@@ -991,6 +1018,9 @@ $('#btnCreate').click(function () {
             onlyAutoCloned.explodeBidding = explodeBidding;
             onlyAutoCloned.explodeAge = explodeAge;
             onlyAutoCloned.explodeGender=explodeGender;
+            onlyAutoCloned.groupId=p.adsGroup.groupId;
+            onlyAutoCloned.title=p.adsGroup.title;
+            onlyAutoCloned.message=p.adsGroup.message;
             onlyAutoRequestPool.push(onlyAutoCloned);
         });
         //function(param,onSuccess,onFail)整个函数体作为一个对象传递给了 batchRequest(params,send,onFinish)的 send参数
@@ -1029,6 +1059,9 @@ $('#btnCreate').click(function () {
                 userDevice: p.userDevice,
                 materialPath:p.materialPath
             });
+            cloned.groupId=p.adsGroup.groupId;
+            cloned.title=p.adsGroup.title;
+            cloned.message=p.adsGroup.message;
             requestPool.push(cloned);
         });
         var bFinished = false;
@@ -1077,6 +1110,9 @@ $('#btnCreate').click(function () {
                     onlyAutoCloned.explodeBidding = explodeBidding;
                     onlyAutoCloned.explodeAge = explodeAge;
                     onlyAutoCloned.explodeGender=explodeGender;
+                    onlyAutoCloned.groupId=p.adsGroup.groupId;
+                    onlyAutoCloned.title=p.adsGroup.title;
+                    onlyAutoCloned.message=p.adsGroup.message;
                     onlyAutoRequestPool.push(onlyAutoCloned);
                 });
                 batchRequest(onlyAutoRequestPool, function (param, onSuccess, onFail) {

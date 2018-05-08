@@ -122,7 +122,7 @@
         <div class="form-group">
             <label for="inputCreateCount" class="col-sm-2 control-label">创建数量</label>
             <div class="col-sm-10">
-                <input class="form-control" id="inputCreateCount" />
+                <input class="form-control" id="inputCreateCount" value="1"/>
             </div>
         </div>
 
@@ -258,7 +258,7 @@
         <br>
         <table class="table table-hover" id="advertisement">
             <thead>
-            <tr><th><span class="glyphicon glyphicon-info-sign" title="广告语暂时单选"></span></th>
+            <tr><th><input type="checkbox" id="checkbox_facebook"></th>
                 <th>广告语组合</th><th>语言</th><th>广告语标题</th><th>广告语</th></tr>
             </thead>
             <tbody id="tbody_facebook"></tbody>
@@ -287,7 +287,7 @@
         <div class="form-group">
             <label for="inputCreateCountAdmob" class="col-sm-2 control-label">创建数量</label>
             <div class="col-sm-10">
-                <input class="form-control" id="inputCreateCountAdmob" />
+                <input class="form-control" id="inputCreateCountAdmob" value="1"/>
             </div>
         </div>
         <div class="form-group">
@@ -378,7 +378,7 @@
         <br>
         <table class="table table-hover" id="advertisement_admob">
             <thead>
-            <tr><th><span class="glyphicon glyphicon-info-sign" title="广告语暂时单选"></span></th>
+            <tr><th><input type="checkbox" id="checkbox_admob"></th>
                 <th>广告语组合</th><th>语言</th><th>广告语1</th><th>广告语2</th><th>广告语3</th><th>广告语4</th></tr>
             </thead>
             <tbody id="tbody_admob"></tbody>
@@ -412,8 +412,8 @@
     var IndexBudget = <%=budget%>;
     var IndexBidding = <%=bidding%>;
 </script>
-<script src="js\campaign_create_init.js"></script>
-<script src="js/campaign_create.js?t=20180326"></script>
+<script src="js/campaign_create_init.js?t=20180420"></script>
+<script src="js/campaign_create.js?t=20180420"></script>
 
 </body>
 </html>
