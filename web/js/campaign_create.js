@@ -406,8 +406,6 @@ $("#selectRegionAdmob").change(function () {
                 });
             }else if(data && data.ret==0){
                 admanager.showCommonDlg("Warning",data.message);
-            }else{
-                admanager.showCommonDlg("Warning","请求失败");
             }
         }, "json");
     } else {
