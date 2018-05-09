@@ -74,7 +74,6 @@
             <th>PurchasedUser</th>
             <th>Installed</th>
             <th>UninstalledRate</th>
-            <th>TotalUser</th>
             <th>ActiveUser</th>
             <th>Revenue</th>
             <th>ECPM</th>
@@ -85,7 +84,6 @@
             <th>Incoming</th>
             <th>RT</th>
             <th>30DaysActiveUser</th>
-            <th>30DaysActiveUser*ARPU</th>
         </tr>
         </thead>
         <tbody id="results_body">
@@ -125,6 +123,7 @@
     $("#inputSearch").autocomplete({
         source: data
     });
+
 
     $("#btnSearch").click(function(){
         var query = $("#inputSearch").val();
@@ -283,6 +282,8 @@
             $('#results_body').append(tr);
         }
     }
+
+
 </script>
 </body>
 </html>
