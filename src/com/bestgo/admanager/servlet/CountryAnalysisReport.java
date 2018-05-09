@@ -59,7 +59,7 @@ public class CountryAnalysisReport extends HttpServlet {
                 String countryCode = json.get("country_code").getAsString();
                 String cost = json.get("cost_upper_limit").getAsString();
                 try{
-                    String sql = "SELECT id,rule_content FROM web_ad_rules WHERE rule_type = 3 AND rule_content LIKE '%"+app_name+"%"+countryCode+"%'";
+                    String sql = "SELECT id,rule_content FROM web_ad_rules WHERE rule_type = 3 AND rule_content LIKE '%app_name=" + app_name + "%country_code=" + countryCode + "%'";
                     JSObject one = DB.findOneBySql(sql);
                     if(one.hasObjectData()){
                         String rule_content = one.get("rule_content");
@@ -90,8 +90,7 @@ public class CountryAnalysisReport extends HttpServlet {
                 jsonObject.addProperty("ret",0);
                 jsonObject.addProperty("message","后台未正确修改");
             }
-        }
-        if (path.matches("/query_country_analysis_report")) {
+        }else if (path.matches("/query_country_analysis_report")) {
             try {
                 String sqlG = "select google_package_id from web_facebook_app_ids_rel WHERE tag_name = '" + tagName + "'";
                 JSObject oneG = DB.findOneBySql(sqlG);
@@ -316,7 +315,7 @@ public class CountryAnalysisReport extends HttpServlet {
                                 totalPuserchaedUser += purchasedUsers;
                                 totalRevenue += revenues;
 
-                                sql = "SELECT rule_content FROM web_ad_rules WHERE rule_type = 3 AND rule_content LIKE '%" + tagName + "%" + countryCode + "%'";
+                                sql = "SELECT rule_content FROM web_ad_rules WHERE rule_type = 3 AND rule_content LIKE '%app_name=" + tagName + "%country_code=" + countryCode + "%'";
                                 oneC = DB.findOneBySql(sql);
                                 String costUpperLimit = "";
                                 if(oneC.hasObjectData()){
