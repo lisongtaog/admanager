@@ -412,8 +412,8 @@
     var IndexBudget = <%=budget%>;
     var IndexBidding = <%=bidding%>;
 </script>
-<script src="js/campaign_create_init.js?t=20180420"></script>
-<script src="js/campaign_create.js?t=20180420"></script>
+<script src="js\campaign_create_init.js"></script>
+<script src="js/campaign_create.js?t=20180326"></script>
 
 </body>
 </html>
