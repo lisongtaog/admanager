@@ -141,10 +141,8 @@
                     "<th>PurchasedUser<span sorterId=\"1033\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
                     "<th>Installed<span sorterId=\"1034\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
                     "<th>UninstalledRate</th>" +
-                    "<th>TotalUser<span sorterId=\"1037\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
                     "<th>ActiveUser<span sorterId=\"1038\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
                     "<th>Revenue<span sorterId=\"1039\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
-                    "<th>Revenue/Installed</th>" +
                     "<th>7daysCost</th>" +
                     "<th>7daysRevenue</th>" +
                     "<th>7daysIncoming</th>" +
@@ -158,7 +156,7 @@
                     "<th>Incoming<span sorterId=\"1042\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
                     "<th>RT</th>" +
                     "<th>30DaysActiveUser</th>" +
-                    "<th>30DaysActiveUser*ARPU</th></tr>");
+                    "</tr>");
                 setData(data,query);
                 bindSortOp();
                 var str = "Cost: " + data.total_cost + "&nbsp;&nbsp;&nbsp;&nbsp;PuserchaedUser: " + data.total_puserchaed_user +
@@ -213,10 +211,10 @@
         var arr = data.array;
         var len = arr.length;
         var one;
-        var keyset = ["costs","purchased_users", "installed", "uninstalled_rate", "users",
-            "active_users", "revenues", "revenue/installed", "seven_days_costs", "seven_days_revenues",
+        var keyset = ["costs","purchased_users", "installed", "uninstalled_rate",
+            "active_users", "revenues", "seven_days_costs", "seven_days_revenues",
             "seven_days_incoming","pi", "arpu", "ecpm", "revenue_per_install","cpa","a_cpa","cpa_div_ecpm", "incoming",
-            "rt","thirty_days_active_user", "thirty_days_active_user_mul_arpu"];
+            "rt","thirty_days_active_user"];
         for (var i = 0; i < len; i++) {
             one = arr[i];
             var tr = $('<tr></tr>');

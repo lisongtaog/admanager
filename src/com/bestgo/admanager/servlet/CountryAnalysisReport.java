@@ -55,7 +55,7 @@ public class CountryAnalysisReport extends HttpServlet {
                         JsonArray jsonArray = new JsonArray();
                         String sql = "select country_code, sum(cost) as total_cost, sum(purchased_user) as total_purchased_user, " +
                                 "sum(total_installed) as installed, sum(today_uninstalled) as total_today_uninstalled, " +
-                                "sum(total_user) as users, sum(active_user) as active_users, sum(impression) as impressions, sum(revenue) as revenues, " +
+                                "sum(active_user) as active_users, sum(impression) as impressions, sum(revenue) as revenues, " +
                                 " (sum(revenue) - sum(cost)) as incoming, "+
                                 "(case when sum(impression) > 0 then sum(revenue) * 1000 / sum(impression) else 0 end) as ecpm,"+
                                 "(case when sum(purchased_user) > 0 then sum(cost) / sum(purchased_user) else 0 end) as cpa "+
@@ -84,12 +84,6 @@ public class CountryAnalysisReport extends HttpServlet {
                                 break;
                             case 34:
                                 sql += " order by installed";
-                                break;
-                            case 1037:
-                                sql += " order by users desc";
-                                break;
-                            case 37:
-                                sql += " order by users";
                                 break;
                             case 1038:
                                 sql += " order by active_users desc";
@@ -136,22 +130,13 @@ public class CountryAnalysisReport extends HttpServlet {
                             if(j.hasObjectData()){
                                 String countryCode = j.get("country_code");
 
-                                //计算30DaysActiveUser*ARPU
+                                //计算30DaysActiveUser
                                 sql = "select avg_30_day_active from ad_report_active_user_admob_rel_result where tag_name = '" + tagName + "' and country_code = '" + countryCode + "'";
                                 JSObject oneC = DB.findOneBySql(sql);
                                 double thirtyDaysActiveUser = 0;
                                 if(oneC.hasObjectData()){
                                     thirtyDaysActiveUser = Utils.convertDouble(oneC.get("avg_30_day_active"),0);
                                 }
-                                sql = "SELECT avg(arpu) AS seven_days_avg_arpu FROM web_ad_country_analysis_report_history h,web_facebook_app_ids_rel r " +
-                                        "WHERE h.app_id = r.google_package_id AND tag_name = '" + tagName + "' AND country_code = '" +
-                                        countryCode + "' AND date BETWEEN '" + sevenDaysAgo + "' and '" + endTime + "'";
-                                oneC = DB.findOneBySql(sql);
-                                double sevenDaysAvgARPU = 0;
-                                if(oneC.hasObjectData()){
-                                    sevenDaysAvgARPU = Utils.convertDouble(oneC.get("seven_days_avg_arpu"),0);
-                                }
-                                double thirtyDaysActiveUserMulARPU = thirtyDaysActiveUser * sevenDaysAvgARPU;
 
 
                                 //计算七天的总花费、总营收、总盈利等
@@ -261,7 +246,6 @@ public class CountryAnalysisReport extends HttpServlet {
                                 double uninstalledRate = installed != 0 ? totalTodayUninstalled / installed : 0;
 
 
-                                double users = Utils.convertDouble(j.get("users"),0);
                                 double activeUsers = Utils.convertDouble(j.get("active_users"),0);
 
 
@@ -292,10 +276,8 @@ public class CountryAnalysisReport extends HttpServlet {
                                 d.addProperty("purchased_users", purchasedUsers);
                                 d.addProperty("installed", installed);
                                 d.addProperty("uninstalled_rate", Utils.trimDouble(uninstalledRate,3));
-                                d.addProperty("users", users);
                                 d.addProperty("active_users", activeUsers);
                                 d.addProperty("revenues", Utils.trimDouble(revenues,0));
-                                d.addProperty("revenue/installed", installed > 0 ? Utils.trimDouble(revenues/installed, 2) : 0);
                                 HashMap<String, CPAHistory.CPAItem> history = CPAHistory.historyMaps.get(appId);
                                 double rpi = 0;
                                 if (history != null) {
@@ -329,7 +311,6 @@ public class CountryAnalysisReport extends HttpServlet {
                                 d.addProperty("cpa", Utils.trimDouble(cpa,3));
                                 d.addProperty("rt", Utils.trimDouble(rt,3));
                                 d.addProperty("thirty_days_active_user", Utils.trimDouble(thirtyDaysActiveUser,3));
-                                d.addProperty("thirty_days_active_user_mul_arpu", Utils.trimDouble(thirtyDaysActiveUserMulARPU,3));
 
                                 jsonArray.add(d);
                             }
