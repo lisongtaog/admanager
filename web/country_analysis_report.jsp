@@ -156,6 +156,7 @@
                     "<th>Incoming<span sorterId=\"1042\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
                     "<th>RT</th>" +
                     "<th>30DaysActiveUser</th>" +
+                    "<th>花费上限</th>" +
                     "</tr>");
                 setData(data,query);
                 bindSortOp();
@@ -214,7 +215,7 @@
         var keyset = ["costs","purchased_users", "installed", "uninstalled_rate",
             "active_users", "revenues", "seven_days_costs", "seven_days_revenues",
             "seven_days_incoming","pi", "arpu", "ecpm", "revenue_per_install","cpa","a_cpa","cpa_div_ecpm", "incoming",
-            "rt","thirty_days_active_user"];
+            "rt","thirty_days_active_user","cost_upper_limit"];
         for (var i = 0; i < len; i++) {
             one = arr[i];
             var tr = $('<tr></tr>');
@@ -252,9 +253,10 @@
                     if(r < 0){
                         td.addClass("red");
                     }
-                }
-                if('revenue_per_install' == key){
+                }else if('revenue_per_install' == key){
                     r = r / 2;
+                }else if('cost_upper_limit' == key){
+                    td = $('<td>'+one['cost_upper_limit']+'"</td>');
                 }
                 td.text(r);
                 tr.append(td);

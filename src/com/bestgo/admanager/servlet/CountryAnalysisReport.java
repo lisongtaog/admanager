@@ -270,6 +270,13 @@ public class CountryAnalysisReport extends HttpServlet {
                                 totalPuserchaedUser += purchasedUsers;
                                 totalRevenue += revenues;
 
+                                sql = "SELECT rule_content FROM web_ad_rules WHERE rule_type = 3 AND rule_content LIKE '%" + tagName + "%' AND rule_content LIKE '%" + countryCode + "%'";
+                                oneC = DB.findOneBySql(sql);
+                                String costUpperLimit = "";
+                                if(oneC.hasObjectData()){
+                                    String ruleContent = oneC.get("rule_content");
+                                    costUpperLimit = ruleContent.substring(ruleContent.indexOf("cost>") + 5,ruleContent.length());
+                                }
                                 JsonObject d = new JsonObject();
                                 d.addProperty("country_name", countryName);
                                 d.addProperty("costs", Utils.trimDouble(costs,0));
@@ -311,6 +318,7 @@ public class CountryAnalysisReport extends HttpServlet {
                                 d.addProperty("cpa", Utils.trimDouble(cpa,3));
                                 d.addProperty("rt", Utils.trimDouble(rt,3));
                                 d.addProperty("thirty_days_active_user", Utils.trimDouble(thirtyDaysActiveUser,3));
+                                d.addProperty("cost_upper_limit", costUpperLimit);
 
                                 jsonArray.add(d);
                             }
