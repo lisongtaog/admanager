@@ -356,6 +356,8 @@ $("#selectRegion").change(function () {
                 }else if(data && data.ret==0){
                     admanager.showCommonDlg("Warning",data.message);
                 }
+                $("#checkbox_facebook").prop("checked",false);
+                $("#checkbox_facebook").click();
             }, "json");
         }
     }
@@ -396,6 +398,8 @@ $("#selectRegionAdmob").change(function () {
             }else if(data && data.ret==0){
                 admanager.showCommonDlg("Warning",data.message);
             }
+            $("#checkbox_admob").prop("checked",false);
+            $("#checkbox_admob").click();
         }, "json");
     }
     return false;

@@ -32,7 +32,7 @@ public class IndexCampaignCreate extends HttpServlet{
         String admob = p2.pattern();
         String sql = "";
         if(Pattern.matches(facebook,CampaignId)){
-            sql = "select app_name,account_id,country_region,language,title,message,campaign_name,age,gender,id"+
+            sql = "select app_name,account_id,country_region,language,campaign_name,age,gender,id"+
                     " from ad_campaigns where campaign_id ='"+CampaignId+"'";
             JSObject fb = null;
             try{
@@ -42,8 +42,6 @@ public class IndexCampaignCreate extends HttpServlet{
             String app_name = fb.get("app_name");
             String account_id = fb.get("account_id");
             String country_region = fb.get("country_region");
-            String title = fb.get("title");
-            String message = fb.get("message");
             String campaign_name = fb.get("campaign_name");
             String age = fb.get("age");
             String gender = fb.get("gender");
@@ -58,8 +56,6 @@ public class IndexCampaignCreate extends HttpServlet{
                 facebook_campaign.addProperty("app_name",app_name);
                 facebook_campaign.addProperty("account_id",account_id);
                 facebook_campaign.addProperty("country_region",country_region);
-                facebook_campaign.addProperty("title",title);
-                facebook_campaign.addProperty("message",message);
                 facebook_campaign.addProperty("campaign_name",campaign_name);
                 facebook_campaign.addProperty("age",age);
                 facebook_campaign.addProperty("gender",gender);
@@ -73,7 +69,7 @@ public class IndexCampaignCreate extends HttpServlet{
             response.setCharacterEncoding("UTF-8"); //这一行： 设置response里的编码格式
             response.getWriter().write(facebook_campaign.toString());
         }else if(Pattern.matches(admob,CampaignId)){
-            sql = "select app_name,account_id,campaign_name,country_region,excluded_region,message1,message2,message3,message4,image_path"+
+            sql = "select app_name,account_id,campaign_name,country_region,excluded_region,image_path"+
                     " from ad_campaigns_admob where campaign_id ='"+CampaignId+"'";
             JSObject ad = null;
             try{
@@ -85,10 +81,6 @@ public class IndexCampaignCreate extends HttpServlet{
             String campaign_name = ad.get("campaign_name");
             String country_region = ad.get("country_region");  //这里拿到的是如'BR'一样的国家代码，有时会有多个：“BR,AR,US”
             String excluded_region = ad.get("excluded_region");
-            String message1 = ad.get("message1");
-            String message2 = ad.get("message2");
-            String message3 = ad.get("message3");
-            String message4 = ad.get("message4");
             String image_path = ad.get("image_path");
             if(ad.hasObjectData()){
                 admob_campaign.addProperty("app_name",app_name);
@@ -96,10 +88,6 @@ public class IndexCampaignCreate extends HttpServlet{
                 admob_campaign.addProperty("campaign_name",campaign_name);
                 admob_campaign.addProperty("country_region",country_region);
                 admob_campaign.addProperty("excluded_region",excluded_region);
-                admob_campaign.addProperty("message1",message1);
-                admob_campaign.addProperty("message2",message2);
-                admob_campaign.addProperty("message3",message3);
-                admob_campaign.addProperty("message4",message4);
                 admob_campaign.addProperty("image_path",image_path);
                 admob_campaign.addProperty("flag","admob");
             }else{

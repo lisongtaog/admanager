@@ -408,7 +408,7 @@
     var modifyNetwork = "<%=network%>";
     var modifyRecordId = <%=recordId%>;
     var isIndexCreate = <%=isIndexCreate%>;
-    var campaign_id = <%=campaignId%>;
+    var campaign_id = "<%=campaignId%>";
     var IndexBudget = <%=budget%>;
     var IndexBidding = <%=bidding%>;
 </script>
