@@ -34,8 +34,7 @@ function generateFacebookCampaignName(params) {
     var appName = $('#selectApp').val();
     dims.push(appName);
 
-    var advert_group_id = $('#selectAdvertGroupId').val();
-    dims.push("Group" + advert_group_id);
+    dims.push("Group_");
 
     var region = $('#selectRegion').val();
     var countryAlisa = $('#selectRegion')[0].countryAlisa;
@@ -103,8 +102,7 @@ function generateAdmobCampaignName(params) {
     var now = new Date();
     dims.push($('#selectAppAdmob').val());
 
-    var advert_group_id = $('#selectAdvertGroupIdAdmob').val();
-    dims.push("Group" + advert_group_id);
+    dims.push("Group_");
 
     var region = $('#selectRegionAdmob option:selected').text();
     var countryAlisa = $('#selectRegionAdmob')[0].countryAlisa;

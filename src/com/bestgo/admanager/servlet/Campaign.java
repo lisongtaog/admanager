@@ -76,7 +76,7 @@ public class Campaign extends HttpServlet {
             String bugdet = request.getParameter("bugdet");
             String bidding = request.getParameter("bidding");
             String maxCPA = request.getParameter("maxCPA");
-            String groupId = request.getParameter("groupId");
+            String groupIdStr = request.getParameter("groupId");
             String title = request.getParameter("title");
             String message = request.getParameter("message");
             String identification = request.getParameter("identification");
@@ -98,7 +98,10 @@ public class Campaign extends HttpServlet {
                 File videosPath = null;
                 Collection<File> uploadImages = null;
                 Collection<File> uploadVideos = null;
-                if (createCount.isEmpty()) {
+                int groupId = Utils.parseInt(groupIdStr,0);
+                if (groupId == 0) {
+                    result.message = "广告组ID不存在！请联系管理员";
+                }else if (createCount.isEmpty()) {
                     result.message = "创建数量不能为空";
                 } else if (title.isEmpty()) {
                     result.message = "标题不能为空";
@@ -170,11 +173,9 @@ public class Campaign extends HttpServlet {
                     }
                 }
 
-//                //test
-//                result.result=true;
                 if (result.result) {
                     Calendar calendar = Calendar.getInstance();
-                    String campaignNameOld = campaignName + "_";
+                    String campaignNameOld = campaignName.replace("Group_","Group" + groupId) + "_";
                     String[] accountNameArr = accountName.split(",");
                     String accountNameArrStr = accountName.replace(",", "");
                     String[] accountIdArr = accountId.split(",");
