@@ -174,29 +174,26 @@ function batchRequest(params, send, onFinish) {
         return logs.join("\n");
     }
 
+    //后台失败信息：（出价||预算||广告||国家||创建数量||性别）不能为空，或 图片/视频路径不存在
     function next() {
         if (stop) {
-            admanager.showCommonDlg("终止", getProgress(), function () {
-                onFinish(errLog);
-            });
+            admanager.showCommonDlg("终止", getProgress());
             return;
         }
         setTimeout(function () {   //定时任务，直到 idx === param.length的时候 定时任务才结束
             idx++;
             if (idx === params.length) {
-                setTimeout(function(){
-                    $('#common_message_dialog').modal('hide');
-                },1500);
-                // console.log("你能看到我，说明执行了这个setTimeout（）");
-                admanager.showCommonDlg("完成", getFullLog(), function () {
-                    onFinish(errLog);
-                });
+                if(errLog.length>0){
+                    admanager.showCommonDlg("完成", getFullLog());
+                }else{
+                    setTimeout(function(){
+                        $('#common_message_dialog').modal('hide');
+                    },1500);
+                    admanager.showCommonDlg("完成", getFullLog(), function () {
+                        onFinish(errLog);
+                    });
+                }
                 return;
-            }
-            if(errLog.length>0){
-                admanager.showCommonDlg("进度", getProgress() + " 。有 " + errLog.length + " 个错误，看console", function () {
-                    stop = true;
-                });
             }
             request();
         }, 50);
@@ -209,7 +206,7 @@ function batchRequest(params, send, onFinish) {
         }, function (errMsg) {
             //请求一个失败，要不要重试？
             errLog.push({param: params[idx], errMsg: errMsg});
-            console.log(errLog[errLog.length - 1]);
+            // console.log(errLog[errLog.length - 1]);
             next();
         })
     }
@@ -568,7 +565,7 @@ $('#btnCreateAdmob').click(function () {
         // 以下if是使用 campaigns_create.jsp页面传来的数据决定新的url 和 参数id
         batchRequest(onlyAutoRequestPool, function (param, onSuccess, onFail) {
             //fake
-            console.log("start.. ", param);
+            // console.log("start.. ", param);
             $.post(url, param, function (data) {
                 if (data && data.ret == 1) {
                     onSuccess();
