@@ -165,7 +165,7 @@ public class CampaignAdmob extends HttpServlet {
                                             calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), calendar.get(Calendar.SECOND));
                                     String r = String.valueOf(random.nextInt());
                                     String s = String.valueOf(System.currentTimeMillis());
-                                    campaignName = campaignNameOld + accountNameArr[j] + "_"+ r  + "_"+ s + "_" + i;
+                                    campaignName = campaignNameOld + accountNameArr[j] + "_"+ r  + s + "_" + i;
                                     if (campaignName.length() > 100) {
                                         campaignName = campaignName.substring(0, 100);
                                     }
