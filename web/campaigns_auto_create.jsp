@@ -94,7 +94,10 @@
 
       <table class="table">
         <thead>
-        <tr><th>序号</th><th>应用</th><th>国家</th><th>语言</th><th>系列名称</th><th>预算</th><th>出价</th><th>操作</th>
+        <tr>
+          <th>序号</th><th>应用</th><th>国家</th><th>语言</th><th>系列名称</th><th>预算</th><th>出价</th>
+          <th>修改&nbsp;/&nbsp;<a id="batch_delete" class="glyphicon glyphicon-remove" onclick="allDelete()"></a>
+            <input type="checkbox" class="all_delete_check"></th>
           <th>开启<input class="all_checkbox_campaign_enable" type= "checkbox" onclick="allChecked()"></th>
         </tr>
         </thead>
@@ -111,7 +114,8 @@
           <td><%=one.get("campaign_name")%></td>
           <td><%=one.get("bugdet")%></td>
           <td><%=one.get("bidding")%></td>
-          <td><a class="link_modify" target="_blank" href="campaigns_create.jsp?type=auto_create&network=<%=network%>&id=<%=one.get("id")%>"><span class="glyphicon glyphicon-pencil"></span></a>&nbsp;&nbsp;<a class="link_delete" href="#"><span class="glyphicon glyphicon-remove"></span></a></td>
+          <td><a class="link_modify" target="_blank" href="campaigns_create.jsp?type=auto_create&network=<%=network%>&id=<%=one.get("id")%>">
+            <span class="glyphicon glyphicon-pencil"></span></a>&nbsp;/&nbsp;<input type="checkbox" class="delete_check"></td>
           <td><input class="checkbox_campaign_enable" type="checkbox" <% if (one.get("enabled").equals(1)) { %> checked <% }%> /></td>
         </tr>
         <% } %>
@@ -139,23 +143,23 @@
     </div>
   </div>
 
-  <div id="delete_dlg" class="modal fade" tabindex="-1" role="dialog">
-    <div class="modal-dialog" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-          <h4 class="modal-title">提示</h4>
-        </div>
-        <div class="modal-body">
-          <p id="delete_message">确认要删除吗?</p>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
-          <button type="button" class="btn btn-primary">确定</button>
-        </div>
-      </div>
-    </div>
-  </div>
+  <%--<div id="delete_dlg" class="modal fade" tabindex="-1" role="dialog">--%>
+    <%--<div class="modal-dialog" role="document">--%>
+      <%--<div class="modal-content">--%>
+        <%--<div class="modal-header">--%>
+          <%--<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>--%>
+          <%--<h4 class="modal-title">提示</h4>--%>
+        <%--</div>--%>
+        <%--<div class="modal-body">--%>
+          <%--<p id="delete_message">确认要删除吗?</p>--%>
+        <%--</div>--%>
+        <%--<div class="modal-footer">--%>
+          <%--<button type="button" class="btn btn-default" data-dismiss="modal">取消</button>--%>
+          <%--<button type="button" class="btn btn-primary">确定</button>--%>
+        <%--</div>--%>
+      <%--</div>--%>
+    <%--</div>--%>
+  <%--</div>--%>
 
   <jsp:include page="loading_dialog.jsp"></jsp:include>
 
@@ -226,6 +230,42 @@
       }
     });
 
+    //批量删除
+    $(".all_delete_check").click(function(){
+        var check = $(".all_delete_check").prop("checked");
+        if(check){
+            $(".delete_check").prop("checked",true);
+        }else{
+            $(".delete_check").prop("checked",false);
+        }
+    });
+    function allDelete(){
+        var batch = $(".delete_check:checked");
+        var id_batch = [];
+        batch.each(function(idx){
+            var tr = $(this).parents("tr");
+            var id = tr.children("td:eq(0)").text();
+            id_batch.push(id);
+        });
+        var id_batch_string = id_batch.join(",");
+        var conf = confirm("确认删除？");
+        if(conf){
+            $.post('auto_create_campaign/<%=network%>/delete', {
+                id_batch:id_batch_string
+            },function(data){
+                if (data && data.ret == 1) {
+                    admanager.showCommonDlg("成功", data.message);
+                    batch.each(function(idx){
+                        var tr = $(this).parents("tr");
+                        tr.empty();
+                    });
+                } else {
+                    admanager.showCommonDlg("错误", data.message);
+                }
+            },"json")
+        }
+    }
+    //批量开启
     function allChecked(){
         var checked = $(".all_checkbox_campaign_enable").prop("checked");
         if(checked){
@@ -272,6 +312,31 @@
             });
         }
     }
+    // 点击[开启]checkbox后往后台修改表
+    function bindOp() {
+        $(".checkbox_campaign_enable").click(function() {
+            var checkbox = $(this);
+            if(checkbox.prop("checked")==false){
+                $(".all_checkbox_campaign_enable").prop("checked",false);
+            }
+            var tr = $(this).parents("tr");
+            var tds = tr.find('td');
+            var id = $(tds.get(0)).text();
+
+            var checked = $(this).prop('checked');
+            $.post('auto_create_campaign/<%=network%>/enable', {
+                id: id,
+                enable: checked,
+            }, function(data) {
+                if (data && data.ret == 1) {
+                    admanager.showCommonDlg("成功", data.message);
+                } else {
+                    admanager.showCommonDlg("错误", data.message);
+                }
+            }, 'json');
+
+        });
+    }
     function setData(data) {
       for (var i = 0; i < data.length; i++) {
         var one = data[i];
@@ -297,7 +362,10 @@
         td = $('<td></td>');
         td.text(one.bidding);
         tr.append(td);
-        td = $('<td><a class="link_modify" target="_blank" href="campaigns_create.jsp?type=auto_create&network=<%=network%>&id=' + one.id + '">修改</a><a class="link_delete" href="#">删除</a></td>');
+        td =
+            $('<td><a class="link_modify glyphicon glyphicon-pencil" target="_blank" ' +
+                'href="campaigns_create.jsp?type=auto_create&network=<%=network%>&id=' + one.id +
+            '"></a>&nbsp;/&nbsp;<input type="checkbox" class="delete_check"></td>');
         tr.append(td);
         td = $('<td></td>');
         td.html('<input class="checkbox_campaign_enable" type="checkbox" ' + (one.enabled == 1 ? 'checked' : '') + ' />');
@@ -355,55 +423,6 @@
             tempStr += "  下一页&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
         }
         $("nav").append(tempStr);
-    }
-
-    // 点击[开启]checkbox后往后台修改表
-    function bindOp() {
-        $(".checkbox_campaign_enable").click(function() {
-            var checkbox = $(this);
-            if(checkbox.prop("checked")==false){
-                $(".all_checkbox_campaign_enable").prop("checked",false);
-            }
-            var tr = $(this).parents("tr");
-            var tds = tr.find('td');
-            var id = $(tds.get(0)).text();
-
-            var checked = $(this).prop('checked');
-            $.post('auto_create_campaign/<%=network%>/enable', {
-                id: id,
-                enable: checked,
-            }, function(data) {
-                if (data && data.ret == 1) {
-                    admanager.showCommonDlg("成功", data.message);
-                } else {
-                    admanager.showCommonDlg("错误", data.message);
-                }
-            }, 'json');
-
-        });
-        $(".link_delete").click(function() {
-            var tr = $(this).parents("tr");
-            var tds = tr.find('td');
-            var id = $(tds.get(0)).text();
-
-            $("#delete_dlg .btn-primary").unbind('click');
-            $("#delete_dlg .btn-primary").click(function() {
-                $('#delete_dlg').modal('hide');
-                setTimeout(function () {
-                    $.post('auto_create_campaign/<%=network%>/delete', {
-                        id: id
-                    }, function(data) {
-                        if (data && data.ret == 1) {
-                            tr.remove();
-                            admanager.showCommonDlg("成功", data.message);
-                        } else {
-                            admanager.showCommonDlg("错误", data.message);
-                        }
-                    }, 'json');
-                }, 10);
-            });
-            $('#delete_dlg').modal('show');
-      });
     }
     bindOp();
   </script>

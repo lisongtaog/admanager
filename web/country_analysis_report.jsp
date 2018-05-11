@@ -290,16 +290,16 @@
     $("#results_body").on("click",".cost_upper_limit",function(){
         $("#result_header tr").children("th:eq(20)").empty();
         $("#result_header tr").children("th:eq(20)").append("花费上限<button class='btn btn-link glyphicon glyphicon-pencil' title='修改花费上限'></button>");
-        var elementCheck = $(this).children("textarea").attr("class");
+        var elementCheck = $(this).children("input[type='text']").attr("class");
         if(elementCheck=="new_cost_upper_limit"){
             return false;
         }
         var value = $(this).text();
         $(this).empty();
         if(value=="--"){
-            $(this).append("<textarea class='new_cost_upper_limit' style='width:60px;height:25px'></textarea>");
+            $(this).append("<input class='new_cost_upper_limit' type='text' style='width:60px;height:25px'>");
         }else{
-            $(this).append("<textarea class='new_cost_upper_limit' style='width:60px;height:25px'>"+value+"</textarea>");
+            $(this).append("<input class='new_cost_upper_limit' type='text' style='width:60px;height:25px'value='"+value+"'>");
         }
     });
     $("#result_header").on("click",".btn-link",function(){
