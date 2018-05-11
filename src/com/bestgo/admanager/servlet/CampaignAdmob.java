@@ -64,7 +64,7 @@ public class CampaignAdmob extends HttpServlet {
             String bidding = request.getParameter("bidding");
             String maxCPA = request.getParameter("maxCPA");
             String message1 = request.getParameter("message1");
-            String groupId = request.getParameter("groupId");
+            String groupIdStr = request.getParameter("groupId");
             String message2 = request.getParameter("message2");
             String message3 = request.getParameter("message3");
             String message4 = request.getParameter("message4");
@@ -76,7 +76,10 @@ public class CampaignAdmob extends HttpServlet {
             try {
 
                 result.result = false;
-                if (createCount.isEmpty()) {
+                int groupId = Utils.parseInt(groupIdStr,0);
+                if (groupId == 0) {
+                    result.message = "广告组ID不存在！请联系管理员";
+                }else if (createCount.isEmpty()) {
                     result.message = "创建数量不能为空";
                 } else if (message1.isEmpty()) {
                     result.message = "广告语1不能为空";
@@ -151,7 +154,7 @@ public class CampaignAdmob extends HttpServlet {
                             }else{
                                 campaignNameOld = campaignName + "_";
                             }
-
+                            campaignNameOld = campaignNameOld.replace("Group_","Group" + groupId);
                             String[] accountNameArr = accountName.split(",");
                             String[] accountIdArr = accountId.split(",");
                             int createCountInt = Integer.parseInt(createCount);
@@ -162,7 +165,7 @@ public class CampaignAdmob extends HttpServlet {
                                             calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), calendar.get(Calendar.SECOND));
                                     String r = String.valueOf(random.nextInt());
                                     String s = String.valueOf(System.currentTimeMillis());
-                                    campaignName = campaignNameOld + accountNameArr[j] + "_"+ r  + "_"+ s + "_" + i;
+                                    campaignName = campaignNameOld + accountNameArr[j] + "_"+ r  + s + "_" + i;
                                     if (campaignName.length() > 100) {
                                         campaignName = campaignName.substring(0, 100);
                                     }

@@ -328,9 +328,6 @@ function indexInitFormData(isIndexCreate,campaign_id) {
                     $('#inputBidding').val(IndexBidding);
                     $('#inputBiddingExplode').prop('checked', campaignData.explode_bidding == 1);
 
-                    $('#inputTitle').val(campaignData.title);
-                    $('#inputMessage').val(campaignData.message);
-
                     $('#inputCampaignName').val(campaignData.campaign_name);
 
                     $("#selectGender").val(campaignData.gender.split(','));
@@ -360,11 +357,6 @@ function indexInitFormData(isIndexCreate,campaign_id) {
                     $('#inputBudgetAdmob').val(IndexBudget);
                     $('#inputBiddingAdmob').val(IndexBidding);
                     $('#inputBiddingAdmobExplode').prop('checked', campaignData.explode_bidding == 1); //"分离到系列"
-
-                    $('#inputMessage1').val(campaignData.message1);
-                    $('#inputMessage2').val(campaignData.message2);
-                    $('#inputMessage3').val(campaignData.message3);
-                    $('#inputMessage4').val(campaignData.message4);
 
                     var imageTrimed = campaignData.image_path.replace(/home\/\w+\/\w+\/\w+\//,"");
                     imageTrimed = imageTrimed.replace(/(\/.+\/)(.*\.\w+)/,"$1");

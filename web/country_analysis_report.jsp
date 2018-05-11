@@ -74,7 +74,6 @@
             <th>PurchasedUser</th>
             <th>Installed</th>
             <th>UninstalledRate</th>
-            <th>TotalUser</th>
             <th>ActiveUser</th>
             <th>Revenue</th>
             <th>ECPM</th>
@@ -85,7 +84,6 @@
             <th>Incoming</th>
             <th>RT</th>
             <th>30DaysActiveUser</th>
-            <th>30DaysActiveUser*ARPU</th>
         </tr>
         </thead>
         <tbody id="results_body">
@@ -125,6 +123,7 @@
     $("#inputSearch").autocomplete({
         source: data
     });
+
 
     $("#btnSearch").click(function(){
         var query = $("#inputSearch").val();
@@ -256,7 +255,10 @@
                 }else if('revenue_per_install' == key){
                     r = r / 2;
                 }else if('cost_upper_limit' == key){
-                    td = $('<td>'+one['cost_upper_limit']+'"</td>');
+                    td = $("<td class='cost_upper_limit'></td>");
+                    if(r ==""){
+                        r = "--";
+                    }
                 }
                 td.text(r);
                 tr.append(td);
@@ -283,6 +285,63 @@
             $('#results_body').append(tr);
         }
     }
+
+    //实现修改花费上限的输入框功能
+    $("#results_body").on("click",".cost_upper_limit",function(){
+        $("#result_header tr").children("th:eq(20)").empty();
+        $("#result_header tr").children("th:eq(20)").append("花费上限<button class='btn btn-link glyphicon glyphicon-pencil' title='修改花费上限'></button>");
+        var elementCheck = $(this).children("input[type='text']").attr("class");
+        if(elementCheck=="new_cost_upper_limit"){
+            return false;
+        }
+        var value = $(this).text();
+        $(this).empty();
+        if(value=="--"){
+            $(this).append("<input class='new_cost_upper_limit' type='text' style='width:60px;height:25px'>");
+        }else{
+            $(this).append("<input class='new_cost_upper_limit' type='text' style='width:60px;height:25px'value='"+value+"'>");
+        }
+    });
+    $("#result_header").on("click",".btn-link",function(){
+        var cost_array = [];
+        var collection = $(".new_cost_upper_limit");
+        collection.each(function(idx){
+            var value = $(this).val().trim().replace(/(\D*)(\d+)(\D*)/,"$2");
+            if(value==""){
+                var tr = $(this).parent();
+                tr.text("--");
+                return true;
+            }
+            var tr = $(this).parents("tr");
+            var costGroup = {};
+            var countryName = tr.children("td:eq(0)").text(); //这里得到的是完整的国家名
+            regionList.forEach(function(region){
+                if(region.name == countryName){
+                    costGroup.country_code = region.country_code;
+                }
+            });
+            costGroup.cost_upper_limit = value;
+            cost_array.push(costGroup);
+        });
+        var cost_array_string = JSON.stringify(cost_array);
+        var app_name = $("#inputSearch").val();
+        // var cost_array_json = $.toJSON(cost_array);
+        $.post("country_analysis_report/modify_web_ad_rules",{
+            app_name:app_name,
+            cost_array:cost_array_string
+        },function(data){
+            if(data && data.ret == 1){
+                admanager.showCommonDlg("提示",data.message+"✪ω✪");
+                setTimeout(function(){
+                    $("#common_message_dialog").modal("hide");
+                    $("#btnSearch").click();
+                },1500)
+            }else{
+                admanager.showCommonDlg("提示",data.message);
+            }
+        },"json");
+    });
+
 </script>
 </body>
 </html>

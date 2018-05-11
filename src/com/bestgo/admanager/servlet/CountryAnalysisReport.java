@@ -7,6 +7,7 @@ import com.bestgo.common.database.services.DB;
 import com.bestgo.common.database.utils.JSObject;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -17,6 +18,7 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.regex.*;
 
 /**
  * 国家分析报告
@@ -45,7 +47,50 @@ public class CountryAnalysisReport extends HttpServlet {
         String beforeFourDay = DateUtil.addDay(endTime,-4,"yyyy-MM-dd");//不包括endTime
         String beforeTwentyTwoDay = DateUtil.addDay(endTime,-22,"yyyy-MM-dd");//不包括endTime
 
-        if (path.matches("/query_country_analysis_report")) {
+
+        if(path.matches("/modify_web_ad_rules")){
+            String cost_array = request.getParameter("cost_array");
+            String app_name = request.getParameter("app_name");
+            JsonParser parser = new JsonParser();
+            JsonArray cost_JsonArray = parser.parse(cost_array).getAsJsonArray();
+            boolean flag = false;
+            for(int i=0;i<cost_JsonArray.size();i++){
+                JsonObject json = cost_JsonArray.get(i).getAsJsonObject();
+                String countryCode = json.get("country_code").getAsString();
+                String cost = json.get("cost_upper_limit").getAsString();
+                try{
+                    String sql = "SELECT id,rule_content FROM web_ad_rules WHERE rule_type = 3 AND rule_content LIKE '%app_name=" + app_name + "%country_code=" + countryCode + "%'";
+                    JSObject one = DB.findOneBySql(sql);
+                    if(one.hasObjectData()){
+                        String rule_content = one.get("rule_content");
+                        long id = one.get("id");
+                        String newLine = rule_content.replaceAll("cost>\\d*","cost>"+cost);
+                        flag = DB.update("web_ad_rules")
+                                .put("rule_content",newLine)
+                                .where(DB.filter().whereEqualTo("id",id))
+                                .execute();
+                    }else{
+                        String ruleContent = "app_name="+app_name+",country_code="+countryCode+",cpa_div_ecpm>0.2,cost>"+cost;
+                        flag=DB.insert("web_ad_rules")
+                                .put("rule_type",3)
+                                .put("rule_content",ruleContent)
+                                .execute();
+                    }
+                }catch(Exception e){
+                    e.printStackTrace();
+                    String error = e.getMessage();
+                    jsonObject.addProperty("ret",0);
+                    jsonObject.addProperty("message",error);
+                }
+            }
+            if(flag){
+                jsonObject.addProperty("ret",1);
+                jsonObject.addProperty("message","执行成功");
+            }else{
+                jsonObject.addProperty("ret",0);
+                jsonObject.addProperty("message","后台未正确修改");
+            }
+        }else if (path.matches("/query_country_analysis_report")) {
             try {
                 String sqlG = "select google_package_id from web_facebook_app_ids_rel WHERE tag_name = '" + tagName + "'";
                 JSObject oneG = DB.findOneBySql(sqlG);
@@ -270,7 +315,7 @@ public class CountryAnalysisReport extends HttpServlet {
                                 totalPuserchaedUser += purchasedUsers;
                                 totalRevenue += revenues;
 
-                                sql = "SELECT rule_content FROM web_ad_rules WHERE rule_type = 3 AND rule_content LIKE '%" + tagName + "%' AND rule_content LIKE '%" + countryCode + "%'";
+                                sql = "SELECT rule_content FROM web_ad_rules WHERE rule_type = 3 AND rule_content LIKE '%app_name=" + tagName + "%country_code=" + countryCode + "%'";
                                 oneC = DB.findOneBySql(sql);
                                 String costUpperLimit = "";
                                 if(oneC.hasObjectData()){

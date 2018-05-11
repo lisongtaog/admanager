@@ -7,6 +7,7 @@ import com.bestgo.common.database.services.DB;
 import com.bestgo.common.database.utils.JSObject;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 
@@ -37,6 +38,9 @@ public class AutoCreateCampaign extends HttpServlet {
         if (path.startsWith("/facebook")) {
             String method = path.replace("/facebook", "");
             switch (method) {
+                case "/update_bidding":
+                    result = facebookCampaignBiddingBatchUpdate(request);
+                    break;
                 case "/create":
                     result = facebookCampaignCreate(request);
                     break;
@@ -112,6 +116,9 @@ public class AutoCreateCampaign extends HttpServlet {
         } else if (path.startsWith("/adwords")) {
             String method = path.replace("/adwords", "");
             switch (method) {
+                case "/update_bidding":
+                    result = adwordsCampaignBiddingBatchUpdate(request);
+                    break;
                 case "/create":
                     result = adwordsCampaignCreate(request);
                     break;
@@ -269,6 +276,29 @@ public class AutoCreateCampaign extends HttpServlet {
         return 0;
     }
 
+    private OperationResult facebookCampaignBiddingBatchUpdate(HttpServletRequest request){
+        OperationResult result = new OperationResult();
+        JsonParser parser = new JsonParser();
+        String bidding_array = request.getParameter("bidding_array");
+        JsonArray bidding_JsonArray = parser.parse(bidding_array).getAsJsonArray();
+        try{
+            for(int i=0;i<bidding_JsonArray.size();i++){
+                JsonObject j = bidding_JsonArray.get(i).getAsJsonObject();
+                String id = j.get("id").getAsString();
+                String bidding = j.get("bidding").getAsString();
+                DB.update("ad_campaigns_auto_create")
+                        .put("bidding",bidding)
+                        .where(DB.filter().whereEqualTo("id", id))  //这里 id 可是一个String 类型啊！
+                        .execute();
+            }
+            result.result = true;
+            result.message = "批量更新成功";
+        }catch (Exception e){
+            result.result = false;
+            result.message = e.getMessage();
+        }
+        return result;
+    }
     private OperationResult facebookCampaignCreate(HttpServletRequest request) {
         OperationResult result = new OperationResult();
         try {
@@ -548,10 +578,13 @@ public class AutoCreateCampaign extends HttpServlet {
     private OperationResult facebookCampaignDelete(HttpServletRequest request) {
         OperationResult result = new OperationResult();
         try {
-            String id = request.getParameter("id");
-            DB.delete("ad_campaigns_auto_create")
-                    .where(DB.filter().whereEqualTo("id", id))
-                    .execute();
+            String id_batch = request.getParameter("id_batch");
+            String[] id_array = id_batch.split(",");
+            for (String id:id_array){   //这里会有删不掉的隐患吗？
+                DB.delete("ad_campaigns_auto_create")
+                        .where(DB.filter().whereEqualTo("id", id))
+                        .execute();
+            }
             result.result = true;
             result.message = "删除成功";
         } catch (Exception ex) {
@@ -656,6 +689,30 @@ public class AutoCreateCampaign extends HttpServlet {
             logger.error(ex.getMessage(), ex);
         }
         return 0;
+    }
+
+    private OperationResult adwordsCampaignBiddingBatchUpdate(HttpServletRequest request){
+        OperationResult result = new OperationResult();
+        JsonParser parser = new JsonParser();
+        String bidding_array = request.getParameter("bidding_array");
+        JsonArray bidding_JsonArray = parser.parse(bidding_array).getAsJsonArray();
+        try{
+            for(int i=0;i<bidding_JsonArray.size();i++){
+                JsonObject j = bidding_JsonArray.get(i).getAsJsonObject();
+                String id = j.get("id").getAsString();
+                String bidding = j.get("bidding").getAsString();
+                DB.update("ad_campaigns_admob_auto_create")
+                        .put("bidding",bidding)
+                        .where(DB.filter().whereEqualTo("id", id))  //这里 id 可是一个String 类型啊！
+                        .execute();
+            }
+            result.result = true;
+            result.message = "批量更新成功";
+        }catch (Exception e){
+            result.result = false;
+            result.message = e.getMessage();
+        }
+        return result;
     }
 
     private OperationResult  adwordsCampaignCreate(HttpServletRequest request) {
@@ -877,10 +934,13 @@ public class AutoCreateCampaign extends HttpServlet {
     private OperationResult adwordsCampaignDelete(HttpServletRequest request) {
         OperationResult result = new OperationResult();
         try {
-            String id = request.getParameter("id");
-            DB.delete("ad_campaigns_admob_auto_create")
-                    .where(DB.filter().whereEqualTo("id", id))
-                    .execute();
+            String id_batch = request.getParameter("id_batch");
+            String[] id_array = id_batch.split(",");
+            for(String id:id_array){
+                DB.delete("ad_campaigns_admob_auto_create")
+                        .where(DB.filter().whereEqualTo("id", id))
+                        .execute();
+            }
             result.result = true;
             result.message = "删除成功";
         } catch (Exception ex) {

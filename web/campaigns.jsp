@@ -267,7 +267,7 @@
         if(this.name == "false"){
             $('#btnNotExistTagSearch').css("background-color","red");
             this.name = "true";
-            $.post('campaign/selectCampaingnWhereNotExistTag',{
+            $.post('campaign/query_not_exist_tag_campaingns',{
             },function(data) {
                 if (data && data.ret == 1) {
                     $('.table tbody > tr').remove();
