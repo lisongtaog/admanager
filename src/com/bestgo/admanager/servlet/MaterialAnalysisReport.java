@@ -12,8 +12,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Author: mengjun
@@ -22,6 +22,40 @@ import java.util.List;
  */
 @WebServlet(name = "MaterialAnalysisReport",urlPatterns = "/material_analysis_report/*")
 public class MaterialAnalysisReport extends HttpServlet {
+    class CampaignResourceItem {
+        public String campaignId;
+        public String network;
+        public String title;
+        public String message;
+        public String appName;
+        public String message1;
+        public String message2;
+        public String message3;
+        public String message4;
+        public String imagePath;
+        public String videoPath;
+    }
+
+    class ResourceAnalysisItem {
+        public String network;
+        public String title;
+        public String message;
+        public String message1;
+        public String message2;
+        public String message3;
+        public String message4;
+        public String imagePath;
+        public String videoPath;
+
+        public double spend;
+        public long installed;
+        public long impressions;
+        public long click;
+        public double cpa;
+        public double ctr;
+    }
+    static ConcurrentHashMap<String, CampaignResourceItem> cacheCampaigns = new ConcurrentHashMap<>();
+
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         if (!Utils.isAdmin(request, response)) return;
         JsonObject json = new JsonObject();
@@ -30,358 +64,235 @@ public class MaterialAnalysisReport extends HttpServlet {
         if (path.matches("/query_material_analysis_report_by_tag")) {
             JsonArray array = new JsonArray();
             try {
-                JsonObject pathJO = new JsonObject();
                 String tagName = request.getParameter("tagName");
                 String startTime = request.getParameter("startTime");
                 String endTime = request.getParameter("endTime");
-
-                //查询所有国家
-                String sql = "SELECT country_name,country_code FROM app_country_code_dict ORDER BY country_name";
-                List<JSObject> countryList = DB.findListBySql(sql);
-
-                //查询标签对应的所有图片路径
-                ArrayList<JSObject> imageCampaignList = new ArrayList<>();
-                sql = "SELECT DISTINCT image_path FROM ad_app_image_path_rel WHERE app_name = '" + tagName + "'";
-                List<JSObject> imagePathList = DB.findListBySql(sql);
-                String pathStr = "";
-                if (imagePathList != null) {
-                    for (int i = 0, len = imagePathList.size(); i < len; i++) {
-                        JSObject campaign = new JSObject();
-                        String facebookCampaignIdsStr = "";
-                        String adwordsCampaignIdsStr = "";
-                        JSObject image = imagePathList.get(i);
-                        String imagePath = image.get("image_path");
-                        pathStr += "imagePath=" + imagePath + ",";
-
-                        //根据图片路径匹配Facebook系列
-                        sql = "SELECT DISTINCT campaign_id FROM ad_ads a,ad_campaigns c " +
-                                " WHERE a.parent_id = c.id AND image_file_path LIKE '%" + imagePath + "%'";
-                        List<JSObject> facebookCampaignIdList = DB.findListBySql(sql);
-                        if (facebookCampaignIdList != null && facebookCampaignIdList.size() > 0) {
-                            facebookCampaignIdsStr = Utils.getStrForListDistinctByAttrWithCommmas(facebookCampaignIdList, "campaign_id");
-                        }
-
-                        //根据图片路径匹配Adwords系列
-                        sql = "SELECT DISTINCT campaign_id FROM ad_campaigns_admob WHERE image_path LIKE '%" + imagePath + "%'";
-                        List<JSObject> adwordsCampaignIdList = DB.findListBySql(sql);
-                        if (adwordsCampaignIdList != null && adwordsCampaignIdList.size() > 0) {
-                            adwordsCampaignIdsStr = Utils.getStrForListDistinctByAttrWithCommmas(adwordsCampaignIdList, "campaign_id");
-                        }
-                        facebookCampaignIdsStr = facebookCampaignIdsStr == "" ? "noData" : facebookCampaignIdsStr;
-                        adwordsCampaignIdsStr = adwordsCampaignIdsStr == "" ? "noData" : adwordsCampaignIdsStr;
-                        campaign.put("facebook_campaign_image_" + i, facebookCampaignIdsStr);
-                        campaign.put("adwords_campaign_image_" + i, adwordsCampaignIdsStr);
-                        imageCampaignList.add(campaign);
-                    }
+                int sortId = Utils.parseInt(request.getParameter("sortId"), 1001);
+                int inputCount = Utils.parseInt(request.getParameter("inputCount"), 100);
+                if (tagName != null && tagName.isEmpty()) {
+                    json.addProperty("ret", 0);
+                    json.addProperty("message", "标签不能为空");
+                    response.getWriter().write(json.toString());
+                    return;
                 }
 
+                HashMap<String, ResourceAnalysisItem> resultMap = new HashMap<>();
 
-                //查询标签对应的所有视频路径
-                ArrayList<JSObject> videoCampaignList = new ArrayList<>();
-                sql = "SELECT DISTINCT video_path FROM ad_app_video_path_rel WHERE app_name = '" + tagName + "'";
-                List<JSObject> videoPathList = DB.findListBySql(sql);
-                if(videoPathList != null){
-                    for(int i=0,len=videoPathList.size();i<len;i++){
-                        JSObject campaign = new JSObject();
-                        String facebookCampaignIdsStr = "";
-
-                        JSObject video = videoPathList.get(i);
-                        String videoPath = video.get("video_path");
-                        if(i == len - 1){
-                            pathStr += "facebookVideoPath=" + videoPath;
-                        }else {
-                            pathStr += "facebookVideoPath=" + videoPath + ",";
-                        }
-
-                        //根据视频路径匹配Facebook系列
-                        sql = "SELECT DISTINCT campaign_id FROM ad_ads a,ad_campaigns c " +
-                                " WHERE a.parent_id = c.id AND video_file_path LIKE '%" + videoPath + "%'";
-                        List<JSObject> facebookCampaignIdList = DB.findListBySql(sql);
-                        if(facebookCampaignIdList != null && facebookCampaignIdList.size() > 0) {
-                            facebookCampaignIdsStr = Utils.getStrForListDistinctByAttrWithCommmas(facebookCampaignIdList, "campaign_id");
-                        }
-
-                        facebookCampaignIdsStr = facebookCampaignIdsStr == "" ? "noData" : facebookCampaignIdsStr;
-                        campaign.put("facebook_campaign_video_" + i,facebookCampaignIdsStr);
-                        videoCampaignList.add(campaign);
-                    }
+                JSObject tagObject = DB.simpleScan("web_tag")
+                        .select("id", "tag_name")
+                        .where(DB.filter().whereEqualTo("tag_name", tagName)).execute();
+                if (!tagObject.hasObjectData()) {
+                    json.addProperty("ret", 0);
+                    json.addProperty("message", "标签不能为空");
+                    response.getWriter().write(json.toString());
+                    return;
                 }
 
-                //查询标签对应的所有广告组1
-                String groupOneCampaignsStr = "";
-                sql = "SELECT DISTINCT campaign_id FROM ad_campaigns WHERE app_name = '" + tagName + "' AND group_id = 1";
-                List<JSObject> facebookGroupOneCampaignList = DB.findListBySql(sql);
-                if(facebookGroupOneCampaignList != null && facebookGroupOneCampaignList.size() > 0){
-                    groupOneCampaignsStr = Utils.getStrForListDistinctByAttrWithCommmas(facebookGroupOneCampaignList,"campaign_id");
-                }
-                sql = "SELECT DISTINCT campaign_id FROM ad_campaigns_admob WHERE app_name = '" + tagName + "' AND group_id = 1";
-                List<JSObject> admobGroupOneCampaignList = DB.findListBySql(sql);
-                if(admobGroupOneCampaignList != null && admobGroupOneCampaignList.size() > 0){
-                    String admobGroupOneCampaignsStr = Utils.getStrForListDistinctByAttrWithCommmas(admobGroupOneCampaignList,"campaign_id");
-                    if(!"''".equals(admobGroupOneCampaignsStr) && admobGroupOneCampaignsStr != ""){
-                        groupOneCampaignsStr += "," + admobGroupOneCampaignsStr;
-                    }
-                }
+                long tagId = tagObject.get("id");
 
-                //查询标签对应的所有广告组2
-                String groupTwoCampaignsStr = "";
-                sql = "SELECT DISTINCT campaign_id FROM ad_campaigns WHERE app_name = '" + tagName + "' AND group_id = 2";
-                List<JSObject> facebookGroupTwoCampaignList = DB.findListBySql(sql);
-                if(facebookGroupTwoCampaignList != null && facebookGroupTwoCampaignList.size() > 0){
-                    groupTwoCampaignsStr = Utils.getStrForListDistinctByAttrWithCommmas(facebookGroupTwoCampaignList,"campaign_id");
-                }
-                sql = "SELECT DISTINCT campaign_id FROM ad_campaigns_admob WHERE app_name = '" + tagName + "' AND group_id = 2";
-                List<JSObject> admobGroupTwoCampaignList = DB.findListBySql(sql);
-                if(admobGroupTwoCampaignList != null && admobGroupTwoCampaignList.size() > 0){
-                    String admobGroupTwoCampaignsStr = Utils.getStrForListDistinctByAttrWithCommmas(admobGroupTwoCampaignList,"campaign_id");
-                    if(!"''".equals(admobGroupTwoCampaignsStr) && admobGroupTwoCampaignsStr != ""){
-                        groupTwoCampaignsStr += "," + admobGroupTwoCampaignsStr;
-                    }
-                }
+                String sql = "select h.campaign_id, sum(total_click) as total_click, sum(total_impressions) as total_impressions, " +
+                        "sum(total_spend) as total_spend, sum(total_installed) as total_installed from web_ad_campaigns_history h, web_ad_campaign_tag_rel r " +
+                        "where date between ? and ? and h.campaign_id=r.campaign_id and r.tag_id=? group by campaign_id having total_installed > 0;";
+                List<JSObject> list = DB.findListBySql(sql, startTime, endTime, tagId);
+                for (int i = 0; i < list.size(); i++) {
+                    String campaignId = list.get(i).get("campaign_id");
+                    double spend = Utils.convertDouble(list.get(i).get("total_spend"), 0);
+                    long installed = Utils.convertLong(list.get(i).get("total_installed"), 0);
+                    long impressions = Utils.convertLong(list.get(i).get("total_impressions"), 0);
+                    long click = Utils.convertLong(list.get(i).get("total_click"), 0);
 
-                //查询标签对应的所有广告组3
-                String groupThreeCampaignsStr = "";
-                sql = "SELECT DISTINCT campaign_id FROM ad_campaigns WHERE app_name = '" + tagName + "' AND group_id = 3";
-                List<JSObject> facebookGroupThreeCampaignList = DB.findListBySql(sql);
-                if(facebookGroupThreeCampaignList != null && facebookGroupThreeCampaignList.size() > 0){
-                    groupThreeCampaignsStr = Utils.getStrForListDistinctByAttrWithCommmas(facebookGroupThreeCampaignList,"campaign_id");
-                }
-                sql = "SELECT DISTINCT campaign_id FROM ad_campaigns_admob WHERE app_name = '" + tagName + "' AND group_id = 3";
-                List<JSObject> admobGroupThreeCampaignList = DB.findListBySql(sql);
-                if(admobGroupThreeCampaignList != null && admobGroupThreeCampaignList.size() > 0){
-                    String admobGroupThreeCampaignsStr = Utils.getStrForListDistinctByAttrWithCommmas(admobGroupThreeCampaignList,"campaign_id");
-                    if(!"''".equals(admobGroupThreeCampaignsStr) && admobGroupThreeCampaignsStr != ""){
-                        groupThreeCampaignsStr += "," + admobGroupThreeCampaignsStr;
-                    }
-                }
-
-
-                //查询标签对应的所有广告组4
-                String groupFourCampaignsStr = "";
-                sql = "SELECT DISTINCT campaign_id FROM ad_campaigns WHERE app_name = '" + tagName + "' AND group_id = 4";
-                List<JSObject> facebookGroupFourCampaignList = DB.findListBySql(sql);
-                if(facebookGroupFourCampaignList != null && facebookGroupFourCampaignList.size() > 0){
-                    groupFourCampaignsStr = Utils.getStrForListDistinctByAttrWithCommmas(facebookGroupFourCampaignList,"campaign_id");
-                }
-                sql = "SELECT DISTINCT campaign_id FROM ad_campaigns_admob WHERE app_name = '" + tagName + "' AND group_id = 4";
-                List<JSObject> admobGroupFourCampaignList = DB.findListBySql(sql);
-                if(admobGroupFourCampaignList != null && admobGroupFourCampaignList.size() > 0){
-                    String admobGroupFourCampaignsStr = Utils.getStrForListDistinctByAttrWithCommmas(admobGroupFourCampaignList,"campaign_id");
-                    if(!"''".equals(admobGroupFourCampaignsStr) && admobGroupFourCampaignsStr != ""){
-                        groupFourCampaignsStr += "," + admobGroupFourCampaignsStr;
-                    }
-                }
-
-                if(pathStr == ""){
-                    pathStr = "广告语组1" + ",广告语组2" + ",广告语组3" + ",广告语组4";
-                }else{
-                    pathStr += ",广告语组1" + ",广告语组2" + ",广告语组3" + ",广告语组4";
-                }
-                pathJO.addProperty("paths",pathStr);
-                array.add(pathJO);
-
-                double totalSpends = 0;
-                double totalClicks = 0;
-                double totalImpressionses = 0;
-                double totalInstalleds = 0;
-                for (int c = 1, len = countryList.size(); c <= len; c++) {
-                    JsonObject countryParam = new JsonObject();
-                    JSObject country = countryList.get(c - 1);
-                    JSObject one = null;
-                    String countryCode = country.get("country_code");
-                    String countryName = country.get("country_name");
-                    String paramStr = countryName;
-                    if(imagePathList != null){
-                        for (int i = 0,length = imagePathList.size(); i < length; i++) {
-                            JSObject campaign = imageCampaignList.get(i);
-                            String facebookCampaignIdsStr = campaign.get("facebook_campaign_image_" + i);
-                            String adwordsCampaignIdsStr = campaign.get("adwords_campaign_image_" + i);
-                            if (!"noData".equals(facebookCampaignIdsStr)) {
-                                sql = "SELECT SUM(total_spend) AS total_spends,SUM(total_click) AS total_clicks," +
-                                        " SUM(total_impressions) AS total_impressionses,SUM(total_installed) AS total_installeds " +
-                                        " FROM web_ad_campaigns_country_history " +
-                                        " WHERE country_code = '" + countryCode + "' " +
-                                        " AND date BETWEEN '" + startTime + "' AND '" + endTime + "'" +
-                                        " AND campaign_id IN(" + facebookCampaignIdsStr + ")";
-                                one = DB.findOneBySql(sql);
-                                if (one.hasObjectData()) {
-                                    totalSpends = Utils.convertDouble(one.get("total_spends"), 0);
-                                    totalClicks = Utils.convertDouble(one.get("total_clicks"), 0);
-                                    totalImpressionses = Utils.convertDouble(one.get("total_impressionses"), 0);
-                                    totalInstalleds = Utils.convertDouble(one.get("total_installeds"), 0);
-                                }
+                    CampaignResourceItem item = cacheCampaigns.get(campaignId);
+                    if (item == null) {
+                        String sql1 = "select app_name, title, message, image_file_path, video_file_path, thumbnail_image_file_path from ad_campaigns, ad_ads " +
+                                "where campaign_id=? and ad_campaigns.id=ad_ads.parent_id";
+                        JSObject one = DB.findOneBySql(sql1, campaignId);
+                        if (one.hasObjectData()) {
+                            item = new CampaignResourceItem();
+                            cacheCampaigns.put(campaignId, item);
+                            item.network = "facebook";
+                            item.appName = one.get("app_name");
+                            item.title = one.get("title");
+                            item.message = one.get("message");
+                            item.imagePath = one.get("image_file_path");
+                            if (item.imagePath.isEmpty()) {
+                                item.imagePath = one.get("thumbnail_image_file_path");
                             }
-                            if (!"noData".equals(adwordsCampaignIdsStr)) {
-                                sql = "SELECT SUM(total_spend) AS total_spends,SUM(total_click) AS total_clicks," +
-                                        " SUM(total_impressions) AS total_impressionses,SUM(total_installed) AS total_installeds " +
-                                        " FROM web_ad_campaigns_country_history_admob " +
-                                        " WHERE country_code = '" + countryCode + "' " +
-                                        " AND date BETWEEN '" + startTime + "' AND '" + endTime + "'" +
-                                        " AND campaign_id IN(" + adwordsCampaignIdsStr + ")";
-                                one = DB.findOneBySql(sql);
-                                if (one.hasObjectData()) {
-                                    totalSpends += Utils.convertDouble(one.get("total_spends"), 0);
-                                    totalClicks += Utils.convertDouble(one.get("total_clicks"), 0);
-                                    totalImpressionses += Utils.convertDouble(one.get("total_impressionses"), 0);
-                                    totalInstalleds += Utils.convertDouble(one.get("total_installeds"), 0);
-                                }
-                            }
-                            double cpa = totalInstalleds == 0 ? 0 : Utils.trimDouble(totalSpends / totalInstalleds, 3);
-                            double ctr = totalImpressionses == 0 ? 0 : Utils.trimDouble(totalClicks / totalImpressionses, 3);
-                            double cvr = totalClicks == 0 ? 0 : Utils.trimDouble(totalInstalleds / totalClicks, 3);
-                            totalInstalleds = Utils.trimDouble(totalInstalleds, 3);
-                            paramStr += "," + cpa + "," + totalInstalleds + "," + ctr + "," + cvr;
-                            totalSpends = 0;
-                            totalClicks = 0;
-                            totalImpressionses = 0;
-                            totalInstalleds = 0;
+                            item.videoPath = one.get("video_file_path");
+                            item.campaignId = campaignId;
                         }
-                    }
-                    if(videoPathList != null){
-                        for(int i = 0,length = videoPathList.size();i < length;i++){
-                            JSObject campaign = videoCampaignList.get(i);
-                            String facebookCampaignIdsStr = campaign.get("facebook_campaign_video_" + i);
-                            if(!"noData".equals(facebookCampaignIdsStr)){
-                                sql = "SELECT SUM(total_spend) AS total_spends,SUM(total_click) AS total_clicks," +
-                                        " SUM(total_impressions) AS total_impressionses,SUM(total_installed) AS total_installeds " +
-                                        " FROM web_ad_campaigns_country_history " +
-                                        " WHERE country_code = '" + countryCode + "' " +
-                                        " AND date BETWEEN '" + startTime + "' AND '" + endTime + "'" +
-                                        " AND campaign_id IN(" + facebookCampaignIdsStr + ")";
-                                one = DB.findOneBySql(sql);
-                                if(one.hasObjectData()){
-                                    totalSpends = Utils.convertDouble(one.get("total_spends"),0);
-                                    totalClicks = Utils.convertDouble(one.get("total_clicks"),0);
-                                    totalImpressionses = Utils.convertDouble(one.get("total_impressionses"),0);
-                                    totalInstalleds = Utils.convertDouble(one.get("total_installeds"),0);
-                                }
-                            }
-
-                            double cpa = totalInstalleds == 0 ? 0 : Utils.trimDouble(totalSpends / totalInstalleds, 3);
-                            double ctr = totalImpressionses == 0 ? 0 :  Utils.trimDouble(totalClicks / totalImpressionses, 3);
-                            double cvr = totalClicks == 0 ? 0 :  Utils.trimDouble(totalInstalleds / totalClicks, 3);
-                            totalInstalleds = Utils.trimDouble(totalInstalleds, 3);
-                            paramStr += "," + cpa + "," + totalInstalleds + "," + ctr + "," + cvr;
-                            totalSpends = 0;
-                            totalClicks = 0;
-                            totalImpressionses = 0;
-                            totalInstalleds = 0;
+                        if (item == null || !item.appName.equals(tagName)) {
+                            continue;
                         }
-                    }
-
-                    if("''".equals(groupOneCampaignsStr) || groupOneCampaignsStr == ""){
-                        paramStr += ",0,0,0,0";
-                    }else {
-                        sql = "SELECT SUM(total_spend) AS total_spends,SUM(total_click) AS total_clicks," +
-                                " SUM(total_impressions) AS total_impressionses,SUM(total_installed) AS total_installeds " +
-                                " FROM web_ad_campaigns_country_history " +
-                                " WHERE country_code = '" + countryCode + "' " +
-                                " AND date BETWEEN '" + startTime + "' AND '" + endTime + "'" +
-                                " AND campaign_id IN(" + groupOneCampaignsStr + ")";
-                        one = DB.findOneBySql(sql);
-                        if(one.hasObjectData()){
-                            totalSpends = Utils.convertDouble(one.get("total_spends"),0);
-                            totalClicks = Utils.convertDouble(one.get("total_clicks"),0);
-                            totalImpressionses = Utils.convertDouble(one.get("total_impressionses"),0);
-                            double cpa = totalInstalleds == 0 ? 0 : Utils.trimDouble(totalSpends / totalInstalleds, 3);
-                            double ctr = totalImpressionses == 0 ? 0 :  Utils.trimDouble(totalClicks / totalImpressionses, 3);
-                            double cvr = totalClicks == 0 ? 0 :  Utils.trimDouble(totalInstalleds / totalClicks, 3);
-                            totalInstalleds = Utils.convertDouble(one.get("total_installeds"),0);
-                            paramStr += "," + cpa + "," + totalInstalleds + "," + ctr + "," + cvr;
-                            totalSpends = 0;
-                            totalClicks = 0;
-                            totalImpressionses = 0;
-                            totalInstalleds = 0;
+                        String key = String.format("%s_%s_%s_%s", item.title, item.message, item.imagePath, item.videoPath);
+                        ResourceAnalysisItem resourceAnalysisItem = resultMap.get(key);
+                        if (resourceAnalysisItem == null) {
+                            resourceAnalysisItem = new ResourceAnalysisItem();
+                            resultMap.put(key, resourceAnalysisItem);
                         }
+                        resourceAnalysisItem.network = "facebook";
+                        resourceAnalysisItem.title = item.title;
+                        resourceAnalysisItem.message = item.message;
+                        resourceAnalysisItem.imagePath = item.imagePath;
+                        resourceAnalysisItem.videoPath = item.videoPath;
+                        resourceAnalysisItem.spend += spend;
+                        resourceAnalysisItem.installed += installed;
+                        resourceAnalysisItem.impressions += impressions;
+                        resourceAnalysisItem.click += click;
+                        resourceAnalysisItem.ctr = Utils.trimDouble(resourceAnalysisItem.impressions > 0 ? resourceAnalysisItem.click * 1.0 / resourceAnalysisItem.impressions : 0, 3);
+                        resourceAnalysisItem.cpa = Utils.trimDouble(resourceAnalysisItem.installed > 0 ? resourceAnalysisItem.spend / resourceAnalysisItem.installed : 0, 3);
                     }
-
-                    if("''".equals(groupTwoCampaignsStr) || groupTwoCampaignsStr == ""){
-                        paramStr += ",0,0,0,0";
-                    }else {
-                        sql = "SELECT SUM(total_spend) AS total_spends,SUM(total_click) AS total_clicks," +
-                                " SUM(total_impressions) AS total_impressionses,SUM(total_installed) AS total_installeds " +
-                                " FROM web_ad_campaigns_country_history " +
-                                " WHERE country_code = '" + countryCode + "' " +
-                                " AND date BETWEEN '" + startTime + "' AND '" + endTime + "'" +
-                                " AND campaign_id IN(" + groupTwoCampaignsStr + ")";
-                        one = DB.findOneBySql(sql);
-                        if(one.hasObjectData()){
-                            totalSpends = Utils.convertDouble(one.get("total_spends"),0);
-                            totalClicks = Utils.convertDouble(one.get("total_clicks"),0);
-                            totalImpressionses = Utils.convertDouble(one.get("total_impressionses"),0);
-                            double cpa = totalInstalleds == 0 ? 0 : Utils.trimDouble(totalSpends / totalInstalleds, 3);
-                            double ctr = totalImpressionses == 0 ? 0 :  Utils.trimDouble(totalClicks / totalImpressionses, 3);
-                            double cvr = totalClicks == 0 ? 0 :  Utils.trimDouble(totalInstalleds / totalClicks, 3);
-                            totalInstalleds = Utils.convertDouble(one.get("total_installeds"),0);
-                            paramStr += "," + cpa + "," + totalInstalleds + "," + ctr + "," + cvr;
-                            totalSpends = 0;
-                            totalClicks = 0;
-                            totalImpressionses = 0;
-                            totalInstalleds = 0;
-                        }
-                    }
-
-
-                    if("''".equals(groupThreeCampaignsStr) || groupThreeCampaignsStr == ""){
-                        paramStr += ",0,0,0,0";
-                    }else {
-                        sql = "SELECT SUM(total_spend) AS total_spends,SUM(total_click) AS total_clicks," +
-                                " SUM(total_impressions) AS total_impressionses,SUM(total_installed) AS total_installeds " +
-                                " FROM web_ad_campaigns_country_history " +
-                                " WHERE country_code = '" + countryCode + "' " +
-                                " AND date BETWEEN '" + startTime + "' AND '" + endTime + "'" +
-                                " AND campaign_id IN(" + groupThreeCampaignsStr + ")";
-                        one = DB.findOneBySql(sql);
-                        if(one.hasObjectData()){
-                            totalSpends = Utils.convertDouble(one.get("total_spends"),0);
-                            totalClicks = Utils.convertDouble(one.get("total_clicks"),0);
-                            totalImpressionses = Utils.convertDouble(one.get("total_impressionses"),0);
-                            double cpa = totalInstalleds == 0 ? 0 : Utils.trimDouble(totalSpends / totalInstalleds, 3);
-                            double ctr = totalImpressionses == 0 ? 0 :  Utils.trimDouble(totalClicks / totalImpressionses, 3);
-                            double cvr = totalClicks == 0 ? 0 :  Utils.trimDouble(totalInstalleds / totalClicks, 3);
-                            totalInstalleds = Utils.convertDouble(one.get("total_installeds"),0);
-                            paramStr += "," + cpa + "," + totalInstalleds + "," + ctr + "," + cvr;
-                            totalSpends = 0;
-                            totalClicks = 0;
-                            totalImpressionses = 0;
-                            totalInstalleds = 0;
-                        }
-                    }
-
-
-                    if("''".equals(groupFourCampaignsStr) || groupFourCampaignsStr == ""){
-                        paramStr += ",0,0,0,0";
-                    }else {
-                        sql = "SELECT SUM(total_spend) AS total_spends,SUM(total_click) AS total_clicks," +
-                                " SUM(total_impressions) AS total_impressionses,SUM(total_installed) AS total_installeds " +
-                                " FROM web_ad_campaigns_country_history " +
-                                " WHERE country_code = '" + countryCode + "' " +
-                                " AND date BETWEEN '" + startTime + "' AND '" + endTime + "'" +
-                                " AND campaign_id IN(" + groupFourCampaignsStr + ")";
-                        one = DB.findOneBySql(sql);
-                        if(one.hasObjectData()){
-                            totalSpends = Utils.convertDouble(one.get("total_spends"),0);
-                            totalClicks = Utils.convertDouble(one.get("total_clicks"),0);
-                            totalImpressionses = Utils.convertDouble(one.get("total_impressionses"),0);
-                            double cpa = totalInstalleds == 0 ? 0 : Utils.trimDouble(totalSpends / totalInstalleds, 3);
-                            double ctr = totalImpressionses == 0 ? 0 :  Utils.trimDouble(totalClicks / totalImpressionses, 3);
-                            double cvr = totalClicks == 0 ? 0 :  Utils.trimDouble(totalInstalleds / totalClicks, 3);
-                            totalInstalleds = Utils.convertDouble(one.get("total_installeds"),0);
-                            paramStr += "," + cpa + "," + totalInstalleds + "," + ctr + "," + cvr;
-                            totalSpends = 0;
-                            totalClicks = 0;
-                            totalImpressionses = 0;
-                            totalInstalleds = 0;
-                        }
-                    }
-
-
-                    countryParam.addProperty("country_param_" + c, paramStr);
-                    array.add(countryParam);
                 }
+
+                sql = "select h.campaign_id, sum(total_click) as total_click, sum(total_impressions) as total_impressions, " +
+                        "sum(total_spend) as total_spend, sum(total_installed) as total_installed from web_ad_campaigns_history_admob h, web_ad_campaign_tag_admob_rel r " +
+                        "where date between ? and ? and h.campaign_id=r.campaign_id and r.tag_id=? group by campaign_id having total_installed > 0;";
+                list = DB.findListBySql(sql, startTime, endTime, tagId);
+                for (int i = 0; i < list.size(); i++) {
+                    String campaignId = list.get(i).get("campaign_id");
+                    double spend = Utils.convertDouble(list.get(i).get("total_spend"), 0);
+                    long installed = Utils.convertLong(list.get(i).get("total_installed"), 0);
+                    long impressions = Utils.convertLong(list.get(i).get("total_impressions"), 0);
+                    long click = Utils.convertLong(list.get(i).get("total_click"), 0);
+
+                    CampaignResourceItem item = cacheCampaigns.get(campaignId);
+                    if (item == null) {
+                        String sql1 = "select app_name, message1, message2, message3, message4, image_path from ad_campaigns_admob where campaign_id=?";
+                        JSObject one = DB.findOneBySql(sql1, campaignId);
+                        if (one.hasObjectData()) {
+                            item = new CampaignResourceItem();
+                            cacheCampaigns.put(campaignId, item);
+                            item.network = "adwords";
+                            item.appName = one.get("app_name");
+                            item.message1 = one.get("message1");
+                            item.message2 = one.get("message2");
+                            item.message3 = one.get("message3");
+                            item.message4 = one.get("message4");
+                            item.imagePath = one.get("image_path");
+                            item.campaignId = campaignId;
+                        }
+                    }
+                    if (item == null || !item.appName.equals(tagName)) {
+                        continue;
+                    }
+                    String key = String.format("%s_%s_%s_%s_%s", item.message1, item.message2, item.message3, item.message4, item.imagePath);
+                    ResourceAnalysisItem resourceAnalysisItem = resultMap.get(key);
+                    if (resourceAnalysisItem == null) {
+                        resourceAnalysisItem = new ResourceAnalysisItem();
+                        resultMap.put(key, resourceAnalysisItem);
+                    }
+                    resourceAnalysisItem.network = "adwords";
+                    resourceAnalysisItem.message1 = item.message1;
+                    resourceAnalysisItem.message2 = item.message2;
+                    resourceAnalysisItem.message3 = item.message3;
+                    resourceAnalysisItem.message4 = item.message4;
+                    resourceAnalysisItem.imagePath = item.imagePath;
+                    resourceAnalysisItem.spend += spend;
+                    resourceAnalysisItem.installed += installed;
+                    resourceAnalysisItem.impressions += impressions;
+                    resourceAnalysisItem.click += click;
+                    resourceAnalysisItem.ctr = Utils.trimDouble(resourceAnalysisItem.impressions > 0 ? resourceAnalysisItem.click * 1.0 / resourceAnalysisItem.impressions : 0, 3);
+                    resourceAnalysisItem.cpa = Utils.trimDouble(resourceAnalysisItem.installed > 0 ? resourceAnalysisItem.spend / resourceAnalysisItem.installed : 0, 3);
+                }
+
+                Collection<ResourceAnalysisItem> results = resultMap.values();
+
+                ArrayList<ResourceAnalysisItem> sortArr = new ArrayList<>(results);
+                sortArr.sort(new Comparator<ResourceAnalysisItem>() {
+                    @Override
+                    public int compare(ResourceAnalysisItem o1, ResourceAnalysisItem o2) {
+                        int ret = 0;
+                        switch (sortId) {
+                            case 1:
+                            case 1001:
+                                if (o1.spend > o2.spend) {
+                                    ret = sortId > 1000 ? -1 : 1;
+                                } else if (o1.spend < o2.spend) {
+                                    ret = sortId > 1000 ? 1 : -1;
+                                }
+                                break;
+                            case 2:
+                            case 1002:
+                                if (o1.installed > o2.installed) {
+                                    ret = sortId > 1000 ? -1 : 1;
+                                } else if (o1.installed < o2.installed) {
+                                    ret = sortId > 1000 ? 1 : -1;
+                                }
+                                break;
+                            case 3:
+                            case 1003:
+                                if (o1.click > o2.click) {
+                                    ret = sortId > 1000 ? -1 : 1;
+                                } else if (o1.click < o2.click) {
+                                    ret = sortId > 1000 ? 1 : -1;
+                                }
+                                break;
+                            case 4:
+                            case 1004:
+                                if (o1.impressions > o2.impressions) {
+                                    ret = sortId > 1000 ? -1 : 1;
+                                } else if (o1.impressions < o2.impressions) {
+                                    ret = sortId > 1000 ? 1 : -1;
+                                }
+                                break;
+                            case 5:
+                            case 1005:
+                                if (o1.cpa > o2.cpa) {
+                                    ret = sortId > 1000 ? -1 : 1;
+                                } else if (o1.cpa < o2.cpa) {
+                                    ret = sortId > 1000 ? 1 : -1;
+                                }
+                                break;
+                            case 6:
+                            case 1006:
+                                if (o1.ctr > o2.ctr) {
+                                    ret = sortId > 1000 ? -1 : 1;
+                                } else if (o1.ctr < o2.ctr) {
+                                    ret = sortId > 1000 ? 1 : -1;
+                                }
+                                break;
+                            default:
+                                if (o1.spend > o2.spend) {
+                                    ret = sortId > 1000 ? -1 : 1;
+                                } else if (o1.spend < o2.spend) {
+                                    ret = sortId > 1000 ? 1 : -1;
+                                }
+                        }
+                        return ret;
+                    }
+                });
+                for (int i = 0; i < sortArr.size(); i++) {
+                    if (sortId > 1000) {
+                        if (i >= inputCount) {
+                            continue;
+                        }
+                    } else {
+                        if (i < sortArr.size() - inputCount) {
+                            continue;
+                        }
+                    }
+                    JsonObject one = new JsonObject();
+                    one.addProperty("network", sortArr.get(i).network);
+                    one.addProperty("title", sortArr.get(i).title);
+                    one.addProperty("message", sortArr.get(i).message);
+                    one.addProperty("message1", sortArr.get(i).message1);
+                    one.addProperty("message2", sortArr.get(i).message2);
+                    one.addProperty("message3", sortArr.get(i).message3);
+                    one.addProperty("message4", sortArr.get(i).message4);
+                    one.addProperty("imagePath", sortArr.get(i).imagePath);
+                    one.addProperty("videoPath", sortArr.get(i).videoPath);
+                    one.addProperty("installed", sortArr.get(i).installed);
+                    one.addProperty("click", sortArr.get(i).click);
+                    one.addProperty("impressions", sortArr.get(i).impressions);
+                    one.addProperty("spend", Utils.trimDouble(sortArr.get(i).spend, 2));
+                    one.addProperty("ctr", sortArr.get(i).ctr);
+                    one.addProperty("cpa", sortArr.get(i).cpa);
+                    array.add(one);
+                }
+
                 json.add("array", array);
                 json.addProperty("ret", 1);
             } catch (Exception e) {
+                e.printStackTrace();
                 json.addProperty("ret", 0);
                 json.addProperty("message", e.getMessage());
             }
@@ -391,5 +302,61 @@ public class MaterialAnalysisReport extends HttpServlet {
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         doPost(request, response);
+    }
+
+    private void initCache() {
+        if (cacheCampaigns.size() == 0) {
+            String sql = "select ad_campaigns.campaign_id, app_name, title, message, image_file_path, video_file_path, thumbnail_image_file_path from ad_campaigns, ad_ads, " +
+                    "(select campaign_id, sum(total_installed) as installed from web_ad_campaigns_history where date > '2018-3-1' group by campaign_id having installed > 0) h " +
+                    "where ad_campaigns.id=ad_ads.parent_id and h.campaign_id=ad_campaigns.campaign_id";
+            try {
+                List<JSObject> list = DB.findListBySql(sql);
+                for (int i = 0; i < list.size(); i++) {
+                    JSObject one = list.get(i);
+                    String campaignId = one.get("campaign_id");
+                    CampaignResourceItem item = cacheCampaigns.get(campaignId);
+                    if (item == null) {
+                        item = new CampaignResourceItem();
+                        cacheCampaigns.put(campaignId, item);
+                        item.network = "facebook";
+                        item.appName = one.get("app_name");
+                        item.title = one.get("title");
+                        item.message = one.get("message");
+                        item.imagePath = one.get("image_file_path");
+                        if (item.imagePath.isEmpty()) {
+                            item.imagePath = one.get("thumbnail_image_file_path");
+                        }
+                        item.videoPath = one.get("video_file_path");
+                        item.campaignId = campaignId;
+                    }
+                }
+            } catch (Exception e) {
+            }
+
+            sql = "select c.campaign_id, app_name, message1, message2, message3, message4, image_path from ad_campaigns_admob c, " +
+                    "(select campaign_id, sum(total_installed) as installed from web_ad_campaigns_history_admob where date > '2018-3-1' group by campaign_id having installed > 0) h " +
+                    "where c.campaign_id=h.campaign_id";
+            try {
+                List<JSObject> list = DB.findListBySql(sql);
+                for (int i = 0; i < list.size(); i++) {
+                    JSObject one = list.get(i);
+                    String campaignId = one.get("campaign_id");
+                    CampaignResourceItem item = cacheCampaigns.get(campaignId);
+                    if (item == null) {
+                        item = new CampaignResourceItem();
+                        cacheCampaigns.put(campaignId, item);
+                        item.network = "adwords";
+                        item.appName = one.get("app_name");
+                        item.message1 = one.get("message1");
+                        item.message2 = one.get("message2");
+                        item.message3 = one.get("message3");
+                        item.message4 = one.get("message4");
+                        item.imagePath = one.get("image_path");
+                        item.campaignId = campaignId;
+                    }
+                }
+            } catch (Exception e) {
+            }
+        }
     }
 }

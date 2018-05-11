@@ -65,6 +65,8 @@
             <input type="text" value="2012-05-15" id="inputEndTime" readonly>
             <span>标签</span>
             <input id="inputSearch" class="form-control" style="display: inline; width: auto;" type="text"/>
+            <span>返回条数</span>
+            <input id="inputCount" class="form-control" style="display: inline; width: auto;" type="text" value="100"/>
             <button id="btnSearch" class="btn btn-default glyphicon glyphicon-search"></button>
         </div>
     </div>
@@ -74,6 +76,14 @@
     <%--</div>--%>
     <table class="table table-hover">
         <thead id="result_header">
+        <tr><th>网络</th><th>文字</th><th>图片</th><th>视频</th>
+            <th>花费<span sorterId="1" class="sorter glyphicon glyphicon-arrow-down"></span></th>
+            <th>安装<span sorterId="2" class="sorter glyphicon glyphicon-arrow-up"></span></th>
+            <th>点击<span sorterId="3" class="sorter glyphicon glyphicon-arrow-up"></span></th>
+            <th>展示<span sorterId="4" class="sorter glyphicon glyphicon-arrow-up"></span></th>
+            <th>CPA<span sorterId="5" class="sorter glyphicon glyphicon-arrow-up"></span></th>
+            <th>CTR<span sorterId="6" class="sorter glyphicon glyphicon-arrow-up"></span></th>
+        </tr>
         </thead>
         <tbody id="results_body">
         </tbody>
@@ -114,89 +124,77 @@
         source: data
     });
 
-    $("#btnSearch").click(function(){
+    $("#btnSearch").click(function () {
+        queryData(1001);
+    });
+
+    function queryData(sortId) {
         var query = $("#inputSearch").val();
         var startTime = $('#inputStartTime').val();
         var endTime = $('#inputEndTime').val();
+        var inputCount = $('#inputCount').val();
         $('#results_body > tr').remove();
-        var loadingIndex = layer.load(2,{time: 10000});
+        var loadingIndex = layer.load(2, {time: 10000});
         $.post('material_analysis_report/query_material_analysis_report_by_tag', {
             tagName: query,
             startTime: startTime,
-            endTime: endTime
-        },function(data){
+            endTime: endTime,
+            inputCount: inputCount,
+            sortId: sortId
+        }, function (data) {
             layer.close(loadingIndex);
-            if(data && data.ret == 1){
+            if (data && data.ret == 1) {
                 setData(data);
             } else {
                 admanager.showCommonDlg("错误", data.message);
             }
-        },'json');
-    });
+        }, 'json');
+    }
+
+    bindSortOp();
+    function bindSortOp() {
+        $('.sorter').click(function() {
+            var sorterId = $(this).attr('sorterId');
+            sorterId = parseInt(sorterId);
+            if ($(this).hasClass("glyphicon-arrow-up")) {
+                $(this).removeClass("glyphicon-arrow-up");
+                $(this).addClass("glyphicon-arrow-down");
+                sorterId += 1000;
+            } else {
+                $(this).removeClass("glyphicon-arrow-down");
+                $(this).addClass("glyphicon-arrow-up");
+            }
+            queryData(sorterId);
+        });
+    }
 
     function setData(data) {
         var arr = data.array;
         var len = arr.length;
-
         <!-- 素材这一行 -->
-        var one = arr[0];
-        var pathsStr = one['paths'];
-        var pathArr = pathsStr.split(",");
-        var pathArrLength = pathArr.length;
-        var tr = $('<tr></tr>');
-        var th = $("<th class='td_left_border td_right_border'></th>");
-        th.text("素材");
-        tr.append(th);
-        for(var m = 0; m < pathArrLength; m++){
-            var path = pathArr[m];
-            th = $("<th colspan = '4' class='td_right_border'></th>");
-            th.text(path);
-            tr.append(th);
-        }
-        $('#results_body').append(tr);
+        var tr = '';
 
-        <!-- cpa&install&crt&cvr这一行 -->
-        tr = $('<tr></tr>');
-        th = $('<th class="td_left_border td_right_border"></th>');
-        tr.append(th);
-        for(var m = 0; m < pathArrLength; m++){
-            th = $("<th class='red'></th>");
-            th.text("CPA");
-            tr.append(th);
-            th = $("<th class='green'></th>");
-            th.text("Install");
-            tr.append(th);
-            th = $("<th class='orange'></th>");
-            th.text("CTR");
-            tr.append(th);
-            th = $("<th class='purple td_right_border'></th>");
-            th.text("CVR");
-            tr.append(th);
-        }
-        $('#results_body').append(tr);
+        for (var i = 0; i < len; i++) {
+            var one = arr[i];
+            tr = $('<tr></tr>');
+            var td = $('<td></td>');
+            td.text(one.network);
+            tr.append(td);
 
-
-
-
-        for (var i = 1; i < len; i++) {
-            one = arr[i];
-            var tr = $("<tr></tr>");
-            if(i == len - 1){
-                tr = $("<tr class='td_bottom_border'></tr>");
+            td = $('<td></td>');
+            if (one.network == 'adwords') {
+                var html = one.message1 + "</br>" + one.message2 + "</br>" + one.message3 + "</br>" + one.message4;
+                td.html(html);
+            } else {
+                var html = one.title + "</br>" + one.message;
+                td.html(html);
             }
-            var countryParam = one['country_param_'+i];
-            var countryParamArr = countryParam.split(",");
-            var countryParamArrLength = countryParamArr.length;
-//            var countryParamArrMaxLength = pathArrLength * 4 + 1;
+            tr.append(td);
 
-            for (var j = 0; j < countryParamArrLength; j++) {
-                var td = $("<td></td>");
-                if(j == 0){
-                    td = $("<td class='td_left_border td_right_border'></td>");
-                }else if(j % 4 == 0){
-                    td = $("<td class='td_right_border'></td>");
-                }
-                td.text(countryParamArr[j]);
+            var keys = ['imagePath', 'videoPath', 'spend', 'installed', 'click', 'impressions', 'cpa', 'ctr']
+            for (var j = 0; j < keys.length; j++) {
+                td = $('<td></td>');
+                td.text(one[keys[j]]);
                 tr.append(td);
             }
             $('#results_body').append(tr);
