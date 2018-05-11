@@ -113,7 +113,7 @@
           <td><%=one.get("language")%></td>
           <td><%=one.get("campaign_name")%></td>
           <td><%=one.get("bugdet")%></td>
-          <td><%=one.get("bidding")%></td>
+          <td class="bidding"><%=one.get("bidding")%></td>
           <td><a class="link_modify" target="_blank" href="campaigns_create.jsp?type=auto_create&network=<%=network%>&id=<%=one.get("id")%>">
             <span class="glyphicon glyphicon-pencil"></span></a>&nbsp;/&nbsp;<input type="checkbox" class="delete_check"></td>
           <td><input class="checkbox_campaign_enable" type="checkbox" <% if (one.get("enabled").equals(1)) { %> checked <% }%> /></td>
@@ -142,24 +142,6 @@
       </nav>
     </div>
   </div>
-
-  <%--<div id="delete_dlg" class="modal fade" tabindex="-1" role="dialog">--%>
-    <%--<div class="modal-dialog" role="document">--%>
-      <%--<div class="modal-content">--%>
-        <%--<div class="modal-header">--%>
-          <%--<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>--%>
-          <%--<h4 class="modal-title">提示</h4>--%>
-        <%--</div>--%>
-        <%--<div class="modal-body">--%>
-          <%--<p id="delete_message">确认要删除吗?</p>--%>
-        <%--</div>--%>
-        <%--<div class="modal-footer">--%>
-          <%--<button type="button" class="btn btn-default" data-dismiss="modal">取消</button>--%>
-          <%--<button type="button" class="btn btn-primary">确定</button>--%>
-        <%--</div>--%>
-      <%--</div>--%>
-    <%--</div>--%>
-  <%--</div>--%>
 
   <jsp:include page="loading_dialog.jsp"></jsp:include>
 
@@ -230,6 +212,44 @@
       }
     });
 
+    //批量修改出价
+    $("tbody").on("click",".bidding",function(){
+        $("thead th:eq(6)").empty();
+        $("thead th:eq(6)").append("出价<button id='modify_bidding' class='btn btn-link glyphicon glyphicon-pencil' title='批量修改出价' onclick='modifyBidding()'></button>");
+        var elementCheck = $(this).children("input[type='text']").attr("class");
+        if(elementCheck=="new_bidding"){
+            return false;
+        }
+        var value = $(this).text();
+        $(this).empty();
+        $(this).append("<input class='new_bidding' type='text' style='width:60px;height:25px'value='"+value+"'>");
+    });
+    function modifyBidding(){
+        var bidding_array = [];
+        var collection = $(".new_bidding");
+        collection.each(function(idx){
+            var id = $(this).parents("tr").children("td:eq(0)").text();
+            var bidding = $(this).val();
+            var json = {};
+            json.id = id;
+            json.bidding = bidding;
+            bidding_array.push(json);
+        });
+        var bidding_array_string = JSON.stringify(bidding_array);
+        $.post("auto_create_campaign/<%=network%>/update_bidding",{
+            bidding_array:bidding_array_string
+        },function(data){
+            if(data && data.ret==1){
+                admanager.showCommonDlg("成功", data.message);
+                setTimeout(function(){
+                    $("#common_message_dialog").modal("hide");
+                },1500);
+            }else{
+                admanager.showCommonDlg("错误", data.message);
+            }
+        },"json")
+    }
+
     //批量删除
     $(".all_delete_check").click(function(){
         var check = $(".all_delete_check").prop("checked");
@@ -255,6 +275,9 @@
             },function(data){
                 if (data && data.ret == 1) {
                     admanager.showCommonDlg("成功", data.message);
+                    setTimeout(function(){
+                        $("#common_message_dialog").modal("hide");
+                    },1500);
                     batch.each(function(idx){
                         var tr = $(this).parents("tr");
                         tr.empty();

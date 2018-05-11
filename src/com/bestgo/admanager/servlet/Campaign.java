@@ -643,7 +643,7 @@ public class Campaign extends HttpServlet {
                 }
                 json.add("data", array);
             }
-        } else if (path.startsWith("/selectCampaingnWhereNotExistTag")) {
+        } else if (path.startsWith("/query_not_exist_tag_campaingns")) {
             JsonArray array = new JsonArray();
             String sqlCampaignIds = "select campaign_id from web_ad_campaign_tag_rel";
             
