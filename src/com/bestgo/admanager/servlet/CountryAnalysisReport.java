@@ -174,7 +174,6 @@ public class CountryAnalysisReport extends HttpServlet {
                         for(JSObject j : countryDetailJSObjectList){
                             if(j.hasObjectData()){
                                 String countryCode = j.get("country_code");
-
                                 //计算30DaysActiveUser
                                 sql = "select avg_30_day_active from ad_report_active_user_admob_rel_result where tag_name = '" + tagName + "' and country_code = '" + countryCode + "'";
                                 JSObject oneC = DB.findOneBySql(sql);
@@ -285,6 +284,8 @@ public class CountryAnalysisReport extends HttpServlet {
                                     countryName = countryCode;
                                 }
                                 double costs = Utils.convertDouble(j.get("total_cost"),0);
+                                double impressions = Utils.convertDouble(j.get("impressions"),0);
+                                double cEcpm = impressions == 0 ? 0 : costs * 1000 / impressions;
                                 double purchasedUsers = Utils.convertDouble(j.get("total_purchased_user"),0);
                                 double installed = Utils.convertDouble(j.get("installed"),0);
                                 double totalTodayUninstalled = Utils.convertDouble(j.get("total_today_uninstalled"),0);
@@ -325,6 +326,7 @@ public class CountryAnalysisReport extends HttpServlet {
                                 JsonObject d = new JsonObject();
                                 d.addProperty("country_name", countryName);
                                 d.addProperty("costs", Utils.trimDouble(costs,0));
+                                d.addProperty("c_ecpm", Utils.trimDouble(cEcpm,3));
                                 d.addProperty("purchased_users", purchasedUsers);
                                 d.addProperty("installed", installed);
                                 d.addProperty("uninstalled_rate", Utils.trimDouble(uninstalledRate,3));
