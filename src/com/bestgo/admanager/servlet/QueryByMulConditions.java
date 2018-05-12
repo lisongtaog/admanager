@@ -446,7 +446,7 @@ public class QueryByMulConditions extends HttpServlet {
                             j.addProperty("spend",c.spend);
                             j.addProperty("ctr",c.ctr);
                             j.addProperty("cpa",c.cpa);
-                            j.addProperty("open_cpa",c.open_cpa);
+//                            j.addProperty("open_cpa",c.open_cpa);
                             j.addProperty("cvr",c.cvr);
                             j.addProperty("un_rate",c.un_rate);
                             j.addProperty("open_rate",c.open_rate);
@@ -1024,8 +1024,8 @@ public class QueryByMulConditions extends HttpServlet {
 
                         //系列开启率 = 系列安装数量 / 系列总安装
                         double openRate = Utils.convertDouble(oneQ.get("open_rate"),0);
-                        double openCpa = openRate == 0 ? 0 : cpa / openRate;
-                        d.addProperty("open_cpa", Utils.trimDouble(openCpa,3));
+//                        double openCpa = openRate == 0 ? 0 : cpa / openRate;
+//                        d.addProperty("open_cpa", Utils.trimDouble(openCpa,3));
                         d.addProperty("open_rate", Utils.trimDouble(openRate,3));
                     }
                 }
@@ -1059,7 +1059,8 @@ public class QueryByMulConditions extends HttpServlet {
                 total_cpa = total_installed > 0 ? total_spend / total_installed : 0;
                 total_cvr = total_click > 0 ? total_installed / total_click : 0;
 
-
+                //针对系列的ECPM
+                double ecpm = impressions == 0 ? 0 : spend * 1000 / impressions;
 
                 d.addProperty("campaign_id", campaignId);
                 d.addProperty("short_name", short_name);
@@ -1079,6 +1080,7 @@ public class QueryByMulConditions extends HttpServlet {
                 d.addProperty("ctr", Utils.trimDouble(ctr,3));
                 d.addProperty("cpa", Utils.trimDouble(cpa,3));
                 d.addProperty("cvr", Utils.trimDouble(cvr,3));
+                d.addProperty("ecpm", Utils.trimDouble(ecpm,3));
                 if (admobCheck) {
                     d.addProperty("network", "admob");
                 } else {
@@ -1133,7 +1135,7 @@ public class QueryByMulConditions extends HttpServlet {
                 d.addProperty("click", 0);
                 d.addProperty("ctr", 0);
                 d.addProperty("cpa", 0);
-                d.addProperty("open_cpa", 0);
+//                d.addProperty("open_cpa", 0);
                 d.addProperty("cvr", 0);
                 d.addProperty("un_rate", -100000);
                 d.addProperty("open_rate", -100000);
