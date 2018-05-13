@@ -158,7 +158,7 @@
                     "<th>30DaysActiveUser</th>" +
                     "<th>花费上限</th>" +
                     "</tr>");
-                setData(data,query);
+                setData(data);
                 bindSortOp();
                 var str = "Cost: " + data.total_cost + "&nbsp;&nbsp;&nbsp;&nbsp;PuserchaedUser: " + data.total_puserchaed_user +
                     "&nbsp;&nbsp;&nbsp;&nbsp;CPA: " + data.total_cpa + "&nbsp;&nbsp;&nbsp;&nbsp;Revenue: " + data.total_revenue;
@@ -193,7 +193,7 @@
                 sorterId: sorterId
             },function(data){
                 if (data && data.ret == 1) {
-                    setData(data,query);
+                    setData(data);
                     var str = "Cost: " + data.total_cost + "&nbsp;&nbsp;&nbsp;&nbsp;PuserchaedUser: " + data.total_puserchaed_user +
                         "&nbsp;&nbsp;&nbsp;&nbsp;CPA: " + data.total_cpa + "&nbsp;&nbsp;&nbsp;&nbsp;Revenue: " + data.total_revenue;
 
@@ -207,7 +207,7 @@
         });
     }
 
-    function setData(data,tagName) {
+    function setData(data) {
         $('#results_body > tr').remove();
         var arr = data.array;
         var len = arr.length;
@@ -264,33 +264,33 @@
                 td.text(r);
                 tr.append(td);
             }
-            var td_outer = $('<td></td>');
-            var btn = $('<input type="button" value="跳转更新">');
-            btn.data("country_name", one['country_name']);
-            btn.click(function(){
-                var country_name = $(this).data("country_name");
-                $.post('country_analysis_report/query_id_of_auto_create_campaigns', {
-                    tagName: tagName,
-                    curr_country_name: country_name
-            },function(data){
-                    if (data && data.ret == 1) {
-                        window.open("campaigns_create.jsp?type=auto_create&network=facebook&id="+data.id_facebook,"_blank");
-                        window.open("campaigns_create.jsp?type=auto_create&network=adwords&id="+data.id_adwords,"_blank");
-                    } else {
-                        admanager.showCommonDlg("错误", data.message);
-                    }
-                }, 'json');
-            });
-            td_outer.append(btn);
-            tr.append(td_outer);
+//            var td_outer = $('<td></td>');
+//            var btn = $('<input type="button" value="跳转更新">');
+//            btn.data("country_name", one['country_name']);
+//            btn.click(function(){
+//                var country_name = $(this).data("country_name");
+//                $.post('country_analysis_report/query_id_of_auto_create_campaigns', {
+//                    tagName: tagName,
+//                    curr_country_name: country_name
+//            },function(data){
+//                    if (data && data.ret == 1) {
+//                        window.open("campaigns_create.jsp?type=auto_create&network=facebook&id="+data.id_facebook,"_blank");
+//                        window.open("campaigns_create.jsp?type=auto_create&network=adwords&id="+data.id_adwords,"_blank");
+//                    } else {
+//                        admanager.showCommonDlg("错误", data.message);
+//                    }
+//                }, 'json');
+//            });
+//            td_outer.append(btn);
+//            tr.append(td_outer);
             $('#results_body').append(tr);
         }
     }
 
     //实现修改花费上限的输入框功能
     $("#results_body").on("click",".cost_upper_limit",function(){
-        $("#result_header tr").children("th:eq(20)").empty();
-        $("#result_header tr").children("th:eq(20)").append("花费上限<button class='btn btn-link glyphicon glyphicon-pencil' title='修改花费上限'></button>");
+        $("#result_header tr").children("th:eq(21)").empty();
+        $("#result_header tr").children("th:eq(21)").append("花费上限<button class='btn btn-link glyphicon glyphicon-pencil' title='修改花费上限'></button>");
         var elementCheck = $(this).children("input[type='text']").attr("class");
         if(elementCheck=="new_cost_upper_limit"){
             return false;
