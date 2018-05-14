@@ -37,16 +37,29 @@ public class ReleasedDataStatistics extends HttpServlet {
         likeCategoryName = likeCategoryName.trim();
         String likeTeamName = request.getParameter("likeTeamName");
         likeTeamName = likeTeamName.trim();
+        String nickname = request.getParameter("nickname");
         String endTime = request.getParameter("endTime");
         if (path.matches("/query_released_data_statistics")) {
             JsonArray jsonArray = new JsonArray();
             try {
-                String sql = "select team_name,category_name,t.tag_name,anticipated_incoming,anticipated_revenue " +
+                String sql = "select team_name,category_name,t.tag_name,anticipated_incoming,anticipated_revenue,t.user_id " +
                         "from web_ad_category_team ct, web_ad_tag_category tc, web_tag t " +
                         "where tc.id = t.tag_category_id and ct.id = tc.team_id " +
                         ((likeTeamName == "") ? " " : " and team_name like '%" + likeTeamName + "%' ") +
                         ((likeCategoryName == "") ? " " : " and category_name like '%" + likeCategoryName + "%' ") +
                         " ORDER BY ct.id,tc.id,t.id ";
+                if(nickname != null && nickname != ""){
+                    JSObject one = DB.findOneBySql("select id from web_ad_login_user where nickname = '" + nickname + "'");
+                    if(one.hasObjectData()){
+                        long id = one.get("id");
+                        sql = "select team_name,category_name,t.tag_name,anticipated_incoming,anticipated_revenue,t.user_id " +
+                                "from web_ad_category_team ct, web_ad_tag_category tc, web_tag t " +
+                                "where tc.id = t.tag_category_id and ct.id = tc.team_id and t.user_id = " + id +
+                                ((likeTeamName == "") ? " " : " and team_name like '%" + likeTeamName + "%' ") +
+                                ((likeCategoryName == "") ? " " : " and category_name like '%" + likeCategoryName + "%' ") +
+                                " ORDER BY ct.id,tc.id,t.id ";
+                    }
+                }
                 List<JSObject> listTag = DB.findListBySql(sql);
                 if (listTag != null && listTag.size() > 0) {
                     for (JSObject t : listTag) {
@@ -59,9 +72,18 @@ public class ReleasedDataStatistics extends HttpServlet {
                             String tagName = t.get("tag_name");
                             double anticipatedIncoming = t.get("anticipated_incoming");
                             double anticipatedRevenue = t.get("anticipated_revenue");
+                            int userId = t.get("user_id");
+                            JSObject user = DB.findOneBySql("select nickname from web_ad_login_user where id = " + userId);
+                            if(user.hasObjectData()){
+                                String currNickname = user.get("nickname");
+                                d.addProperty("nickname", currNickname);
+                            }else{
+                                d.addProperty("nickname", "--");
+                            }
                             d.addProperty("tag_name", tagName);
                             d.addProperty("anticipated_incoming", anticipatedIncoming);
                             d.addProperty("anticipated_revenue", anticipatedRevenue);
+
                             for (int i = 0; i > -7; i--) {
                                 double totalRevenue = 0;
                                 double totalSpend = 0;

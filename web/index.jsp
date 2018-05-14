@@ -93,7 +93,7 @@
             <input id="inputCpaComparisonValue" class="form-control" style="display: inline; width: auto;" type="text" />
 
             <span>竞价等于</span>
-            <%--<select id="biddingOperator"><option value="7" selected="true">大于</option><option value="8">小于</option><option value="9"  selected="true">等于</option></select>--%>
+            <select id="biddingOperator"><option value="7" selected="true">大于</option><option value="8">小于</option><option value="9"  selected="true">等于</option></select>
             <input id="inputBiddingComparisonValue" class="form-control" style="display: inline; width: auto;" type="text" />
 
             <button id="btnSearch" class="btn btn-default glyphicon glyphicon-search"></button><br>

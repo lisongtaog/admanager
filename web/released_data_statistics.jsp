@@ -1,5 +1,5 @@
 <%@ page import="com.google.gson.JsonArray" %>
-<%@ page import="com.bestgo.admanager.servlet.Tags" %>
+<%@ page import="com.bestgo.admanager.servlet.UserServlet" %>
 <%@ page import="com.bestgo.common.database.utils.JSObject" %>
 <%@ page import="java.util.List" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
@@ -48,12 +48,6 @@
             color: #ff615d;
         }
 
-        /*.purple {*/
-            /*color: #9671ff;*/
-        /*}*/
-        /*.modena {*/
-            /*color: #9eb9ff;*/
-        /*}*/
 
         .orange {
             color: orange;
@@ -72,6 +66,12 @@
     if (object == null) {
         response.sendRedirect("login.jsp");
     }
+
+    List<JSObject> allUsers = UserServlet.getNicknamesWithAllUsers();
+    JsonArray array = new JsonArray();
+    for (int i = 0; i < allUsers.size(); i++) {
+        array.add((String) allUsers.get(i).get("nickname"));
+    }
 %>
 
 <div class="container-fluid">
@@ -85,13 +85,12 @@
             <input id="inputLikeTeamName" class="form-control" style="display: inline; width: auto;" type="text"/>
             <span>品类名</span>
             <input id="inputLikeCategoryName" class="form-control" style="display: inline; width: auto;" type="text"/>
+            <span>投放人员</span>
+            <input id="inputNickname" class="form-control" style="display: inline; width: auto;" type="text"/>
             <button id="btnSearch" class="btn btn-default">模糊查询</button>
         </div>
     </div>
-    <%--<div class="panel panel-default">--%>
-        <%--<div class="panel-body" id="total_result">--%>
-        <%--</div>--%>
-    <%--</div>--%>
+
     <table class="table table-hover">
         <thead id="result_header">
 
@@ -115,7 +114,6 @@
 
 <script>
     function init() {
-
         function getDate(dd,AddDayCount) {
             dd.setDate(dd.getDate()+AddDayCount);//获取AddDayCount天后的日期
             var y = dd.getFullYear();
@@ -125,6 +123,12 @@
         }
 
         $("li[role='presentation']:eq(4)").addClass("active");
+        var data = <%=array.toString()%>;
+        $("#inputNickname").autocomplete({
+            source: data
+        });
+        $("#inputNickname")[0].placeholder = data;
+
         var now = new Date(new Date().getTime() - 86400 * 1000);
         var nowDateStr = now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + now.getDate();
         $('#inputEndTime').val(nowDateStr);
@@ -141,17 +145,19 @@
             var endTime = $('#inputEndTime').val();
             var likeTeamName = $('#inputLikeTeamName').val();
             var likeCategoryName = $('#inputLikeCategoryName').val();
+            var nickname = $('#inputNickname').val();
             $('#result_header > tr').remove();
             $('#results_body > tr').remove();
             var loadingIndex = layer.load(2,{time: 10000});
             $.post('released_data_statistics/query_released_data_statistics', {
                 endTime: endTime,
                 likeTeamName: likeTeamName,
-                likeCategoryName: likeCategoryName
+                likeCategoryName: likeCategoryName,
+                nickname: nickname
             },function(data){
                 layer.close(loadingIndex);
                 if(data && data.ret == 1){
-                    $('#result_header').html("<tr class='aqua'><th rowspan=\"2\">项目组</th><th rowspan=\"2\">品类名称</th><th rowspan=\"2\">应用名称</th>" +
+                    $('#result_header').html("<tr class='aqua'><th rowspan=\"2\">项目组</th><th rowspan=\"2\">品类名称</th><th rowspan=\"2\">应用名称</th><th rowspan=\"2\">投放人员</th>" +
                         "<th></th><th></th><th colspan=\"3\" id=\"dateA\" class='td_left_border'></th><th colspan=\"3\" id=\"dateB\"  class='td_left_border'></th><th colspan=\"3\" id=\"dateC\"  class='td_left_border'></th>" +
                         "<th colspan=\"3\" id=\"dateD\" class='td_left_border'></th><th colspan=\"3\" id=\"dateE\" class='td_left_border'></th><th colspan=\"3\" id=\"dateF\" class='td_left_border'></th>" +
                         "<th colspan=\"3\" id=\"dateG\" class='td_left_border'></th></tr><tr class='aqua'>" +
@@ -181,13 +187,6 @@
                     var dateG = getDate(nowDate,-1);
                     $('#dateG').text(dateG);
                     setData(data);
-//                    bindSortOp();
-//                    var str = "Cost: " + data.total_cost + "&nbsp;&nbsp;&nbsp;&nbsp;PuserchaedUser: " + data.total_puserchaed_user +
-//                        "&nbsp;&nbsp;&nbsp;&nbsp;CPA: " + data.total_cpa + "&nbsp;&nbsp;&nbsp;&nbsp;Revenue: " + data.total_revenue +
-//                        "&nbsp;&nbsp;&nbsp;&nbsp;Es14: " + data.total_es14 + "&nbsp;&nbsp;&nbsp;&nbsp;Es14/Cost: " + data.es14_dev_cost;
-//                    str += "<br/><span class='estimateResult'></span>"
-//                    $('#total_result').html(str);
-//                    $('#total_result').removeClass("editable");
                 } else {
                     admanager.showCommonDlg("错误", data.message);
                 }
@@ -195,10 +194,6 @@
         });
 
         function setData(data) {
-//            var keyset = ["team_name","category_name", "tag_name","anticipated_incoming","anticipated_revenue", "total_incoming0","total_spend0",  "total_revenue0",
-//                "total_incoming-1","total_spend-1","total_revenue-1", "total_incoming-2","total_spend-2", "total_revenue-2",
-//                "total_incoming-3","total_spend-3","total_revenue-3", "total_incoming-4","total_spend-4", "total_revenue-4",
-//                "total_incoming-5", "total_spend-5","total_revenue-5", "total_incoming-6", "total_spend-6","total_revenue-6" ];
             var arr = data.array;
             var len = arr.length;
             var currCategory = "";
@@ -253,7 +248,7 @@
                         var tTd = $('<td class="td_top_bottom_border"></td>');
                         tTr.append(tTd);
 
-                        tTd = $('<td colspan="2" class="td_top_bottom_border"></td>');
+                        tTd = $('<td colspan="3" class="td_top_bottom_border"></td>');
                         tTd.text("["+currCategory + "]品类汇总");
                         tTr.append(tTd);
 
@@ -370,7 +365,7 @@
                     }
                     if(currTeam != teamName){
                         var tTr = $('<tr class="red background_modena td_top_bottom_border"></tr>');
-                        var tTd = $('<td colspan="3" class="td_top_bottom_border"></td>');
+                        var tTd = $('<td colspan="4" class="td_top_bottom_border"></td>');
                         tTd.text("【"+currTeam + "】项目组汇总");
                         tTr.append(tTd);
 
@@ -499,6 +494,11 @@
                 td = $('<td></td>');
                 var tagName = one['tag_name'];
                 td.text(tagName);
+                tr.append(td);
+
+                td = $('<td></td>');
+                var nickname = one['nickname'];
+                td.text(nickname);
                 tr.append(td);
 
                 td = $('<td></td>');
@@ -662,7 +662,7 @@
                     var tTd = $('<td class="td_top_bottom_border"></td>');
                     tTr.append(tTd);
 
-                    tTd = $('<td colspan="2" class="td_top_bottom_border"></td>');
+                    tTd = $('<td colspan="3" class="td_top_bottom_border"></td>');
                     tTd.text("["+currCategory + "]品类汇总");
                     tTr.append(tTd);
 
@@ -760,7 +760,7 @@
                     $('#results_body').append(tTr);
 
                     tTr = $('<tr class="red background_modena td_top_bottom_border"></tr>');
-                    tTd = $('<td colspan="3" class="td_top_bottom_border"></td>');
+                    tTd = $('<td colspan="4" class="td_top_bottom_border"></td>');
                     tTd.text("【"+currTeam + "】项目组汇总");
                     tTr.append(tTd);
 
