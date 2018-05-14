@@ -3,9 +3,9 @@ package com.bestgo.admanager.servlet;
 import com.bestgo.admanager.Config;
 import com.bestgo.admanager.utils.DateUtil;
 import com.bestgo.admanager.OperationResult;
+import com.bestgo.admanager.utils.StringUtil;
 import com.bestgo.admanager.utils.Utils;
 import com.bestgo.admanager.bean.BatchChangeItem;
-import com.bestgo.admanager.bean.ReduceCostItem;
 import com.bestgo.common.database.services.DB;
 import com.bestgo.common.database.utils.JSObject;
 import com.google.gson.Gson;
@@ -103,6 +103,8 @@ public class Campaign extends HttpServlet {
                     result.message = "广告组ID不存在！请联系管理员";
                 }else if (createCount.isEmpty()) {
                     result.message = "创建数量不能为空";
+                } else if (StringUtil.isEmpty(pageId)) {
+                    result.message = "pageId不能为空，请关闭页面刷新重试";
                 } else if (title.isEmpty()) {
                     result.message = "标题不能为空";
                 } else if (message.isEmpty()) {
