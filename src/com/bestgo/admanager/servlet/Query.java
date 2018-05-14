@@ -31,7 +31,6 @@ public class Query extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-//        String[] fourteen_arr = null;
         if (!Utils.isAdmin(request, response)) return;
 
         JsonObject json = new JsonObject();

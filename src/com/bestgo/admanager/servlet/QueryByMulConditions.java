@@ -722,7 +722,7 @@ public class QueryByMulConditions extends HttpServlet {
                             one.addProperty("impressions", record.impressions);
                             one.addProperty("installed", record.installed);
                             one.addProperty("click", record.click);
-                            one.addProperty("spend", Utils.trimDouble(record.spend,0));
+                            one.addProperty("spend", Utils.trimDouble(record.spend,2));
                             one.addProperty("ctr", Utils.trimDouble(record.ctr,3));
                             one.addProperty("cpa", Utils.trimDouble(record.cpa,3));
                             one.addProperty("cvr", Utils.trimDouble(record.cvr,3));
@@ -740,7 +740,7 @@ public class QueryByMulConditions extends HttpServlet {
                             one.addProperty("impressions", record.impressions);
                             one.addProperty("installed", record.installed);
                             one.addProperty("click", record.click);
-                            one.addProperty("spend", Utils.trimDouble(record.spend,0));
+                            one.addProperty("spend", Utils.trimDouble(record.spend,2));
                             one.addProperty("ctr", Utils.trimDouble(record.ctr,3));
                             one.addProperty("cpa", Utils.trimDouble(record.cpa,3));
                             one.addProperty("cvr", Utils.trimDouble(record.cvr,3));
@@ -751,7 +751,7 @@ public class QueryByMulConditions extends HttpServlet {
 
                     jsonObject.add("array", newArr);
                 }
-                jsonObject.addProperty("total_spend", Utils.trimDouble(total_spend,0));
+                jsonObject.addProperty("total_spend", Utils.trimDouble(total_spend,2));
                 jsonObject.addProperty("total_installed", total_installed);
                 jsonObject.addProperty("total_impressions", total_impressions);
                 jsonObject.addProperty("total_click", total_click);
@@ -1008,7 +1008,7 @@ public class QueryByMulConditions extends HttpServlet {
                 }
                 double installed = Utils.convertDouble(one.get("installed"), 0);
                 String campaignId = one.get("campaign_id");
-                double spend = Utils.convertDouble(one.get("spend"), 0);
+                double spend = Utils.convertDouble(one.get("spend"), 2);
                 double cpa = Utils.convertDouble(one.get("cpa"), 0);
 
                 //目前只有Adwords能收集到unRate和openRate
@@ -1024,8 +1024,6 @@ public class QueryByMulConditions extends HttpServlet {
 
                         //系列开启率 = 系列安装数量 / 系列总安装
                         double openRate = Utils.convertDouble(oneQ.get("open_rate"),0);
-//                        double openCpa = openRate == 0 ? 0 : cpa / openRate;
-//                        d.addProperty("open_cpa", Utils.trimDouble(openCpa,3));
                         d.addProperty("open_rate", Utils.trimDouble(openRate,3));
                     }
                 }
@@ -1049,7 +1047,7 @@ public class QueryByMulConditions extends HttpServlet {
                 JSObject js = countryCampaignspendMap.get(campaignId);
                 double campaign_spends = 0;
                 if(js != null && js.hasObjectData()){
-                    campaign_spends = Utils.convertDouble(js.get("campaign_spends"), 0);
+                    campaign_spends = Utils.convertDouble(js.get("campaign_spends"), 2);
                 }
                 total_spend += spend;
                 total_installed += installed;
@@ -1073,7 +1071,7 @@ public class QueryByMulConditions extends HttpServlet {
                 d.addProperty("budget", budget);
                 d.addProperty("bidding", bidding);
                 d.addProperty("impressions", impressions);
-                d.addProperty("spend", Utils.trimDouble(spend,0));
+                d.addProperty("spend", Utils.trimDouble(spend,2));
                 d.addProperty("campaign_spends", campaign_spends);
                 d.addProperty("installed", installed);
                 d.addProperty("click", click);
@@ -1107,12 +1105,12 @@ public class QueryByMulConditions extends HttpServlet {
                 create_time = create_time.substring(0,create_time.length()-5);
                 String country_code = one.get("country_code");
                 double budget = one.get("budget");
-                double spend = Utils.convertDouble(one.get("spend"), 0);
+                double spend = Utils.convertDouble(one.get("spend"), 2);
 
                 JSObject js = countryCampaignspendMap.get(campaign_id);
                 double campaign_spends = 0;
                 if(js != null && js.hasObjectData()){
-                    campaign_spends = Utils.convertDouble(js.get("campaign_spends"), 0);
+                    campaign_spends = Utils.convertDouble(js.get("campaign_spends"), 2);
                 }
 
                 total_spend += spend;
@@ -1129,7 +1127,7 @@ public class QueryByMulConditions extends HttpServlet {
                 d.addProperty("budget", budget);
                 d.addProperty("bidding", bidding);
                 d.addProperty("impressions", 0);
-                d.addProperty("spend", Utils.trimDouble(spend,0));
+                d.addProperty("spend", Utils.trimDouble(spend,2));
                 d.addProperty("campaign_spends", campaign_spends);
                 d.addProperty("installed", 0);
                 d.addProperty("click", 0);
