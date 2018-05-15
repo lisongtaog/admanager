@@ -157,6 +157,7 @@
                     "<th>RT</th>" +
                     "<th>30DaysActiveUser</th>" +
                     "<th>花费上限</th>" +
+                    "<th>竞价</th>" +
                     "</tr>");
                 setData(data);
                 bindSortOp();
@@ -215,7 +216,7 @@
         var keyset = ["costs","purchased_users", "installed", "uninstalled_rate",
             "active_users", "revenues", "seven_days_costs", "seven_days_revenues",
             "seven_days_incoming","pi", "arpu", "ecpm","c_ecpm", "revenue_per_install","cpa","a_cpa","cpa_div_ecpm", "incoming",
-            "rt","thirty_days_active_user","cost_upper_limit"];
+            "rt","thirty_days_active_user","cost_upper_limit","bidding_summary"];
         for (var i = 0; i < len; i++) {
             one = arr[i];
             var tr = $('<tr></tr>');

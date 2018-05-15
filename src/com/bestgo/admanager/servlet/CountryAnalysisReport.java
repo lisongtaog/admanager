@@ -15,9 +15,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.regex.*;
 
 /**
@@ -92,10 +90,11 @@ public class CountryAnalysisReport extends HttpServlet {
             }
         }else if (path.matches("/query_country_analysis_report")) {
             try {
-                String sqlG = "select google_package_id from web_facebook_app_ids_rel WHERE tag_name = '" + tagName + "'";
+                String sqlG = "select t.id, google_package_id from web_facebook_app_ids_rel r,web_tag t WHERE t.tag_name = r.tag_name AND t.tag_name = '" + tagName + "'";
                 JSObject oneG = DB.findOneBySql(sqlG);
                 if(oneG != null){
                     String appId = oneG.get("google_package_id");
+                    long tagId = oneG.get("id");
                     if(appId != null){
                         JsonArray jsonArray = new JsonArray();
                         String sql = "select country_code, sum(cost) as total_cost, sum(purchased_user) as total_purchased_user, " +
@@ -323,8 +322,51 @@ public class CountryAnalysisReport extends HttpServlet {
                                     String ruleContent = oneC.get("rule_content");
                                     costUpperLimit = ruleContent.substring(ruleContent.indexOf("cost>") + 5,ruleContent.length());
                                 }
+
+                                Set<String> biddingSet = new HashSet<>();
+                                sql = "SELECT DISTINCT bidding FROM web_ad_campaigns c,web_ad_campaigns_country_history ch " +
+                                        " WHERE c.campaign_id = ch.campaign_id AND c.tag_id = '"+tagId+"' AND country_code = '" + countryCode + "' AND date = '" + endTime + "'";
+                                List<JSObject> biddingList = DB.findListBySql(sql);
+                                if(biddingList.size() > 0){
+                                    for(JSObject js : biddingList){
+                                        if(js.hasObjectData()){
+                                            double bidding = Utils.convertDouble(js.get("bidding"),0);
+                                            bidding = Utils.trimDouble(bidding / 100,2);
+                                            if(bidding > 0){
+                                                biddingSet.add(bidding + ",");
+                                            }
+                                        }
+                                    }
+                                }
+                                sql = "SELECT DISTINCT bidding FROM web_ad_campaigns_admob c,web_ad_campaigns_country_history_admob ch " +
+                                        " WHERE c.campaign_id = ch.campaign_id AND c.tag_id = '"+tagId+"' AND country_code = '" + countryCode + "' AND date = '" + endTime + "'";
+                                biddingList = DB.findListBySql(sql);
+                                if(biddingList.size() > 0){
+                                    for(JSObject js : biddingList){
+                                        if(js.hasObjectData()){
+                                            double bidding = Utils.convertDouble(js.get("bidding"),0);
+                                            bidding = Utils.trimDouble(bidding / 100,2);
+                                            if(bidding > 0){
+                                                biddingSet.add(bidding + ",");
+                                            }
+                                        }
+                                    }
+                                }
+                                String biddingSummaryStr = "";
+                                int currCount = 0;
+                                if(biddingSet.size() > 0){
+                                    for(String s : biddingSet){
+                                        currCount++;
+                                        if(currCount % 5 == 0){
+                                            biddingSummaryStr += "\n";
+                                        }
+                                        biddingSummaryStr += s;
+                                    }
+                                }
+
                                 JsonObject d = new JsonObject();
                                 d.addProperty("country_name", countryName);
+                                d.addProperty("bidding_summary", biddingSummaryStr);
                                 d.addProperty("costs", Utils.trimDouble(costs,0));
                                 d.addProperty("c_ecpm", Utils.trimDouble(cEcpm,3));
                                 d.addProperty("purchased_users", purchasedUsers);
