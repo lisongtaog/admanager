@@ -27,6 +27,7 @@ public class Utils {
             response.getWriter().write(json.toString());
             return false;
         }
+        LogUtils.logRequest(request);
         return true;
     }
 
