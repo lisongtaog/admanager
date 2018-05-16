@@ -75,6 +75,7 @@ public class Campaign extends HttpServlet {
             String campaignName = request.getParameter("campaignName");
             String bugdet = request.getParameter("bugdet");
             String bidding = request.getParameter("bidding");
+            bidding = bidding.trim();
             String maxCPA = request.getParameter("maxCPA");
             String groupIdStr = request.getParameter("groupId");
             String title = request.getParameter("title");
@@ -115,6 +116,8 @@ public class Campaign extends HttpServlet {
                     result.message = "预算不能为空";
                 } else if (bidding.isEmpty()) {
                     result.message = "出价不能为空";
+                }else if (bidding.indexOf(" ") != -1) {
+                    result.message = "出价不能包含空格！";
                 }else if(gender == null) {
                     result.message = "性别不能为空";
                 }else if(region.isEmpty()){
