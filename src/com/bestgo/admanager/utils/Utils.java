@@ -7,6 +7,7 @@ import com.google.gson.JsonObject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.*;
@@ -229,6 +230,29 @@ public class Utils {
             }
         }
         return diff;
+    }
+
+
+    /**
+     * 遍历某个目录，获取这个目录下的所有文件夹路径（和文件路径）
+     * @param file
+     * @param resultAll
+     * @param returnFile  如果为true，则返回所有文件夹路径和文件路径；如果为false，则只返回文件夹路径
+     * @return
+     */
+    public static List<String> ergodicDirectory(File file, List<String> resultAll, boolean returnFile){
+        File[] files = file.listFiles();
+        if(files == null) return resultAll;// 判断目录下是不是空的
+        for (File f : files) {
+            if(f.isDirectory()){// 判断是否是文件夹
+                resultAll.add(f.getPath());
+                ergodicDirectory(f,resultAll,returnFile);// 调用自身,查找子目录
+            }else{
+                if(returnFile)
+                    resultAll.add(f.getPath());
+            }
+        }
+        return resultAll;
     }
 
 }

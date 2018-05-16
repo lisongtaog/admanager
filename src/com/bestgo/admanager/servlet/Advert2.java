@@ -14,8 +14,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-@WebServlet(name = "Advert", urlPatterns = "/advert/*")
-public class Advert extends HttpServlet {
+@WebServlet(name = "Advert2", urlPatterns = "/advert2/*")
+public class Advert2 extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         if (!Utils.isAdmin(request, response)) return;
 

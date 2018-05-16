@@ -408,7 +408,7 @@
         var message3 = $("#inputMessageAdmob3").val();
         var message4 = $("#inputMessageAdmob4").val();
         var version = "English";
-        $.post("advert_admob/save_advert_admob",{
+        $.post("advert_admob2/save_advert_admob",{
             appName: appName,
             language: language,
             groupNumber:groupNumber,
@@ -442,7 +442,7 @@
         var message13 = $("#inputMessageAdmob13").val();
         var message14 = $("#inputMessageAdmob14").val();
         var version = "Translation";
-        $.post("advert_admob/save_advert_admob",{
+        $.post("advert_admob2/save_advert_admob",{
             appName: appName,
             language: language,
             groupNumber:groupNumber,
@@ -472,7 +472,7 @@
         var title11 = $('#inputTitle11').val();
         var message11 = $('#inputMessage11').val();
         var version = "Translation";
-        $.post("advert/save_advert_facebook", {
+        $.post("advert2/save_advert_facebook", {
             appName: appName,
             language: language,
             groupNumber:groupNumber,
@@ -501,7 +501,7 @@
         var title = $('#inputTitle').val();
         var message = $('#inputMessage').val();
         var version = "English";
-        $.post("advert/save_advert_facebook", {
+        $.post("advert2/save_advert_facebook", {
             appName: appName,
             language: language,
             groupNumber:groupNumber,
@@ -529,7 +529,7 @@
         var appName = $("#selectApp").val();
         var language = $("#selectLanguage").val();
         var groupNumber = $("#selectAdvertGroupId").val();
-        $.post("advert/query_before_insertion", {
+        $.post("advert2/query_before_insertion", {
             appName: appName,
             language: language,
             groupNumber:groupNumber
@@ -560,7 +560,7 @@
         var languageAdmob = $("#selectLanguageAdmob").val();
         var groupNumberAdmob = $("#selectAdvertGroupIdAdmob").val();
         //无论如何都发送请求
-        $.post("advert_admob/query_before_admob_insert", {
+        $.post("advert_admob2/query_before_admob_insert", {
             appNameAdmob: appNameAdmob,
             languageAdmob: languageAdmob,
             groupNumberAdmob: groupNumberAdmob
