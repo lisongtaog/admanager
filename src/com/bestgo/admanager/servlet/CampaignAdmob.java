@@ -62,6 +62,7 @@ public class CampaignAdmob extends HttpServlet {
             String campaignName = request.getParameter("campaignName");
             String bugdet = request.getParameter("bugdet");
             String bidding = request.getParameter("bidding");
+            bidding = bidding.trim();
             String maxCPA = request.getParameter("maxCPA");
             String message1 = request.getParameter("message1");
             String groupIdStr = request.getParameter("groupId");
@@ -95,6 +96,8 @@ public class CampaignAdmob extends HttpServlet {
                     result.message = "预算不能为空";
                 } else if (bidding.isEmpty()) {
                     result.message = "出价不能为空";
+                } else if (bidding.indexOf(" ") != -1) {
+                    result.message = "出价不能出现空格！";
                 } else if(region.isEmpty()){
                     result.message = "国家不能为空";
                 }else {
