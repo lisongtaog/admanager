@@ -37,41 +37,56 @@ public class AdvertAdmob extends HttpServlet {
                 String message2 = j.get("message2").getAsString();
                 String message3 = j.get("message3").getAsString();
                 String message4 = j.get("message4").getAsString();
-                String sql = "select id from web_ad_descript_dict_admob where app_name='"+appName+"'and language='"+language+"'and group_id " +
-                        "="+groupNumber;
-                try{
-                    JSObject id = DB.findOneBySql(sql);
-                    if(id.hasObjectData()){
-                        DB.update("web_ad_descript_dict_admob")
-                                .put("message1", message1)
-                                .put("message2", message2)
-                                .put("message3", message3)
-                                .put("message4", message4)
-                                .where(DB.filter().whereEqualTo("app_name", appName))
-                                .and(DB.filter().whereEqualTo("language", language))
-                                .and(DB.filter().whereEqualTo("group_id", groupNumber))
-                                .execute();
-                    }else{
-                        DB.insert("web_ad_descript_dict_admob")
-                                .put("message1", message1)
-                                .put("message2", message2)
-                                .put("message3", message3)
-                                .put("message4", message4)
-                                .put("group_id", groupNumber)
-                                .put("app_name", appName)
-                                .put("language", language)
-                                .execute();
+                if(language == "Chinese"||language == "Japanese"||language == "Korean"||language == "Traditional"){
+                    if(message1.length()>12||message2.length()>12||message3.length()>12||message4.length()>12){
+                        json.addProperty("ret",0);
+                        json.addProperty("message",language+"is out of Adwords character limits.");
+                        break;
                     }
-                }catch(Exception e){
-                    String err = e.getMessage();
-                    json.addProperty("ret",0);
-                    json.addProperty("message",err);
+                }else{
+                    if(message1.length()>25||message2.length()>25||message3.length()>25||message4.length()>25){
+                        json.addProperty("ret",0);
+                        json.addProperty("message",language+"超过 Adwords 字符长度限制。");
+                        break;
+                    }
+                    String sql = "select id from web_ad_descript_dict_admob where app_name='"+appName+"'and language='"+language+"'and group_id " +
+                            "="+groupNumber;
+                    try{
+                        JSObject id = DB.findOneBySql(sql);
+                        if(id.hasObjectData()){
+                            DB.update("web_ad_descript_dict_admob")
+                                    .put("message1", message1)
+                                    .put("message2", message2)
+                                    .put("message3", message3)
+                                    .put("message4", message4)
+                                    .where(DB.filter().whereEqualTo("app_name", appName))
+                                    .and(DB.filter().whereEqualTo("language", language))
+                                    .and(DB.filter().whereEqualTo("group_id", groupNumber))
+                                    .execute();
+                        }else{
+                            DB.insert("web_ad_descript_dict_admob")
+                                    .put("message1", message1)
+                                    .put("message2", message2)
+                                    .put("message3", message3)
+                                    .put("message4", message4)
+                                    .put("group_id", groupNumber)
+                                    .put("app_name", appName)
+                                    .put("language", language)
+                                    .execute();
+                        }
+                    }catch(Exception e){
+                        String err = e.getMessage();
+                        json.addProperty("ret",0);
+                        json.addProperty("message",err);
+                    }
+                    //JsonObject 用 LinkedTreeMap实现，只不过是HashMap的双向链表形式
+                    json.addProperty("ret",1);
+                    json.addProperty("message","译文保存成功");
                 }
             }
-            json.addProperty("ret",1);
-            json.addProperty("message","译文保存成功");
+
         }else if (path.startsWith("/save_advert_admob")) {
-            OperationResult result = new OperationResult();   //OperationResult 是有两个实例的封装类
+            OperationResult result = new OperationResult();
             result.result = true;
             String appName = request.getParameter("appName");
             String language = request.getParameter("language");

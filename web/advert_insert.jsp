@@ -81,6 +81,7 @@
         </div>
 
         <input type="button" class="btn btn-primary" id="inputTranslate" value="翻译&保存"/>
+        <input type="button" class="btn btn-primary" id="saveEdition" value="保存修改">
         <br>
         <table class="table table-hover" id="advertisement">
             <thead>
@@ -138,6 +139,7 @@
             </div>
         </div>
         <input type="button" class="btn btn-primary" id="inputTranslateAdmob" value="翻译&保存"/>
+        <input type="button" class="btn btn-primary" id="saveEditionAdmob" value="保存修改">
         <br>
         <table class="table table-hover" id="advertisement_adwords">
             <thead>
@@ -220,28 +222,6 @@
             }
         }, 'json');
 
-        // $.post('adaccount_admob/query',{word:''}, function(data) {
-        //     if (data && data.ret == 1) {
-        //         var accountList = data.data;
-        //         accountList.forEach(function(one) {
-        //             $('#selectAccountAdmob').append($("<option value='" + one.account_id + "'>" + one.short_name + "</option>"));
-        //         })
-        //     } else {
-        //         admanager.showCommonDlg("错误", data.message);
-        //     }
-        // }, 'json');
-
-        // $.post('adaccount/query',{word:''}, function(data) {
-        //     if (data && data.ret == 1) {
-        //         var accountList = data.data;
-        //         accountList.forEach(function(one) {
-        //             $('#selectAccount').append($("<option value='" + one.account_id + "'>" + one.short_name + "</option>"));
-        //         })
-        //     } else {
-        //         admanager.showCommonDlg("错误", data.message);
-        //     }
-        // }, 'json');
-
         //以下连着两个用于判定是否隐藏表单
         $('#checkAdmob').click(function () {
             if ($('#checkAdmob').prop('checked')) {
@@ -256,8 +236,29 @@
             }
         });
         $('#formAdmob').hide();
+        $("#saveEdition").hide();
+        $("#saveEditionAdmob").hide();
     }
     init();
+
+    function sizeOfBytes(str,charset){
+        var bytes = 0;
+        if(charset==="utf-8"||charset==="utf8"){
+            for(var i=0;i<str.length;i++){
+                var charCode = str.charCodeAt(i);
+                if(charCode<=0x007f){
+                    bytes += 1;
+                }else if(charCode <= 0x07ff){
+                    bytes += 2;
+                }else if(charCode <= 0xffff){
+                    bytes += 3;
+                }else{
+                    bytes += 4;
+                }
+            }
+        }
+        return bytes;
+    }
 
     //翻译接口
     function translate(text,googleCodeTo,resolve,reject){
@@ -276,7 +277,7 @@
         }, 'json');
     }
 
-    //facebook form【翻译】按钮的事件绑定
+    //facebook form【翻译&保存】
     $('#inputTranslate').click(function () {
         $("#inputTranslate").prop("disabled",true);
         $("#tbody_facebook").empty();
@@ -352,8 +353,7 @@
         }
     });
 
-
-    //Admob form【翻译】按钮的事件绑定
+    //Admob form【翻译&保存】
     $('#inputTranslateAdmob').click(function () {
         $("#inputTranslateAdmob").prop("disabled",true);
         $("#tbody_adwords").empty();
@@ -376,14 +376,23 @@
                 tr.append("<td>"+language+"</td>");
                 asynPost(googleCodeTo,message1,message2,message3,message4)
                     .then(function(translation){
-                        var msg1 = translation[0];
-                        var msg2 = translation[1];
-                        var msg3 = translation[2];
-                        var msg4 = translation[3];
-                        tr.append("<td>"+msg1+"</td>");
-                        tr.append("<td>"+msg2+"</td>");
-                        tr.append("<td>"+msg3+"</td>");
-                        tr.append("<td>"+msg4+"</td>");
+                        if(language == "Chinese"||language == "Japanese"||language == "Korean"||language == "Traditional"){
+                            for(var j = 0;j<4;j++){
+                                if(translation[j].length>12){
+                                    tr.append("<td class='red'>"+translation[j]+"</td>");
+                                }else{
+                                    tr.append("<td>"+translation[j]+"</td>");
+                                }
+                            }
+                        }else{
+                            for(var j = 0;j<4;j++){
+                                if(translation[j].length>25){
+                                    tr.append("<td class='red'>"+translation[j]+"</td>");
+                                }else{
+                                    tr.append("<td>"+translation[j]+"</td>");
+                                }
+                            }
+                        }
                     })
                     .then(function(){
                         x++;
@@ -505,7 +514,7 @@
         return false;
     });
 
-    //facebook 表单 当【应用】【语言】【广告语组合】三项的内容改变时
+    //facebook 表单 当【应用】【广告语组合】的内容改变时
     $('#selectApp,#selectAdvertGroupId').change(function () {
         var appName = $("#selectApp").val();
         var groupNumber = $("#selectAdvertGroupId").val();
@@ -528,7 +537,6 @@
     // admob 表单，功能同上
     $('#selectAppAdmob,#selectAdvertGroupIdAdmob').change(function () {
         var appNameAdmob = $("#selectAppAdmob").val();
-        var languageAdmob = $("#selectLanguageAdmob").val();
         var groupNumberAdmob = $("#selectAdvertGroupIdAdmob").val();
         //无论如何都发送请求
         $.post("advert_admob/query_before_admob_insert_one_key", {
@@ -542,7 +550,6 @@
                 $('#inputMessageAdmob3').val(data.message3);
                 $('#inputMessageAdmob4').val(data.message4);
             } else {
-                //没有数据返回
                 $('#inputMessageAdmob1').val("");
                 $('#inputMessageAdmob2').val("");
                 $('#inputMessageAdmob3').val("");
@@ -550,6 +557,114 @@
             }
         }, "json");
         return false;
+    });
+
+    //Facebook form 修改
+    $("#tbody_facebook").on("click","td",function(){
+        var theTd = $(this);
+        var elementCheck = theTd.children("input").attr("class");
+        if(elementCheck == "edition"){
+            return false;
+        }
+        var check = $("#tbody_facebook").children("tr").toArray().length;
+        var idx = theTd.index();
+        if(check>0 && idx>1){
+            $("#saveEdition").show();
+            var content = theTd.text();
+            theTd.empty().append("<input class='edition'style='width:100%'>");
+            theTd.children("input").val(content);
+        }
+    });
+    $("#saveEdition").click(function(){
+        $("#inputTranslate").prop("disabled",true);
+        $("#saveEdition").prop("disabled",true);
+        var inputArray = $("#tbody_facebook input");
+        inputArray.each(function(){
+            var content = $(this).val();
+            var theTd = $(this).parent();
+            theTd.empty().text(content);
+        });
+        var adsArray = [];
+        var tbodyList = $("#tbody_facebook").children("tr");
+        tbodyList.each(function(){
+            var trHere = $(this);
+            var ads = {};
+            ads.language = trHere.children("td:eq(1)").text();
+            ads.title = trHere.children("td:eq(2)").text();
+            ads.message = trHere.children("td:eq(3)").text();
+            adsArray.push(ads);
+        });
+        var adsArrayString = JSON.stringify(adsArray);
+        var appName = $("#selectApp").val();
+        var groupId = $("#selectAdvertGroupId").val();
+        $.post("advert/save_advert_facebook_one_key", {
+            appName: appName,
+            group_id:groupId,
+            ads:adsArrayString
+        }, function (data) {
+            $("#inputTranslate").prop("disabled",false);
+            $("#saveEdition").prop("disabled",false);
+            if (data && data.ret == 1) {
+                layer.tips(data.message,"#saveEdition",{tips:1,time:3000});
+            } else {
+                admanager.showCommonDlg("提示", data.message);
+            }
+        }, "json");
+    });
+
+    //Adwords form 修改
+    $("#tbody_adwords").on("click","td",function(){
+        var theTd = $(this);
+        var elementCheck = theTd.children("input").attr("class");
+        if(elementCheck == "edition_admob"){
+            return false;
+        }
+        var check = $("#tbody_adwords").children("tr").toArray().length;
+        var idx = theTd.index();
+        if(check>0 && idx>1){
+            $("#saveEditionAdmob").show();
+            var content = theTd.text();
+            theTd.empty().append("<input class='edition_admob'style='width:100%'>");
+            theTd.children("input").val(content);
+        }
+    });
+    $("#saveEditionAdmob").click(function(){
+        $("#inputTranslateAdmob").prop("disabled",true);
+        $("#saveEditionAdmob").prop("disabled",true);
+        var inputArray = $("#tbody_adwords input");
+        inputArray.each(function(){
+            var content = $(this).val();
+            var theTd = $(this).parent();
+            theTd.empty().text(content);
+        });
+        var adsArray = [];
+        var tbodyList = $("#tbody_adwords").children("tr");
+        tbodyList.each(function(){
+            var trHere = $(this);
+            var ads = {};
+            ads.language = trHere.children("td:eq(1)").text();
+            ads.message1 = trHere.children("td:eq(2)").text();
+            ads.message2 = trHere.children("td:eq(3)").text();
+            ads.message3 = trHere.children("td:eq(4)").text();
+            ads.message4 = trHere.children("td:eq(5)").text();
+            adsArray.push(ads);
+        });
+        var adsArrayString = JSON.stringify(adsArray);
+        var appName = $("#selectAppAdmob").val();
+        var groupId = $("#selectAdvertGroupIdAdmob").val();
+        $.post("advert_admob/save_advert_admob_one_key", {
+            appName: appName,
+            group_id:groupId,
+            ads:adsArrayString
+        }, function (data) {
+            $("#inputTranslateAdmob").prop("disabled",false);
+            $("#saveEditionAdmob").prop("disabled",false);
+            if (data && data.ret == 1) {
+                layer.tips(data.message,"#saveEditionAdmob",{tips:1,time:3000});
+            } else {
+                admanager.showCommonDlg("提示", data.message);
+            }
+        }, "json");
     });
 </script>
 </body>
