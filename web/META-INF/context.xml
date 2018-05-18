@@ -14,7 +14,8 @@
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   See the License for the specific language governing permissions and
   limitations under the License.
---><!-- The contents of this file will be loaded for each web application --><Context>
+--><!-- The contents of this file will be loaded for each web application -->
+<Context>
 
 	<!-- Default set of monitored resources -->
 	<WatchedResource>WEB-INF/web.xml</WatchedResource>
@@ -35,7 +36,7 @@
 		username 数据库用户名 password 数据库密码 -->
 
 	<Resource name="jdbc/mysql" auth="Container" type="javax.sql.DataSource"
-			  driverClassName="com.mysql.jdbc.Driver" url="jdbc:mysql://localhost/admanager?characterEncoding=UTF-8&amp;noAccessToProcedureBodies=true"
+			  driverClassName="com.mysql.jdbc.Driver" url="jdbc:mysql://localhost/admanager?characterEncoding=UTF-8&amp;noAccessToProcedureBodies=true&amp;autoReconnect=true"
 			  username="aduser" password="aduser1234" maxIdle="10" minIdle="1" maxWaitMillis="10000" maxTotal="100"
-			  validationQuery="select 1" initialSize="1" testOnBorrow="true"/>
+			  validationQuery="select 1" initialSize="1" testOnBorrow="true" testWhileIdle="true"/>
 </Context>
