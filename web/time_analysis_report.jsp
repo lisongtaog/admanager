@@ -77,6 +77,8 @@
         <div class="panel-body" id="total_result">
         </div>
     </div>
+    <button id="line_chart" class="btn btn-link glyphicon glyphicon-zoom-in">折线图</button>
+    <canvas id="lineChart"></canvas>
     <table class="table table-hover">
         <thead id="result_header">
         <tr>
@@ -85,14 +87,12 @@
             <th>PurchasedUser</th>
             <th>Installed</th>
             <th>Uninstalled</th>
+            <th>UninstalledRate</th>
             <th>TotalUser</th>
             <th>ActiveUser</th>
-            <th>UninstalledRate</th>
             <th>Revenue</th>
-            <th>PI</th>
             <th>ECPM</th>
             <th>CPA</th>
-            <th>AC</th>
             <th>CPA/ECPM</th>
             <th>Incoming</th>
             <th>EstimatedRevenue14</th>
@@ -114,9 +114,121 @@
 <script src="jqueryui/jquery-ui.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.4/js/select2.min.js"></script>
 <script src="js/country-name-code-dict.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.js"></script>
 
 <script>
+    $("canvas").hide();
+    $("#line_chart").click(function(){
+        $("canvas").show();
+        var Date_chart = [];
+        var Cost = [];
+        var PurchasedUser = [];
+        var Installed = [];
+        var Uninstalled = [];
+        var TotalUser = [];
+        var ActiveUser = [];
+        var Revenue = [];
+        var ECPM = [];
+        var CPA = [];
+        var CPA_ECPM = [];
+        var Incoming = [];
+        var EstimatedRevenue14 = [];
+        var Revenue14_Cost = [];
+        var trArray = $("#results_body").children("tr");
+        trArray.each(function(){
+            var theTr = $(this);
+            Date_chart.push(theTr.children("td:eq(0)").text());
+            Cost.push(theTr.children("td:eq(1)").text());
+            PurchasedUser.push(theTr.children("td:eq(2)").text());
+            Installed.push(theTr.children("td:eq(3)").text());
+            Uninstalled.push(theTr.children("td:eq(4)").text());
+            TotalUser.push(theTr.children("td:eq(5)").text());
+            ActiveUser.push(theTr.children("td:eq(6)").text());
+            Revenue.push(theTr.children("td:eq(7)").text());
+            ECPM.push(theTr.children("td:eq(8)").text());
+            CPA.push(theTr.children("td:eq(9)").text());
+            CPA_ECPM.push(theTr.children("td:eq(10)").text());
+            Incoming.push(theTr.children("td:eq(11)").text());
+            EstimatedRevenue14.push(theTr.children("td:eq(12)").text());
+            Revenue14_Cost.push(theTr.children("td:eq(13)").text());
+        });
+        var chrt = $("canvas");
+        var chart = new Chart(chrt, {
+            type: "line",
+            data: {
+                datasets: [{
+                    label: 'Cost',
+                    data: Cost,
+                    borderColor: "rgba(160,82,45,1)",
+                    backgroundColor:"rgba(160,82,45,0.1)"
+                }, {
+                    label: 'PurchasedUser',
+                    data: PurchasedUser,
+                    borderColor: "rgba(238,0,0,1)",
+                    backgroundColor:"rgba(238,0,0,0.1)"
+                }, {
+                    label: 'Installed',
+                    data: Installed,
+                    borderColor:"rgba(142,142,56,1)",
+                    backgroundColor:"rgba(142,142,56,0.1)"
+                }, {
+                    label: 'Uninstalled',
+                    data: Uninstalled,
+                    borderColor:'rgba(124,252,0,1)',
+                    backgroundColor:"rgba(124,252,0,0.1)"
+                },{
+                    label: 'TotalUser',
+                    data: TotalUser,
+                    borderColor:'rgba(0,0,170,1)',
+                    backgroundColor:"rgba(0,0,170,0.1)"
+                },{
+                    label: 'ActiveUser',
+                    data: ActiveUser,
+                    borderColor:'rgba(99,184,255,1)',
+                    backgroundColor:"rgba(99,184,255,0.1)"
+                },{
+                    label: 'Revenue',
+                    data: Revenue,
+                    borderColor:'rgba(122,55,139,1)',
+                    backgroundColor:"rgba(122,55,139,0.1)"
+                },{
+                    label: 'ECPM',
+                    data: ECPM,
+                    borderColor:'rgba(171,130,255,1)',
+                    backgroundColor:"rgba(171,130,255,0.1)"
+                },{
+                    label: 'CPA',
+                    data: CPA,
+                    borderColor:'rgba(110,110,110,1)',
+                    backgroundColor:"rgba(110,110,110,0.1)"
+                },{
+                    label: 'CPA/ECPM',
+                    data: CPA_ECPM,
+                    borderColor:'rgba(124,205,124,1)',
+                    backgroundColor:"rgba(124,205,124,0.1)"
+                },{
+                    label: 'Incoming',
+                    data: Incoming,
+                    borderColor:'rgba(205,173,0,1)',
+                    backgroundColor:"rgba(205,173,0,0.1)"
+                },{
+                    label: 'EstimatedRevenue14',
+                    data: EstimatedRevenue14,
+                    borderColor:'rgba(255,215,0,1)',
+                    backgroundColor:"rgba(255,215,0,0.1)"
+                },{
+                    label: 'Revenue14/Cost',
+                    data: Revenue14_Cost,
+                    borderColor:'rgba(160,82,45,1)',
+                    backgroundColor:"rgba(255,215,0,0.1)"
+                }],
+                labels: Date_chart
+            },
+        });
+    });
 
+</script>
+<script>
     $.post("time_analysis_report/setOption",function(data){
         var options = new Array();
         var len = data.length;
@@ -153,7 +265,7 @@
     });
 
     $("#btnSearch").click(function(){
-
+        $("canvas").hide();
         var query = $("#inputSearch").val();
         var country_filter = $("#country_filter").val();
         var startTime = $('#inputStartTime').val();
@@ -166,41 +278,39 @@
         },function(data){
             if(data && data.ret == 1){
                 if(!country_filter){
-                    $('#result_header').html("<tr><th>Date<span sorterId=\"1032\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>"+
-                        "<th>Cost<span sorterId=\"1031\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
-                        "<th>PurchasedUser<span sorterId=\"1033\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
-                        "<th>Installed<span sorterId=\"1034\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
-                        "<th>Uninstalled<span sorterId=\"1035\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
-                        "<th>UninstalledRate</th><th>TotalUser<span sorterId=\"1037\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
-                        "<th>ActiveUser<span sorterId=\"1038\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
-                        "<th>Revenue<span sorterId=\"1039\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
-                        "<th>ECPM<span sorterId=\"1040\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
-                        "<th>CPA<span sorterId=\"1041\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
+                    $('#result_header').html("<tr><th>Date<button sorterId=\"1032\" class=\"btn btn-link glyphicon glyphicon-arrow-down\"></button></th>"+
+                        "<th>Cost<button sorterId=\"1031\" class=\"btn btn-link glyphicon glyphicon-arrow-down\"></button></th>" +
+                        "<th>PurchasedUser<button sorterId=\"1033\" class=\"btn btn-link glyphicon glyphicon-arrow-down\"></button></th>" +
+                        "<th>Installed<button sorterId=\"1034\" class=\"btn btn-link glyphicon glyphicon-arrow-down\"></button></th>" +
+                        "<th>Uninstalled<button sorterId=\"1035\" class=\"btn btn-link glyphicon glyphicon-arrow-down\"></button></th>" +
+                        "<th>UninstalledRate</th><th>TotalUser<button sorterId=\"1037\" class=\"btn btn-link glyphicon glyphicon-arrow-down\"></button></th>" +
+                        "<th>ActiveUser<button sorterId=\"1038\" class=\"btn btn-link glyphicon glyphicon-arrow-down\"></button></th>" +
+                        "<th>Revenue<button sorterId=\"1039\" class=\"btn btn-link glyphicon glyphicon-arrow-down\"></button></th>" +
+                        "<th>ECPM<button sorterId=\"1040\" class=\"btn btn-link glyphicon glyphicon-arrow-down\"></button></th>" +
+                        "<th>CPA<button sorterId=\"1041\" class=\"btn btn-link glyphicon glyphicon-arrow-down\"></button></th>" +
                         "<th>CPA/ECPM</th>" +
-                        "<th>Incoming<span sorterId=\"1042\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
-                        "<th>EstimatedRevenue14<span sorterId=\"1044\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
-                        "<th>Revenue14/Cost<span sorterId=\"1045\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>");
+                        "<th>Incoming<button sorterId=\"1042\" class=\"btn btn-link glyphicon glyphicon-arrow-down\"></button></th>" +
+                        "<th>EstimatedRevenue14<button sorterId=\"1044\" class=\"btn btn-link glyphicon glyphicon-arrow-down\"></button></th>" +
+                        "<th>Revenue14/Cost<button sorterId=\"1045\" class=\"btn btn-link glyphicon glyphicon-arrow-down\"></button></th>");
                 }else{
-                    $('#result_header').html("<tr><th>Date<span sorterId=\"1032\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>"+
-                        "<th>Cost<span sorterId=\"1031\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
-                        "<th>PurchasedUser<span sorterId=\"1033\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
-                        "<th>Installed<span sorterId=\"1034\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
-                        "<th>Uninstalled<span sorterId=\"1035\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
-                        "<th>UninstalledRate</th><th>TotalUser<span sorterId=\"1037\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
-                        "<th>ActiveUser<span sorterId=\"1038\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
-                        "<th>Revenue<span sorterId=\"1039\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
+                    $('#result_header').html("<tr><th>Date<button sorterId=\"1032\" class=\"btn btn-link glyphicon glyphicon-arrow-down\"></button></th>"+
+                        "<th>Cost<button sorterId=\"1031\" class=\"btn btn-link glyphicon glyphicon-arrow-down\"></button></th>" +
+                        "<th>PurchasedUser<button sorterId=\"1033\" class=\"btn btn-link glyphicon glyphicon-arrow-down\"></button></th>" +
+                        "<th>Installed<button sorterId=\"1034\" class=\"btn btn-link glyphicon glyphicon-arrow-down\"></button></th>" +
+                        "<th>Uninstalled<button sorterId=\"1035\" class=\"btn btn-link glyphicon glyphicon-arrow-down\"></button></th>" +
+                        "<th>UninstalledRate</th><th>TotalUser<button sorterId=\"1037\" class=\"btn btn-link glyphicon glyphicon-arrow-down\"></button></th>" +
+                        "<th>ActiveUser<button sorterId=\"1038\" class=\"btn btn-link glyphicon glyphicon-arrow-down\"></button></th>" +
+                        "<th>Revenue<button sorterId=\"1039\" class=\"btn btn-link glyphicon glyphicon-arrow-down\"></button></th>" +
                         "<th>PI</th>"  +
-                        "<th>ECPM<span sorterId=\"1040\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
-                        "<th>CPA<span sorterId=\"1041\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
+                        "<th>ECPM<button sorterId=\"1040\" class=\"btn btn-link glyphicon glyphicon-arrow-down\"></button></th>" +
+                        "<th>CPA<button sorterId=\"1041\" class=\"btn btn-link glyphicon glyphicon-arrow-down\"></button></th>" +
                         "<th>ACPA</th>"+
                         "<th>CPA/ECPM</th>" +
-                        "<th>Incoming<span sorterId=\"1042\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
-                        "<th>EstimatedRevenue14<span sorterId=\"1044\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
-                        "<th>Revenue14/Cost<span sorterId=\"1045\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>");
+                        "<th>Incoming<button sorterId=\"1042\" class=\"btn btn-link glyphicon glyphicon-arrow-down\"></button></th>" +
+                        "<th>EstimatedRevenue14<button sorterId=\"1044\" class=\"btn btn-link glyphicon glyphicon-arrow-down\"></button></th>" +
+                        "<th>Revenue14/Cost<button sorterId=\"1045\" class=\"btn btn-link glyphicon glyphicon-arrow-down\"></button></th>");
                 }
-
                 setData(data,query,country_filter);  //这里是往表格里添加项目，并设置某三列的颜色
-                bindSortOp();  //鼠标触发的排序
                 var str = "Cost: " + data.total_cost + "&nbsp;&nbsp;&nbsp;&nbsp;PuserchaedUser: " + data.total_puserchaed_user +
                     "&nbsp;&nbsp;&nbsp;&nbsp;CPA: " + data.total_cpa + "&nbsp;&nbsp;&nbsp;&nbsp;Revenue: " + data.total_revenue +
                     "&nbsp;&nbsp;&nbsp;&nbsp;Es14: " + data.total_es14 + "&nbsp;&nbsp;&nbsp;&nbsp;Es14/Cost: " + data.es14_dev_cost;
@@ -213,46 +323,71 @@
         },'json');
     });
 
-    function bindSortOp() {
-        $('.sorter').click(function() {
-            var sorterId = $(this).attr('sorterId');
-            sorterId = parseInt(sorterId);
-            if ($(this).hasClass("glyphicon-arrow-down")) {
-                $(this).removeClass("glyphicon-arrow-down");
-                $(this).addClass("glyphicon-arrow-up");
-                sorterId -= 1000; //便于在升序和降序间切换
-            } else {
-                $(this).removeClass("glyphicon-arrow-up");
-                $(this).addClass("glyphicon-arrow-down");
-            }
-
-            var query = $("#inputSearch").val();
-            var startTime = $('#inputStartTime').val();
-            var endTime = $('#inputEndTime').val();
-            var country_filter = $("#country_filter").val();
-            $.post('time_analysis_report/time_query', {
-                tagName: query,   //query是在标签一栏输入的应用名(实操时候用了输入才会触发的下拉列表)
-                startTime: startTime,
-                endTime: endTime,
-                sorterId: sorterId,
-                country_filter: country_filter
-            },function(data){
-                if (data && data.ret == 1) {
-                    setData(data,query,country_filter);
-                    var str = "Cost: " + data.total_cost + "&nbsp;&nbsp;&nbsp;&nbsp;PuserchaedUser: " + data.total_puserchaed_user +  // &nbsp; 在html语言里表示空格
-                        "&nbsp;&nbsp;&nbsp;&nbsp;CPA: " + data.total_cpa + "&nbsp;&nbsp;&nbsp;&nbsp;Revenue: " + data.total_revenue +
-                        "&nbsp;&nbsp;&nbsp;&nbsp;Es14: " + data.total_es14 + "&nbsp;&nbsp;&nbsp;&nbsp;Es14/Cost: " + data.es14_dev_cost;
-
-                    str += "<br/><span class='estimateResult'></span>"
-                    $('#total_result').removeClass("editable");  //移除 类editable
-                    $('#total_result').html(str); //把选中元素的内容替换成 str：结果是页面动态出现了一行字
-                } else {
-                    admanager.showCommonDlg("错误", data.message);
-                }
-            }, 'json');
-        });
+    //排序
+    $("#result_header").on('click',"button",function(){
+        var table = $(this).parents('table').eq(0);
+        if ($(this).hasClass("glyphicon-arrow-up")) {
+            $(this).removeClass("glyphicon-arrow-up");
+            $(this).addClass("glyphicon-arrow-down");
+        } else {
+            $(this).removeClass("glyphicon-arrow-down");
+            $(this).addClass("glyphicon-arrow-up");
+        }
+        var rows = table.find('tr:gt(0)').toArray().sort(comparer($(this).parents("th").index()));
+        this.asc = !this.asc;
+        if (!this.asc){rows = rows.reverse();}
+        table.children('tbody').empty().html(rows);
+    });
+    function comparer(index) {
+        return function(a, b) {
+            var valA = getCellValue(a, index), valB = getCellValue(b, index);
+            return $.isNumeric(valA) && $.isNumeric(valB) ?
+                valA - valB : valA.localeCompare(valB);
+        };
+    }
+    function getCellValue(row, index){
+        return $(row).children('td').eq(index).text();
     }
 
+    // function bindSortOp() {    //在后端排序
+    //     $('.sorter').click(function() {
+    //         var sorterId = $(this).attr('sorterId');
+    //         sorterId = parseInt(sorterId);
+    //         if ($(this).hasClass("glyphicon-arrow-down")) {
+    //             $(this).removeClass("glyphicon-arrow-down");
+    //             $(this).addClass("glyphicon-arrow-up");
+    //             sorterId -= 1000; //便于在升序和降序间切换
+    //         } else {
+    //             $(this).removeClass("glyphicon-arrow-up");
+    //             $(this).addClass("glyphicon-arrow-down");
+    //         }
+    //
+    //         var query = $("#inputSearch").val();
+    //         var startTime = $('#inputStartTime').val();
+    //         var endTime = $('#inputEndTime').val();
+    //         var country_filter = $("#country_filter").val();
+    //         $.post('time_analysis_report/time_query', {
+    //             tagName: query,   //query是在标签一栏输入的应用名(实操时候用了输入才会触发的下拉列表)
+    //             startTime: startTime,
+    //             endTime: endTime,
+    //             sorterId: sorterId,
+    //             country_filter: country_filter
+    //         },function(data){
+    //             if (data && data.ret == 1) {
+    //                 setData(data,query,country_filter);
+    //                 var str = "Cost: " + data.total_cost + "&nbsp;&nbsp;&nbsp;&nbsp;PuserchaedUser: " + data.total_puserchaed_user +  // &nbsp; 在html语言里表示空格
+    //                     "&nbsp;&nbsp;&nbsp;&nbsp;CPA: " + data.total_cpa + "&nbsp;&nbsp;&nbsp;&nbsp;Revenue: " + data.total_revenue +
+    //                     "&nbsp;&nbsp;&nbsp;&nbsp;Es14: " + data.total_es14 + "&nbsp;&nbsp;&nbsp;&nbsp;Es14/Cost: " + data.es14_dev_cost;
+    //
+    //                 str += "<br/><span class='estimateResult'></span>"
+    //                 $('#total_result').removeClass("editable");  //移除 类editable
+    //                 $('#total_result').html(str); //把选中元素的内容替换成 str：结果是页面动态出现了一行字
+    //             } else {
+    //                 admanager.showCommonDlg("错误", data.message);
+    //             }
+    //         }, 'json');
+    //     });
+    // }
 
     function setData(data,tagName,countryFilter) {
         $('#results_body > tr').remove();  //2018-2-9：多层级选择器
