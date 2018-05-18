@@ -913,8 +913,11 @@ public class QueryByMulConditions extends HttpServlet {
                 }
 
                 listAll = DB.findListBySql(sql);
-                if(list != null && list.size() > 0){
-                    listNoData = Utils.getDiffJSObjectList(listAll, list, "campaign_id");
+                sql = "select ch.campaign_id from " + webAdCampaignsHistoryTable + " ch, " + "(SELECT DISTINCT campaign_id FROM " + webAdCampaignTagRelTable + " WHERE tag_id = "+tagId+") r " +
+                        " where date between '" + startTime + "' and '" + endTime + "' and r.campaign_id = ch.campaign_id";
+                List<JSObject> dataList = DB.findListBySql(sql);
+                if(dataList != null && dataList.size() > 0){
+                    listNoData = Utils.getDiffJSObjectList(listAll, dataList, "campaign_id");
                 }else{
                     listNoData = listAll;
                 }
@@ -979,8 +982,11 @@ public class QueryByMulConditions extends HttpServlet {
                 }
 
                 listAll = DB.findListBySql(sql);
-                if(list != null && list.size() >0){
-                    listNoData = Utils.getDiffJSObjectList(listAll, list, "campaign_id");
+                sql = "select ch.campaign_id from " + webAdCampaignsHistoryTable + " ch, " + "(SELECT DISTINCT campaign_id FROM " + webAdCampaignTagRelTable + " WHERE tag_id = "+tagId+") r " +
+                        " where date between '" + startTime + "' and '" + endTime + "' and r.campaign_id = ch.campaign_id";
+                List<JSObject> dataList = DB.findListBySql(sql);
+                if(dataList != null && dataList.size() > 0){
+                    listNoData = Utils.getDiffJSObjectList(listAll, dataList, "campaign_id");
                 }else{
                     listNoData = listAll;
                 }
