@@ -831,12 +831,12 @@ public class QueryByMulConditions extends HttpServlet {
         List<JSObject> listCampaignSpend4CountryCode = new ArrayList<>();
         Map<String,JSObject> countryCampaignspendMap = new HashMap<>();
         String havingField = "";
-        if(totalInstallComparisonValue == "" && cpaComparisonValue == ""){
+        if(totalInstallComparisonValue.isEmpty() && cpaComparisonValue.isEmpty()){
             havingField = " having impressions > 0 ";
         }else{
-            if(totalInstallComparisonValue != "" && cpaComparisonValue == ""){
+            if(!totalInstallComparisonValue.isEmpty() && cpaComparisonValue.isEmpty()){
                 havingField = " having installed " + totalInstallOperator + " " + totalInstallComparisonValue;
-            }else if(totalInstallComparisonValue == "" && cpaComparisonValue != ""){
+            }else if(totalInstallComparisonValue.isEmpty() && !cpaComparisonValue.isEmpty()){
                 havingField = " having cpa " + cpaOperator + " " + cpaComparisonValue;
             }else{
                 havingField = " having installed " + totalInstallOperator + " " + totalInstallComparisonValue + " and cpa " + cpaOperator + " " + cpaComparisonValue;
