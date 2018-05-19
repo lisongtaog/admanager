@@ -1,5 +1,6 @@
 package com.bestgo.admanager.servlet;
 
+import com.bestgo.admanager.utils.StringUtil;
 import com.bestgo.admanager.utils.Utils;
 import com.bestgo.common.database.services.DB;
 import com.bestgo.common.database.utils.JSObject;
@@ -117,7 +118,7 @@ public class QueryNotExistData extends HttpServlet {
             webAdCampaignsCountryHistoryTable = "web_ad_campaigns_country_history_admob";
         }
         List<JSObject> list = null;
-        if(country == "" || country == null){
+        if(StringUtil.isEmpty(country)){
             list = DB.scan(webAdCampaignTagRelTable).select("campaign_id")
                     .where(DB.filter().whereEqualTo("tag_id", tagId)).execute();
         }else{
@@ -130,7 +131,7 @@ public class QueryNotExistData extends HttpServlet {
         }
 
         String campaignIds = "";
-        if(campaignCreateTime == "" || campaignCreateTime == null){
+        if(StringUtil.isEmpty(campaignCreateTime)){
             for(String s : campaignIdSet){
                 campaignIds += "'" + s + "',";
             }
@@ -153,11 +154,11 @@ public class QueryNotExistData extends HttpServlet {
             }
         }
 
-        if(campaignIds != null && campaignIds.length()>0){
+        if(StringUtil.isNotEmpty(campaignIds)){
             campaignIds = campaignIds.substring(0,campaignIds.length()-1);
         }
         String sql = "";
-        if (!campaignIds.isEmpty()) {
+        if(StringUtil.isNotEmpty(campaignIds)){
 
             if(admobCheck){
                 sql = "select campaign_id, a.account_id, short_name, campaign_name, create_time, a.status, budget, bidding, total_spend, " +
@@ -166,7 +167,7 @@ public class QueryNotExistData extends HttpServlet {
                         "  from " + webAdCampaignsTable + " a LEFT JOIN " + webAccountIdTable + " b ON a.account_id = b.account_id " +
                         " where a.status = '" + openStatus + "'" +
                         " and campaign_id in (" + campaignIds + ") " +
-                        ((likeCampaignName == "" || likeCampaignName == null) ? "" : " and campaign_name like %" + likeCampaignName + "%");
+                        (StringUtil.isEmpty(likeCampaignName) ? "" : " and campaign_name like %" + likeCampaignName + "%");
             }else{
                 sql = "select campaign_id, a.account_id, short_name, campaign_name, create_time, a.status, budget, bidding, total_spend, " +
                         " total_installed, total_click, cpa,ctr, " +
@@ -174,11 +175,11 @@ public class QueryNotExistData extends HttpServlet {
                         "  from " + webAdCampaignsTable + " a LEFT JOIN " + webAccountIdTable + " b ON a.account_id = b.account_id " +
                         " where a.status = '" + openStatus + "' AND b.status = 1 " +
                         " and campaign_id in (" + campaignIds + ") " +
-                        ((likeCampaignName == "" || likeCampaignName == null) ? "" : " and campaign_name like %" + likeCampaignName + "%");
+                        (StringUtil.isEmpty(likeCampaignName) ? "" : " and campaign_name like %" + likeCampaignName + "%");
             }
 
             listAll = DB.findListBySql(sql);
-            if(country == "" || country == null){
+            if(StringUtil.isEmpty(country)){
                 sql = "select campaign_id, impressions from ( " +
                         "select ch.campaign_id, " +
                         " sum(ch.total_impressions) as impressions " +

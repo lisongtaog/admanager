@@ -1,6 +1,7 @@
 package com.bestgo.admanager.servlet;
 
 import com.bestgo.admanager.utils.DateUtil;
+import com.bestgo.admanager.utils.StringUtil;
 import com.bestgo.admanager.utils.Utils;
 import com.bestgo.common.database.services.DB;
 import com.bestgo.common.database.utils.JSObject;
@@ -45,18 +46,18 @@ public class ReleasedDataStatistics extends HttpServlet {
                 String sql = "select team_name,category_name,t.tag_name,anticipated_incoming,anticipated_revenue,t.user_id " +
                         "from web_ad_category_team ct, web_ad_tag_category tc, web_tag t " +
                         "where tc.id = t.tag_category_id and ct.id = tc.team_id " +
-                        ((likeTeamName == "") ? " " : " and team_name like '%" + likeTeamName + "%' ") +
-                        ((likeCategoryName == "") ? " " : " and category_name like '%" + likeCategoryName + "%' ") +
+                        (StringUtil.isEmpty(likeTeamName) ? " " : " and team_name like '%" + likeTeamName + "%' ") +
+                        (StringUtil.isEmpty(likeCategoryName) ? " " : " and category_name like '%" + likeCategoryName + "%' ") +
                         " ORDER BY ct.id,tc.id,t.id ";
-                if(nickname != null && nickname != ""){
+                if(StringUtil.isNotEmpty(nickname)){
                     JSObject one = DB.findOneBySql("select id from web_ad_login_user where nickname = '" + nickname + "'");
                     if(one.hasObjectData()){
                         long id = one.get("id");
                         sql = "select team_name,category_name,t.tag_name,anticipated_incoming,anticipated_revenue,t.user_id " +
                                 "from web_ad_category_team ct, web_ad_tag_category tc, web_tag t " +
                                 "where tc.id = t.tag_category_id and ct.id = tc.team_id and t.user_id = " + id +
-                                ((likeTeamName == "") ? " " : " and team_name like '%" + likeTeamName + "%' ") +
-                                ((likeCategoryName == "") ? " " : " and category_name like '%" + likeCategoryName + "%' ") +
+                                (StringUtil.isEmpty(likeTeamName) ? " " : " and team_name like '%" + likeTeamName + "%' ") +
+                                (StringUtil.isEmpty(likeCategoryName) ? " " : " and category_name like '%" + likeCategoryName + "%' ") +
                                 " ORDER BY ct.id,tc.id,t.id ";
                     }
                 }
