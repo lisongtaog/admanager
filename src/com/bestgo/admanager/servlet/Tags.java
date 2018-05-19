@@ -2,6 +2,7 @@ package com.bestgo.admanager.servlet;
 
 import com.bestgo.admanager.utils.DateUtil;
 import com.bestgo.admanager.OperationResult;
+import com.bestgo.admanager.utils.StringUtil;
 import com.bestgo.admanager.utils.Utils;
 import com.bestgo.common.database.services.DB;
 import com.bestgo.common.database.utils.JSObject;
@@ -39,7 +40,7 @@ public class Tags extends HttpServlet {
                 String maxBiddingStr = request.getParameter("maxBidding");
                 String tagCategoryIdStr = request.getParameter("tagCategoryId");
 
-                if(!tagName.isEmpty() && tagCategoryIdStr.matches("[0-9]{1,}") && (maxBiddingStr.matches("^\\d+(\\.\\d+)?$") || maxBiddingStr == "")){
+                if(!tagName.isEmpty() && tagCategoryIdStr.matches("[0-9]{1,}") && (maxBiddingStr.matches("^\\d+(\\.\\d+)?$") || StringUtil.isEmpty(maxBiddingStr))){
                     result = createNewTag(tagName,maxBiddingStr,tagCategoryIdStr);
                     json.addProperty("ret", result.result ? 1 : 0);
                     json.addProperty("message", result.message);
@@ -58,8 +59,8 @@ public class Tags extends HttpServlet {
                 String idStr = request.getParameter("id");
                 String tagCategoryIdStr = request.getParameter("tagCategoryId");
 
-                if(!tagName.isEmpty() && tagCategoryIdStr.matches("[0-9]{1,}") && (maxBiddingStr.matches("^\\d+(\\.\\d+)?$") || maxBiddingStr == "")){
-                    if(maxBiddingStr == ""){
+                if(!tagName.isEmpty() && tagCategoryIdStr.matches("[0-9]{1,}") && (maxBiddingStr.matches("^\\d+(\\.\\d+)?$") || StringUtil.isEmpty(maxBiddingStr))){
+                    if(maxBiddingStr.isEmpty()){
                         maxBiddingStr = "NULL";
                     }
                     result = updateTag(idStr, tagName,maxBiddingStr,tagCategoryIdStr);
@@ -258,7 +259,7 @@ public class Tags extends HttpServlet {
                 String sql = "select id from web_ad_tag_category where id = " + tagCategoryIdStr;
                 one = DB.findOneBySql(sql);
                 if(one != null && one.hasObjectData()){
-                    if(maxBiddingStr == ""){
+                    if(maxBiddingStr.isEmpty()){
                         DB.insert("web_tag")
                                 .put("tag_name", tagName)
                                 .put("tag_category_id",tagCategoryIdStr)

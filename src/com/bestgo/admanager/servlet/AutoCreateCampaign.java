@@ -2,6 +2,7 @@ package com.bestgo.admanager.servlet;
 
 import com.bestgo.admanager.utils.DateUtil;
 import com.bestgo.admanager.OperationResult;
+import com.bestgo.admanager.utils.StringUtil;
 import com.bestgo.admanager.utils.Utils;
 import com.bestgo.common.database.services.DB;
 import com.bestgo.common.database.utils.JSObject;
@@ -225,20 +226,20 @@ public class AutoCreateCampaign extends HttpServlet {
     public static List<JSObject> facebookFetchData(String word,String tagName,String countryName) {
         List<JSObject> list = new ArrayList<>();
         try {
-            if (tagName!="" && countryName== "" && (word==""||word==null)) {
+            if (StringUtil.isNotEmpty(tagName) && countryName.isEmpty() && (StringUtil.isEmpty(word))) {
                 return DB.scan("ad_campaigns_auto_create").select(FB_CAMPAIGN_FIELDS)
                         .where(DB.filter().whereEqualTo("app_name",tagName)).orderByAsc("id").execute();
-            }else if(tagName != "" && countryName!= "" && (word==""||word==null)){
+            }else if(StringUtil.isNotEmpty(tagName) && StringUtil.isNotEmpty(countryName) && (StringUtil.isEmpty(word))){
                 return DB.scan("ad_campaigns_auto_create").select(FB_CAMPAIGN_FIELDS)
                         .where(DB.filter().whereEqualTo("app_name",tagName))
                         .and(DB.filter().whereEqualTo("country_region",countryName))
                         .orderByAsc("id").execute();
-            }else if(tagName!=""  && word != null && word!= "" && countryName==""){
+            }else if(StringUtil.isNotEmpty(tagName) && StringUtil.isNotEmpty(word)  && countryName.isEmpty()){
                 return DB.scan("ad_campaigns_auto_create").select(FB_CAMPAIGN_FIELDS)
                         .where(DB.filter().whereEqualTo("app_name",tagName))
                         .and(DB.filter().whereLikeTo("campaign_name", "%" + word + "%"))
                         .orderByAsc("id").execute();
-            }else if(tagName != "" && word != null && word!= "" && countryName!=""){
+            }else if(StringUtil.isNotEmpty(tagName) && StringUtil.isNotEmpty(word)  &&  StringUtil.isNotEmpty(countryName)){
                 return DB.scan("ad_campaigns_auto_create").select(FB_CAMPAIGN_FIELDS)
                         .where(DB.filter().whereEqualTo("app_name",tagName))
                         .and(DB.filter().whereLikeTo("campaign_name", "%" + word + "%"))
@@ -640,27 +641,26 @@ public class AutoCreateCampaign extends HttpServlet {
     public static List<JSObject> adwordsFetchData(String word,String tagName,String countryName) {
         List<JSObject> list = new ArrayList<>();
         try {
-            if (tagName!="" && countryName== "" && (word==""||word==null)) {
+            if (StringUtil.isNotEmpty(tagName) && countryName.isEmpty() && (StringUtil.isEmpty(word))) {
                 return DB.scan("ad_campaigns_admob_auto_create").select(ADWORDS_CAMPAIGN_FIELDS)
                         .where(DB.filter().whereEqualTo("app_name",tagName)).orderByAsc("id").execute();
-            }else if(tagName != "" && countryName!= "" && (word==""||word==null)){
+            }else if(StringUtil.isNotEmpty(tagName) && StringUtil.isNotEmpty(countryName) && (StringUtil.isEmpty(word))){
                 return DB.scan("ad_campaigns_admob_auto_create").select(ADWORDS_CAMPAIGN_FIELDS)
                         .where(DB.filter().whereEqualTo("app_name",tagName))
                         .and(DB.filter().whereEqualTo("country_region",countryName))
                         .orderByAsc("id").execute();
-            }else if(tagName!=""  && word != null && word!= "" && countryName==""){
+            }else if(StringUtil.isNotEmpty(tagName) && StringUtil.isNotEmpty(word)  && countryName.isEmpty()){
                 return DB.scan("ad_campaigns_admob_auto_create").select(ADWORDS_CAMPAIGN_FIELDS)
                         .where(DB.filter().whereEqualTo("app_name",tagName))
                         .and(DB.filter().whereLikeTo("campaign_name", "%" + word + "%"))
                         .orderByAsc("id").execute();
-            }else if(tagName != "" && word != null && word!= "" && countryName!=""){
+            }else if(StringUtil.isNotEmpty(tagName) && StringUtil.isNotEmpty(word)  &&  StringUtil.isNotEmpty(countryName)){
                 return DB.scan("ad_campaigns_admob_auto_create").select(ADWORDS_CAMPAIGN_FIELDS)
                         .where(DB.filter().whereEqualTo("app_name",tagName))
                         .and(DB.filter().whereLikeTo("campaign_name", "%" + word + "%"))
                         .and(DB.filter().whereEqualTo("country_region",countryName))
                         .orderByAsc("id").execute();
             }
-
         } catch (Exception ex) {
             Logger logger = Logger.getRootLogger();
             logger.error(ex.getMessage(), ex);

@@ -1,5 +1,6 @@
 package com.bestgo.admanager.servlet;
 
+import com.bestgo.admanager.utils.StringUtil;
 import com.bestgo.admanager.utils.Utils;
 import com.bestgo.common.database.services.DB;
 import com.bestgo.common.database.utils.JSObject;
@@ -202,7 +203,7 @@ public class TimeAnalysisReport extends HttpServlet {
                             double a_cpa = 0;
                             SimpleDateFormat date_wfc = new SimpleDateFormat("yyyy-MM-dd");
                             String date = date_wfc.format(j.get("date"));
-                            if(country_filter != null && country_filter != ""){
+                            if(StringUtil.isNotEmpty(country_filter)){
                                 sql = "select pi,a_cpa " +
                                         " from web_ad_country_analysis_report_history_by_date where app_id = '" + google_package_id + "' " +
                                         " and country_code = '" + country_filter_code + "' and date = '" + date + "'";
@@ -253,7 +254,7 @@ public class TimeAnalysisReport extends HttpServlet {
                             d.addProperty("users", users);
                             d.addProperty("active_users", active_users);
                             d.addProperty("revenues", Utils.trimDouble(revenues, 0));
-                            if(country_filter != null && country_filter != ""){
+                            if(StringUtil.isNotEmpty(country_filter)){
                                 d.addProperty("pi", Utils.trimDouble(pi,3));
                                 d.addProperty("a_cpa", Utils.trimDouble(a_cpa,3));
                             }
