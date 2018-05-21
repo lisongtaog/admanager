@@ -97,16 +97,15 @@ public class CountryAnalysisReport extends HttpServlet {
                     long tagId = oneG.get("id");
                     if(appId != null){
                         JsonArray jsonArray = new JsonArray();
-                        String sql = "SELECT arh.country_code, sum(cost) as total_cost, sum(purchased_user) as total_purchased_user," +
+                        String sql = "SELECT country_code, sum(cost) as total_cost, sum(purchased_user) as total_purchased_user," +
                                 " sum(total_installed) as installed, sum(today_uninstalled) as total_today_uninstalled," +
                                 " sum(active_user) as active_users, sum(impression) as impressions, sum(revenue) as revenues," +
                                 " (sum(revenue) - sum(cost)) as incoming," +
                                 " (case when sum(impression) > 0 then sum(revenue) * 1000 / sum(impression) else 0 end) as ecpm," +
                                 " (case when sum(purchased_user) > 0 then sum(cost) / sum(purchased_user) else 0 end) as cpa " +
-                                " from web_ad_country_analysis_report_history arh,app_country_code_dict ccd " +
-                                " where arh.country_code = ccd.country_code AND date BETWEEN '" + startTime + "' AND '" + endTime + "' " +
-                                " and app_id = '" + appId + "' GROUP BY arh.country_code";
-
+                                " from web_ad_country_analysis_report_history " +
+                                " where date BETWEEN '" + startTime + "' AND '" + endTime + "' " +
+                                " and app_id = '" + appId + "' GROUP BY country_code";
                         int sorter = 0;
                         if (sorterId != null) {
                             sorter = Utils.parseInt(sorterId, 0);
@@ -185,8 +184,11 @@ public class CountryAnalysisReport extends HttpServlet {
 
                                 //计算七天的总花费、总营收、总盈利等
                                 sql = "select cost, revenue,purchased_user,impression " +
-                                        "from web_ad_country_analysis_report_history where app_id = '" + appId + "' " +
-                                        " and country_code = '" + countryCode + "' and date BETWEEN '" + sevenDaysAgo + "' AND '" + endTime + "'";
+                                        "from web_ad_country_analysis_report_history where " +
+                                        " date BETWEEN '" + sevenDaysAgo + "' AND '" + endTime + "'" +
+                                        " and app_id = '" + appId + "' " +
+                                        " and country_code = '" + countryCode + "' ";
+
                                 List<JSObject> listCR = DB.findListBySql(sql);
 
                                 double sevenDaysCosts  = 0;
@@ -211,8 +213,11 @@ public class CountryAnalysisReport extends HttpServlet {
                                         "(case when total_installed > 0 then today_uninstalled / total_installed else 0 end) as uninstall_rate," +
                                         "(case when impression > 0 then revenue * 1000 / impression else 0 end) as ecpm," +
                                         "(case when purchased_user > 0 then cost / purchased_user else 0 end) as cpa " +
-                                        "from web_ad_country_analysis_report_history where app_id = '" + appId + "' " +
-                                        " and country_code = '" + countryCode + "' and date BETWEEN '" + fourteenDaysAgo + "' AND '" + endTime + "'";
+                                        "from web_ad_country_analysis_report_history where " +
+                                        " date BETWEEN '" + fourteenDaysAgo + "' AND '" + endTime + "'" +
+                                        " and app_id = '" + appId + "' " +
+                                        " and country_code = '" + countryCode + "' ";
+
                                 listCR = DB.findListBySql(sql);
                                 String everyDayCostForFourteenDays = "";
                                 String everyDayPurchasedUserForFourteenDays = "";
@@ -250,8 +255,12 @@ public class CountryAnalysisReport extends HttpServlet {
                                     }
                                 }
 
-                                sql = "select date, pi from web_ad_country_analysis_report_history_by_date where app_id = '" + appId + "' " +
-                                        " and country_code = '" + countryCode + "' and date BETWEEN '" + beforeTwentyTwoDay + "' AND '" + beforeFourDay + "'";
+                                sql = "select date, pi from web_ad_country_analysis_report_history_by_date " +
+                                        "where " +
+                                        " date BETWEEN '" + beforeTwentyTwoDay + "' AND '" + beforeFourDay + "'" +
+                                        " and app_id = '" + appId + "' " +
+                                        " and country_code = '" + countryCode + "' ";
+
                                 listCR = DB.findListBySql(sql);
                                 String everyDayPiForFourteenDays = "";
                                 if(listCR != null && listCR.size()>0){
@@ -263,8 +272,11 @@ public class CountryAnalysisReport extends HttpServlet {
                                 }
 
                                 sql = "select pi,a_cpa " +
-                                        " from web_ad_country_analysis_report_history where app_id = '" + appId + "' " +
-                                        " and country_code = '" + countryCode + "' and date = '" + endTime + "'";
+                                        " from web_ad_country_analysis_report_history where " +
+                                        " date = '" + endTime + "'" +
+                                        " and app_id = '" + appId + "' " +
+                                        " and country_code = '" + countryCode + "' ";
+
                                 oneC = DB.findOneBySql(sql);
                                 double pi = 0;
                                 double aCpa = 0;
@@ -302,7 +314,11 @@ public class CountryAnalysisReport extends HttpServlet {
                                 double arpu = activeUsers > 0 ? revenues / activeUsers : 0;
 
                                 sql = "SELECT avg(pi) as avg_pi FROM web_ad_country_analysis_report_history_by_date " +
-                                        "WHERE app_id = '" + appId + "' AND country_code = '" + countryCode + "' AND date BETWEEN '" + beforeTenDay + "' AND '" + beforeFourDay + "'";
+                                        "WHERE " +
+                                        " date BETWEEN '" + beforeTenDay + "' AND '" + beforeFourDay + "'" +
+                                        " and app_id = '" + appId + "' " +
+                                        " AND country_code = '" + countryCode + "'";
+
                                 oneC = DB.findOneBySql(sql);
                                 double sevenDaysAvgPi = 0;
                                 if(oneC.hasObjectData()){
@@ -326,7 +342,11 @@ public class CountryAnalysisReport extends HttpServlet {
 
                                 Set<String> biddingSet = new HashSet<>();
                                 sql = "SELECT DISTINCT bidding FROM web_ad_campaigns c,web_ad_campaigns_country_history ch " +
-                                        " WHERE c.campaign_id = ch.campaign_id AND c.tag_id = '"+tagId+"' AND country_code = '" + countryCode + "' AND date = '" + endTime + "'";
+                                        " WHERE c.campaign_id = ch.campaign_id " +
+                                        " AND date = '" + endTime + "'" +
+                                        " AND c.tag_id = '"+tagId+"' " +
+                                        " AND country_code = '" + countryCode + "'";
+
                                 List<JSObject> biddingList = DB.findListBySql(sql);
                                 if(biddingList.size() > 0){
                                     for(JSObject js : biddingList){
@@ -340,7 +360,10 @@ public class CountryAnalysisReport extends HttpServlet {
                                     }
                                 }
                                 sql = "SELECT DISTINCT bidding FROM web_ad_campaigns_admob c,web_ad_campaigns_country_history_admob ch " +
-                                        " WHERE c.campaign_id = ch.campaign_id AND c.tag_id = '"+tagId+"' AND country_code = '" + countryCode + "' AND date = '" + endTime + "'";
+                                        " WHERE c.campaign_id = ch.campaign_id " +
+                                        " AND date = '" + endTime + "'" +
+                                        " AND c.tag_id = '"+tagId+"' " +
+                                        " AND country_code = '" + countryCode + "'";
                                 biddingList = DB.findListBySql(sql);
                                 if(biddingList.size() > 0){
                                     for(JSObject js : biddingList){
