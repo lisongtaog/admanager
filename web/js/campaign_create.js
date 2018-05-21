@@ -27,13 +27,50 @@ function getExplodeParams(params, explodeParam) {    //这里的参数由reduce(
 //以下在Facebook表单的"广告系列名称"中拼凑 系列名称 字符串
 function generateFacebookCampaignName(params) {
     // var campaignName = [];
+    var publisherPlatformKeyValue = [{"name":"facebook","code":"FB"},{"name":"audience_network","code":"AN"},{"name":"messenger","code":"MS"}];
     if (!params) {
         params = {};
     }
     var dims = [];
     var appName = $('#selectApp').val();
     dims.push(appName);
-
+    var publisherPlatformsValue = $("#selectPublisherPlatforms").val();
+    if(params.publisherPlatforms) {
+        var pp = params.publisherPlatforms.split(",");
+        var code = [];
+        pp.forEach(function (cur) {
+            publisherPlatformKeyValue.forEach(function (current) {
+                if (current.name == cur) {
+                    code.push(current.code);
+                }
+            });
+        });
+        dims.push(code.join(","));
+    }else{
+        if(publisherPlatformsValue.length>0){
+            var code = [];
+            publisherPlatformsValue.forEach(function (cur) {
+                publisherPlatformKeyValue.forEach(function (current) {
+                    if (current.name == cur) {
+                        code.push(current.code);
+                    }
+                });
+            });
+            dims.push(code.join(","));
+        }
+    }
+    // }else{
+    //     var pp = publisherPlatformsValue.split(",");
+    //     var code = [];
+    //     pp.forEach(function(cur){
+    //         publisherPlatformKeyValue.forEach(function(current){
+    //             if(current.name==cur){
+    //                 code.push(current.code);
+    //             }
+    //         });
+    //     });
+    //     dims.push(code.join(","));
+    // }
     dims.push("Group_");
 
     var region = $('#selectRegion').val();
@@ -155,7 +192,7 @@ $('#checkFacebook').click(function () {
 /**
  * @param Array params 一个数组，存放所有的等待请求的参数,这里即
  * @param Function send 处理每一个参数的请求
- * @param onFinish 队列全部处理完成后，调用一下
+ * @param Function onFinish 队列全部处理完成后，调用一下
  **/
 function batchRequest(params, send, onFinish) {
     var idx = -1;
@@ -695,6 +732,7 @@ $('#btnCreate').click(function () {
     var bugdet = $('#inputBudget').val();
     var bidding = $('#inputBidding').val();
     var maxCPA = $('#inputMaxCpa').val();
+    var PublisherPlatforms = $("#selectPublisherPlatforms").val();
 
     //定位已经选了的广告系列，存进数组
     var checkedTr = $("#tbody_facebook input:checked").parent();
@@ -838,6 +876,18 @@ $('#btnCreate').click(function () {
             key:"adsGroup",
             values:adsGroup
         });
+        if($("#selectPublisherPlatformsExplode").prop("checked")){
+            explodeListImage.push({
+                key:"publisherPlatforms",
+                values:PublisherPlatforms
+            });
+        }else{
+            var PublisherPlatformsString = PublisherPlatforms.join(",");
+            explodeListImage.push({
+                key:"publisherPlatforms",
+                values:[PublisherPlatformsString]
+            });
+        }
     }
     var explodeListVideo = [];
     if($("#inputVideoPath").val()||$("#inputVideoPath").prop("checked")){
@@ -957,6 +1007,18 @@ $('#btnCreate').click(function () {
             key:"adsGroup",
             values:adsGroup
         });
+        if($("#selectPublisherPlatformsExplode").prop("checked")){
+            explodeListVideo.push({
+                key:"publisherPlatforms",
+                values:PublisherPlatforms
+            });
+        }else{
+            var PublisherPlatformsString = PublisherPlatforms.join(",");
+            explodeListVideo.push({
+                key:"publisherPlatforms",
+                values:[PublisherPlatformsString]
+            });
+        }
     }
 
     var explodeParamsImage = explodeListImage.length > 0 ? explodeListImage.reduce(function (params, explodeParam){
@@ -1011,7 +1073,8 @@ $('#btnCreate').click(function () {
                 region: p.region,
                 userOs: p.userOs,
                 userDevice: p.userDevice,
-                materialPath:p.materialPath //改为material_path ,在后台再根据正则表达式匹配系列名决定存image还是video
+                materialPath:p.materialPath, //改为material_path ,在后台再根据正则表达式匹配系列名决定存image还是video
+                publisherPlatforms:p.publisherPlatforms
             });
             onlyAutoCloned.explodeCountry = explodeCountry;
             onlyAutoCloned.explodeBidding = explodeBidding;
@@ -1056,7 +1119,8 @@ $('#btnCreate').click(function () {
                 region: p.region,
                 userOs: p.userOs,
                 userDevice: p.userDevice,
-                materialPath:p.materialPath
+                materialPath:p.materialPath,
+                publisherPlatforms:p.publisherPlatforms
             });
             cloned.groupId=p.adsGroup.groupId;
             cloned.title=p.adsGroup.title;

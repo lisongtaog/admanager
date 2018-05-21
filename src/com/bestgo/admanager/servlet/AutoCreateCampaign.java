@@ -328,6 +328,7 @@ public class AutoCreateCampaign extends HttpServlet {
             String explodeBidding = request.getParameter("explodeBidding");
             String identification = request.getParameter("identification");
             String materialPath = request.getParameter("materialPath");
+            String publisherPlatforms = request.getParameter("publisherPlatforms");
             String imagePath = new String();
             String videoPath = new String();
             if(identification.equals("image")){
@@ -359,6 +360,8 @@ public class AutoCreateCampaign extends HttpServlet {
                 result.message = "性别不能为空";
             }else if(region.isEmpty()){
                 result.message = "国家不能为空";
+            }else if(publisherPlatforms.isEmpty()){
+                result.message = "版位不能为空";
             }else {
                 double dBidding = Utils.parseDouble(bidding, 0);
                 Double maxBiddingDouble = Campaign.tagMaxBiddingRelationMap.get(appName);
@@ -438,6 +441,7 @@ public class AutoCreateCampaign extends HttpServlet {
                         .put("image_path", imagePath)
                         .put("video_path", videoPath)
                         .put("create_time", DateUtil.getNowTime())
+                        .put("publisher_platforms",publisherPlatforms)
                         .execute();
                 if (record) {
                     result.result = true;

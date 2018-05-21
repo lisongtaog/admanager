@@ -210,6 +210,16 @@
             </div>
         </div>
         <div class="form-group">
+            <label for="selectPublisherPlatforms" class="col-sm-2 control-label">版位</label>
+            <div class="col-sm-8">
+                <select class="form-control select2" id="selectPublisherPlatforms" multiple="multiple">
+                </select>
+            </div>
+            <div class="col-sm-2">
+                <label title="选中后每个选项创建一个或多个广告系列"><input type="checkbox" class="form-check-input" id="selectPublisherPlatformsExplode">分离到系列</label>
+            </div>
+        </div>
+        <div class="form-group">
             <label for="inputBudget" class="col-sm-2 control-label">预算</label>
             <div class="col-sm-10">
                 <input class="form-control" id="inputBudget" />

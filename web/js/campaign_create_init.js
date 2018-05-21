@@ -196,6 +196,9 @@ function init() {
         }
     }, 'json');
 
+    $("#selectPublisherPlatforms").html("<option value='facebook'>facebook</option><option value='audience_network'>audience_network</option>" +
+        "<option value='messenger'>messenger</option>");
+
     $('#formAdmob').hide();
 
 }
@@ -309,7 +312,7 @@ function indexInitFormData(isIndexCreate,campaign_id) {
                 alert("There's no data which campaign_id = "+campaign_id);
             }else{
                 if (campaignData.flag == "facebook") {
-                    $('#checkFacebook').prop('checked', true); //“Facebook广告”：prop()，设置属性checked为true
+                    $('#checkFacebook').prop('checked', true);
                     $('#checkAutoCreate').prop('checked', true);
 
 

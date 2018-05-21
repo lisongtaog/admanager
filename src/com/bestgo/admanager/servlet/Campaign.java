@@ -82,6 +82,7 @@ public class Campaign extends HttpServlet {
             String message = request.getParameter("message");
             String identification = request.getParameter("identification");
             String materialPath = request.getParameter("materialPath");
+            String publisherPlatforms = request.getParameter("publisherPlatforms");
             String imagePath = new String();
             String videoPath = new String();
             if(identification.equals("image")){
@@ -122,6 +123,8 @@ public class Campaign extends HttpServlet {
                     result.message = "性别不能为空";
                 }else if(region.isEmpty()){
                     result.message = "国家不能为空";
+                }else if(publisherPlatforms.isEmpty()){
+                    result.message = "版位不能为空";
                 }else {
                     double dBidding = Utils.parseDouble(bidding, 0);
                     Double maxBiddingDouble = tagMaxBiddingRelationMap.get(appName);
@@ -218,6 +221,7 @@ public class Campaign extends HttpServlet {
                                     .put("max_cpa", maxCPA)
                                     .put("user_devices", userDevice)
                                     .put("user_os", userOs)
+                                    .put("publisher_platforms", publisherPlatforms)
                                     .executeReturnId();
                             if(genId >0){
                                 boolean flag = false;
