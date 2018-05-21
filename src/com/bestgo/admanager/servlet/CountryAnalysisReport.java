@@ -97,14 +97,15 @@ public class CountryAnalysisReport extends HttpServlet {
                     long tagId = oneG.get("id");
                     if(appId != null){
                         JsonArray jsonArray = new JsonArray();
-                        String sql = "select country_code, sum(cost) as total_cost, sum(purchased_user) as total_purchased_user, " +
-                                "sum(total_installed) as installed, sum(today_uninstalled) as total_today_uninstalled, " +
-                                "sum(active_user) as active_users, sum(impression) as impressions, sum(revenue) as revenues, " +
-                                " (sum(revenue) - sum(cost)) as incoming, "+
-                                "(case when sum(impression) > 0 then sum(revenue) * 1000 / sum(impression) else 0 end) as ecpm,"+
-                                "(case when sum(purchased_user) > 0 then sum(cost) / sum(purchased_user) else 0 end) as cpa "+
-                                "from web_ad_country_analysis_report_history where app_id = '" + appId +"' " +
-                                "and date BETWEEN '" + startTime + "' AND '" + endTime + "' GROUP BY country_code";
+                        String sql = "SELECT arh.country_code, sum(cost) as total_cost, sum(purchased_user) as total_purchased_user," +
+                                " sum(total_installed) as installed, sum(today_uninstalled) as total_today_uninstalled," +
+                                " sum(active_user) as active_users, sum(impression) as impressions, sum(revenue) as revenues," +
+                                " (sum(revenue) - sum(cost)) as incoming," +
+                                " (case when sum(impression) > 0 then sum(revenue) * 1000 / sum(impression) else 0 end) as ecpm," +
+                                " (case when sum(purchased_user) > 0 then sum(cost) / sum(purchased_user) else 0 end) as cpa " +
+                                " from web_ad_country_analysis_report_history arh,app_country_code_dict ccd " +
+                                " where arh.country_code = ccd.country_code AND date BETWEEN '" + startTime + "' AND '" + endTime + "' " +
+                                " and app_id = '" + appId + "' GROUP BY arh.country_code";
 
                         int sorter = 0;
                         if (sorterId != null) {
