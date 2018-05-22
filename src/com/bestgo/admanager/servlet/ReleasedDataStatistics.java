@@ -23,6 +23,14 @@ import java.util.List;
  */
 @WebServlet(name = "ReleasedDataStatistics", urlPatterns = {"/released_data_statistics/*"}, asyncSupported = true)
 public class ReleasedDataStatistics extends HttpServlet {
+    private static final String[] filterApps = {"CleanV3", "WeatherV6", "PedometerV1", "PedometerV2", "BrowserV1", "AntivirusV3",
+    "WeatherV3", "WeatherV8", "WeatherV9", "WeatherV11", "AntivirusV1", "CleanerV1", "CleanerV2", "BatteryV2", "SecurityV3",
+    "BatteryV3", "SecurityV4", "BatteryV4", "Wifi", "Plusapplock", "ApplockV9", "ApplockV11", "VideoV9", "NewMusicV2",
+    "Callflash", "callflashV5", "CallflashV7", "CallflashV9", "RecorderV1", "VideoV7", "VideoV8", "ClockV1", "ClockV2", "FlashlightV35",
+    "VpnV2", "VpnV4", "VpnV5", "VpnV7", "VpnV8", "VpnV9", "BubbleV1", "HtSpiderV1", "999", "HtCollectionV1", "SudokuV3",
+    "SudokuV5", "pouplarsudoku", "SolitaireYang2", "SolitaireYang3", "BingoV3", "BingoV5", "SlotsV4", "WordsearchV3", "MahjongV1",
+    "CpVpn", "CpTimeback", "slimmer", "dressup", "CpAilsa", "CpBattery", "CpDressup", "Cptoyland", "SolitaireV15", "SolitaireV1",
+    "Solitairev12", "Solitairev13", "SolitaireV14", "SolitaireV15", "SlotsV2", "SlotsV5", "ReversiV1", "BarcodeV1", "BarcodeV3", "BarcodeV4"};
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         doPost(request, response);
@@ -71,6 +79,14 @@ public class ReleasedDataStatistics extends HttpServlet {
                             d.addProperty("team_name", teamName);
                             d.addProperty("category_name", categoryName);
                             String tagName = t.get("tag_name");
+                            boolean found = false;
+                            for (int ii = 0; ii < filterApps.length; ii++) {
+                                if (filterApps[ii].equalsIgnoreCase(tagName)) {
+                                    found = true;
+                                }
+                            }
+                            if (found) continue;
+
                             double anticipatedIncoming = t.get("anticipated_incoming");
                             double anticipatedRevenue = t.get("anticipated_revenue");
                             int userId = t.get("user_id");
