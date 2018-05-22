@@ -44,7 +44,6 @@ var appQueryData = [];
 var strFullPath = "";
 
 function init() {
-
     var now = new Date(new Date().getTime() - 86400 * 1000);
     $('#inputStartTime').val(now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + now.getDate());
     $('#inputEndTime').val(now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + now.getDate());
@@ -549,7 +548,6 @@ function setData(data) {
     }
     bindOp();
 }
-
 
 function bindOp() {
     $(".link_modify").click(function() {
@@ -1061,6 +1059,27 @@ function bindQueryZero() {
         }, "json");
     });
 }
+
+//由“标签”刷新路径
+$("#updateAppMaterialPath").click(function(){
+    var app_name_for_path = $("#inputSearch").val();
+    if(app_name_for_path){
+        $("#updateAppMaterialPath").prop("disabled",true);
+        $.post("update_app_material_path_rel",{
+            app_name:app_name_for_path
+        },function(data){
+            $("#updateAppMaterialPath").prop("disabled",false);
+            if(data.err==0){
+                admanager.showCommonDlg("提示",data.message);
+                setTimeout(function(){
+                    $("#common_message_dialog").modal("hide");
+                },1500);
+            }else{
+                admanager.showCommonDlg("提示",data.message);
+            }
+        },"json");
+    }
+});
 
 init();
 bindQueryZero();

@@ -77,6 +77,7 @@
             <input type="text" value="2012-05-15" id="inputEndTime" readonly>
             <span>标签</span>
             <input id="inputSearch" class="form-control" style="display: inline; width: auto;" type="text"/>
+            <button id="updateAppMaterialPath" class="btn btn-default glyphicon glyphicon-refresh" >路径</button>
             <span>国家</span>
             <input id="inputCountry" class="form-control" style="display: inline; width: auto;" type="text"/>
             <span>系列创建时间</span>
