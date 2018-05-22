@@ -35,14 +35,13 @@ public class UpdateAppImageVideoPathRel extends HttpServlet {
                     String configKey = config.get("config_key");
                     if ("fb_image_path".equals(configKey)){
                         String ParentPath = config.get("config_value");
-                        File file = new File(ParentPath);  //windows系统这里得到的是反斜杠 "\"
+                        File file = new File(ParentPath);
                         List<String> PathList = Utils.ergodicDirectory(file, new ArrayList<>(), false,true);
                         //截取，判图片，去重
                         HashSet<String> set = new HashSet<>();
                         if(PathList.size() > 0){
                             DB.delete("ad_app_image_path_rel").where(DB.filter().whereEqualTo("app_name", appName)).execute();
                             for(String imagePath : PathList){
-                                imagePath = imagePath.replace("\\","/");
                                 imagePath = imagePath.replace(ParentPath + "/","");
                                 imagePath = imagePath.substring(0,imagePath.lastIndexOf("/"));
                                 set.add(imagePath);
@@ -72,7 +71,6 @@ public class UpdateAppImageVideoPathRel extends HttpServlet {
                             //截取，判视频，去重
                             HashSet<String> set = new HashSet<>();
                             for(String videoPath : PathList){
-                                videoPath = videoPath.replace("\\","/");
                                 videoPath = videoPath.replace(ParentPath + "/","");
                                 videoPath =  videoPath.substring(0,videoPath.lastIndexOf("/"));
                                 set.add(videoPath);
