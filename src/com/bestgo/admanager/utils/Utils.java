@@ -234,19 +234,22 @@ public class Utils {
 
 
     /**
-     * 遍历某个目录，获取这个目录下的所有文件夹路径（和文件路径）
+     * 遍历某个目录，获取这个目录下的所有文件夹全路径和文件全路径
      * @param file
      * @param resultAll
-     * @param returnFile  如果为true，则返回所有文件夹路径和文件路径；如果为false，则只返回文件夹路径
+     * @param returnDirectory 如果为true，则返回所有文件夹全路径
+     * @param returnFile  如果为true，则返回所有文件全路径
      * @return
      */
-    public static List<String> ergodicDirectory(File file, List<String> resultAll, boolean returnFile){
+    public static List<String> ergodicDirectory(File file, List<String> resultAll, boolean returnDirectory,boolean returnFile){
         File[] files = file.listFiles();
         if(files == null) return resultAll;// 判断目录下是不是空的
         for (File f : files) {
             if(f.isDirectory()){// 判断是否是文件夹
-                resultAll.add(f.getPath());
-                ergodicDirectory(f,resultAll,returnFile);// 调用自身,查找子目录
+                if(returnDirectory){
+                    resultAll.add(f.getPath());
+                }
+                ergodicDirectory(f,resultAll,returnDirectory,returnFile);// 调用自身,查找子目录
             }else{
                 if(returnFile)
                     resultAll.add(f.getPath());
