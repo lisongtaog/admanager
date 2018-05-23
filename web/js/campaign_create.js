@@ -120,7 +120,7 @@ function generateFacebookCampaignName(params) {
             var imagePath = params.materialPath;
             dims.push(imagePath);
         }else if(params.identification == "video"){
-            var videoPath = params.materialPath.replace(/.*\//,"视频");
+            var videoPath = "视频" + params.materialPath;
             dims.push(videoPath);
         }
     } else {
