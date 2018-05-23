@@ -46,7 +46,9 @@ public class Campaign extends HttpServlet {
             for(JSObject j : list){
                 String currTagName = j.get("tag_name");
                 double currMaxBidding = Utils.convertDouble(j.get("max_bidding"),0);
-                tagMaxBiddingRelationMap.put(currTagName,currMaxBidding);
+                if (currMaxBidding > 0) {
+                    tagMaxBiddingRelationMap.put(currTagName, currMaxBidding);
+                }
             }
         }
     }
