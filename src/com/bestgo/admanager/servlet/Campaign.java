@@ -132,7 +132,9 @@ public class Campaign extends HttpServlet {
                         JSObject one = DB.findOneBySql("select max_bidding from web_tag where tag_name = '" + appName + "'");
                         if(one != null && one.hasObjectData()){
                             maxBiddingDouble = Utils.convertDouble(one.get("max_bidding"),0);
-                            tagMaxBiddingRelationMap.put(appName,maxBiddingDouble);
+                            if (maxBiddingDouble > 0) {
+                                tagMaxBiddingRelationMap.put(appName, maxBiddingDouble);
+                            }
                         }
                         if (maxBiddingDouble == null || maxBiddingDouble == 0) {
                             maxBiddingDouble = 0.01;
@@ -768,7 +770,9 @@ public class Campaign extends HttpServlet {
                         JSObject one = DB.findOneBySql("select max_bidding from web_tag where tag_name = '" + appName + "'");
                         if(one != null && one.hasObjectData()){
                             maxBiddingDouble = Utils.convertDouble(one.get("max_bidding"),0);
-                            tagMaxBiddingRelationMap.put(appName,maxBiddingDouble);
+                            if (maxBiddingDouble > 0) {
+                                tagMaxBiddingRelationMap.put(appName, maxBiddingDouble);
+                            }
                         }
                         if (maxBiddingDouble == null || maxBiddingDouble == 0) {
                             maxBiddingDouble = 0.01;

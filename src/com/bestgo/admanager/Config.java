@@ -38,7 +38,7 @@ public class Config {
     public static final String DPA_FEED_FILE_PATH = "dpa-feed-example.xml";
     public static final String CAMPAIGN_ID = "Your campaign ID";
 
-    public static final String ACCESS_TOKEN_URL = "https://www.facebook.com/v2.9/dialog/oauth?client_id=1353267041422321&redirect_uri=http://suijide.info&response_type=token+code&scope=ads_management";
+    public static final String ACCESS_TOKEN_URL = "https://www.facebook.com/v2.9/dialog/oauth?client_id=1353267041422321&redirect_uri=http://uugame.info&response_type=token+code&scope=ads_management";
 
 
     public static void setProxy() {
