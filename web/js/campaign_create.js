@@ -222,10 +222,10 @@ function initFormData() {
                 if (modifyNetwork == 'facebook') {
                     $('#checkFacebook').prop('checked', true);
                     $('#checkFacebook').click();
-
                     var campaignData = data.data;
                     var accountIds = campaignData.account_id.split(",");
                     $('#selectApp').val(campaignData.app_name);
+                    $("#selectApp").trigger("change");//确保路径能正确导入
                     $('#selectAccount').val(accountIds);
                     $('#selectAccount').trigger('change');
                     $("#inputCreateCount").val(campaignData.create_count);
@@ -250,8 +250,12 @@ function initFormData() {
                     $('#inputMaxCpa').val(campaignData.max_cpa);
                     $('#inputTitle').val(campaignData.title);
                     $('#inputMessage').val(campaignData.message);
+                    //填入相对路径
                     var imageTrimed = campaignData.image_path.replace(/home\/\w+\/\w+\/\w+\//,"");
                     $('#inputImagePath').val(imageTrimed);
+                    var videoTrimed = campaignData.video_path.replace(/home\/\w+\/\w+\/\w+\//,"");
+                    $("#inputVideoPath").val(videoTrimed);
+
                     $('#inputCampaignName').val(campaignData.campaign_name);
 
                     $('#btnCreate').val('更新');
@@ -263,10 +267,10 @@ function initFormData() {
                 } else {
                     $('#checkAdmob').prop('checked', true);
                     $('#checkAdmob').click();
-
                     var campaignData = data.data;
                     var accountIds = campaignData.account_id.split(",");
                     $('#selectAppAdmob').val(campaignData.app_name);
+                    $("#selectAppAdmob").trigger("change"); //确保路径正确导入
                     $('#selectAccountAdmob').val(accountIds);
                     $('#selectAccountAdmob').trigger('change');
                     $("#inputCreateCountAdmob").val(campaignData.create_count);
@@ -284,8 +288,10 @@ function initFormData() {
                     $('#inputMessage2').val(campaignData.message2);
                     $('#inputMessage3').val(campaignData.message3);
                     $('#inputMessage4').val(campaignData.message4);
+                    
                     var imageTrimed = campaignData.image_path.replace(/home\/\w+\/\w+\/\w+\//,"");
                     $('#inputImagePathAdmob').val(imageTrimed);
+
                     $('#inputCampaignNameAdmob').val(campaignData.campaign_name);
 
                     $('#btnCreateAdmob').val('更新');
@@ -314,7 +320,6 @@ function indexInitFormData(isIndexCreate,campaign_id) {
                 if (campaignData.flag == "facebook") {
                     $('#checkFacebook').prop('checked', true);
                     $('#checkAutoCreate').prop('checked', true);
-
 
                     $('#selectApp').val(campaignData.app_name);
 
