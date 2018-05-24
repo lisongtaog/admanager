@@ -477,8 +477,10 @@ public class AutoCreateCampaign extends HttpServlet {
             String groupId = request.getParameter("groupId");
             String title = request.getParameter("title");
             String message = request.getParameter("message");
-            String imagePath = request.getParameter("imagePath");
-            String videoPath = request.getParameter("videoPath");
+//            String imagePath = request.getParameter("imagePath");
+//            String videoPath = request.getParameter("videoPath");
+            String materialPath = request.getParameter("materialPath");
+            String identification = request.getParameter("identification");
             String region = request.getParameter("region");
             String age = request.getParameter("age");
             String gender = request.getParameter("gender");
@@ -487,13 +489,20 @@ public class AutoCreateCampaign extends HttpServlet {
             String explodeAge = request.getParameter("explodeAge");
             String explodeGender = request.getParameter("explodeGender");
             String explodeBidding = request.getParameter("explodeBidding");
-
+            String imagePath = new String();
+            String videoPath = new String();
+            if(identification.equals("image")){
+               imagePath = materialPath;
+               videoPath = "";
+            }else{
+               videoPath = materialPath;
+               imagePath = "";
+            }
             result.result = true;
             JSObject record = DB.simpleScan("web_system_config").select("config_value").where(DB.filter().whereEqualTo("config_key", "fb_image_path")).execute();
-            String imageRoot = null;
-            if (record.hasObjectData()) {
-                imageRoot = record.get("config_value");
-            }
+            String imageRoot = record.get("config_value");
+            record = DB.simpleScan("web_system_config").select("config_value").where(DB.filter().whereEqualTo("config_key", "fb_video_path")).execute();
+            String videoRoot = record.get("config_value");
             if (createCount.isEmpty()) {
                 result.result = false;
                 result.message = "创建数量不能为空";
@@ -533,10 +542,18 @@ public class AutoCreateCampaign extends HttpServlet {
                 result.message = "bidding超过了0.5,   " + bidding;
             }
 
-            File imagesPath = new File(imageRoot + File.separatorChar + imagePath);
-            if (!imagesPath.exists()) {
-                result.result = false;
-                result.message = "图片路径不存在";
+            if(identification.equals("image")){
+                File imagesPath = new File(imageRoot + File.separatorChar + materialPath);
+                if (!imagesPath.exists()) {
+                    result.result = false;
+                    result.message = "图片路径不存在";
+                }
+            }else if(identification.equals("video")){
+                File videosPath = new File(videoRoot+File.separatorChar + materialPath);
+                if (!videosPath.exists()) {
+                    result.result = false;
+                    result.message = "视频路径不存在";
+                }
             }
             if (campaignName.length() > 100) {
                 campaignName = campaignName.substring(0, 100);
