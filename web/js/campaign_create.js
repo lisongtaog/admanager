@@ -256,8 +256,6 @@ function initFormData() {
                     var videoTrimed = campaignData.video_path.replace(/home\/\w+\/\w+\/\w+\//,"");
                     $("#inputVideoPath").val(videoTrimed);
 
-                    $('#inputCampaignName').val(campaignData.campaign_name);
-
                     $('#btnCreate').val('更新');
                     $(".form-check-input").prop("checked",false);
                     $(".form-check-input").prop("disabled",true);
@@ -291,8 +289,6 @@ function initFormData() {
                     
                     var imageTrimed = campaignData.image_path.replace(/home\/\w+\/\w+\/\w+\//,"");
                     $('#inputImagePathAdmob').val(imageTrimed);
-
-                    $('#inputCampaignNameAdmob').val(campaignData.campaign_name);
 
                     $('#btnCreateAdmob').val('更新');
                     $(".form-check-input").prop("checked",false);
@@ -336,8 +332,6 @@ function indexInitFormData(isIndexCreate,campaign_id) {
                     $('#inputBidding').val(IndexBidding);
                     $('#inputBiddingExplode').prop('checked', campaignData.explode_bidding == 1);
 
-                    $('#inputCampaignName').val(campaignData.campaign_name);
-
                     $("#selectGender").val(campaignData.gender.split(','));
                     $("#selectGender").trigger('change');
                     $("#inputAge").val(campaignData.age);
@@ -353,8 +347,6 @@ function indexInitFormData(isIndexCreate,campaign_id) {
                     $('#selectAccountAdmob').trigger('change');
 
                     $("#inputCreateCountAdmob").val(1);
-
-                    $('#inputCampaignNameAdmob').val(campaignData.campaign_name);
 
                     $('#inputBudgetAdmob').val(IndexBudget);
                     $('#inputBiddingAdmob').val(IndexBidding);
@@ -438,20 +430,9 @@ function generateFacebookCampaignName(params) {
             dims.push(code.join(","));
         }
     }
-    // }else{
-    //     var pp = publisherPlatformsValue.split(",");
-    //     var code = [];
-    //     pp.forEach(function(cur){
-    //         publisherPlatformKeyValue.forEach(function(current){
-    //             if(current.name==cur){
-    //                 code.push(current.code);
-    //             }
-    //         });
-    //     });
-    //     dims.push(code.join(","));
-    // }
-    dims.push("Group_");
-
+    if(params.groupId){
+        dims.push("Group"+ params.groupId)
+    }
     var region = $('#selectRegion').val();
     var countryAlisa = $('#selectRegion')[0].countryAlisa;
     if (countryAlisa) {
@@ -517,9 +498,9 @@ function generateAdmobCampaignName(params) {
     var dims = [];
     var now = new Date();
     dims.push($('#selectAppAdmob').val());
-
-    dims.push("Group_");
-
+    if(params.groupId){
+        dims.push("Group"+ params.groupId)
+    }
     var region = $('#selectRegionAdmob option:selected').text();
     var countryAlisa = $('#selectRegionAdmob')[0].countryAlisa;
     if (params.region) {
@@ -825,257 +806,8 @@ $("#checkbox_admob").click(function(){
     }
 });
 
-//以下用于读取admob表单数据（手动输入时）
-$('#btnCreateAdmob').click(function () {
-    var appName = $('#selectAppAdmob').val();
-    var selectOptionsAdmob = $('#selectAccountAdmob option:selected');
-    var accountNameAdmob = [];
-    var accountIdAdmob = [];
-    selectOptionsAdmob.each(function () {
-        accountNameAdmob.push($(this).text());
-        accountIdAdmob.push($(this).val());
-    });
-    var createCountAdmob = $('#inputCreateCountAdmob').val();
-
-    var region = $('#selectRegionAdmob').val();
-    var excludedRegion = $('#selectRegionUnselectedAdmob').val();
-    var language = $('#selectLanguageAdmob').val();
-    var conversion_id = $('#selectIncidentAdmob').val();
-    var campaignName = $('#inputCampaignNameAdmob').val();
-    var bugdet = $('#inputBudgetAdmob').val();
-    var bidding = $('#inputBiddingAdmob').val();
-    var maxCPA = $('#inputMaxCpaAdmob').val();
-
-    //得到选中行的广告语信息
-    var checkedTr = $("#tbody_admob input:checked").parent();
-    var adsGroup = [];
-    checkedTr.each(function(idx){
-        var group = {};
-        group.groupId = $(this).children("td:eq(0)").text();
-        group.message1 = $(this).children("td:eq(2)").text();
-        group.message2 = $(this).children("td:eq(3)").text();
-        group.message3 = $(this).children("td:eq(4)").text();
-        group.message4 = $(this).children("td:eq(5)").text();
-        adsGroup.push(group);
-    });
-
-    var imagePath = $('#inputImagePathAdmob').val();
-
-    var app = null;
-    for (var i = 0; i < appList.length; i++) {
-        if (appList[i].tag_name == appName) {
-            app = appList[i];
-            break;
-        }
-    }
-
-    //处理分离到国家的字段
-    var explodeList = [];//{key:x, values:[]}
-    if ($("#selectRegionAdmobExplode").prop("checked")) {
-        explodeList.push({
-            key: 'region',
-            values: region.map(function (x) {
-                return x.trim();
-            })
-        })
-    } else {
-        explodeList.push({
-            key: 'region',
-            values: [region.join(",")]
-        })
-    }
-    if(isAutoCreate && modifyRecordId>0){
-        $("#inputBiddingAdmobExplode").prop("checked",false);
-    }else if (!$("#inputBiddingAdmobExplode").prop("checked") && bidding.indexOf(",") !== -1) {
-        admanager.showCommonDlg("错误", "不分离的情况下不允许出价多选");
-        return false;
-    }
-    if($("#inputBiddingAdmobExplode").prop("checked")){
-        explodeList.push({
-            key: 'bidding',
-            values: bidding.split(",").map(function (x) {
-                return x.trim();
-            })
-        });
-    }else{
-        explodeList.push({
-            key: 'bidding',
-            values: [bidding]
-        });
-    }
-    //处理图片路径
-    if($("#inputImageAdmobExplode").prop("checked")) {
-        var valueList = imagePath.trim().replace(/,$/, "").split(",");    //确保正确地切分为数组
-        explodeList.push({
-            key: 'imagePath',
-            values: valueList
-        });
-    }else{
-        var valueStr = imagePath.trim().replace(/,$/, "");
-        explodeList.push({
-            key: 'imagePath',
-            values:[valueStr]
-        });
-    }
-    explodeList.push({
-        key:"adsGroup",
-        values:adsGroup
-    });
-
-    var explodeParams = explodeList.length > 0 ? explodeList.reduce(function (params, explodeParam) {
-        return getExplodeParams(params, explodeParam);
-    }, []) : [];
-
-    var baseParam = {
-        appName: appName,
-        accountId: accountIdAdmob.join(","),
-        accountName: accountNameAdmob.join(","),
-        createCount: createCountAdmob,
-        campaignName: campaignName,
-        //region: region.join(','),
-        excludedRegion: excludedRegion.join(','),
-        language: language,
-        conversion_id: conversion_id,
-        bugdet: bugdet,
-        //bidding: bidding,
-        gpPackageId: app.google_package_id,
-        maxCPA: maxCPA,
-    }
-//弹一个进度条出来
-    var onlyAutoCreateCheck = $('#onlyCheckAdmobAutoCreate').prop('checked');
-    if (onlyAutoCreateCheck) {
-        var onlyAutoRequestPool = [];
-        var explodeCountry = $("#selectRegionAdmobExplode").prop("checked");  //这两个量是选中【仅设为自动创建】特有的
-        var explodeBidding = $("#inputBiddingAdmobExplode").prop("checked");
-        var url = "auto_create_campaign/adwords/create";
-        if (isAutoCreate && modifyRecordId > 0) {
-            baseParam.id = modifyRecordId;   //这个是另外新增的字段
-            url = "auto_create_campaign/adwords/modify";
-        }
-        explodeParams.forEach(function (p) {
-            var onlyAutoCloned = $.extend({}, baseParam);
-            $.extend(onlyAutoCloned, p);
-            onlyAutoCloned.campaignName = generateAdmobCampaignName({  //动态生成系列名字
-                bidding: p.bidding,
-                region: p.region,
-                imagePath:p.imagePath
-            });
-            onlyAutoCloned.explodeCountry = explodeCountry;
-            onlyAutoCloned.explodeBidding = explodeBidding;
-            onlyAutoCloned.groupId = p.adsGroup.groupId;
-            onlyAutoCloned.message1 = p.adsGroup.message1;
-            onlyAutoCloned.message2 = p.adsGroup.message2;
-            onlyAutoCloned.message3 = p.adsGroup.message3;
-            onlyAutoCloned.message4 = p.adsGroup.message4;
-            onlyAutoRequestPool.push(onlyAutoCloned);
-        });
-        // 以下if是使用 campaigns_create.jsp页面传来的数据决定新的url 和 参数id
-        batchRequest(onlyAutoRequestPool, function (param, onSuccess, onFail) {
-            //fake
-            // console.log("start.. ", param);
-            $.post(url, param, function (data) {
-                if (data && data.ret == 1) {
-                    onSuccess();
-                } else {
-                    onFail(data.message)
-                }
-            }, "json");
-        }, function (errorLog) {
-            //[仅设置为自动创建]队列全部处理完成
-            layer.tips("仅自动创建队列处理完毕","#btnCreateAdmob",{tips:1,time:2000});
-        });
-
-    }else {
-        var requestPool = [];
-        explodeParams.forEach(function (p) {
-            var cloned = $.extend({}, baseParam);
-            $.extend(cloned, p);
-            cloned.campaignName = generateAdmobCampaignName({
-                bidding: p.bidding,
-                region: p.region,
-                imagePath:p.imagePath
-            });
-            cloned.groupId = p.adsGroup.groupId;
-            cloned.message1 = p.adsGroup.message1;
-            cloned.message2 = p.adsGroup.message2;
-            cloned.message3 = p.adsGroup.message3;
-            cloned.message4 = p.adsGroup.message4;
-            requestPool.push(cloned);
-        });
-        var bFinished = false;
-        batchRequest(requestPool, function (param, onSuccess, onFail) {  //param是怎么传递进去的
-            //fake
-            console.log("start.. ", param);
-            /*setTimeout(function(){
-             if( Math.random()< 0.5){
-             onSuccess();
-             }else{
-             onFail("随机错误");
-             }
-             },100);*/
-
-            $.post("campaign_admob/create", param, function (data) {
-                if (data && data.ret == 1) {
-                    onSuccess();
-                } else {
-                    onFail(data.message)
-                }
-            }, "json");
-
-        }, function (errorLog) {
-            //队列全部处理完成
-            var checked = $('#checkAdmobAutoCreate').prop('checked');
-            if (checked && !bFinished && errorLog && errorLog.length == 0) {
-                // bFinished = true;
-                var onlyAutoRequestPool = [];
-                var explodeCountry = $("#selectRegionAdmobExplode").prop("checked");
-                var explodeBidding = $("#inputBiddingAdmobExplode").prop("checked");
-                explodeParams.forEach(function (p) {
-                    var onlyAutoCloned = $.extend({}, baseParam);
-                    $.extend(onlyAutoCloned, p);
-                    onlyAutoCloned.campaignName = generateAdmobCampaignName({  //动态生成系列名字
-                        bidding: p.bidding,
-                        region: p.region,
-                        imagePath:p.imagePath
-                    });
-                    onlyAutoCloned.explodeCountry = explodeCountry;
-                    onlyAutoCloned.explodeBidding = explodeBidding;
-                    onlyAutoCloned.groupId = p.adsGroup.groupId;
-                    onlyAutoCloned.message1 = p.adsGroup.message1;
-                    onlyAutoCloned.message2 = p.adsGroup.message2;
-                    onlyAutoCloned.message3 = p.adsGroup.message3;
-                    onlyAutoCloned.message4 = p.adsGroup.message4;
-                    onlyAutoRequestPool.push(onlyAutoCloned);
-                });
-                var url = "auto_create_campaign/adwords/create";
-                // var messageBody = "创建成功";
-                if (isAutoCreate && modifyRecordId > 0) {
-                    baseParam.id = modifyRecordId;
-                    url = "auto_create_campaign/adwords/modify";
-                }
-                batchRequest(onlyAutoRequestPool, function (param, onSuccess, onFail) {
-                    //fake
-                    console.log("start.. ", param);
-                    $.post(url, param, function (data) {
-                        if (data && data.ret == 1) {
-                            onSuccess();
-                        } else {
-                            onFail(data.message)
-                        }
-                    }, "json");
-
-                }, function (errorLog) {
-                    //[设置为自动创建]队列全部处理完成
-                    layer.tips("自动创建队列处理完毕","#btnCreate",{tips:1,time:3000});
-                });
-            }
-        });
-    }
-
-    return false;
-});
-//以下触发读取facebook表单数据的行为
-$('#btnCreate').click(function () {
+//读取并分离Facebook表单数据
+function FacebookFormReading(){
     var appName = $('#selectApp').val();
     var selectOptions = $('#selectAccount option:selected');
     var accountName = [];
@@ -1094,7 +826,6 @@ $('#btnCreate').click(function () {
     var interest = $('#inputInterest').val();
     var userOs = $('#selectUserOs').val();
     var userDevice = $('#inputUserDevices').val();
-    //var campaignName = $('#inputCampaignName').val();
     var bugdet = $('#inputBudget').val();
     var bidding = $('#inputBidding').val();
     var maxCPA = $('#inputMaxCpa').val();
@@ -1122,13 +853,46 @@ $('#btnCreate').click(function () {
         }
     }
 
-    //处理分离到国家的字段
+    //“分离到系列”作数组处理
     var explodeListImage = [];//{key:x, values:[]}
     //从图片路径和视频路径开始把List分裂
     if($("#inputImagePath").val()||$("#inputImagePath").prop("checked")){
         explodeListImage.push({
             key:"identification",
             values:["image"]
+        },{
+            key:"appName",
+            values:[appName]
+        },{
+            key:"accountName",
+            values:[accountName.join(",")]
+        },{
+            key:"accountId",
+            values:[accountId.join(",")]
+        },{
+            key:"createCount",
+            values:[createCount]
+        },{
+            key:"excludedRegion",
+            values:[excludedRegion.join(",")]
+        },{
+            key:"language",
+            values:[language]
+        },{
+            key:"interest",
+            values:[interest]
+        },{
+            key:"bugdet",
+            values:[bugdet]
+        },{
+            key:"maxCPA",
+            values:[maxCPA]
+        },{
+            key:"appId",
+            values:[app.fb_app_id]
+        },{
+            key:"pageId",
+            values:[app.page_id]
         });
         if ($("#selectRegionExplode").prop("checked")) {
             explodeListImage.push({
@@ -1260,6 +1024,39 @@ $('#btnCreate').click(function () {
         explodeListVideo.push({
             key:"identification",
             values:["video"]
+        },{
+            key:"appName",
+            values:[appName]
+        },{
+            key:"accountName",
+            values:[accountName.join(",")]
+        },{
+            key:"accountId",
+            values:[accountId.join(",")]
+        },{
+            key:"createCount",
+            values:[createCount]
+        },{
+            key:"excludedRegion",
+            values:[excludedRegion.join(",")]
+        },{
+            key:"language",
+            values:[language]
+        },{
+            key:"interest",
+            values:[interest]
+        },{
+            key:"bugdet",
+            values:[bugdet]
+        },{
+            key:"maxCPA",
+            values:[maxCPA]
+        },{
+            key:"appId",
+            values:[app.fb_app_id]
+        },{
+            key:"pageId",
+            values:[app.page_id]
         });
         if ($("#selectRegionExplode").prop("checked")) {
             explodeListVideo.push({
@@ -1386,7 +1183,6 @@ $('#btnCreate').click(function () {
             });
         }
     }
-
     var explodeParamsImage = explodeListImage.length > 0 ? explodeListImage.reduce(function (params, explodeParam){
         return getExplodeParams(params, explodeParam);
     }, []) : [];
@@ -1394,28 +1190,26 @@ $('#btnCreate').click(function () {
         return getExplodeParams(params, explodeParam);
     }, []) : [];
     var explodeParams = explodeParamsImage.concat(explodeParamsVideo);
-
+    explodeParams.forEach(function(p){
+        p.campaignName = generateFacebookCampaignName({
+            identification:p.identification,
+            age: p.age,
+            gender: p.gender,
+            bidding: p.bidding,
+            region: p.region,
+            userOs: p.userOs,
+            userDevice: p.userDevice,
+            materialPath:p.materialPath, //改为material_path ,在后台再根据正则表达式匹配系列名决定存image还是video
+            publisherPlatforms:p.publisherPlatforms,
+            groupId:p.adsGroup.groupId
+        });
+    });
+    return explodeParams;
+}
+//创建facebook系列
+$('#btnCreate').click(function () {
+    var explodeParams = FacebookFormReading();
     //用 explodeParams 构造新的请求
-    var baseParam = {
-        appName: appName,
-        appId: app.fb_app_id,
-        accountName: accountName.join(","),
-        accountId: accountId.join(","),
-        createCount: createCount,
-        pageId: app.page_id,
-        //region: region.join(","),
-        excludedRegion: excludedRegion.join(","),
-        language: language,
-        //age: age,
-        //gender: gender,
-        interest: interest,
-//                userOs: userOs,
-//                userDevice: userDevice,
-        campaignName: "",
-        bugdet: bugdet,
-        //bidding: bidding,
-        maxCPA: maxCPA,
-    };
     var onlyAutoCreateCheck = $('#onlyCheckAutoCreate').prop('checked');
     if (onlyAutoCreateCheck) {
         var onlyAutoRequestPool = [];
@@ -1425,23 +1219,14 @@ $('#btnCreate').click(function () {
         var explodeBidding = $("#inputBiddingExplode").prop("checked");
         var url = "auto_create_campaign/facebook/create";
         if (isAutoCreate && modifyRecordId > 0) {
-            baseParam.id = modifyRecordId;
+            explodeParams.forEach(function(p){
+                p.id = modifyRecordId;
+            });
             url = "auto_create_campaign/facebook/modify";
         }
         explodeParams.forEach(function (p) {
-            var onlyAutoCloned = $.extend({}, baseParam);
+            var onlyAutoCloned = {};
             $.extend(onlyAutoCloned, p);
-            onlyAutoCloned.campaignName = generateFacebookCampaignName({
-                identification:p.identification,
-                age: p.age,
-                gender: p.gender,
-                bidding: p.bidding,
-                region: p.region,
-                userOs: p.userOs,
-                userDevice: p.userDevice,
-                materialPath:p.materialPath, //改为material_path ,在后台再根据正则表达式匹配系列名决定存image还是video
-                publisherPlatforms:p.publisherPlatforms
-            });
             onlyAutoCloned.explodeCountry = explodeCountry;
             onlyAutoCloned.explodeBidding = explodeBidding;
             onlyAutoCloned.explodeAge = explodeAge;
@@ -1451,130 +1236,384 @@ $('#btnCreate').click(function () {
             onlyAutoCloned.message=p.adsGroup.message;
             onlyAutoRequestPool.push(onlyAutoCloned);
         });
-        //function(param,onSuccess,onFail)整个函数体作为一个对象传递给了 batchRequest(params,send,onFinish)的 send参数
-        //但 这里的 onSuccess 和 onFail 都只是一个形式上的函数，真正执行的方法体在batchRequest(params,send,onFinish)内部
-        batchRequest(onlyAutoRequestPool, function (param, onSuccess, onFail) {
-            //fake
-            console.log("start.. ", param);
-            $.post(url, param, function (data) {
-                if (data && data.ret == 1) {
-                    onSuccess();
-                }else {
-                    onFail(data.message)
-                }
-            }, "json");
-        }, function (errorLog) {
-            //[仅设置为自动创建]队列全部处理完成
-            if(isAutoCreate && modifyRecordId > 0){
-                layer.tips("更新队列处理完毕","#btnCreate",{tips:1,time:3000});
-            }else{
-                layer.tips("自动创建队列处理完毕","#btnCreate",{tips:1,time:3000});
+        confirmModal.showCampaignConfirm(onlyAutoRequestPool,"仅设为自动创建");
+        //confirmModal.showCampaignConfirm()执行完以后会接着执行下面的代码
+        $("#confirmed_campaign_creation").off("click").on("click",function(){
+            var input = $("#campaign_confirm_table_body input");
+            if(input.length>0){
+                input.each(function(idx){
+                    var value = $(this).val();
+                    var trIdx = $(this).parents("tr").attr("id").replace(/\D+/,"");
+                    var poolIdx = parseInt(trIdx);
+                    onlyAutoRequestPool[poolIdx]["campaignName"] = value;
+                });
             }
+            $("#campaign_confirm_dialog").modal("hide");
+            batchRequest(onlyAutoRequestPool, function (param, onSuccess, onFail) {
+                //fake
+                console.log("start.. ", param);
+                $.post(url, param, function (data) {
+                    if (data && data.ret == 1) {
+                        onSuccess();
+                    }else {
+                        onFail(data.message)
+                    }
+                }, "json");
+            }, function (errorLog) {
+                //[仅设置为自动创建]队列全部处理完成
+                if(isAutoCreate && modifyRecordId > 0){
+                    layer.tips("更新队列处理完毕","#btnCreate",{tips:1,time:3000});
+                }else{
+                    layer.tips("自动创建队列处理完毕","#btnCreate",{tips:1,time:3000});
+                }
+            });
         });
-    } else {
-//弹一个进度条出来
+    } else {   //这里还没改
         var requestPool = [];
         explodeParams.forEach(function (p) {    //拆分好的键值对数组
-            var cloned = $.extend({}, baseParam);
+            var cloned = {};
             $.extend(cloned, p);
-            cloned.campaignName = generateFacebookCampaignName({
-                identification:p.identification,
-                age: p.age,
-                gender: p.gender,
-                bidding: p.bidding,
-                region: p.region,
-                userOs: p.userOs,
-                userDevice: p.userDevice,
-                materialPath:p.materialPath,
-                publisherPlatforms:p.publisherPlatforms
-            });
             cloned.groupId=p.adsGroup.groupId;
             cloned.title=p.adsGroup.title;
             cloned.message=p.adsGroup.message;
             requestPool.push(cloned);
         });
         var bFinished = false;
-        batchRequest(requestPool, function (param, onSuccess, onFail) {
-            //fake
-            console.log("start.. ", param);
-            $.post("campaign/create", param, function (data) {
-                if (data && data.ret == 1) {
-                    onSuccess()
-                } else {
-                    onFail(data.message)
-                }
-            }, "json");
-
-        }, function (errorLog) {
-            //队列全部处理完成
-            var checked = $('#checkAutoCreate').prop('checked');
-            if (checked && !bFinished && errorLog && errorLog.length == 0) {
-                // bFinished = true;
-                var onlyAutoRequestPool = [];
-                var explodeCountry = $("#selectRegionExplode").prop("checked");
-                var explodeAge = $("#inputAgeExplode").prop("checked");
-                var explodeGender = $("#selectGenderExplode").prop("checked");
-                var explodeBidding = $("#inputBiddingExplode").prop("checked");
-                var autoCreateParams = $.extend({}, baseParam);
-                var url = "auto_create_campaign/facebook/create";
-                if (isAutoCreate && modifyRecordId > 0) {
-                    autoCreateParams.id = modifyRecordId;
-                    url = "auto_create_campaign/facebook/modify";
-                }
-                // var messageBody = "创建成功";
-                explodeParams.forEach(function (p) {
-                    var onlyAutoCloned = $.extend({}, baseParam);
-                    $.extend(onlyAutoCloned, p);
-                    onlyAutoCloned.campaignName = generateFacebookCampaignName({
-                        identification:p.identification,
-                        age: p.age,
-                        gender: p.gender,
-                        bidding: p.bidding,
-                        region: p.region,
-                        userOs: p.userOs,
-                        userDevice: p.userDevice,
-                        materialPath:p.materialPath
-                    });
-                    onlyAutoCloned.explodeCountry = explodeCountry;
-                    onlyAutoCloned.explodeBidding = explodeBidding;
-                    onlyAutoCloned.explodeAge = explodeAge;
-                    onlyAutoCloned.explodeGender=explodeGender;
-                    onlyAutoCloned.groupId=p.adsGroup.groupId;
-                    onlyAutoCloned.title=p.adsGroup.title;
-                    onlyAutoCloned.message=p.adsGroup.message;
-                    onlyAutoRequestPool.push(onlyAutoCloned);
-                });
-                batchRequest(onlyAutoRequestPool, function (param, onSuccess, onFail) {
-                    //fake
-                    console.log("start.. ", param);
-                    $.post(url, param, function (data) {
-                        if (data && data.ret == 1) {
-                            onSuccess();
-                        } else {
-                            onFail(data.message)
-                        }
-                    }, "json");
-                }, function () {
-                    //[仅设置为自动创建]队列全部处理完成
-                    layer.tips("自动创建队列处理完毕","#btnCreate",{tips:1,time:3000});
+        confirmModal.showCampaignConfirm(requestPool,"设置为自动创建");
+        $("#confirmed_campaign_creation").off("click").on("click",function(){
+            var input = $("#campaign_confirm_table_body input");
+            if(input.length>0){
+                input.each(function(idx){
+                    var value = $(this).val();
+                    var trIdx = $(this).parents("tr").attr("id").replace(/\D+/,"");
+                    var poolIdx = parseInt(trIdx);
+                    requestPool[poolIdx]["campaignName"] = value;
                 });
             }
+            $("#campaign_confirm_dialog").modal("hide");
+            batchRequest(requestPool, function (param, onSuccess, onFail) {
+                //fake
+                console.log("start.. ", param);
+                $.post("campaign/create", param, function (data) {
+                    if (data && data.ret == 1) {
+                        onSuccess()
+                    } else {
+                        onFail(data.message)
+                    }
+                }, "json");
+
+            }, function (errorLog) {
+                //队列全部处理完成
+                var checked = $('#checkAutoCreate').prop('checked');
+                if (checked && !bFinished && errorLog && errorLog.length == 0) {
+                    // bFinished = true;
+                    var AutoRequestPool = [];
+                    var url = "auto_create_campaign/facebook/create";
+                    if (isAutoCreate && modifyRecordId > 0) {
+                        requestPool.forEach(function(p){
+                            p.push({
+                                key:id,
+                                values:modifyRecordId
+                            });
+                        });
+                        url = "auto_create_campaign/facebook/modify";
+                    }
+                    // var messageBody = "创建成功";
+                    requestPool.forEach(function (p) {
+                        var AutoCloned = {};
+                        $.extend(AutoCloned, p);
+                        AutoCloned.explodeCountry = $("#selectRegionExplode").prop("checked");
+                        AutoCloned.explodeBidding = $("#inputBiddingExplode").prop("checked");
+                        AutoCloned.explodeAge = $("#inputAgeExplode").prop("checked");
+                        AutoCloned.explodeGender= $("#selectGenderExplode").prop("checked");
+                        AutoRequestPool.push(AutoCloned);
+                    });
+                    batchRequest(AutoRequestPool, function (param, onSuccess, onFail) {
+                        //fake
+                        console.log("start.. ", param);
+                        $.post(url, param, function (data) {
+                            if (data && data.ret == 1) {
+                                onSuccess();
+                            } else {
+                                onFail(data.message)
+                            }
+                        }, "json");
+                    }, function () {
+                        //[仅设置为自动创建]队列全部处理完成
+                        layer.tips("自动创建队列处理完毕","#btnCreate",{tips:1,time:3000});
+                    });
+                }
+            });
         });
     }
     return false;
 });
+//读取并分离adwords表单数据
+function AdwordFormReading(){
+    var appName = $('#selectAppAdmob').val();
+    var selectOptionsAdmob = $('#selectAccountAdmob option:selected');
+    var accountNameAdmob = [];
+    var accountIdAdmob = [];
+    selectOptionsAdmob.each(function () {
+        accountNameAdmob.push($(this).text());
+        accountIdAdmob.push($(this).val());
+    });
+    var createCountAdmob = $('#inputCreateCountAdmob').val();
+    var region = $('#selectRegionAdmob').val();
+    var excludedRegion = $('#selectRegionUnselectedAdmob').val();
+    var language = $('#selectLanguageAdmob').val();
+    var conversion_id = $('#selectIncidentAdmob').val();
+    var bugdet = $('#inputBudgetAdmob').val();
+    var bidding = $('#inputBiddingAdmob').val();
+    var maxCPA = $('#inputMaxCpaAdmob').val();
 
-//以下两个change用于随输入随时生成系列名称
-$('#formFacebook input, #formFacebook select').change(function () {
-//            标签名_地理位置&性别&年龄&设备&操作系统_语言_账号_广告图路径
-    if ($(this).attr('id') == 'inputCampaignName') return;
-    $('#inputCampaignName').val(generateFacebookCampaignName());
-});
-$('#formAdmob input, #formAdmob select').change(function () {
-//            标签名_地理位置&语言&出价_创建时间
-    if ($(this).attr('id') == 'inputCampaignNameAdmob') return;
+    //得到选中行的广告语信息
+    var checkedTr = $("#tbody_admob input:checked").parent();
+    var adsGroup = [];
+    checkedTr.each(function(idx){
+        var group = {};
+        group.groupId = $(this).children("td:eq(0)").text();
+        group.message1 = $(this).children("td:eq(2)").text();
+        group.message2 = $(this).children("td:eq(3)").text();
+        group.message3 = $(this).children("td:eq(4)").text();
+        group.message4 = $(this).children("td:eq(5)").text();
+        adsGroup.push(group);
+    });
+    var imagePath = $('#inputImagePathAdmob').val();
+    var app = null;
+    for (var i = 0; i < appList.length; i++) {
+        if (appList[i].tag_name == appName) {
+            app = appList[i];
+            break;
+        }
+    }
+    //处理分离到国家的字段
+    var explodeList = [];//{key:x, values:[]}
+    explodeList.push({
+        key:"appName",
+        values:[appName]
+    },{
+        key:"accountId",
+        values:[accountIdAdmob.join(",")]
+    },{
+        key:"accountName",
+        values:[accountNameAdmob.join(",")]
+    },{
+        key:"createCount",
+        values:[createCountAdmob]
+    },{
+        key:"excludedRegion",
+        values:[excludedRegion.join(',')]
+    },{
+        key:"language",
+        values:[language]
+    },{
+        key:"conversion_id",
+        values:[conversion_id]
+    },{
+        key:"bugdet",
+        values:[bugdet]
+    },{
+        key:"gpPackageId",
+        values:[app.google_package_id]
+    },{
+        key:"maxCPA",
+        values:[maxCPA]
+    },{
+        key:"adsGroup",
+        values:adsGroup
+    });
+    if ($("#selectRegionAdmobExplode").prop("checked")) {
+        explodeList.push({
+            key: 'region',
+            values: region.map(function (x) {
+                return x.trim();
+            })
+        })
+    } else {
+        explodeList.push({
+            key: 'region',
+            values: [region.join(",")]
+        })
+    }
+    if(isAutoCreate && modifyRecordId>0){
+        $("#inputBiddingAdmobExplode").prop("checked",false);
+    }else if (!$("#inputBiddingAdmobExplode").prop("checked") && bidding.indexOf(",") !== -1) {
+        admanager.showCommonDlg("错误", "不分离的情况下不允许出价多选");
+        return false;
+    }
+    if($("#inputBiddingAdmobExplode").prop("checked")){
+        explodeList.push({
+            key: 'bidding',
+            values: bidding.split(",").map(function (x) {
+                return x.trim();
+            })
+        });
+    }else{
+        explodeList.push({
+            key: 'bidding',
+            values: [bidding]
+        });
+    }
+    //处理图片路径
+    if($("#inputImageAdmobExplode").prop("checked")) {
+        var valueList = imagePath.trim().replace(/,$/, "").split(",");    //确保正确地切分为数组
+        explodeList.push({
+            key: 'imagePath',
+            values: valueList
+        });
+    }else{
+        var valueStr = imagePath.trim().replace(/,$/, "");
+        explodeList.push({
+            key: 'imagePath',
+            values:[valueStr]
+        });
+    }
 
-    $('#inputCampaignNameAdmob').val(generateAdmobCampaignName());
+    var explodeParams = explodeList.length > 0 ? explodeList.reduce(function (params, explodeParam) {
+        return getExplodeParams(params, explodeParam);
+    }, []) : [];
+    explodeParams.forEach(function(p){
+        p.campaignName = generateAdmobCampaignName({  //动态生成系列名字
+            bidding: p.bidding,
+            region: p.region,
+            imagePath:p.imagePath,
+            groupId:p.adsGroup.groupId
+        });
+    });
+    return explodeParams;
+}
+//创建admob系列
+$("#btnCreateAdmob").click(function () {
+    var explodeParams = AdwordFormReading();
+    var onlyAutoCreateCheck = $('#onlyCheckAdmobAutoCreate').prop('checked');
+    if (onlyAutoCreateCheck) {
+        var onlyAutoRequestPool = [];
+        var explodeCountry = $("#selectRegionAdmobExplode").prop("checked");  //这两个量是选中【仅设为自动创建】特有的
+        var explodeBidding = $("#inputBiddingAdmobExplode").prop("checked");
+        var url = "auto_create_campaign/adwords/create";
+        if (isAutoCreate && modifyRecordId > 0) {
+            explodeParams.forEach(function(p){
+                p.id = modifyRecordId;
+            });
+            url = "auto_create_campaign/adwords/modify";
+        }
+        explodeParams.forEach(function (p) {
+            var onlyAutoCloned = {};
+            $.extend(onlyAutoCloned, p);
+            onlyAutoCloned.explodeCountry = explodeCountry;
+            onlyAutoCloned.explodeBidding = explodeBidding;
+            onlyAutoCloned.groupId = p.adsGroup.groupId;
+            onlyAutoCloned.message1 = p.adsGroup.message1;
+            onlyAutoCloned.message2 = p.adsGroup.message2;
+            onlyAutoCloned.message3 = p.adsGroup.message3;
+            onlyAutoCloned.message4 = p.adsGroup.message4;
+            onlyAutoRequestPool.push(onlyAutoCloned);
+        });
+        confirmModal.showCampaignConfirm(onlyAutoRequestPool,"仅设为自动创建");
+        $("#confirmed_campaign_creation").off("click").on("click",function(){
+            var input = $("#campaign_confirm_table_body input");
+            if(input.length>0){
+                input.each(function(idx){
+                    var value = $(this).val();
+                    var trIdx = $(this).parents("tr").attr("id").replace(/\D+/,"");
+                    var poolIdx = parseInt(trIdx);
+                    onlyAutoRequestPool[poolIdx]["campaignName"] = value;
+                });
+            }
+            $("#campaign_confirm_dialog").modal("hide");
+            batchRequest(onlyAutoRequestPool, function (param, onSuccess, onFail) {
+                $.post(url, param, function (data) {
+                    if (data && data.ret == 1) {
+                        onSuccess();
+                    } else {
+                        onFail(data.message)
+                    }
+                }, "json");
+            }, function (errorLog) {
+                //[仅设置为自动创建]队列全部处理完成
+                layer.tips("仅自动创建队列处理完毕","#btnCreateAdmob",{tips:1,time:2000});
+            });
+        })
+    }else {
+        var requestPool = [];
+        explodeParams.forEach(function (p) {
+            var cloned = {}
+            $.extend(cloned, p);
+            cloned.groupId = p.adsGroup.groupId;
+            cloned.message1 = p.adsGroup.message1;
+            cloned.message2 = p.adsGroup.message2;
+            cloned.message3 = p.adsGroup.message3;
+            cloned.message4 = p.adsGroup.message4;
+            requestPool.push(cloned);
+        });
+        var bFinished = false;
+        confirmModal.showCampaignConfirm(requestPool,"仅设为自动创建");
+        $("#confirmed_campaign_creation").off("click").on("click",function(){
+            var input = $("#campaign_confirm_table_body input");
+            if(input.length>0){
+                input.each(function(idx){
+                    var value = $(this).val();
+                    var trIdx = $(this).parents("tr").attr("id").replace(/\D+/,"");
+                    var poolIdx = parseInt(trIdx);
+                    requestPool[poolIdx]["campaignName"] = value;
+                });
+            }
+            $("#campaign_confirm_dialog").modal("hide");
+            batchRequest(requestPool, function (param, onSuccess, onFail) {
+                //fake
+                console.log("start.. ", param);
+                $.post("campaign_admob/create", param, function (data) {
+                    if (data && data.ret == 1) {
+                        onSuccess();
+                    } else {
+                        onFail(data.message)
+                    }
+                }, "json");
+            }, function (errorLog) {
+                //队列全部处理完成
+                var checked = $('#checkAdmobAutoCreate').prop('checked');
+                if (checked && !bFinished && errorLog && errorLog.length == 0) {
+                    // bFinished = true;
+                    var AutoRequestPool = [];
+                    var explodeCountry = $("#selectRegionAdmobExplode").prop("checked");
+                    var explodeBidding = $("#inputBiddingAdmobExplode").prop("checked");
+                    requestPool.forEach(function (p) {
+                        var AutoCloned = {};
+                        $.extend(AutoCloned, p);
+                        AutoCloned.explodeCountry = explodeCountry;
+                        AutoCloned.explodeBidding = explodeBidding;
+                        AutoCloned.groupId = p.adsGroup.groupId;
+                        AutoCloned.message1 = p.adsGroup.message1;
+                        AutoCloned.message2 = p.adsGroup.message2;
+                        AutoCloned.message3 = p.adsGroup.message3;
+                        AutoCloned.message4 = p.adsGroup.message4;
+                        AutoRequestPool.push(AutoCloned);
+                    });
+                    var url = "auto_create_campaign/adwords/create";
+                    if (isAutoCreate && modifyRecordId > 0) {
+                        AutoRequestPool.forEach(function(p){
+                            p.id = modifyRecordId;
+                        });
+                        url = "auto_create_campaign/adwords/modify";
+                    }
+                    batchRequest(AutoRequestPool, function (param, onSuccess, onFail) {
+                        $.post(url, param, function (data) {
+                            if (data && data.ret == 1) {
+                                onSuccess();
+                            } else {
+                                onFail(data.message)
+                            }
+                        }, "json");
+                    }, function (errorLog) {
+                        //[设置为自动创建]队列全部处理完成
+                        layer.tips("自动创建队列处理完毕","#btnCreateAdmob",{tips:1,time:3000});
+                    });
+                }
+            });
+        });
+    }
+    return false;
 });
 
 //在路径选了多个的情况下，用于决定是否默认"分离到系列"
