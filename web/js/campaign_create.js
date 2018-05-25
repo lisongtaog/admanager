@@ -504,7 +504,27 @@ function generateAdmobCampaignName(params) {
     var region = $('#selectRegionAdmob option:selected').text();
     var countryAlisa = $('#selectRegionAdmob')[0].countryAlisa;
     if (params.region) {
-        dims.push(params.region);
+        if(params.region.includes(",")){
+            var regionList = params.region.split(",");
+            regionList.forEach(function(r,idx){
+                for(var code in admobRegionCodes){
+                    if(admobRegionCodes[code] === r){
+                        regionList[idx] = code;
+                        break;
+                    }
+                }
+            });
+            dims.push(regionList.join(","));
+        }else{
+            var country = new String();
+            for(var code in admobRegionCodes){
+                if(admobRegionCodes[code] === params.region){
+                    country = code;
+                    break;
+                }
+            }
+            dims.push(country);
+        }
     } else if (countryAlisa) {
         dims.push(params.countryAlisa);
     } else {
@@ -1387,7 +1407,7 @@ function AdwordFormReading(){
             break;
         }
     }
-    //处理分离到国家的字段
+    //处理分离到系列的字段
     var explodeList = [];//{key:x, values:[]}
     explodeList.push({
         key:"appName",
