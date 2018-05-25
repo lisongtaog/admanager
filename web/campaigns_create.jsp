@@ -204,12 +204,6 @@
             </div>
         </div>
         <div class="form-group">
-            <label for="inputCampaignName" class="col-sm-2 control-label">广告系列名称</label>
-            <div class="col-sm-10">
-                <input class="form-control" id="inputCampaignName" />
-            </div>
-        </div>
-        <div class="form-group">
             <label for="selectPublisherPlatforms" class="col-sm-2 control-label">版位</label>
             <div class="col-sm-8">
                 <select class="form-control select2" id="selectPublisherPlatforms" multiple="multiple">
@@ -261,7 +255,8 @@
         </div>
         <div class="form-group">
             <div class="col-sm-10" style="text-align: center">
-                <label><input type="checkbox" id="checkAutoCreate"/>设置为自动创建</label> <input type="submit" class="btn btn-primary" style="width: 100px;" id="btnCreate" value="创建"/>
+                <input type="submit" class="btn btn-primary" style="width: 100px;" id="btnCreate" value="创建"/>
+                <label><input type="checkbox" id="checkAutoCreate"/>设置为自动创建</label>
                 <label><input type="checkbox" id="onlyCheckAutoCreate"/>仅设置为自动创建</label>
             </div>
         </div>
@@ -298,12 +293,6 @@
             <label for="inputCreateCountAdmob" class="col-sm-2 control-label">创建数量</label>
             <div class="col-sm-10">
                 <input class="form-control" id="inputCreateCountAdmob" value="1"/>
-            </div>
-        </div>
-        <div class="form-group">
-            <label for="inputCampaignName" class="col-sm-2 control-label">广告系列名称</label>
-            <div class="col-sm-10">
-                <input class="form-control" id="inputCampaignNameAdmob" />
             </div>
         </div>
         <div class="form-group">
@@ -381,7 +370,8 @@
         </div>
         <div class="form-group">
             <div class="col-sm-10" style="text-align: center">
-                <label><input type="checkbox" id="checkAdmobAutoCreate"/>设置为自动创建</label> <input type="submit" class="btn btn-primary" style="width: 100px;" id="btnCreateAdmob" value="创建"/>
+                <input type="submit" class="btn btn-primary" style="width: 100px;" id="btnCreateAdmob" value="创建"/>
+                <label><input type="checkbox" id="checkAdmobAutoCreate"/>设置为自动创建</label>
                 <label><input type="checkbox" id="onlyCheckAdmobAutoCreate"/>仅设置为自动创建</label>
             </div>
         </div>
@@ -401,7 +391,7 @@
 
 
 <jsp:include page="loading_dialog.jsp"></jsp:include>
-
+<jsp:include page="campaign_confirm_dialog.jsp"></jsp:include>
 
 <script src="js/jquery.js"></script>
 <script src="bootstrap/js/bootstrap.min.js"></script>
@@ -410,6 +400,7 @@
 <script src="jqueryui/jquery-ui.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.4/js/select2.min.js"></script>
 <script src="js/layer/layer.js" ></script>
+<script src="js/campaign_confirm_creation.js?20180524"></script>
 
 
 <script>
