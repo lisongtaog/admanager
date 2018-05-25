@@ -1236,7 +1236,7 @@ $('#btnCreate').click(function () {
             onlyAutoCloned.message=p.adsGroup.message;
             onlyAutoRequestPool.push(onlyAutoCloned);
         });
-        confirmModal.showCampaignConfirm(onlyAutoRequestPool,"仅设为自动创建");
+        confirmModal.showCampaignConfirm(onlyAutoRequestPool);
         //confirmModal.showCampaignConfirm()执行完以后会接着执行下面的代码
         $("#confirmed_campaign_creation").off("click").on("click",function(){
             var input = $("#campaign_confirm_table_body input");
@@ -1279,7 +1279,7 @@ $('#btnCreate').click(function () {
             requestPool.push(cloned);
         });
         var bFinished = false;
-        confirmModal.showCampaignConfirm(requestPool,"设置为自动创建");
+        confirmModal.showCampaignConfirm(requestPool);
         $("#confirmed_campaign_creation").off("click").on("click",function(){
             var input = $("#campaign_confirm_table_body input");
             if(input.length>0){
@@ -1510,7 +1510,7 @@ $("#btnCreateAdmob").click(function () {
             onlyAutoCloned.message4 = p.adsGroup.message4;
             onlyAutoRequestPool.push(onlyAutoCloned);
         });
-        confirmModal.showCampaignConfirm(onlyAutoRequestPool,"仅设为自动创建");
+        confirmModal.showCampaignConfirm(onlyAutoRequestPool);
         $("#confirmed_campaign_creation").off("click").on("click",function(){
             var input = $("#campaign_confirm_table_body input");
             if(input.length>0){
@@ -1548,7 +1548,7 @@ $("#btnCreateAdmob").click(function () {
             requestPool.push(cloned);
         });
         var bFinished = false;
-        confirmModal.showCampaignConfirm(requestPool,"仅设为自动创建");
+        confirmModal.showCampaignConfirm(requestPool);
         $("#confirmed_campaign_creation").off("click").on("click",function(){
             var input = $("#campaign_confirm_table_body input");
             if(input.length>0){

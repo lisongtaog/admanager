@@ -1,7 +1,6 @@
 var confirmModal = {};
-confirmModal.showCampaignConfirm = function(params,footMessage){
+confirmModal.showCampaignConfirm = function(params){
     $("#campaign_confirm_dialog").modal("show");
-    $("#confirmed_campaign_info").text(footMessage);
     $("#campaign_confirm_table_body").empty();
     var mark = 0;
     //在弹出窗口里生成表格
