@@ -1,3 +1,6 @@
+/**
+ * 该文件原属于 campaign_create.js 的功能，用于创建前确认，但暂时不用了（2018-5-28 Xixi）
+ */
 var confirmModal = {};
 confirmModal.showCampaignConfirm = function(params){
     $("#campaign_confirm_dialog").modal("show");

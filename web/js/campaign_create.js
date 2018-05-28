@@ -50,6 +50,8 @@ function multiSelectAutocomplete(selector,valueList){
 }
 
 function init() {
+    $("#custom_country_part_div").hide();
+    $("#custom_country_part_admob_div").hide();
     $('.select2').select2();
 
     $('#btnCampaignStatus').click(function () {
@@ -69,11 +71,11 @@ function init() {
         } else if (id == 'btnSelectRegionAdmobMore') {
             targetId = '#selectRegionAdmob';
         }
-        $('#moreCountryDlg').modal("show");   //modal() 是一个Bootstrap模态框插件
+        $('#moreCountryDlg').modal("show");
         $('#moreCountryDlg .btn-primary').off('click');
         $('#moreCountryDlg .btn-primary').click(function () {
-            console.log(id);
-            var countryAlias = $('#inputCountryAlias').val();
+            // console.log(id);
+            var customCountryPart = $('#inputCustomCountryPart').val().trim();
             var data = $('#textareaCountry').val();
             var countryList = data.split('\n');
             var countryNames = [];
@@ -91,11 +93,15 @@ function init() {
                 }
             });
 
-            if (targetId != '') {
-                if (countryNames.length > 0) {
-                    $(targetId)[0].countryAlisa = countryAlias;
-                } else {
-                    $(targetId)[0].countryAlisa = null;
+            if (targetId === "#selectRegion" || targetId === "#selectRegionAdmob") {
+                if (customCountryPart) {
+                    if(targetId === "#selectRegion"){
+                        $("#custom_country_part_div").show();
+                        $("#custom_country_part").val(customCountryPart);
+                    }else{
+                        $("#custom_country_part_admob_div").show();
+                        $("#custom_country_part_admob").val(customCountryPart);
+                    }
                 }
                 $(targetId).val(countryNames);
                 $(targetId).trigger('change');
@@ -434,7 +440,7 @@ function generateFacebookCampaignName(params) {
         dims.push("Group"+ params.groupId)
     }
     var region = $('#selectRegion').val();
-    var countryAlisa = $('#selectRegion')[0].countryAlisa;
+    var countryAlisa = $('#custom_country_part').val();
     if (countryAlisa) {
         dims.push(countryAlisa);
     } else {
@@ -502,33 +508,35 @@ function generateAdmobCampaignName(params) {
         dims.push("Group"+ params.groupId)
     }
     var region = $('#selectRegionAdmob option:selected').text();
-    var countryAlisa = $('#selectRegionAdmob')[0].countryAlisa;
-    if (params.region) {
-        if(params.region.includes(",")){
-            var regionList = params.region.split(",");
-            regionList.forEach(function(r,idx){
+    var countryAlisa = $('#custom_country_part_admob').val();
+    if(countryAlisa){
+        dims.push(countryAlisa);
+    }else{
+        if (params.region) {
+            if(params.region.includes(",")){
+                var regionList = params.region.split(",");
+                regionList.forEach(function(r,idx){
+                    for(var code in admobRegionCodes){
+                        if(admobRegionCodes[code] === r){
+                            regionList[idx] = code;
+                            break;
+                        }
+                    }
+                });
+                dims.push(regionList.join(","));
+            }else{
+                var country = new String();
                 for(var code in admobRegionCodes){
-                    if(admobRegionCodes[code] === r){
-                        regionList[idx] = code;
+                    if(admobRegionCodes[code] === params.region){
+                        country = code;
                         break;
                     }
                 }
-            });
-            dims.push(regionList.join(","));
-        }else{
-            var country = new String();
-            for(var code in admobRegionCodes){
-                if(admobRegionCodes[code] === params.region){
-                    country = code;
-                    break;
-                }
+                dims.push(country);
             }
-            dims.push(country);
+        }else{
+            dims.push(region);
         }
-    } else if (countryAlisa) {
-        dims.push(params.countryAlisa);
-    } else {
-        dims.push(region);
     }
 
     dims.push($('#selectLanguageAdmob option:selected').text());
@@ -1256,37 +1264,23 @@ $('#btnCreate').click(function () {
             onlyAutoCloned.message=p.adsGroup.message;
             onlyAutoRequestPool.push(onlyAutoCloned);
         });
-        confirmModal.showCampaignConfirm(onlyAutoRequestPool);
-        //confirmModal.showCampaignConfirm()执行完以后会接着执行下面的代码
-        $("#confirmed_campaign_creation").off("click").on("click",function(){
-            var input = $("#campaign_confirm_table_body input");
-            if(input.length>0){
-                input.each(function(idx){
-                    var value = $(this).val();
-                    var trIdx = $(this).parents("tr").attr("id").replace(/\D+/,"");
-                    var poolIdx = parseInt(trIdx);
-                    onlyAutoRequestPool[poolIdx]["campaignName"] = value;
-                });
-            }
-            $("#campaign_confirm_dialog").modal("hide");
-            batchRequest(onlyAutoRequestPool, function (param, onSuccess, onFail) {
-                //fake
-                console.log("start.. ", param);
-                $.post(url, param, function (data) {
-                    if (data && data.ret == 1) {
-                        onSuccess();
-                    }else {
-                        onFail(data.message)
-                    }
-                }, "json");
-            }, function (errorLog) {
-                //[仅设置为自动创建]队列全部处理完成
-                if(isAutoCreate && modifyRecordId > 0){
-                    layer.tips("更新队列处理完毕","#btnCreate",{tips:1,time:3000});
-                }else{
-                    layer.tips("自动创建队列处理完毕","#btnCreate",{tips:1,time:3000});
+        batchRequest(onlyAutoRequestPool, function (param, onSuccess, onFail) {
+            //fake
+            console.log("start.. ", param);
+            $.post(url, param, function (data) {
+                if (data && data.ret == 1) {
+                    onSuccess();
+                }else {
+                    onFail(data.message)
                 }
-            });
+            }, "json");
+        }, function (errorLog) {
+            //[仅设置为自动创建]队列全部处理完成
+            if(isAutoCreate && modifyRecordId > 0){
+                layer.tips("更新队列处理完毕","#btnCreate",{tips:1,time:3000});
+            }else{
+                layer.tips("自动创建队列处理完毕","#btnCreate",{tips:1,time:3000});
+            }
         });
     } else {   //这里还没改
         var requestPool = [];
@@ -1299,71 +1293,58 @@ $('#btnCreate').click(function () {
             requestPool.push(cloned);
         });
         var bFinished = false;
-        confirmModal.showCampaignConfirm(requestPool);
-        $("#confirmed_campaign_creation").off("click").on("click",function(){
-            var input = $("#campaign_confirm_table_body input");
-            if(input.length>0){
-                input.each(function(idx){
-                    var value = $(this).val();
-                    var trIdx = $(this).parents("tr").attr("id").replace(/\D+/,"");
-                    var poolIdx = parseInt(trIdx);
-                    requestPool[poolIdx]["campaignName"] = value;
+        batchRequest(requestPool, function (param, onSuccess, onFail) {
+            //fake
+            console.log("start.. ", param);
+            $.post("campaign/create", param, function (data) {
+                if (data && data.ret == 1) {
+                    onSuccess()
+                } else {
+                    onFail(data.message)
+                }
+            }, "json");
+
+        }, function (errorLog) {
+            //队列全部处理完成
+            var checked = $('#checkAutoCreate').prop('checked');
+            if (checked && !bFinished && errorLog && errorLog.length == 0) {
+                // bFinished = true;
+                var AutoRequestPool = [];
+                var url = "auto_create_campaign/facebook/create";
+                if (isAutoCreate && modifyRecordId > 0) {
+                    requestPool.forEach(function(p){
+                        p.push({
+                            key:id,
+                            values:modifyRecordId
+                        });
+                    });
+                    url = "auto_create_campaign/facebook/modify";
+                }
+                // var messageBody = "创建成功";
+                requestPool.forEach(function (p) {
+                    var AutoCloned = {};
+                    $.extend(AutoCloned, p);
+                    AutoCloned.explodeCountry = $("#selectRegionExplode").prop("checked");
+                    AutoCloned.explodeBidding = $("#inputBiddingExplode").prop("checked");
+                    AutoCloned.explodeAge = $("#inputAgeExplode").prop("checked");
+                    AutoCloned.explodeGender= $("#selectGenderExplode").prop("checked");
+                    AutoRequestPool.push(AutoCloned);
+                });
+                batchRequest(AutoRequestPool, function (param, onSuccess, onFail) {
+                    //fake
+                    console.log("start.. ", param);
+                    $.post(url, param, function (data) {
+                        if (data && data.ret == 1) {
+                            onSuccess();
+                        } else {
+                            onFail(data.message)
+                        }
+                    }, "json");
+                }, function () {
+                    //[仅设置为自动创建]队列全部处理完成
+                    layer.tips("自动创建队列处理完毕","#btnCreate",{tips:1,time:3000});
                 });
             }
-            $("#campaign_confirm_dialog").modal("hide");
-            batchRequest(requestPool, function (param, onSuccess, onFail) {
-                //fake
-                console.log("start.. ", param);
-                $.post("campaign/create", param, function (data) {
-                    if (data && data.ret == 1) {
-                        onSuccess()
-                    } else {
-                        onFail(data.message)
-                    }
-                }, "json");
-
-            }, function (errorLog) {
-                //队列全部处理完成
-                var checked = $('#checkAutoCreate').prop('checked');
-                if (checked && !bFinished && errorLog && errorLog.length == 0) {
-                    // bFinished = true;
-                    var AutoRequestPool = [];
-                    var url = "auto_create_campaign/facebook/create";
-                    if (isAutoCreate && modifyRecordId > 0) {
-                        requestPool.forEach(function(p){
-                            p.push({
-                                key:id,
-                                values:modifyRecordId
-                            });
-                        });
-                        url = "auto_create_campaign/facebook/modify";
-                    }
-                    // var messageBody = "创建成功";
-                    requestPool.forEach(function (p) {
-                        var AutoCloned = {};
-                        $.extend(AutoCloned, p);
-                        AutoCloned.explodeCountry = $("#selectRegionExplode").prop("checked");
-                        AutoCloned.explodeBidding = $("#inputBiddingExplode").prop("checked");
-                        AutoCloned.explodeAge = $("#inputAgeExplode").prop("checked");
-                        AutoCloned.explodeGender= $("#selectGenderExplode").prop("checked");
-                        AutoRequestPool.push(AutoCloned);
-                    });
-                    batchRequest(AutoRequestPool, function (param, onSuccess, onFail) {
-                        //fake
-                        console.log("start.. ", param);
-                        $.post(url, param, function (data) {
-                            if (data && data.ret == 1) {
-                                onSuccess();
-                            } else {
-                                onFail(data.message)
-                            }
-                        }, "json");
-                    }, function () {
-                        //[仅设置为自动创建]队列全部处理完成
-                        layer.tips("自动创建队列处理完毕","#btnCreate",{tips:1,time:3000});
-                    });
-                }
-            });
         });
     }
     return false;
@@ -1530,31 +1511,18 @@ $("#btnCreateAdmob").click(function () {
             onlyAutoCloned.message4 = p.adsGroup.message4;
             onlyAutoRequestPool.push(onlyAutoCloned);
         });
-        confirmModal.showCampaignConfirm(onlyAutoRequestPool);
-        $("#confirmed_campaign_creation").off("click").on("click",function(){
-            var input = $("#campaign_confirm_table_body input");
-            if(input.length>0){
-                input.each(function(idx){
-                    var value = $(this).val();
-                    var trIdx = $(this).parents("tr").attr("id").replace(/\D+/,"");
-                    var poolIdx = parseInt(trIdx);
-                    onlyAutoRequestPool[poolIdx]["campaignName"] = value;
-                });
-            }
-            $("#campaign_confirm_dialog").modal("hide");
-            batchRequest(onlyAutoRequestPool, function (param, onSuccess, onFail) {
-                $.post(url, param, function (data) {
-                    if (data && data.ret == 1) {
-                        onSuccess();
-                    } else {
-                        onFail(data.message)
-                    }
-                }, "json");
-            }, function (errorLog) {
-                //[仅设置为自动创建]队列全部处理完成
-                layer.tips("仅自动创建队列处理完毕","#btnCreateAdmob",{tips:1,time:2000});
-            });
-        })
+        batchRequest(onlyAutoRequestPool, function (param, onSuccess, onFail) {
+            $.post(url, param, function (data) {
+                if (data && data.ret == 1) {
+                    onSuccess();
+                } else {
+                    onFail(data.message)
+                }
+            }, "json");
+        }, function (errorLog) {
+            //[仅设置为自动创建]队列全部处理完成
+            layer.tips("仅自动创建队列处理完毕","#btnCreateAdmob",{tips:1,time:2000});
+        });
     }else {
         var requestPool = [];
         explodeParams.forEach(function (p) {
@@ -1568,69 +1536,56 @@ $("#btnCreateAdmob").click(function () {
             requestPool.push(cloned);
         });
         var bFinished = false;
-        confirmModal.showCampaignConfirm(requestPool);
-        $("#confirmed_campaign_creation").off("click").on("click",function(){
-            var input = $("#campaign_confirm_table_body input");
-            if(input.length>0){
-                input.each(function(idx){
-                    var value = $(this).val();
-                    var trIdx = $(this).parents("tr").attr("id").replace(/\D+/,"");
-                    var poolIdx = parseInt(trIdx);
-                    requestPool[poolIdx]["campaignName"] = value;
+        batchRequest(requestPool, function (param, onSuccess, onFail) {
+            //fake
+            console.log("start.. ", param);
+            $.post("campaign_admob/create", param, function (data) {
+                if (data && data.ret == 1) {
+                    onSuccess();
+                } else {
+                    onFail(data.message)
+                }
+            }, "json");
+        }, function (errorLog) {
+            //队列全部处理完成
+            var checked = $('#checkAdmobAutoCreate').prop('checked');
+            if (checked && !bFinished && errorLog && errorLog.length == 0) {
+                // bFinished = true;
+                var AutoRequestPool = [];
+                var explodeCountry = $("#selectRegionAdmobExplode").prop("checked");
+                var explodeBidding = $("#inputBiddingAdmobExplode").prop("checked");
+                requestPool.forEach(function (p) {
+                    var AutoCloned = {};
+                    $.extend(AutoCloned, p);
+                    AutoCloned.explodeCountry = explodeCountry;
+                    AutoCloned.explodeBidding = explodeBidding;
+                    AutoCloned.groupId = p.adsGroup.groupId;
+                    AutoCloned.message1 = p.adsGroup.message1;
+                    AutoCloned.message2 = p.adsGroup.message2;
+                    AutoCloned.message3 = p.adsGroup.message3;
+                    AutoCloned.message4 = p.adsGroup.message4;
+                    AutoRequestPool.push(AutoCloned);
+                });
+                var url = "auto_create_campaign/adwords/create";
+                if (isAutoCreate && modifyRecordId > 0) {
+                    AutoRequestPool.forEach(function(p){
+                        p.id = modifyRecordId;
+                    });
+                    url = "auto_create_campaign/adwords/modify";
+                }
+                batchRequest(AutoRequestPool, function (param, onSuccess, onFail) {
+                    $.post(url, param, function (data) {
+                        if (data && data.ret == 1) {
+                            onSuccess();
+                        } else {
+                            onFail(data.message)
+                        }
+                    }, "json");
+                }, function (errorLog) {
+                    //[设置为自动创建]队列全部处理完成
+                    layer.tips("自动创建队列处理完毕","#btnCreateAdmob",{tips:1,time:3000});
                 });
             }
-            $("#campaign_confirm_dialog").modal("hide");
-            batchRequest(requestPool, function (param, onSuccess, onFail) {
-                //fake
-                console.log("start.. ", param);
-                $.post("campaign_admob/create", param, function (data) {
-                    if (data && data.ret == 1) {
-                        onSuccess();
-                    } else {
-                        onFail(data.message)
-                    }
-                }, "json");
-            }, function (errorLog) {
-                //队列全部处理完成
-                var checked = $('#checkAdmobAutoCreate').prop('checked');
-                if (checked && !bFinished && errorLog && errorLog.length == 0) {
-                    // bFinished = true;
-                    var AutoRequestPool = [];
-                    var explodeCountry = $("#selectRegionAdmobExplode").prop("checked");
-                    var explodeBidding = $("#inputBiddingAdmobExplode").prop("checked");
-                    requestPool.forEach(function (p) {
-                        var AutoCloned = {};
-                        $.extend(AutoCloned, p);
-                        AutoCloned.explodeCountry = explodeCountry;
-                        AutoCloned.explodeBidding = explodeBidding;
-                        AutoCloned.groupId = p.adsGroup.groupId;
-                        AutoCloned.message1 = p.adsGroup.message1;
-                        AutoCloned.message2 = p.adsGroup.message2;
-                        AutoCloned.message3 = p.adsGroup.message3;
-                        AutoCloned.message4 = p.adsGroup.message4;
-                        AutoRequestPool.push(AutoCloned);
-                    });
-                    var url = "auto_create_campaign/adwords/create";
-                    if (isAutoCreate && modifyRecordId > 0) {
-                        AutoRequestPool.forEach(function(p){
-                            p.id = modifyRecordId;
-                        });
-                        url = "auto_create_campaign/adwords/modify";
-                    }
-                    batchRequest(AutoRequestPool, function (param, onSuccess, onFail) {
-                        $.post(url, param, function (data) {
-                            if (data && data.ret == 1) {
-                                onSuccess();
-                            } else {
-                                onFail(data.message)
-                            }
-                        }, "json");
-                    }, function (errorLog) {
-                        //[设置为自动创建]队列全部处理完成
-                        layer.tips("自动创建队列处理完毕","#btnCreateAdmob",{tips:1,time:3000});
-                    });
-                }
-            });
         });
     }
     return false;
