@@ -50,8 +50,8 @@ function multiSelectAutocomplete(selector,valueList){
 }
 
 function init() {
-    $("#custom_country_part_div").hide();
-    $("#custom_country_part_admob_div").hide();
+    $("#customCountryPartDiv").hide();
+    $("#customCountryPartAdmobDiv").hide();
     $('.select2').select2();
 
     $('#btnCampaignStatus').click(function () {
@@ -96,11 +96,11 @@ function init() {
             if (targetId === "#selectRegion" || targetId === "#selectRegionAdmob") {
                 if (customCountryPart) {
                     if(targetId === "#selectRegion"){
-                        $("#custom_country_part_div").show();
-                        $("#custom_country_part").val(customCountryPart);
+                        $("#customCountryPartDiv").show();
+                        $("#customCountryPart").val(customCountryPart).prop("disabled",false);
                     }else{
-                        $("#custom_country_part_admob_div").show();
-                        $("#custom_country_part_admob").val(customCountryPart);
+                        $("#customCountryPartAdmobDiv").show();
+                        $("#customCountryPartAdmob").val(customCountryPart).prop("disabled",false);
                     }
                 }
                 $(targetId).val(countryNames);

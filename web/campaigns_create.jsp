@@ -140,11 +140,10 @@
                 <label title="选中后每个选项创建一个或多个广告系列"><input type="checkbox" class="form-check-input" id="selectRegionExplode">分离到系列</label>
             </div>
         </div>
-        <div class="form-group" id="custom_country_part_div">
-            <label for="custom_country_part"
-                   class="col-sm-2 control-label"><span class="glyphicon glyphicon-warning-sign"></span>自定义国家字段</label>
-            <div class="col-sm-10">
-                <input class="form-control" id="custom_country_part"/>
+        <div class="form-group alert-warning" id="customCountryPartDiv">
+            <label for="customCountryPart" class="col-sm-2 control-label">自定义国家字段</label>
+            <div class="col-sm-7">
+                <input class="form-control" id="customCountryPart"/>
             </div>
         </div>
         <div class="form-group">
@@ -316,10 +315,10 @@
                 <label title="选中后每个选项创建一个或多个广告系列"><input type="checkbox" class="form-check-input" id="selectRegionAdmobExplode">分离到系列</label>
             </div>
         </div>
-        <div class="form-group" id="custom_country_part_admob_div">
-            <label for="custom_country_part_admob" class="col-sm-2 control-label"><span class="glyphicon glyphicon-warning-sign"></span>自定义国家字段</label>
-            <div class="col-sm-10">
-                <input class="form-control" id="custom_country_part_admob"/>
+        <div class="form-group alert-warning" id="customCountryPartAdmobDiv">
+            <label for="customCountryPartAdmob" class="col-sm-2 control-label">自定义国家字段</label>
+            <div class="col-sm-7">
+                <input class="form-control" id="customCountryPartAdmob"/>
             </div>
         </div>
         <div class="form-group">
@@ -425,6 +424,20 @@
     var campaign_id = "<%=campaignId%>";
     var IndexBudget = <%=budget%>;
     var IndexBidding = <%=bidding%>;
+
+    $("#selectRegionExplode , #selectRegionAdmobExplode").click(function(){
+        var checkId = $(this).attr("id")
+        var checked = $(this).prop("checked");
+        if(checked){
+            if(checkId === "selectRegionExplode"){
+                $("#customCountryPart").val("").prop("disabled",true);
+                $("#customCountryPartDiv").hide();
+            }else{
+                $("#customCountryPartAdmob").val("").prop("disabled",true);
+                $("#customCountryPartAdmobDiv").hide();
+            }
+        }
+    });
 </script>
 <script src="js/campaign_create.js"></script>
 
