@@ -439,7 +439,7 @@
         }
     });
 </script>
-<script src="js/campaign_create.js"></script>
+<script src="js/campaign_create.js?t=20180530"></script>
 
 </body>
 </html>
