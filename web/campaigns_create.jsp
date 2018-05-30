@@ -68,7 +68,7 @@
             <a href="campaigns_auto_create.jsp" target="_blank">自动创建系列管理</a>
         </div>
     </div>
-
+    <!-- 以下是个模态框用于批量输入国家 -->
     <div id="moreCountryDlg" class="modal fade" tabindex="-1" role="dialog">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -79,13 +79,13 @@
                 <div class="modal-body">
                     <form id="modify_form" class="form-horizontal" action="#" autocomplete="off">
                         <div class="form-group">
-                            <label for="inputCountryAlias" class="col-sm-2 control-label">国家缩写</label>
+                            <label for="inputCustomCountryPart" class="col-sm-2 control-label">自定义字段</label>
                             <div class="col-sm-10">
-                                <input id="inputCountryAlias" style="width:100%;" />
+                                <input id="inputCustomCountryPart" style="width:100%;" />
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="inputCampaignName" class="col-sm-2 control-label">国家</label>
+                            <label for="textareaCountry" class="col-sm-2 control-label">国家</label>
                             <div class="col-sm-10">
                                 <textarea id="textareaCountry" style="width:100%; height:400px;"></textarea>
                             </div>
@@ -138,6 +138,12 @@
             </div>
             <div class="col-sm-2">
                 <label title="选中后每个选项创建一个或多个广告系列"><input type="checkbox" class="form-check-input" id="selectRegionExplode">分离到系列</label>
+            </div>
+        </div>
+        <div class="form-group alert-warning" id="customCountryPartDiv">
+            <label for="customCountryPart" class="col-sm-2 control-label">自定义国家字段</label>
+            <div class="col-sm-7">
+                <input class="form-control" id="customCountryPart"/>
             </div>
         </div>
         <div class="form-group">
@@ -309,6 +315,12 @@
                 <label title="选中后每个选项创建一个或多个广告系列"><input type="checkbox" class="form-check-input" id="selectRegionAdmobExplode">分离到系列</label>
             </div>
         </div>
+        <div class="form-group alert-warning" id="customCountryPartAdmobDiv">
+            <label for="customCountryPartAdmob" class="col-sm-2 control-label">自定义国家字段</label>
+            <div class="col-sm-7">
+                <input class="form-control" id="customCountryPartAdmob"/>
+            </div>
+        </div>
         <div class="form-group">
             <label for="selectRegionUnselected" class="col-sm-2 control-label">排除国家地区</label>
             <div class="col-sm-9">
@@ -391,7 +403,7 @@
 
 
 <jsp:include page="loading_dialog.jsp"></jsp:include>
-<jsp:include page="campaign_confirm_dialog.jsp"></jsp:include>
+<%--<jsp:include page="campaign_confirm_dialog.jsp"></jsp:include>--%>
 
 <script src="js/jquery.js"></script>
 <script src="bootstrap/js/bootstrap.min.js"></script>
@@ -400,7 +412,7 @@
 <script src="jqueryui/jquery-ui.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.4/js/select2.min.js"></script>
 <script src="js/layer/layer.js" ></script>
-<script src="js/campaign_confirm_creation.js?20180524"></script>
+<%--<script src="js/campaign_confirm_creation.js?20180524"></script>--%>
 
 
 <script>
@@ -412,6 +424,20 @@
     var campaign_id = "<%=campaignId%>";
     var IndexBudget = <%=budget%>;
     var IndexBidding = <%=bidding%>;
+
+    $("#selectRegionExplode , #selectRegionAdmobExplode").click(function(){
+        var checkId = $(this).attr("id")
+        var checked = $(this).prop("checked");
+        if(checked){
+            if(checkId === "selectRegionExplode"){
+                $("#customCountryPart").val("").prop("disabled",true);
+                $("#customCountryPartDiv").hide();
+            }else{
+                $("#customCountryPartAdmob").val("").prop("disabled",true);
+                $("#customCountryPartAdmobDiv").hide();
+            }
+        }
+    });
 </script>
 <script src="js/campaign_create.js"></script>
 

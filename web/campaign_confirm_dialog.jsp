@@ -4,11 +4,12 @@
   Date: 2018/5/24
   Time: 15:03
   To change this template use File | Settings | File Templates.
+ * 该文件原属于 campaign_create.js 的功能，用于创建前确认，但暂时不用了（2018-5-28 Xixi）
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8"%>
 
-<div  id="campaign_confirm_dialog" class="modal fade" tabindex="-1" role="dialog">
-    <div class="modal-dialog" role="document">
+<div  id="campaign_confirm_dialog" class="modal fade model-large" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-large" role="document">
        <div class="modal-content">   <!-- 该层用于显示背景版 -->
            <div class="modal-header">
                <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><span aria-hidden="true">&times;</span></button>
