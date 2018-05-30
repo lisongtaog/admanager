@@ -440,7 +440,7 @@ function generateFacebookCampaignName(params) {
         dims.push("Group"+ params.groupId)
     }
     var region = $('#selectRegion').val();
-    var countryAlisa = $('#custom_country_part').val();
+    var countryAlisa = $('#customCountryPart').val();
     if (countryAlisa) {
         dims.push(countryAlisa);
     } else {
@@ -508,7 +508,7 @@ function generateAdmobCampaignName(params) {
         dims.push("Group"+ params.groupId)
     }
     var region = $('#selectRegionAdmob option:selected').text();
-    var countryAlisa = $('#custom_country_part_admob').val();
+    var countryAlisa = $('#customCountryPartAdmob').val();
     if(countryAlisa){
         dims.push(countryAlisa);
     }else{
