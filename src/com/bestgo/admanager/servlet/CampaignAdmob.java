@@ -167,8 +167,10 @@ public class CampaignAdmob extends HttpServlet {
                                     String now  = String.format("%d-%02d-%02d %02d:%02d:%02d", calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH),
                                             calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), calendar.get(Calendar.SECOND));
                                     String r = String.valueOf(random.nextInt());
+                                    String r_new = new StringBuffer(r).reverse().toString() ;
                                     String s = String.valueOf(System.currentTimeMillis());
-                                    campaignName = campaignNameOld + accountNameArr[j] + "_"+ r  + s + "_" + i;
+                                    String s_new = new StringBuffer(s).reverse().toString();
+                                    campaignName = campaignNameOld + accountNameArr[j] + "_"+ i + "_" + r_new + "_" + s_new;
                                     if (campaignName.length() > 100) {
                                         campaignName = campaignName.substring(0, 100);
                                     }
