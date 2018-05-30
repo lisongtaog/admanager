@@ -272,7 +272,8 @@ function init() {
                             "<th>总点击<span sorterId=\"24\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
                             "<th>CPA<span sorterId=\"25\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
                             "<th>CTR<span sorterId=\"26\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
-                            "<th>CVR<span sorterId=\"27\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th></tr>");
+                            "<th>CVR<span sorterId=\"27\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
+                            "</tr>");
                     } else {
                         $('#result_header').html("<tr><th>系列ID</th><th>账户ID</th><th>账户简称</th><th>系列名称</th>" +
                             "<th>创建时间<span sorterId=\"1\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
@@ -286,8 +287,9 @@ function init() {
                             "<th>CECPM</th>" +
                             "<th>CTR<span sorterId=\"9\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
                             "<th>CVR<span sorterId=\"10\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
+                            "<th>CTR*CVR</th>" +
                             "<th>UnRate<span sorterId=\"11\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
-                            "<th>OR</th></tr>");
+                            "</tr>");
                     }
                     data = data.data;
                     setData(data);
@@ -362,7 +364,6 @@ function setDataSummary(data) {
     var total_ctr = 0;
     var total_cpa = 0;
     var total_cvr = 0;
-    var total_ecpm = 0;
     var total_incoming = 0;
     var keyset = ["name", "total_spend","endTime_total_spend", "total_revenue", "endTime_total_revenue","total_installed", "total_impressions", "total_click",
         "total_ctr", "total_cpa", "total_cvr","ecpm","incoming"];
@@ -463,7 +464,7 @@ function setData(data) {
         var tr = $('<tr></tr>');
         var countryCheck = $('#countryCheck').is(':checked');
         var keyset = ["campaign_id", "account_id", "short_name", "campaign_name", "create_time",
-            "status", "budget", "bidding", "spend", "installed", "click", "cpa", "ecpm", "ctr", "cvr","un_rate","open_rate"];
+            "status", "budget", "bidding", "spend", "installed", "click", "cpa", "ecpm", "ctr", "cvr","ctr_mul_cvr","un_rate"];
         var modifyColumns = ["campaign_name", "budget", "bidding"];
         if (countryCheck) {
             keyset = ["country_name",
@@ -495,7 +496,7 @@ function setData(data) {
                     td.addClass("danhuangse");
                 }
                 td.text(field_value + " / " + totalSpend);
-            } else if(field == 'un_rate' || field == 'open_rate'){
+            } else if(field == 'un_rate'){
                 if(field_value == -100000){
                     td.text("--");
                 } else if(field_value == 0){

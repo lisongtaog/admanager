@@ -447,10 +447,8 @@ public class QueryByMulConditions extends HttpServlet {
                             j.addProperty("spend",c.spend);
                             j.addProperty("ctr",c.ctr);
                             j.addProperty("cpa",c.cpa);
-//                            j.addProperty("open_cpa",c.open_cpa);
                             j.addProperty("cvr",c.cvr);
                             j.addProperty("un_rate",c.un_rate);
-                            j.addProperty("open_rate",c.open_rate);
                             j.addProperty("campaign_spends",c.campaign_spends);
                             j.addProperty("network",c.network);
                             jsonArray.add(j);
@@ -1019,21 +1017,21 @@ public class QueryByMulConditions extends HttpServlet {
                 double cpa = Utils.convertDouble(one.get("cpa"), 0);
 
                 //目前只有Adwords能收集到unRate和openRate
-                if(admobCheck){
-                    String sqlQuery = "SELECT un_rate,open_rate FROM web_ad_campaign_un_rate_open_rate_admob " +
-                            "WHERE campaign_id = '" + campaignId + "' AND date = '" + beforeThreeDays + "'";
-                    JSObject oneQ = DB.findOneBySql(sqlQuery);
-                    if(oneQ.hasObjectData()){
-
-                        //系列卸载率 = 系列卸载数量 / 系列安装数量
-                        double unRate = Utils.convertDouble(oneQ.get("un_rate"),0);
-                        d.addProperty("un_rate", Utils.trimDouble(unRate,3));
-
-                        //系列开启率 = 系列安装数量 / 系列总安装
-                        double openRate = Utils.convertDouble(oneQ.get("open_rate"),0);
-                        d.addProperty("open_rate", Utils.trimDouble(openRate,3));
-                    }
-                }
+//                if(admobCheck){
+//                    String sqlQuery = "SELECT un_rate,open_rate FROM web_ad_campaign_un_rate_open_rate_admob " +
+//                            "WHERE campaign_id = '" + campaignId + "' AND date = '" + beforeThreeDays + "'";
+//                    JSObject oneQ = DB.findOneBySql(sqlQuery);
+//                    if(oneQ.hasObjectData()){
+//
+//                        //系列卸载率 = 系列卸载数量 / 系列安装数量
+//                        double unRate = Utils.convertDouble(oneQ.get("un_rate"),0);
+//                        d.addProperty("un_rate", Utils.trimDouble(unRate,3));
+//
+//                        //系列开启率 = 系列安装数量 / 系列总安装
+//                        double openRate = Utils.convertDouble(oneQ.get("open_rate"),0);
+//                        d.addProperty("open_rate", Utils.trimDouble(openRate,3));
+//                    }
+//                }
 
                 String short_name = one.get("short_name");
                 String account_id = one.get("account_id");
@@ -1086,6 +1084,7 @@ public class QueryByMulConditions extends HttpServlet {
                 d.addProperty("cpa", Utils.trimDouble(cpa,3));
                 d.addProperty("cvr", Utils.trimDouble(cvr,3));
                 d.addProperty("ecpm", Utils.trimDouble(ecpm,3));
+                d.addProperty("ctr_mul_cvr", Utils.trimDouble(ctr * cvr,3));
                 if (admobCheck) {
                     d.addProperty("network", "admob");
                 } else {
@@ -1140,10 +1139,9 @@ public class QueryByMulConditions extends HttpServlet {
                 d.addProperty("click", 0);
                 d.addProperty("ctr", 0);
                 d.addProperty("cpa", 0);
-//                d.addProperty("open_cpa", 0);
                 d.addProperty("cvr", 0);
+                d.addProperty("ctr_mul_cvr", 0);
                 d.addProperty("un_rate", -100000);
-                d.addProperty("open_rate", -100000);
                 if (admobCheck) {
                     d.addProperty("network", "admob");
                 } else {
