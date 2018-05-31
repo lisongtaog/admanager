@@ -1,5 +1,6 @@
 package com.bestgo.admanager.servlet;
 
+import com.bestgo.admanager.bean.User;
 import com.bestgo.common.database.services.DB;
 import com.bestgo.common.database.utils.JSObject;
 import com.google.gson.JsonObject;
@@ -19,10 +20,10 @@ import com.bestgo.admanager.utils.MD5Util;
 @WebServlet(name = "login", urlPatterns = "/login")
 public class Login extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String user = request.getParameter("user");
-        String pass = request.getParameter("pass");
+        String username = request.getParameter("user");
+        String password = request.getParameter("pass");
 
-        String sql = "SELECT id,nickname FROM web_ad_login_user WHERE username = '"+MD5Util.digest(user)+"' AND password = '"+MD5Util.digest(pass)+"'";
+        String sql = "SELECT id,nickname FROM web_ad_login_user WHERE username = '"+MD5Util.digest(username)+"' AND password = '"+MD5Util.digest(password)+"'";
         JSObject one = null;
         try {
             one = DB.findOneBySql(sql);
@@ -30,9 +31,14 @@ public class Login extends HttpServlet {
             e.printStackTrace();
         }
         if(one != null && one.hasObjectData()){
+            User loginUser = new User();
             HttpSession session = request.getSession();
             session.setAttribute("isAdmin", true);
-            session.setAttribute("nickname", one.get("nickname"));
+            Long id = one.get("id");
+            loginUser.setId(id.intValue());
+            loginUser.setNickname(one.get("nickname"));
+            loginUser.setUsername(username);
+            session.setAttribute("loginUser", loginUser);
             JsonObject json = new JsonObject();
             json.addProperty("ret", 1);
             response.getWriter().write(json.toString());
