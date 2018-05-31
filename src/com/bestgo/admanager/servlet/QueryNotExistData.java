@@ -122,42 +122,37 @@ public class QueryNotExistData extends HttpServlet {
             list = DB.scan(webAdCampaignTagRelTable).select("campaign_id")
                     .where(DB.filter().whereEqualTo("tag_id", tagId)).execute();
         }else{
-            String sql = "select campaign_id from " + adCampaignsTable + " where app_name = '"+ tagName+"' and country_region like '%" + country + "%'";
+            String sql = "select DISTINCT campaign_id from " + adCampaignsTable + " where app_name = '"+ tagName+"' and country_region like '%" + country + "%'";
             list = DB.findListBySql(sql);
         }
-        Set<String> campaignIdSet = new HashSet<>();
-        for(JSObject j : list){
-            campaignIdSet.add(j.get("campaign_id"));
-        }
 
-        String campaignIds = "";
-        if(StringUtil.isEmpty(campaignCreateTime)){
-            for(String s : campaignIdSet){
-                campaignIds += "'" + s + "',";
+        StringBuilder builder = new StringBuilder();
+        if (StringUtil.isEmpty(campaignCreateTime)){
+            for (int i = 0,len = list.size(); i < len; i++){
+                if (i == len - 1) {
+                    builder.append("'" + list.get(i).get("campaign_id") + "'");
+                } else {
+                    builder.append("'" + list.get(i).get("campaign_id") + "',");
+                }
             }
         }else{
             List<JSObject> campaignIdJSObjectList = new ArrayList<>();
-            String sqlQuery = "select campaign_id from "+adCampaignsTable+" where app_name = '"+ tagName +"' and create_time like '" + campaignCreateTime + "%'";
+            String sqlQuery = "select DISTINCT campaign_id from "+adCampaignsTable+" where app_name = '"+ tagName +"' and create_time like '" + campaignCreateTime + "%'";
             campaignIdJSObjectList  = DB.findListBySql(sqlQuery);
 
             if(campaignIdJSObjectList != null && campaignIdJSObjectList.size()>0){
-                Set<String> campaignIdcommonSet = new HashSet<>();
-                for(JSObject j : campaignIdJSObjectList){
-                    String campaign_id = j.get("campaign_id");
-                    if(campaignIdSet.contains(campaign_id)){
-                        campaignIdcommonSet.add(campaign_id);
+                for (int i = 0,len = campaignIdJSObjectList.size(); i < len; i++){
+                    if (i == len - 1) {
+                        builder.append("'" + list.get(i).get("campaign_id") + "'");
+                    } else {
+                        builder.append("'" + list.get(i).get("campaign_id") + "',");
                     }
-                }
-                for(String s : campaignIdcommonSet){
-                    campaignIds += "'" + s + "',";
                 }
             }
         }
-
-        if(StringUtil.isNotEmpty(campaignIds)){
-            campaignIds = campaignIds.substring(0,campaignIds.length()-1);
-        }
+        String campaignIds = builder.toString();
         String sql = "";
+        java.lang.System.out.println(campaignIds);
         if(StringUtil.isNotEmpty(campaignIds)){
 
             if(admobCheck){
