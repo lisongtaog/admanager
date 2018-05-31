@@ -298,8 +298,8 @@
 
     //实现修改花费上限的输入框功能
     $("#results_body").on("click",".cost_upper_limit",function(){
-        $("#result_header tr").children("th:eq(21)").empty();
-        $("#result_header tr").children("th:eq(21)").append("花费上限<button class='btn btn-link glyphicon glyphicon-pencil' title='修改花费上限'></button>");
+        $("#result_header tr").children("th:eq(2)").empty();
+        $("#result_header tr").children("th:eq(2)").append("花费上限<button class='btn btn-link glyphicon glyphicon-pencil' title='修改花费上限'></button>");
         var elementCheck = $(this).children("input[type='text']").attr("class");
         if(elementCheck=="new_cost_upper_limit"){
             return false;
