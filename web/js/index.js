@@ -232,7 +232,7 @@ function init() {
         //竞价筛选
         var biddingComparisonValue = $('#inputBiddingComparisonValue').val().trim();//这里我做一个提示？竞价必须小于0.8
         var biddingOperator = $("#biddingOperator option:selected").val();
-        if(parseFloat(biddingComparisonValue)<0.8){
+        if(biddingComparisonValue){
             if(biddingOperator === "7"){
                 biddingOperator = " > ";
             }else if(biddingOperator === "8"){
