@@ -182,7 +182,7 @@ function init() {
         var containsNoDataCampaignCheck = $('#containsNoDataCampaignCheck').is(':checked');
         // var onlyQueryNoDataCampaignCheck = $('#onlyQueryNoDataCampaignCheck').is(':checked');
 
-        //非负整数
+        //总安装筛选  非负整数
         var reg = /^\d+$/;
         var totalInstallComparisonValue = $('#inputTotalInstallComparisonValue').val();
         var totalInstallOperator = $('#totalInstallOperator option:selected').val();
@@ -206,7 +206,7 @@ function init() {
             totalInstallOperator = "";
         }
 
-        //非负数（>=0的任意数）
+        // CPA筛选  非负数（>=0的任意数）
         reg = /^\d+(\.{0,1}\d+){0,1}$/;
         var cpaComparisonValue = $('#inputCpaComparisonValue').val();
         var cpaOperator = $('#cpaOperator option:selected').val();
@@ -229,10 +229,19 @@ function init() {
             cpaComparisonValue = "";
             cpaOperator = "";
         }
-
-        var biddingComparisonValue = $('#inputBiddingComparisonValue').val();
-        if(!reg.test(biddingComparisonValue)){
-            biddingComparisonValue = "";
+        //竞价筛选
+        var biddingComparisonValue = $('#inputBiddingComparisonValue').val().trim();//这里我做一个提示？竞价必须小于0.8
+        var biddingOperator = $("#biddingOperator option:selected").val();
+        if(parseFloat(biddingComparisonValue)<0.8){
+            if(biddingOperator === "7"){
+                biddingOperator = " > ";
+            }else if(biddingOperator === "8"){
+                biddingOperator = " < ";
+            }else{
+                biddingOperator = " = ";
+            }
+        }else{
+            biddingOperator = "";
         }
 
         var countryName = $('#inputCountry').val();
@@ -256,11 +265,12 @@ function init() {
             likeCampaignName: likeCampaignName,
             campaignCreateTime: campaignCreateTime,
             cpaComparisonValue: cpaComparisonValue,
+            cpaOperator: cpaOperator,
             totalInstallComparisonValue: totalInstallComparisonValue,
-            containsNoDataCampaignCheck: containsNoDataCampaignCheck,
-            biddingComparisonValue: biddingComparisonValue,
             totalInstallOperator: totalInstallOperator,
-            cpaOperator: cpaOperator
+            containsNoDataCampaignCheck: containsNoDataCampaignCheck,
+            biddingComparisonValue: parseFloat(biddingComparisonValue)* 100,
+            biddingOperator:biddingOperator
             },function(data){
                 if(data && data.ret == 1){
                     appQueryData = data.data.array;
@@ -307,7 +317,6 @@ function init() {
         countryRevenueSpendReturn = "true";
     });
 
-
     strFullPath = window.document.location.href;
     if(strFullPath.indexOf("?") != -1){
         strFullPath = strFullPath.substr(strFullPath.indexOf("?")+1,strFullPath.length);
@@ -321,7 +330,6 @@ function init() {
         $('#inputCountry').val(countryMap[country_code]);
         $('#btnSearch').click();
     }
-
 
     $('#btnSummary').click(function () {
         var startTime = $('#inputStartTime').val();

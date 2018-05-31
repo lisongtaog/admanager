@@ -59,6 +59,7 @@ public class QueryByMulConditions extends HttpServlet {
         String cpaOperator = request.getParameter("cpaOperator");
 
         String biddingComparisonValue = request.getParameter("biddingComparisonValue");
+        String biddingOperator = request.getParameter("biddingOperator");
 
         String likeCampaignName = request.getParameter("likeCampaignName");
         HashMap<String, String> countryMap = Utils.getCountryMap();
@@ -83,8 +84,12 @@ public class QueryByMulConditions extends HttpServlet {
 
                 //如果【Facebook】和【Adwords】都未选中，则要一起统计
                 if ("false".equals(adwordsCheck) && "false".equals(facebookCheck)) {
-                    JsonObject admob = fetchOneAppData(id, tag,startTime, endTime, true, "true".equals(countryCheck), countryCode,likeCampaignName,campaignCreateTime,countryMap,totalInstallComparisonValue, "true".equals(containsNoDataCampaignCheck),countryCode,cpaComparisonValue,biddingComparisonValue,totalInstallOperator,cpaOperator,beforeThreeDays);
-                    JsonObject facebook = fetchOneAppData(id, tag,startTime, endTime,false, "true".equals(countryCheck), countryCode,likeCampaignName,campaignCreateTime,countryMap,totalInstallComparisonValue, "true".equals(containsNoDataCampaignCheck),countryName,cpaComparisonValue,biddingComparisonValue,totalInstallOperator,cpaOperator,beforeThreeDays);
+                    JsonObject admob = fetchOneAppData(id, tag,startTime, endTime, true, "true".equals(countryCheck), countryCode,
+                            likeCampaignName,campaignCreateTime,countryMap,totalInstallComparisonValue, "true".equals(containsNoDataCampaignCheck),countryCode,
+                            cpaComparisonValue,biddingComparisonValue,biddingOperator,totalInstallOperator,cpaOperator,beforeThreeDays);
+                    JsonObject facebook = fetchOneAppData(id, tag,startTime, endTime,false, "true".equals(countryCheck), countryCode,likeCampaignName,
+                            campaignCreateTime,countryMap,totalInstallComparisonValue, "true".equals(containsNoDataCampaignCheck),countryName,
+                            cpaComparisonValue, biddingComparisonValue,biddingOperator,totalInstallOperator,cpaOperator,beforeThreeDays);
                     total_spend = admob.get("total_spend").getAsDouble() + facebook.get("total_spend").getAsDouble();
                     total_installed = admob.get("total_installed").getAsDouble() + facebook.get("total_installed").getAsDouble();
                     total_impressions = admob.get("total_impressions").getAsDouble() + facebook.get("total_impressions").getAsDouble();
@@ -94,7 +99,9 @@ public class QueryByMulConditions extends HttpServlet {
                     array.addAll(array1);
 
                 }else if ("true".equals(adwordsCheck)) { //如果只选中【Adwords】
-                    JsonObject admob = fetchOneAppData(id, tag,startTime, endTime, true, "true".equals(countryCheck), countryCode,likeCampaignName,campaignCreateTime,countryMap,totalInstallComparisonValue, "true".equals(containsNoDataCampaignCheck),countryCode,cpaComparisonValue,biddingComparisonValue,totalInstallOperator,cpaOperator,beforeThreeDays);
+                    JsonObject admob = fetchOneAppData(id, tag,startTime, endTime, true, "true".equals(countryCheck), countryCode,likeCampaignName,
+                            campaignCreateTime,countryMap,totalInstallComparisonValue, "true".equals(containsNoDataCampaignCheck),countryCode,cpaComparisonValue,
+                            biddingComparisonValue,biddingOperator,totalInstallOperator,cpaOperator,beforeThreeDays);
                     total_spend = admob.get("total_spend").getAsDouble();
                     total_installed = admob.get("total_installed").getAsDouble();
                     total_impressions = admob.get("total_impressions").getAsDouble();
@@ -102,7 +109,9 @@ public class QueryByMulConditions extends HttpServlet {
                     array = admob.getAsJsonArray("array");
 
                 }else{ //如果只选中【Facebook】
-                    JsonObject facebook = fetchOneAppData(id, tag,startTime, endTime,false, "true".equals(countryCheck), countryCode,likeCampaignName,campaignCreateTime,countryMap,totalInstallComparisonValue, "true".equals(containsNoDataCampaignCheck),countryName,cpaComparisonValue,biddingComparisonValue,totalInstallOperator,cpaOperator,beforeThreeDays);
+                    JsonObject facebook = fetchOneAppData(id, tag,startTime, endTime,false, "true".equals(countryCheck), countryCode,likeCampaignName,
+                            campaignCreateTime,countryMap,totalInstallComparisonValue, "true".equals(containsNoDataCampaignCheck),countryName,cpaComparisonValue,
+                            biddingComparisonValue,biddingOperator,totalInstallOperator,cpaOperator,beforeThreeDays);
                     total_spend = facebook.get("total_spend").getAsDouble();
                     total_installed = facebook.get("total_installed").getAsDouble();
                     total_impressions = facebook.get("total_impressions").getAsDouble();
@@ -791,14 +800,20 @@ public class QueryByMulConditions extends HttpServlet {
      * @param containsNoDataCampaignCheck 【查询无数据的系列】按钮是否被选中
      * @param country  页面传参进来的国家代号或国家名称；如果是Adwords，则内部传入是countryCode;如果是Facebook，则内部传入countryName
      * @param cpaComparisonValue  cpa比较值
-     * @param biddingComparisonValue 出价比较值
+     * @param biddingComparisonValue 竞价比较值
+     * @param biddingOperator 竞价比较符号
      * @param totalInstallOperator  总安装的条件符号
      * @param cpaOperator cpa的条件符号
      * @param beforeThreeDays  endTime的三天前，不包括endTime
      * @return
      * @throws Exception
      */
-    private JsonObject fetchOneAppData(long tagId, String tagName, String startTime, String endTime, boolean admobCheck, boolean countryCheck, String countryCode,String likeCampaignName,String campaignCreateTime,HashMap<String ,String> countryMap,String totalInstallComparisonValue, boolean containsNoDataCampaignCheck,String country,String cpaComparisonValue,String biddingComparisonValue,String totalInstallOperator,String cpaOperator,String beforeThreeDays) throws Exception {
+    private JsonObject fetchOneAppData(long tagId, String tagName, String startTime, String endTime, boolean admobCheck, boolean countryCheck,
+                                       String countryCode,String likeCampaignName,String campaignCreateTime,HashMap<String ,String> countryMap,
+                                       String totalInstallComparisonValue, boolean containsNoDataCampaignCheck,String country,String cpaComparisonValue,
+                                       String biddingComparisonValue,String biddingOperator,String totalInstallOperator,String cpaOperator,
+                                       String beforeThreeDays)
+            throws Exception {
         String webAdCampaignTagRelTable = "web_ad_campaign_tag_rel";
         String webAdCampaignsTable = "web_ad_campaigns";
         String adCampaignsTable = "ad_campaigns";
@@ -830,17 +845,28 @@ public class QueryByMulConditions extends HttpServlet {
         List<JSObject> listCampaignSpend4CountryCode = new ArrayList<>();
         Map<String,JSObject> countryCampaignspendMap = new HashMap<>();
         String havingField = "";
-        if(totalInstallComparisonValue.isEmpty() && cpaComparisonValue.isEmpty()){
+        if(totalInstallComparisonValue.isEmpty() && cpaComparisonValue.isEmpty() && biddingComparisonValue.isEmpty()){
             havingField = " having impressions > 0 ";
         }else{
-            if(!totalInstallComparisonValue.isEmpty() && cpaComparisonValue.isEmpty()){
+            if(!totalInstallComparisonValue.isEmpty() && cpaComparisonValue.isEmpty() && biddingComparisonValue.isEmpty()){
                 havingField = " having installed " + totalInstallOperator + " " + totalInstallComparisonValue;
-            }else if(totalInstallComparisonValue.isEmpty() && !cpaComparisonValue.isEmpty()){
+            }else if(totalInstallComparisonValue.isEmpty() && !cpaComparisonValue.isEmpty() && biddingComparisonValue.isEmpty()){
                 havingField = " having cpa " + cpaOperator + " " + cpaComparisonValue;
+            }else if(totalInstallComparisonValue.isEmpty() && cpaComparisonValue.isEmpty() && !biddingComparisonValue.isEmpty()){
+                havingField = " having bidding " + biddingOperator + biddingComparisonValue;
+            }else if(!totalInstallComparisonValue.isEmpty() && !cpaComparisonValue.isEmpty() && biddingComparisonValue.isEmpty() ){
+                havingField = " having installed " + totalInstallOperator + " " +  totalInstallComparisonValue +
+                        " and cpa " + cpaOperator + " " + cpaComparisonValue;
+            }else if(!totalInstallComparisonValue.isEmpty() && cpaComparisonValue.isEmpty() && !biddingComparisonValue.isEmpty()){
+                havingField = " having installed " + totalInstallOperator + " " +  totalInstallComparisonValue +
+                        " and bidding " + biddingOperator + biddingComparisonValue;
+            }else if(totalInstallComparisonValue.isEmpty() && !cpaComparisonValue.isEmpty() && !biddingComparisonValue.isEmpty()){
+                havingField = " having cpa "  + cpaOperator + " " + cpaComparisonValue +
+                        " and bidding " + biddingOperator + biddingComparisonValue;
             }else{
-                havingField = " having installed " + totalInstallOperator + " " + totalInstallComparisonValue + " and cpa " + cpaOperator + " " + cpaComparisonValue;
+                havingField = " having installed " + totalInstallOperator + " " + totalInstallComparisonValue + " and cpa " + cpaOperator + " " +
+                        cpaComparisonValue + " and bidding " + " " + biddingOperator + biddingComparisonValue;
             }
-
         }
 
         String sql = "";
@@ -1005,12 +1031,12 @@ public class QueryByMulConditions extends HttpServlet {
             for (JSObject one : list) {
                 JsonObject d = new JsonObject();
                 double bidding = one.get("bidding");
-                if(StringUtil.isNotEmpty(biddingComparisonValue)){
-                    double v = Double.parseDouble(biddingComparisonValue);
-                    if(bidding != v){
-                        continue;
-                    }
-                }
+//                if(StringUtil.isNotEmpty(biddingComparisonValue)){
+//                    double v = Double.parseDouble(biddingComparisonValue);
+//                    if(bidding != v){
+//                        continue;
+//                    }
+//                }
                 double installed = Utils.convertDouble(one.get("installed"), 0);
                 String campaignId = one.get("campaign_id");
                 double spend = Utils.convertDouble(one.get("spend"), 0);

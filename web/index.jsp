@@ -95,7 +95,7 @@
 
             <span>竞价等于</span>
             <select id="biddingOperator"><option value="7" selected="true">大于</option><option value="8">小于</option><option value="9"  selected="true">等于</option></select>
-            <input id="inputBiddingComparisonValue" class="form-control" style="display: inline; width: auto;" type="text" />
+            <input id="inputBiddingComparisonValue" class="form-control" style="display: inline; width: auto;" type="text" placeholder="max = 0.8"/>
 
             <button id="btnSearch" class="btn btn-default glyphicon glyphicon-search"></button><br>
 
@@ -212,7 +212,7 @@
 <script src="jqueryui/jquery-ui.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.4/js/select2.min.js"></script>
 <script src="js/country-name-code-dict.js"></script>
-<script src="js/index.js?t=20180125"></script>
+<script src="js/index.js?t=20180531"></script>
 
 <script>
     $("li[role='presentation']:eq(0)").addClass("active");

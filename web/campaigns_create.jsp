@@ -425,6 +425,7 @@
     var IndexBudget = <%=budget%>;
     var IndexBidding = <%=bidding%>;
 
+    //国家后面的“分离到系列”一旦选中的互动
     $("#selectRegionExplode , #selectRegionAdmobExplode").click(function(){
         var checkId = $(this).attr("id")
         var checked = $(this).prop("checked");
@@ -439,7 +440,7 @@
         }
     });
 </script>
-<script src="js/campaign_create.js?t=20180530"></script>
+<script src="js/campaign_create.js?t=20180531"></script>
 
 </body>
 </html>
