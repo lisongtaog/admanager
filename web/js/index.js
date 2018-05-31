@@ -232,7 +232,8 @@ function init() {
         //竞价筛选
         var biddingComparisonValue = $('#inputBiddingComparisonValue').val().trim();//这里我做一个提示？竞价必须小于0.8
         var biddingOperator = $("#biddingOperator option:selected").val();
-        if(biddingComparisonValue){
+        if(biddingComparisonValue != "" && parseFloat(biddingComparisonValue)>0){
+            biddingComparisonValue = parseFloat(biddingComparisonValue)*100;
             if(biddingOperator === "7"){
                 biddingOperator = " > ";
             }else if(biddingOperator === "8"){
@@ -269,7 +270,7 @@ function init() {
             totalInstallComparisonValue: totalInstallComparisonValue,
             totalInstallOperator: totalInstallOperator,
             containsNoDataCampaignCheck: containsNoDataCampaignCheck,
-            biddingComparisonValue: parseFloat(biddingComparisonValue)* 100,
+            biddingComparisonValue: biddingComparisonValue,
             biddingOperator:biddingOperator
             },function(data){
                 if(data && data.ret == 1){

@@ -95,7 +95,7 @@
 
             <span>竞价</span>
             <select id="biddingOperator"><option value="7" selected="true">大于</option><option value="8">小于</option><option value="9"  selected="true">等于</option></select>
-            <input id="inputBiddingComparisonValue" class="form-control" style="display: inline; width: auto;" type="text" placeholder="max = 0.8"/>
+            <input id="inputBiddingComparisonValue" class="form-control" style="display: inline; width: auto;" type="text"/>
 
             <button id="btnSearch" class="btn btn-default glyphicon glyphicon-search"></button><br>
 
