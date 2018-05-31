@@ -77,21 +77,21 @@
             <th>UninstalledRate</th>
             <th>ActiveUser</th>
             <th>Revenue</th>
-            <th>7DaysCost</th>
-            <th>7DaysRevenue</th>
-            <th>7DaysIncoming</th>
+            <th>Incoming</th>
             <th>PI</th>
             <th>ARPU</th>
             <th>ECPM</th>
             <th>CECPM</th>
             <th>成本价/2</th>
             <th>CPA</th>
-            <th>竞价</th>
             <th>ACpa</th>
             <th>CPA/ECPM</th>
-            <th>Incoming</th>
+            <th>7DaysCost</th>
+            <th>7DaysRevenue</th>
+            <th>7DaysIncoming</th>
             <th>RT</th>
             <th>30DaysActiveUser</th>
+            <th>竞价</th>
         </tr>
         </thead>
         <tbody id="results_body">
@@ -151,21 +151,21 @@
                     "<th>UninstalledRate</th>" +
                     "<th>ActiveUser<span sorterId=\"1038\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
                     "<th>Revenue<span sorterId=\"1039\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
-                    "<th>7daysCost</th>" +
-                    "<th>7daysRevenue</th>" +
-                    "<th>7daysIncoming</th>" +
+                    "<th>Incoming<span sorterId=\"1042\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
                     "<th>PI</th>" +
                     "<th>ARPU</th>" +
                     "<th>ECPM<span sorterId=\"1040\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
                     "<th>CECPM</th>" +
                     "<th>成本价/2</th>" +
                     "<th>CPA<span sorterId=\"1041\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
-                    "<th>竞价</th>" +
                     "<th>ACpa</th>" +
                     "<th>CPA/ECPM</th>" +
-                    "<th>Incoming<span sorterId=\"1042\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
+                    "<th>7daysCost</th>" +
+                    "<th>7daysRevenue</th>" +
+                    "<th>7daysIncoming</th>" +
                     "<th>RT</th>" +
                     "<th>30DaysActiveUser</th>" +
+                    "<th>竞价</th>" +
                     "</tr>");
                 setData(data);
                 bindSortOp();
@@ -222,9 +222,9 @@
         var len = arr.length;
         var one;
         var keyset = ["costs","cost_upper_limit","purchased_users", "installed", "uninstalled_rate",
-            "active_users", "revenues", "seven_days_costs", "seven_days_revenues",
-            "seven_days_incoming","pi", "arpu", "ecpm","c_ecpm", "revenue_per_install","cpa","bidding_summary","a_cpa","cpa_div_ecpm", "incoming",
-            "rt","thirty_days_active_user"];
+            "active_users", "revenues","incoming","pi", "arpu", "ecpm","c_ecpm", "revenue_per_install","cpa",
+            "a_cpa","cpa_div_ecpm", "seven_days_costs", "seven_days_revenues", "seven_days_incoming",
+            "rt","thirty_days_active_user","bidding_summary"];
         for (var i = 0; i < len; i++) {
             one = arr[i];
             var tr = $('<tr></tr>');
