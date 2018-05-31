@@ -71,16 +71,24 @@
         <tr>
             <th>国家</th>
             <th>Cost</th>
+            <th>花费上限</th>
             <th>PurchasedUser</th>
             <th>Installed</th>
             <th>UninstalledRate</th>
             <th>ActiveUser</th>
             <th>Revenue</th>
-            <th>ECPM</th>
+            <th>7DaysCost</th>
+            <th>7DaysRevenue</th>
+            <th>7DaysIncoming</th>
             <th>PI</th>
             <th>ARPU</th>
+            <th>ECPM</th>
+            <th>CECPM</th>
+            <th>成本价/2</th>
             <th>CPA</th>
+            <th>竞价</th>
             <th>ACpa</th>
+            <th>CPA/ECPM</th>
             <th>Incoming</th>
             <th>RT</th>
             <th>30DaysActiveUser</th>
@@ -137,6 +145,7 @@
             if(data && data.ret == 1){
                 $('#result_header').html("<tr><th>国家</th>" +
                     "<th>Cost<span sorterId=\"1031\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
+                    "<th>花费上限</th>" +
                     "<th>PurchasedUser<span sorterId=\"1033\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
                     "<th>Installed<span sorterId=\"1034\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
                     "<th>UninstalledRate</th>" +
@@ -151,13 +160,12 @@
                     "<th>CECPM</th>" +
                     "<th>成本价/2</th>" +
                     "<th>CPA<span sorterId=\"1041\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
+                    "<th>竞价</th>" +
                     "<th>ACpa</th>" +
                     "<th>CPA/ECPM</th>" +
                     "<th>Incoming<span sorterId=\"1042\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
                     "<th>RT</th>" +
                     "<th>30DaysActiveUser</th>" +
-                    "<th>花费上限</th>" +
-                    "<th>竞价</th>" +
                     "</tr>");
                 setData(data);
                 bindSortOp();
@@ -213,10 +221,10 @@
         var arr = data.array;
         var len = arr.length;
         var one;
-        var keyset = ["costs","purchased_users", "installed", "uninstalled_rate",
+        var keyset = ["costs","cost_upper_limit","purchased_users", "installed", "uninstalled_rate",
             "active_users", "revenues", "seven_days_costs", "seven_days_revenues",
-            "seven_days_incoming","pi", "arpu", "ecpm","c_ecpm", "revenue_per_install","cpa","a_cpa","cpa_div_ecpm", "incoming",
-            "rt","thirty_days_active_user","cost_upper_limit","bidding_summary"];
+            "seven_days_incoming","pi", "arpu", "ecpm","c_ecpm", "revenue_per_install","cpa","bidding_summary","a_cpa","cpa_div_ecpm", "incoming",
+            "rt","thirty_days_active_user"];
         for (var i = 0; i < len; i++) {
             one = arr[i];
             var tr = $('<tr></tr>');

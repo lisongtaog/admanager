@@ -152,6 +152,7 @@ public class QueryNotExistData extends HttpServlet {
         }
         String campaignIds = builder.toString();
         String sql = "";
+        java.lang.System.out.println(campaignIds);
         if(StringUtil.isNotEmpty(campaignIds)){
 
             if(admobCheck){
