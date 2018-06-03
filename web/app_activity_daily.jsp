@@ -140,7 +140,7 @@
     });
 
     function init() {
-        $("li[role='presentation']:eq(12)").addClass("active");
+        $("li[role='presentation']:eq(11)").addClass("active");
         var now = new Date(new Date().getTime() - 86400 * 1000); //得到一个该行代码运行时的时间
         var defaultYear = now.getFullYear();
         var defaultMonth = now.getMonth()<9 ? "0"+ (now.getMonth()+1) : ""+(now.getMonth()+1);
