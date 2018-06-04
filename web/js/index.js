@@ -170,6 +170,7 @@ function init() {
         },'json');
     });
     $('#btnSearch').click(function () {
+        $("#btnSearch").prop("disabled",true);
         var startTime = $('#inputStartTime').val();
         var endTime = $('#inputEndTime').val();
         var query = $("#inputSearch").val();
@@ -273,6 +274,7 @@ function init() {
             biddingComparisonValue: biddingComparisonValue,
             biddingOperator:biddingOperator
             },function(data){
+                $("#btnSearch").prop("disabled",false);
                 if(data && data.ret == 1){
                     appQueryData = data.data.array;
                     if (countryCheck) {
@@ -333,6 +335,7 @@ function init() {
     }
 
     $('#btnSummary').click(function () {
+        $("#btnSummary").prop("disabled",true);
         var startTime = $('#inputStartTime').val();
         var endTime = $('#inputEndTime').val();
         var adwordsCheck = $('#adwordsCheck').is(':checked');  //is是一个方法的标签名
@@ -344,6 +347,7 @@ function init() {
             adwordsCheck: adwordsCheck,
             facebookCheck: facebookCheck,
         }, function (data) {
+            $("#btnSummary").prop("disabled",false);
             if (data && data.ret == 1) {
                 $('#result_header').html("<tr><th>应用名称</th><th>总花费<span sorterId=\"70\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>预计总花费<span sorterId=\"71\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
                     "<th>总营收<span sorterId=\"72\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>预计总营收<span sorterId=\"73\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
@@ -351,7 +355,6 @@ function init() {
                     "<th>总点击<span sorterId=\"76\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>CTR<span sorterId=\"77\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
                     "<th>CPA<span sorterId=\"78\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>CVR<span sorterId=\"79\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>"+
                     "<th>ECPM<span sorterId=\"80\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>Incoming<span sorterId=\"81\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th></tr>");
-
 
                 data = data.data; //这里把返回数据里的 data属性 的值给了变量data，即变量data 是Query.java里的 arr[{},{},...,{}]
                 setDataSummary(data);
@@ -476,8 +479,7 @@ function setData(data) {
             "status", "budget", "bidding", "spend", "installed", "click", "cpa", "ecpm", "ctr", "cvr","ctr_mul_cvr","un_rate"];
         var modifyColumns = ["campaign_name", "budget", "bidding"];
         if (countryCheck) {
-            keyset = ["country_name",
-                "impressions","spend", "installed", "click", "cpa", "ctr", "cvr"];
+            keyset = ["country_name", "impressions","spend", "installed", "click", "cpa", "ctr", "cvr"];
         }
         for (var j = 0; j < keyset.length; j++) {
             var campaignId = one['campaign_id'];
@@ -527,8 +529,8 @@ function setData(data) {
 
         //这里增加【新建】按钮
         if(!countryCheck){
-            var btn = $('<input type="button" value="新建">');   //临时创建了一个变量btn，【新建】键
-            btn.data("campaign_id", one['campaign_id']);    //给当前这个键增加键值对
+            var btn = $('<input type="button" value="新建">');
+            btn.data("campaign_id", one['campaign_id']);
             btn.data("budget",one['budget']);
             btn.data("bidding",one['bidding']);
             btn.click(function(){
@@ -546,7 +548,8 @@ function setData(data) {
         if(one["impressions"] == 0){
             tr.addClass("lilac");
         }
-        tr[0].origCampaignData = one;
+        //为当前的 DOM元素 tr[0] 添加属性 origCampaignData
+        tr[0].origCampaignData = one;  //@param one 这是后台返回数据的第 i 个数组元素——Json格式
         tr[0].changedCampainData = {};
         var admobCheck = $('#admobCheck').is(':checked');
         var countryCheck = $('#countryCheck').is(':checked');
@@ -802,12 +805,13 @@ function estimateCost() {
         " 总展示: " + total_impressions + " 总点击: " + total_click +
         " CTR: " + total_ctr + " CPA: " + total_cpa + " CVR: " + total_cvr;
 
-    $('.estimateResult').text(str);
+    $('.estimateResult').text(str);    // $(".estimateResult") 是 div#total_result 里跳出的估计值
 }
 
 function bindBatchModifyOperation() {
     $(document).click(function() {
         $('#results_body td.editable').removeClass('editing');
+        // .inputTemp 以下这个函数究竟要干什么？
         $(".inputTemp").replaceWith(function() {
             var td = $(".inputTemp").parent('td')[0];
             var tr = $(td).parents('tr')[0];
@@ -820,8 +824,13 @@ function bindBatchModifyOperation() {
                         tr.changedCampainData.budget = this.value;
                         break;
                     case 'bidding':
-                        tr.changedCampainData.bidding = this.value;
-                        break;
+                        if(this.value > 0.8){
+                            admanager.showCommonDlg("警告","竞价不能超过 0.8");
+                            break;
+                        }else{
+                            tr.changedCampainData.bidding = this.value;
+                            break;
+                        }
                 }
                 $(td).addClass("changed");
             } else {
@@ -843,6 +852,7 @@ function bindBatchModifyOperation() {
         estimateCost();
     });
 
+    // 【批量修改】
     $('#btnModifyBatch').click(function() {
         var checkbox = $('#result_header input[type=checkbox]');
         if (checkbox.length > 0) return;
@@ -905,7 +915,7 @@ function bindBatchModifyOperation() {
             if (!currentEle.origValue) {
                 currentEle.origValue = value;
             }
-            $(currentEle).html('<input class="inputTemp" type="text" width="2" value="' + value + '" />');
+            $(currentEle).html('<input class="inputTemp" type="text" style="width:100%" value="' + value + '" />');
             $(".inputTemp", currentEle).focus()
                 // .keyup(function (event) {
                 //     if (event.keyCode == 13) {
@@ -937,7 +947,7 @@ function bindBatchModifyOperation() {
         if (countryCode == '' && countryName != '') {
             return;
         }
-
+        //读取被修改行
         $('#results_body td.changed').each(function() {
             var tr = $(this).parents('tr')[0];
             var one = tr.changedCampainData;
@@ -957,6 +967,7 @@ function bindBatchModifyOperation() {
             }
             list.push(one);
         });
+
         var query = $("#inputSearch").val();
         $.post('campaign/batch_change', {
             data: JSON.stringify(list),
@@ -971,6 +982,7 @@ function bindBatchModifyOperation() {
         }, 'json');
     });
 
+    //【批量修改出价】（对“竞价”列进行修改）
     $('#btnBatchModifyBidding').click(function() {
         var checkbox = $('#result_header input[type=checkbox]');
         if (checkbox.length <= 0) return;
