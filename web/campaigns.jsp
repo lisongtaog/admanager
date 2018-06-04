@@ -30,16 +30,16 @@
 <div class="container-fluid">
     <%@include file="common/navigationbar.jsp"%>
 
-    <table>
-        <tr>
-            <td ><a href="adaccounts.jsp" target="_blank" >&nbsp;&nbsp;Facebook广告账号管理&nbsp;&nbsp;</a></td>
+    <div>
+        <ul class="breadcrumb">
+            <li><a href="adaccounts.jsp" target="_blank">Facebook广告账号管理</a></li>
+            <li><a href="adaccounts_admob.jsp" target="_blank">Admob广告账号管理</a></li>
+            <li class="active">Facebook广告系列管理</li>
+            <li><a href="campaigns_admob.jsp" target="_blank">Admob广告系列管理</a></li>
+            <li><a href="tags.jsp" target="_blank">标签管理</a></li>
+        </ul>
+    </div>
 
-            <td ><a href="adaccounts_admob.jsp" target="_blank" > &nbsp;&nbsp;Admob广告账号管理 &nbsp;&nbsp;</a></td>
-
-            <td ><a href="campaigns_admob.jsp" target="_blank">  &nbsp;&nbsp;Admob广告系列管理 &nbsp;&nbsp;  </a></td>
-            <td ><a href="tags.jsp" target="_blank"> &nbsp;&nbsp;  标签管理  &nbsp;&nbsp; </a></td>
-        </tr>
-    </table>
     <div class="panel panel-default">
         <div class="panel-heading">
             <button id="btnNotExistTagSearch" class="btn btn-default" name="false">只显示没有加上标签的广告系列</button>
