@@ -58,7 +58,7 @@
             <%
                 List<JSObject> data = new ArrayList<>();
                 long totalPage = 0;
-                long count = Campaign.count();
+                long count = Campaign.count();  //得到系列总数
                 int index = Utils.parseInt(request.getParameter("page_index"), 0);
                 int size = Utils.parseInt(request.getParameter("page_size"), 20);
                 totalPage = count / size + (count % size == 0 ? 0 : 1);
@@ -267,12 +267,13 @@
         if(this.name == "false"){
             $('#btnNotExistTagSearch').css("background-color","red");
             this.name = "true";
-            $.post('campaign/query_not_exist_tag_campaingns',{
+            $.post('campaign/fetch_not_exist_tag_campaigns',{
             },function(data) {
                 if (data && data.ret == 1) {
-                    $('.table tbody > tr').remove();
+                    $(".table tbody > tr").remove();
                     setData(data.data);
                     bindOp();
+                    $("nav").empty();
                 } else {
                     admanager.showCommonDlg("错误", data.message);
                 }

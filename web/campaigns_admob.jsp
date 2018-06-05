@@ -233,10 +233,11 @@
             $('#btnNotExistTagAdmobSearch').css("background-color","red");
             this.name = "true";
             $('.table tbody > tr').remove();
-            $.post('campaign_admob/query_campaigns_not_exist_tag',function(data) {
+            $.post('campaign_admob/fetch_campaigns_not_exist_tag',function(data) {
                 if (data && data.ret == 1) {
                     setData(data.data);
                     bindOp();
+                    $("nav").empty();
                 } else {
                     admanager.showCommonDlg("错误", data.message);
                 }

@@ -166,10 +166,11 @@ public class CampaignAdmob extends HttpServlet {
                                 for(int i=0;i<createCountInt;i++){
                                     String now  = String.format("%d-%02d-%02d %02d:%02d:%02d", calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH),
                                             calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), calendar.get(Calendar.SECOND));
-                                    int r = random.nextInt();
-                                    long s = System.currentTimeMillis();
-                                    String part = new StringBuffer(i + r + s + "").reverse().toString();
-                                    campaignName = campaignNameOld + accountNameArr[j] + "_"+ (i + j) + part;
+                                    String r = String.valueOf(random.nextInt());
+                                    String r_new = new StringBuffer(r).reverse().toString() ;
+                                    String s = String.valueOf(System.currentTimeMillis());
+                                    String s_new = new StringBuffer(s).reverse().toString();
+                                    campaignName = campaignNameOld + accountNameArr[j] + "_"+ i + "_" + r_new + "_" + s_new;
                                     if (campaignName.length() > 100) {
                                         campaignName = campaignName.substring(0, 100);
                                     }
@@ -311,33 +312,33 @@ public class CampaignAdmob extends HttpServlet {
                 }
                 json.add("data", array);
             }
-        }else if (path.startsWith("/query_campaigns_not_exist_tag")) {
+        }else if (path.startsWith("/fetch_campaigns_not_exist_tag")) {
             JsonArray array = new JsonArray();
-            String sqlCampaignIds = "select campaign_id from web_ad_campaign_tag_admob_rel";
-
-            String sqlAll = "select campaign_id from web_ad_campaigns_admob";
-            List<JSObject> data = new ArrayList<>();
+//            String sqlCampaignIds = "select campaign_id from web_ad_campaign_tag_admob_rel";
+//
+//            String sqlAll = "select campaign_id from web_ad_campaigns_admob";
+//            List<JSObject> data = new ArrayList<>();
             try {
-                List<JSObject> campaignIdsList = DB.findListBySql(sqlCampaignIds);
-                Set<String>  campaignIdsSet = new HashSet<>();
-                for(JSObject j : campaignIdsList){
-                    campaignIdsSet.add(j.get("campaign_id"));
-                }
-                List<JSObject> allList = DB.findListBySql(sqlAll);
-                Set<String>  allSet = new HashSet<>();
-                for(JSObject k : allList){
-                    allSet.add(k.get("campaign_id"));
-                }
-                List<String> diffList = Utils.getDiffrentStrList(allSet, campaignIdsSet);
-                String allStr = "";
-                for(String j : diffList){
-                    allStr += j + ",";
-                }
-                allStr = allStr.substring(0,allStr.length()-1);
+//                List<JSObject> campaignIdsList = DB.findListBySql(sqlCampaignIds);
+//                Set<String>  campaignIdsSet = new HashSet<>();
+//                for(JSObject j : campaignIdsList){
+//                    campaignIdsSet.add(j.get("campaign_id"));
+//                }
+//                List<JSObject> allList = DB.findListBySql(sqlAll);
+//                Set<String>  allSet = new HashSet<>();
+//                for(JSObject k : allList){
+//                    allSet.add(k.get("campaign_id"));
+//                }
+//                List<String> diffList = Utils.getDiffrentStrList(allSet, campaignIdsSet);
+//                String allStr = "";
+//                for(String j : diffList){
+//                    allStr += j + ",";
+//                }
+//                allStr = allStr.substring(0,allStr.length()-1);
                 String sqlFilterAll = "select id,campaign_id,campaign_name,account_id,create_time,status,budget,bidding," +
                         "total_spend,total_click,total_installed,total_impressions,cpa,ctr from web_ad_campaigns_admob " +
-                        "where campaign_id in (" + allStr + ")";
-                data = DB.findListBySql(sqlFilterAll);
+                        "where tag_id = 0";
+                List<JSObject> data = DB.findListBySql(sqlFilterAll);
                 if(data != null){
                     for (int i = 0,len = data.size(); i < len; i++) {
                         JsonObject one = new JsonObject();
