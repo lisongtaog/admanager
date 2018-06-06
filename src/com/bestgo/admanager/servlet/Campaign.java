@@ -254,9 +254,13 @@ public class Campaign extends HttpServlet {
                                         flag = DB.updateBySql(sql);
                                     }
                                 }
+                                //测试用
+                                flag = false;
                                 if(!flag){
                                     DB.delete("ad_campaigns").where(DB.filter().whereEqualTo("campaign_name", campaignName)).execute();
+                                    //返回前端提醒
                                     System.out.println("由于Media导致第"+(i+1)+"个系列创建失败,名为["+campaignName + "]的系列已经被删除！");
+                                    result.warning = "由于Media导致第"+(i+1)+"个系列创建失败,名为["+campaignName + "]的系列已经被删除！";
                                 }
                             } else {
                                 Logger logger = Logger.getRootLogger();
@@ -276,6 +280,7 @@ public class Campaign extends HttpServlet {
             }
             json.addProperty("ret", result.result ? 1 : 0);
             json.addProperty("message", result.message);
+            json.addProperty("warning",result.warning); //目前仅在Media导致的系列创建后又删除下有用
         } else if (path.startsWith("/update")) {
             String id = request.getParameter("id");
             String campaignId = request.getParameter("campaignId");

@@ -585,6 +585,7 @@ $('#checkFacebook').click(function () {
 function batchRequest(params, send, onFinish) {
     var idx = -1;
     var errLog = [];//[{param:object, errMsg:string}]
+    var warning = [];
     var stop = false;
 
     function getProgress() {
@@ -615,7 +616,7 @@ function batchRequest(params, send, onFinish) {
                         $('#common_message_dialog').modal('hide');
                     },1500);
                     admanager.showCommonDlg("完成", getFullLog(), function () {
-                        onFinish(errLog);
+                        onFinish(errLog,warning);
                     });
                 }
                 return;
@@ -625,8 +626,11 @@ function batchRequest(params, send, onFinish) {
     }
 
     function request() {
-        send(params[idx], function () {
-            //请求一个成功
+        send(params[idx], function (message) {
+            //本function()是batchRequest()在 send 参数部分传入的onSuccess()函数对象具体执行部分
+            if(message!= null){
+                warning.push(message);
+            }
             next();
         }, function (errMsg) {
             //请求一个失败，要不要重试？
@@ -1266,7 +1270,7 @@ $('#btnCreate').click(function () {
         });
         batchRequest(onlyAutoRequestPool, function (param, onSuccess, onFail) {
             //fake
-            console.log("start.. ", param);
+            // console.log("start.. ", param);
             $.post(url, param, function (data) {
                 if (data && data.ret == 1) {
                     onSuccess();
@@ -1282,7 +1286,7 @@ $('#btnCreate').click(function () {
                 layer.tips("自动创建队列处理完毕","#btnCreate",{tips:1,time:3000});
             }
         });
-    } else {   //这里还没改
+    } else {
         var requestPool = [];
         explodeParams.forEach(function (p) {    //拆分好的键值对数组
             var cloned = {};
@@ -1293,57 +1297,66 @@ $('#btnCreate').click(function () {
             requestPool.push(cloned);
         });
         var bFinished = false;
+        //针对 campaign.java 内部产生的Media错误导致的删除
+        var warning = [];
         batchRequest(requestPool, function (param, onSuccess, onFail) {
             //fake
-            console.log("start.. ", param);
+            // console.log("start.. ", param);
             $.post("campaign/create", param, function (data) {
                 if (data && data.ret == 1) {
-                    onSuccess()
+                    onSuccess();
+                    if(data.warning){
+                        warning.push(data.warning);
+                    }
                 } else {
                     onFail(data.message)
                 }
             }, "json");
-
         }, function (errorLog) {
-            //队列全部处理完成
-            var checked = $('#checkAutoCreate').prop('checked');
-            if (checked && !bFinished && errorLog && errorLog.length == 0) {
-                // bFinished = true;
-                var AutoRequestPool = [];
-                var url = "auto_create_campaign/facebook/create";
-                if (isAutoCreate && modifyRecordId > 0) {
-                    requestPool.forEach(function(p){
-                        p.push({
-                            key:id,
-                            values:modifyRecordId
+            //手动队列全部处理完成
+            if(warning.length > 0){
+                warning = warning.join("\n");
+                admanager.showCommonDlg("部分系列创建失败",warning);
+            }else{
+                var checked = $('#checkAutoCreate').prop('checked');
+                if (checked && !bFinished && errorLog && errorLog.length == 0) {
+                    // bFinished = true;
+                    var AutoRequestPool = [];
+                    var url = "auto_create_campaign/facebook/create";
+                    if (isAutoCreate && modifyRecordId > 0) {
+                        requestPool.forEach(function(p){
+                            p.push({
+                                key:id,
+                                values:modifyRecordId
+                            });
                         });
+                        url = "auto_create_campaign/facebook/modify";
+                    }
+                    // var messageBody = "创建成功";
+                    requestPool.forEach(function (p) {
+                        var AutoCloned = {};
+                        $.extend(AutoCloned, p);
+                        AutoCloned.explodeCountry = $("#selectRegionExplode").prop("checked");
+                        AutoCloned.explodeBidding = $("#inputBiddingExplode").prop("checked");
+                        AutoCloned.explodeAge = $("#inputAgeExplode").prop("checked");
+                        AutoCloned.explodeGender= $("#selectGenderExplode").prop("checked");
+                        AutoRequestPool.push(AutoCloned);
                     });
-                    url = "auto_create_campaign/facebook/modify";
+                    batchRequest(AutoRequestPool, function (param, onSuccess, onFail) {
+                        //fake
+                        console.log("start.. ", param);
+                        $.post(url, param, function (data) {
+                            if (data && data.ret == 1) {
+                                onSuccess();
+                            } else {
+                                onFail(data.message)
+                            }
+                        }, "json");
+                    }, function () {
+                        //[仅设置为自动创建]队列全部处理完成
+                        layer.tips("自动创建队列处理完毕","#btnCreate",{tips:1,time:3000});
+                    });
                 }
-                // var messageBody = "创建成功";
-                requestPool.forEach(function (p) {
-                    var AutoCloned = {};
-                    $.extend(AutoCloned, p);
-                    AutoCloned.explodeCountry = $("#selectRegionExplode").prop("checked");
-                    AutoCloned.explodeBidding = $("#inputBiddingExplode").prop("checked");
-                    AutoCloned.explodeAge = $("#inputAgeExplode").prop("checked");
-                    AutoCloned.explodeGender= $("#selectGenderExplode").prop("checked");
-                    AutoRequestPool.push(AutoCloned);
-                });
-                batchRequest(AutoRequestPool, function (param, onSuccess, onFail) {
-                    //fake
-                    console.log("start.. ", param);
-                    $.post(url, param, function (data) {
-                        if (data && data.ret == 1) {
-                            onSuccess();
-                        } else {
-                            onFail(data.message)
-                        }
-                    }, "json");
-                }, function () {
-                    //[仅设置为自动创建]队列全部处理完成
-                    layer.tips("自动创建队列处理完毕","#btnCreate",{tips:1,time:3000});
-                });
             }
         });
     }
