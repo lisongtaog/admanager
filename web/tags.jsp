@@ -227,9 +227,22 @@
             var td = $('<td></td>');
             td.text(one.id);
             tr.append(td);
+
             td = $('<td></td>');
             td.text(one.tag_name);
             tr.append(td);
+
+            td = $('<td></td>');
+            td.text(one.max_bidding);
+            tr.append(td);
+            td = $('<td></td>');
+            td.text(one.tag_category_id);
+            tr.append(td);
+
+            td = $('<td></td>');
+            td.text(one.category_name);
+            tr.append(td);
+
             td = $('<td><a class="link_modify glyphicon glyphicon-pencil" href="#"></a><a class="link_delete glyphicon glyphicon-remove" href="#"></a></td>');
             tr.append(td);
             $('.table tbody').append(tr);

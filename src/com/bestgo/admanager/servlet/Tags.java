@@ -73,14 +73,17 @@ public class Tags extends HttpServlet {
 
             } else if (path.startsWith("/query")) {
                 String word = request.getParameter("word");
-                if (word != null) {
+                if (StringUtil.isNotEmpty(word)) {
                     List<JSObject> data = fetchData(word);
                     json.addProperty("ret", 1);
                     JsonArray array = new JsonArray();
                     for (int i = 0; i < data.size(); i++) {
                         JsonObject one = new JsonObject();
                         one.addProperty("tag_name", (String)data.get(i).get("tag_name"));
-                        one.addProperty("id", (long)data.get(i).get("id"));
+                        one.addProperty("id", data.get(i).get("id").toString());
+                        one.addProperty("max_bidding", (Double)data.get(i).get("max_bidding"));
+                        one.addProperty("tag_category_id", data.get(i).get("tag_category_id").toString());
+                        one.addProperty("category_name", (String)data.get(i).get("category_name"));
                         array.add(one);
                     }
                     json.add("data", array);
@@ -95,7 +98,10 @@ public class Tags extends HttpServlet {
                     for (int i = 0; i < data.size(); i++) {
                         JsonObject one = new JsonObject();
                         one.addProperty("tag_name", (String)data.get(i).get("tag_name"));
-                        one.addProperty("id", (long)data.get(i).get("id"));
+                        one.addProperty("id", data.get(i).get("id").toString());
+                        one.addProperty("max_bidding", (Double)data.get(i).get("max_bidding"));
+                        one.addProperty("tag_category_id", data.get(i).get("tag_category_id").toString());
+                        one.addProperty("category_name", (String)data.get(i).get("category_name"));
                         array.add(one);
                     }
                     json.add("data", array);
@@ -185,8 +191,10 @@ public class Tags extends HttpServlet {
     public static List<JSObject> fetchData(String word) {
         List<JSObject> list = new ArrayList<>();
         try {
-            return DB.scan("web_tag").select("id", "tag_name")
-                    .where(DB.filter().whereLikeTo("tag_name", "%" + word + "%")).orderByAsc("id").execute();
+            //return DB.scan("web_tag").select("id", "tag_name")
+            //        .where(DB.filter().whereLikeTo("tag_name", "%" + word + "%")).orderByAsc("id").execute();
+            String sql = "select t.id,t.tag_name,t.max_bidding,t.tag_category_id,tc.category_name from web_tag t LEFT JOIN web_ad_tag_category tc ON t.tag_category_id = tc.id WHERE t.tag_name like ?";
+            return DB.findListBySql(sql,"%"+word+"%");
         } catch (Exception ex) {
             Logger logger = Logger.getRootLogger();
             logger.error(ex.getMessage(), ex);
