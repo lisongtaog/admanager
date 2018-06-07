@@ -20,6 +20,11 @@
 <html>
   <head>
     <title>自动创建系列管理</title>
+    <style>
+      .redline{
+        background-color: #dca7a7;
+      }
+    </style>
   </head>
   <body>
 
@@ -150,6 +155,7 @@
   <script src="js/core.js"></script>
   <script src="js\country-name-code-dict.js"></script>
   <script src="jqueryui/jquery-ui.min.js"></script>
+  <script src="js/core.js?t=20171210"></script>
 
   <script type="text/javascript">
     var network = "<%=network%>";
@@ -230,24 +236,38 @@
         collection.each(function(idx){
             var id = $(this).parents("tr").children("td:eq(0)").text();
             var bidding = $(this).val();
+            if(!parseFloat(bidding) || parseFloat(bidding)> 0.8){
+                $(this).addClass("redline");
+            }else{
+                if($(this).hasClass("redline")){
+                    $(this).removeClass("redline");
+                }
+            }
             var json = {};
             json.id = id;
             json.bidding = bidding;
             bidding_array.push(json);
         });
-        var bidding_array_string = JSON.stringify(bidding_array);
-        $.post("auto_create_campaign/<%=network%>/update_bidding",{
-            bidding_array:bidding_array_string
-        },function(data){
-            if(data && data.ret==1){
-                admanager.showCommonDlg("成功", data.message);
-                setTimeout(function(){
-                    $("#common_message_dialog").modal("hide");
-                },1500);
-            }else{
-                admanager.showCommonDlg("错误", data.message);
-            }
-        },"json")
+        if($(".redline").length == 0){
+            var bidding_array_string = JSON.stringify(bidding_array);
+            $.post("auto_create_campaign/<%=network%>/update_bidding",{
+                bidding_array:bidding_array_string
+            },function(data){
+                if(data && data.ret==1){
+                    admanager.showCommonDlg("成功", data.message);
+                    setTimeout(function(){
+                        $("#common_message_dialog").modal("hide");
+                    },1500);
+                }else{
+                    admanager.showCommonDlg("错误", data.message);
+                }
+            },"json")
+        }else{
+            setTimeout(function(){
+                $("#common_message_dialog").modal("hide");
+            },1500);
+            admanager.showCommonDlg("提示","请检查不符规则的输入");
+        }
     }
 
     //批量删除
