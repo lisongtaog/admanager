@@ -254,8 +254,6 @@ public class Campaign extends HttpServlet {
                                         flag = DB.updateBySql(sql);
                                     }
                                 }
-                                //测试用
-                                flag = false;
                                 if(!flag){
                                     DB.delete("ad_campaigns").where(DB.filter().whereEqualTo("campaign_name", campaignName)).execute();
                                     //返回前端提醒
