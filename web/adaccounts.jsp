@@ -25,17 +25,6 @@
   <div class="container-fluid">
     <%@include file="common/navigationbar.jsp"%>
 
-    <div>
-      <ul class="breadcrumb">
-        <li class="acitve">Facebook广告账号管理</li>
-        <li><a href="adaccounts_admob.jsp" target="_blank">Admob广告账号管理</a></li>
-        <li><a href="campaigns.jsp" target="_blank">Facebook广告系列管理</a></li>
-        <li><a href="campaigns_admob.jsp" target="_blank">Admob广告系列管理</a></li>
-        <li><a href="tags.jsp" target="_blank">标签管理</a></li>
-      </ul>
-    </div>
-
-
     <div class="panel panel-default">
       <!-- Default panel contents -->
       <div class="panel-heading">广告账号

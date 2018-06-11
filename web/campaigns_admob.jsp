@@ -31,16 +31,6 @@
 <div class="container-fluid">
     <%@include file="common/navigationbar.jsp"%>
 
-    <div>
-        <ul class="breadcrumb">
-            <li><a href="adaccounts.jsp" target="_blank">Facebook广告账号管理</a></li>
-            <li><a href="adaccounts_admob.jsp" target="_blank">Admob广告账号管理</a></li>
-            <li><a href="campaigns.jsp" target="_blank">Facebook广告系列管理</a></li>
-            <li class="active">Admob广告系列管理</li>
-            <li><a href="tags.jsp" target="_blank">标签管理</a></li>
-        </ul>
-    </div>
-
     <div class="panel panel-default">
         <div class="panel-heading">
             <button id="btnNotExistTagAdmobSearch" class="btn btn-default" name="false">只显示没有加上标签的广告系列</button>
