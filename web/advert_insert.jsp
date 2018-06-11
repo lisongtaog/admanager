@@ -18,6 +18,11 @@
         .red {
             color: red;
         }
+        tbody{
+            overflow-x: hidden;
+            overflow-y: auto;
+            height:400px;
+        }
     </style>
 </head>
 <body>
@@ -85,6 +90,7 @@
         <input type="button" class="btn btn-primary" id="inputTranslate" value="翻译&保存"/>
         <input type="button" class="btn btn-primary" id="saveEdition" value="保存修改">
         <br>
+        <div class="pre-scrollable" style="height: 420px; margin-top: 10px;">
         <table class="table table-hover" id="advertisement">
             <thead>
             <tr>
@@ -93,6 +99,7 @@
             </thead>
             <tbody id="tbody_facebook"></tbody>
         </table>
+        </div>
     </form>
 
 
@@ -142,13 +149,14 @@
         <input type="button" class="btn btn-primary" id="inputTranslateAdmob" value="翻译&保存"/>
         <input type="button" class="btn btn-primary" id="saveEditionAdmob" value="保存修改">
         <br>
+        <div class="pre-scrollable" style="height: 420px; margin-top: 10px;">
         <table class="table table-hover" id="advertisement_adwords">
             <thead>
             <tr><th>广告语组合</th><th>语言</th><th>广告语1</th><th>广告语2</th><th>广告语3</th><th>广告语4</th></tr>
             </thead>
             <tbody id="tbody_adwords"></tbody>
         </table>
-
+        </div>
     </form>
 
 </div>
@@ -245,25 +253,6 @@
         $("#saveEditionAdmob").hide();
     }
     init();
-
-    function sizeOfBytes(str,charset){
-        var bytes = 0;
-        if(charset==="utf-8"||charset==="utf8"){
-            for(var i=0;i<str.length;i++){
-                var charCode = str.charCodeAt(i);
-                if(charCode<=0x007f){
-                    bytes += 1;
-                }else if(charCode <= 0x07ff){
-                    bytes += 2;
-                }else if(charCode <= 0xffff){
-                    bytes += 3;
-                }else{
-                    bytes += 4;
-                }
-            }
-        }
-        return bytes;
-    }
 
     //翻译接口
     function translate(text,googleCodeTo,resolve,reject){

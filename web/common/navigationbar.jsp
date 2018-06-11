@@ -36,35 +36,49 @@
 <ul class="nav nav-pills">
 
     <%-- 下标从0开始 --%>
-    <li role="presentation"><a href="index.jsp">首页</a></li>
-    <li role="presentation"><a href="campaigns_create.jsp">创建广告</a></li>
+        <li role="presentation"><a href="index.jsp">首页</a></li>
+        <li role="presentation"><a href="campaigns_create.jsp">创建广告</a></li>
 
         <%-- 2 --%>
-    <li role="presentation"><a href="country_analysis_report.jsp">国家分析报告</a></li>
-    <li role="presentation"><a href="time_analysis_report.jsp">时间分析报告</a></li>
+        <li role="presentation"><a href="country_analysis_report.jsp">国家分析报告</a></li>
+        <li role="presentation"><a href="time_analysis_report.jsp">时间分析报告</a></li>
 
         <%-- 4 --%>
-    <li role="presentation"><a href="released_data_statistics.jsp">投放数据统计</a></li>
-    <li role="presentation"><a href="country_active_user_report.jsp">活跃用户报告</a></li>
+        <li role="presentation"><a href="released_data_statistics.jsp">投放数据统计</a></li>
+        <li role="presentation"><a href="country_active_user_report.jsp">活跃用户报告</a></li>
 
         <%-- 6 --%>
-    <li role="presentation"><a href="rules.jsp">规则</a></li>
-    <li role="presentation"><a href="query.jsp">查询</a></li>
+        <li role="presentation"><a href="rules.jsp">规则</a></li>
+        <li role="presentation"><a href="query.jsp">查询</a></li>
 
         <%-- 8 --%>
-    <li role="presentation"><a href="system.jsp">系统管理</a></li>
-    <li role="presentation"><a href="advert_insert.jsp">广告存储</a></li>
+        <li role="presentation" class="dropdown">
+            <a  href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true">
+                系统管理
+                <span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu">
+                <li><a href="system.jsp" >系统管理</a></li>
+                <li class="divider"></li>
+                <li><a href="adaccounts.jsp" target="_blank">Facebook广告账号管理</a></li>
+                <li><a href="adaccounts_admob.jsp" target="_blank">Admob广告账号管理</a></li>
+                <li><a href="campaigns.jsp" target="_blank">Facebook广告系列管理</a></li>
+                <li><a href="campaigns_admob.jsp" target="_blank">Admob广告系列管理</a></li>
+                <li><a href="tags.jsp" target="_blank">标签管理</a></li>
+            </ul>
+        </li>
+        <li role="presentation"><a href="advert_insert.jsp">广告存储</a></li>
 
         <%-- 10 --%>
-    <li role="presentation"><a href="advert_conversions_insert.jsp">转化录入</a></li>
-    <li role="presentation"><a href="app_activity_daily.jsp">应用日更记录</a></li>
+        <li role="presentation"><a href="advert_conversions_insert.jsp">转化录入</a></li>
+        <li role="presentation"><a href="app_activity_daily.jsp">应用日更记录</a></li>
 
         <%-- 12 --%>
-    <li role="presentation"><a href="project_team_total_ revenue_and_total_cost.jsp">项目组总收支</a></li>
-    <li role="presentation"><a href="app_image_video_rel_insert.jsp">应用图片视频关联录入</a></li>
+        <li role="presentation"><a href="project_team_total_ revenue_and_total_cost.jsp">项目组总收支</a></li>
+        <li role="presentation"><a href="app_image_video_rel_insert.jsp">应用图片视频关联录入</a></li>
 
         <%-- 14 --%>
-    <li role="presentation"><a href="material_analysis_report.jsp">素材分析报告</a></li>
+        <li role="presentation"><a href="material_analysis_report.jsp">素材分析报告</a></li>
 </ul>
 </body>
 </html>
