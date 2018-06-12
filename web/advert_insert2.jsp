@@ -58,7 +58,8 @@
                 <select class="form-control" id="selectApp">
                 </select>
             </div>
-            <label>广告语组合：</label><select id="selectAdvertGroupId"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option></select>
+            <select id="selectAdvertGroupId">
+            </select>
         </div><br>
 
         <div class="form-group">
@@ -118,7 +119,6 @@
             </div>
             <label>广告语组合：</label>
             <select id="selectAdvertGroupIdAdmob">
-                <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option>
             </select>
         </div><br>
 
@@ -225,6 +225,11 @@
     function init() {
         $("li[role='presentation']:eq(9)").addClass("active");
         $('.select2').select2();
+
+        for(var i = 1; i<=50;i++){
+            $("#selectAdvertGroupId").append("<option value='"+i+"'>"+i+"</option>");
+            $("#selectAdvertGroupIdAdmob").append("<option value='"+i+"'>"+i+"</option>");
+        }
 
         //这个类btn-more在本jsp页里已经找不到了
         $('.btn-more').click(function() {
