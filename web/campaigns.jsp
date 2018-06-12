@@ -30,16 +30,6 @@
 <div class="container-fluid">
     <%@include file="common/navigationbar.jsp"%>
 
-    <table>
-        <tr>
-            <td ><a href="adaccounts.jsp" target="_blank" >&nbsp;&nbsp;Facebook广告账号管理&nbsp;&nbsp;</a></td>
-
-            <td ><a href="adaccounts_admob.jsp" target="_blank" > &nbsp;&nbsp;Admob广告账号管理 &nbsp;&nbsp;</a></td>
-
-            <td ><a href="campaigns_admob.jsp" target="_blank">  &nbsp;&nbsp;Admob广告系列管理 &nbsp;&nbsp;  </a></td>
-            <td ><a href="tags.jsp" target="_blank"> &nbsp;&nbsp;  标签管理  &nbsp;&nbsp; </a></td>
-        </tr>
-    </table>
     <div class="panel panel-default">
         <div class="panel-heading">
             <button id="btnNotExistTagSearch" class="btn btn-default" name="false">只显示没有加上标签的广告系列</button>
@@ -58,7 +48,7 @@
             <%
                 List<JSObject> data = new ArrayList<>();
                 long totalPage = 0;
-                long count = Campaign.count();
+                long count = Campaign.count();  //得到系列总数
                 int index = Utils.parseInt(request.getParameter("page_index"), 0);
                 int size = Utils.parseInt(request.getParameter("page_size"), 20);
                 totalPage = count / size + (count % size == 0 ? 0 : 1);
@@ -267,12 +257,13 @@
         if(this.name == "false"){
             $('#btnNotExistTagSearch').css("background-color","red");
             this.name = "true";
-            $.post('campaign/query_not_exist_tag_campaingns',{
+            $.post('campaign/fetch_not_exist_tag_campaigns',{
             },function(data) {
                 if (data && data.ret == 1) {
-                    $('.table tbody > tr').remove();
+                    $(".table tbody > tr").remove();
                     setData(data.data);
                     bindOp();
+                    $("nav").empty();
                 } else {
                     admanager.showCommonDlg("错误", data.message);
                 }

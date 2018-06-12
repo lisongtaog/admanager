@@ -25,17 +25,6 @@
   <div class="container-fluid">
     <%@include file="common/navigationbar.jsp"%>
 
-    <table>
-      <tr>
-        <td ><a href="adaccounts_admob.jsp" target="_blank"> &nbsp;&nbsp;Admob广告账号管理 &nbsp;&nbsp;</a></td>
-        <td ><a href="campaigns.jsp" target="_blank"> &nbsp;&nbsp;  Facebook广告系列管理 &nbsp;&nbsp;  </a></td>
-
-        <td ><a href="campaigns_admob.jsp" target="_blank">  &nbsp;&nbsp; Admob广告系列管理 &nbsp;&nbsp;  </a></td>
-        <td ><a href="tags.jsp" target="_blank"> &nbsp;&nbsp;  标签管理  &nbsp;&nbsp; </a></td>
-      </tr>
-    </table>
-
-
     <div class="panel panel-default">
       <!-- Default panel contents -->
       <div class="panel-heading">广告账号

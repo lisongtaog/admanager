@@ -256,7 +256,9 @@ public class Campaign extends HttpServlet {
                                 }
                                 if(!flag){
                                     DB.delete("ad_campaigns").where(DB.filter().whereEqualTo("campaign_name", campaignName)).execute();
+                                    //返回前端提醒
                                     System.out.println("由于Media导致第"+(i+1)+"个系列创建失败,名为["+campaignName + "]的系列已经被删除！");
+                                    result.warning = "由于Media导致第"+(i+1)+"个系列创建失败,名为["+campaignName + "]的系列已经被删除！";
                                 }
                             } else {
                                 Logger logger = Logger.getRootLogger();
@@ -276,6 +278,7 @@ public class Campaign extends HttpServlet {
             }
             json.addProperty("ret", result.result ? 1 : 0);
             json.addProperty("message", result.message);
+            json.addProperty("warning",result.warning); //目前仅在Media导致的系列创建后又删除下有用
         } else if (path.startsWith("/update")) {
             String id = request.getParameter("id");
             String campaignId = request.getParameter("campaignId");
@@ -656,32 +659,32 @@ public class Campaign extends HttpServlet {
                 }
                 json.add("data", array);
             }
-        } else if (path.startsWith("/query_not_exist_tag_campaingns")) {
+        } else if (path.startsWith("/fetch_not_exist_tag_campaigns")) {
             JsonArray array = new JsonArray();
-            String sqlCampaignIds = "select campaign_id from web_ad_campaign_tag_rel";
-            
-            String sqlAll = "select campaign_id from web_ad_campaigns";
-            List<JSObject> data = new ArrayList<>();
+//            String sqlCampaignIds = "select campaign_id from web_ad_campaign_tag_rel";
+//
+//            String sqlAll = "select campaign_id from web_ad_campaigns";
+//            List<JSObject> data = new ArrayList<>();
             try {
-                List<JSObject> campaignIdsList = DB.findListBySql(sqlCampaignIds);
-                Set<String>  campaignIdsSet = new HashSet<>();
-                for(JSObject j : campaignIdsList){
-                    campaignIdsSet.add(j.get("campaign_id"));
-                }
-                List<JSObject> allList = DB.findListBySql(sqlAll);
-                Set<String>  allSet = new HashSet<>();
-                for(JSObject k : allList){
-                    allSet.add(k.get("campaign_id"));
-                }
-                List<String> diffList = Utils.getDiffrentStrList(allSet, campaignIdsSet);
-                String allStr = "";
-                for(String j : diffList){
-                    allStr += j + ",";
-                }
-                allStr = allStr.substring(0,allStr.length()-1);
+//                List<JSObject> campaignIdsList = DB.findListBySql(sqlCampaignIds);
+//                Set<String>  campaignIdsSet = new HashSet<>();
+//                for(JSObject j : campaignIdsList){
+//                    campaignIdsSet.add(j.get("campaign_id"));
+//                }
+//                List<JSObject> allList = DB.findListBySql(sqlAll);
+//                Set<String>  allSet = new HashSet<>();
+//                for(JSObject k : allList){
+//                    allSet.add(k.get("campaign_id"));
+//                }
+//                List<String> diffList = Utils.getDiffrentStrList(allSet, campaignIdsSet);
+//                String allStr = "";
+//                for(String j : diffList){
+//                    allStr += j + ",";
+//                }
+//                allStr = allStr.substring(0,allStr.length()-1);
                 String sqlFilterAll = "select id,campaign_id,adset_id,account_id,campaign_name,create_time,status,budget,bidding," +
-                        "total_spend,total_click,total_installed,cpa,ctr,effective_status from web_ad_campaigns where campaign_id in (" + allStr + ")";
-                data = DB.findListBySql(sqlFilterAll);
+                        "total_spend,total_click,total_installed,cpa,ctr,effective_status from web_ad_campaigns where tag_id = 0 ";
+                List<JSObject> data = DB.findListBySql(sqlFilterAll);
                 if(data != null){
                     for (int i = 0,len = data.size(); i < len; i++) {
                         JsonObject one = new JsonObject();

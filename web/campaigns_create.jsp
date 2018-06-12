@@ -440,7 +440,7 @@
         }
     });
 </script>
-<script src="js/campaign_create.js?t=20180531"></script>
+<script src="js/campaign_create.js?t=<%=Math.random()%>"></script>
 
 </body>
 </html>

@@ -368,6 +368,7 @@ public class AutoCreateCampaign extends HttpServlet {
                 if (maxBiddingDouble != null && maxBiddingDouble != 0 && dBidding > maxBiddingDouble) {
                     result.message = "bidding超过了本应用的最大出价,   " + bidding + " > " + maxBiddingDouble;
                 } else{
+                    //路径检查
                     if(!imagePath.isEmpty()){
                         JSObject record = DB.simpleScan("web_system_config").select("config_value").where(DB.filter().whereEqualTo("config_key", "fb_image_path")).execute();
                         String imageRoot = null;

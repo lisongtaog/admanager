@@ -30,16 +30,6 @@
 
 <div class="container-fluid">
     <%@include file="common/navigationbar.jsp"%>
-    <table>
-        <tr>
-            <td ><a href="adaccounts.jsp" target="_blank" >&nbsp;&nbsp;Facebook广告账号管理&nbsp;&nbsp;</a></td>
-
-            <td ><a href="adaccounts_admob.jsp" target="_blank" > &nbsp;&nbsp;Admob广告账号管理 &nbsp;&nbsp;</a></td>
-            <td ><a href="campaigns.jsp" target="_blank"> &nbsp;&nbsp;  Facebook广告系列管理 &nbsp;&nbsp;  </a></td>
-
-            <td ><a href="tags.jsp" target="_blank"> &nbsp;&nbsp;  标签管理  &nbsp;&nbsp; </a></td>
-        </tr>
-    </table>
 
     <div class="panel panel-default">
         <div class="panel-heading">
@@ -233,10 +223,11 @@
             $('#btnNotExistTagAdmobSearch').css("background-color","red");
             this.name = "true";
             $('.table tbody > tr').remove();
-            $.post('campaign_admob/query_campaigns_not_exist_tag',function(data) {
+            $.post('campaign_admob/fetch_campaigns_not_exist_tag',function(data) {
                 if (data && data.ret == 1) {
                     setData(data.data);
                     bindOp();
+                    $("nav").empty();
                 } else {
                     admanager.showCommonDlg("错误", data.message);
                 }

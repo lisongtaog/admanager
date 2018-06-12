@@ -101,10 +101,9 @@
                     <span class="recordFont">应用日志</span>
                     <textarea id="inputContent"></textarea>
                 </div>
-                <div class="content2">
+                <div class="content2 btn-group">
                     <button id="deleteContent" class="btn btn-default">清除</button>
-                    &nbsp;&nbsp;
-                    <button id="createContent" class="btn btn_default">更新</button>
+                    <button id="createContent" class="btn btn-default">更新</button>
                 </div>
         </div>
     </div>
