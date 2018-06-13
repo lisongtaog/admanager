@@ -98,7 +98,7 @@
         <tr><th>ID</th><th>标签</th><th>广告账号</th><th>FB应用ID</th><th>FB主页ID</th><th>应用包名</th><th>Firebase工程ID</th><th>操作</th></tr>
         </thead>
         <tbody>
-        <%
+        <%--<%
           List<JSObject> data = new ArrayList<>();
           long totalPage = 0;
           long count = com.bestgo.admanager.servlet.System.countFacebookAppRelation();
@@ -124,9 +124,9 @@
           <td><%=one.get("page_id")%></td>
           <td><%=one.get("google_package_id")%></td>
           <td><%=one.get("firebase_project_id")%></td>
-          <td><a class="link_modify glyphicon glyphicon-pencil" href="#"></a><a class="link_delete glyphicon glyphicon-remove" href="#"></a></td>
+          <td><a class="link_modify glyphicon glyphicon-pencil" href="#" fbpages = "<%=one.get("fbPages")%>"></a><a class="link_delete glyphicon glyphicon-remove" href="#"></a></td>
         </tr>
-        <% } %>
+        <% } %>--%>
         </tbody>
       </table>
 
@@ -192,13 +192,24 @@
                 </div>
               </div>
               <div class="form-group">
-                <label for="inputPageId" class="col-sm-2 control-label">FB主页ID</label>
+                <label class="col-sm-2 control-label">
+                  FB主页
+                  <button type="button" class="btn btn-info" onclick="add_fb_page()">添加</button>
+                </label>
+
                 <div class="col-sm-10">
-                  <input type="text" class="form-control" id="inputPageId" placeholder="FB主页ID" autocomplete="off">
+                    <input type="text" class="form-control" id="inputPageId" placeholder="FB主页ID" autocomplete="off">
+                  <table id="fb_page" style="border:#4a98ff 1px solid">
+                    <tr>
+                      <th>facebook主页ID</th>
+                      <th>facebook主页NAME</th>
+                      <th>操作</th>
+                    </tr>
+                  </table>
                 </div>
               </div>
               <div class="form-group">
-                <label for="inputPageId" class="col-sm-2 control-label">应用包名</label>
+                <label for="inputGPPackageId" class="col-sm-2 control-label">应用包名</label>
                 <div class="col-sm-10">
                   <input type="text" class="form-control" id="inputGPPackageId" placeholder="应用包名" autocomplete="off">
                 </div>
@@ -229,9 +240,11 @@
   <script type="text/javascript">
     var modifyType;
     var id;
+    var _tagName;
     $("li[role='presentation']:eq(8)").addClass("active");
     function bindTableFBOp() {
       $('#tableFBAppRel .link_modify').click(function () {
+        clearRelationForm();//清空表单数据
         var tds = $(this).parents("tr").find('td');
         id = $(tds.get(0)).text();
         var tagName = $(tds.get(1)).text();
@@ -241,12 +254,19 @@
         var gpPackageId = $(tds.get(5)).text();
         var firebaseProjectId = $(tds.get(6)).text();
 
+        //facebook首页信息
+        var fbPages =  $.parseJSON($(this).attr("fbpages"));
+
         $('#inputTagName').val(tagName);
         $('#inputAccountId').val(accountId);
         $('#inputFBAppId').val(fbAppId);
         $('#inputPageId').val(fbPageId);
         $('#inputGPPackageId').val(gpPackageId);
         $('#inputFirebaseProjectId').val(firebaseProjectId);
+        for(var i = 0 ; i < fbPages.length ;i++){//修改时 将facebook主页信息回显
+            var page = fbPages[i].data;
+            add_fb_page(page.id,page.page_id,page.page_name);
+        }
 
         modifyType = 'update';
         $('#delete_rel_message').hide();
@@ -258,7 +278,7 @@
       $('#tableFBAppRel .link_delete').click(function () {
         var tds = $(this).parents("tr").find('td');
         id = $(tds.get(0)).text();
-
+      _tagName = $(tds.get(1)).text();
         modifyType = 'delete';
         $('#delete_rel_message').show();
         $('#modify_rel_form').hide();
@@ -268,6 +288,8 @@
     }
 
     function bindOp() {
+      nextPage();
+
       $('#tableParamters .link_modify').click(function () {
         var tds = $(this).parents("tr").find('td');
         var key = $(tds.get(0)).text();
@@ -304,33 +326,41 @@
       });
 
       var currPageIndex = 0;
+        /**
+         *上一页
+         * */
+        function prevPage() {
+            $.post('system/fb_app_id_rel/query', {
+                page_index: currPageIndex > 0 ? --currPageIndex : 0,
+            }, function(data) {
+                if (data && data.ret == 1) {
+                    $('#tableFBAppRel tbody > tr').remove();
+                    setData(data.data);
+                    bindTableFBOp();
+                } else {
+                    admanager.showCommonDlg("错误", data.message);
+                }
+            }, 'json');
+        }
+        /**
+         *下一页
+         * */
+        function nextPage() {
+            $.post('system/fb_app_id_rel/query', {
+                page_index: ++currPageIndex,
+            }, function(data) {
+                if (data && data.ret == 1) {
+                    $('#tableFBAppRel tbody > tr').remove();
+                    setData(data.data);
+                    bindTableFBOp();
+                } else {
+                    admanager.showCommonDlg("错误", data.message);
+                }
+            }, 'json');
+        }
+      $('#prevPage').click(prevPage);
+      $('#nextPage').click(nextPage);
 
-      $('#prevPage').click(function() {
-        $.post('system/fb_app_id_rel/query', {
-          page_index: currPageIndex > 0 ? --currPageIndex : 0,
-        }, function(data) {
-          if (data && data.ret == 1) {
-            $('#tableFBAppRel tbody > tr').remove();
-            setData(data.data);
-            bindTableFBOp();
-          } else {
-            admanager.showCommonDlg("错误", data.message);
-          }
-        }, 'json');
-      });
-      $('#nextPage').click(function () {
-        $.post('system/fb_app_id_rel/query', {
-          page_index: ++currPageIndex,
-        }, function(data) {
-          if (data && data.ret == 1) {
-            $('#tableFBAppRel tbody > tr').remove();
-            setData(data.data);
-            bindTableFBOp();
-          } else {
-            admanager.showCommonDlg("错误", data.message);
-          }
-        }, 'json');
-      });
 
       function setData(data) {
         for (var i = 0; i < data.length; i++) {
@@ -357,7 +387,7 @@
             td = $('<td></td>');
             td.text(one.firebase_project_id);
             tr.append(td);
-          td = $('<td><a class="link_modify glyphicon glyphicon-pencil" href="#"></a>&nbsp;&nbsp;<a class="link_delete glyphicon glyphicon-remove" href="#"></a></td>');
+          td = $('<td><a class="link_modify glyphicon glyphicon-pencil" href="#" fbpages = '+one.fbPages+'></a>&nbsp;&nbsp;<a class="link_delete glyphicon glyphicon-remove" href="#"></a></td>');
           tr.append(td);
           $('#tableFBAppRel tbody').append(tr);
         }
@@ -365,6 +395,8 @@
 
       $('#btn_add_new_relation').click(function() {
         modifyType = 'new';
+        clearRelationForm();//清空表单数据
+        add_fb_page();//默认添加一行 FB主页信息
         $('#delete_rel_message').hide();
         $('#modify_rel_form').show();
         $("#dlg_fb_app_rel_title").text("新建关系");
@@ -379,11 +411,15 @@
           var pageId = $('#inputPageId').val();
           var gpPackageId = $('#inputGPPackageId').val();
           var firebaseProjectId = $('#inputFirebaseProjectId').val();
+
+          var fbPages = genFBPageJSON();
+
           $.post('system/fb_app_id_rel/create', {
             tagName: tagName,
             accountId: accountId,
             fbAppId: fbAppId,
               pageId: pageId,
+              fbPages:JSON.stringify(fbPages),
               gpPackageId: gpPackageId,
               firebaseProjectId: firebaseProjectId
           }, function(data) {
@@ -401,12 +437,14 @@
           var pageId = $('#inputPageId').val();
           var gpPackageId = $('#inputGPPackageId').val();
           var firebaseProjectId = $('#inputFirebaseProjectId').val();
+          var fbPages = genFBPageJSON();
           $.post('system/fb_app_id_rel/update', {
             id: id,
             tagName: tagName,
             accountId: accountId,
             fbAppId: fbAppId,
             pageId: pageId,
+            fbPages:JSON.stringify(fbPages),
             gpPackageId: gpPackageId,
               firebaseProjectId: firebaseProjectId
           }, function(data) {
@@ -418,10 +456,9 @@
             }
           }, 'json');
         } else if (modifyType == 'delete') {
-          var tagName = $('#inputTagName').val();
-
           $.post('system/fb_app_id_rel/delete', {
             id: id,
+            tagName: _tagName
           }, function(data) {
             if (data && data.ret == 1) {
               $("#new_fb_app_rel_dlg").modal("hide");
@@ -432,6 +469,91 @@
           }, 'json');
         }
       });
+    }
+
+    /**
+     * 添加FB主页记录
+     */
+    function clearRelationForm(){
+        $('#inputTagName').val("");
+        $('#inputAccountId').val("");
+        $('#inputFBAppId').val("");
+        $('#inputPageId').val("");
+        $('#inputGPPackageId').val("");
+        $('#inputFirebaseProjectId').val("");
+        $("#fb_page tr:not(:first)").empty();
+    }
+
+    /**
+     * 删除FB主页记录
+     * @param thizz
+     */
+    function del_fb_page(thizz) {
+        var tr = $(thizz).parent().parent();
+        var table = tr.parent();
+        var countTr = $("#fb_page tr").length;
+        //仅保留 表头和第一条数据，至少保留一条数据
+        if(countTr > 2){
+            tr.remove();
+        }else(
+            alert("至少保留一条FB主页信息")
+        )
+    }
+
+    /**
+     * 添加FB主页记录
+     */
+    function add_fb_page(id,pageId,pageName) {
+        console.log(id);
+        if(id === undefined) id = "";
+        if(pageId === undefined) pageId = "";
+        if(pageName === undefined) pageName = "";
+
+        var tr = $("<tr>" +
+          "<input type=\"hidden\" name=\"id\" value=\""+ id +"\" placeholder=\"数据库表主键\"/>" +
+          "<td><input type=\"text\" name=\"page_id\" value=\""+ pageId +"\" placeholder=\"FB主页ID\"/></td>" +
+          "<td><input type=\"text\" name=\"page_name\" value=\""+ pageName +"\" placeholder=\"FB主页NAME\"/></td>"  +
+          "<td><button type=\"button\" class=\"btn btn-link\" onclick=\"del_fb_page(this)\">删除</button></td>" +
+          "</tr>"
+        );
+        $("#fb_page").append(tr);
+    }
+    /**
+     * FB首页信息 组织为JSON
+     */
+    function genFBPageJSON(){
+        var fbIds = [];
+        var fbPageIds = [];
+        var fbPageNames = [];
+
+        $("#fb_page :input[name='id']").each(function(){
+            var id = $(this).val();
+            //fbIds.push(id);
+            //使用时间戳占位，后台暂时没有用到该属性;修改时 使用先删除 后插入的逻辑
+            fbIds.push(""+ new Date().getTime());
+        });
+
+        $("#fb_page :input[name='page_id']").each(function(){
+            var pageId = $(this).val();
+            fbPageIds.push(pageId);
+        });
+
+        $("#fb_page :input[name='page_name']").each(function(){
+            var pageName = $(this).val();
+            fbPageNames.push(pageName);
+        });
+
+        var fbPages = [];
+        var fbPageItem;
+        for(var i=0;i< fbPageIds.length;i++){
+            fbPageItem ={};
+            fbPageItem.id = fbIds[i];
+            fbPageItem.page_id = fbPageIds[i];
+            fbPageItem.page_name = fbPageNames[i];
+            fbPages.push(fbPageItem);
+        }
+
+        return fbPages;
     }
 
     bindOp();

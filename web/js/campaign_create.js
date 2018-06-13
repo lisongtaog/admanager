@@ -642,6 +642,22 @@ function batchRequest(params, send, onFinish) {
     next();
 }
 
+//获取facebook主页信息下拉框
+function getFBPages(tagName) {
+    $.post('system/fb_app_id_rel/queryFBPage', {tagName: tagName}, function (data) {
+        if (data) {
+            $('#selectFBPage').empty();
+            var fbPages = $.parseJSON(data.data);
+            var page;
+            fbPages.forEach(function (item) {
+                page = item.data;
+                $('#selectFBPage').append($("<option value='" + page.page_id + "'>" + page.page_name + "</option>"));
+            });
+        } else {
+            admanager.showCommonDlg("错误", data.message);
+        }
+    }, 'json');
+}
 //执行由app_name自动补充图片和视频路径
 $("#selectApp").change(function() {
     $("#tbody_facebook").empty();
@@ -651,6 +667,7 @@ $("#selectApp").change(function() {
     var checkFacebook = $("#checkFacebook").prop("checked");
     if (checkFacebook) {
         var appName = $("#selectApp").val();
+        getFBPages(appName);//获取facebook主页信息下拉框
         $.post("app_image_video_rel/query_facebook_path_by_app", {
             app_name: appName
         }, function (data) {
@@ -692,6 +709,7 @@ $("#selectApp").change(function() {
     }, "json");
     return false;
 });
+
 $("#selectAppAdmob").change(function(){
     $("#inputImagePath").val("");
     $('#checkAdmob').click();
@@ -851,6 +869,8 @@ function FacebookFormReading(){
 
     var createCount = $("#inputCreateCount").val();
     var region = $('#selectRegion').val();
+    var fbPage = $('#selectFBPage').val();//facebooke主页
+
     var excludedRegion = $('#selectRegionUnselected').val();
     var language = $('#selectLanguage').val();
     var age = $('#inputAge').val();
@@ -926,6 +946,20 @@ function FacebookFormReading(){
             key:"pageId",
             values:[app.page_id]
         });
+
+        if ($("#selectFBPageExplode").prop("checked")) {
+            explodeListImage.push({
+                key: 'pageId',
+                values: fbPage.map(function (x) {
+                    return x.trim();
+                })
+            })
+        } else {
+            explodeListImage.push({
+                key: 'pageId',
+                values: [fbPage.join(",")]
+            })
+        }
         if ($("#selectRegionExplode").prop("checked")) {
             explodeListImage.push({
                 key: 'region',
@@ -1090,6 +1124,21 @@ function FacebookFormReading(){
             key:"pageId",
             values:[app.page_id]
         });
+
+        if ($("#selectFBPageExplode").prop("checked")) {
+            explodeListVideo.push({
+                key: 'pageId',
+                values: fbPage.map(function (x) {
+                    return x.trim();
+                })
+            })
+        } else {
+            explodeListVideo.push({
+                key: 'pageId',
+                values: [fbPage.join(",")]
+            })
+        }
+
         if ($("#selectRegionExplode").prop("checked")) {
             explodeListVideo.push({
                 key: 'region',

@@ -127,6 +127,17 @@
         </div>
 
         <div class="form-group">
+            <label for="selectFBPage" class="col-sm-2 control-label">FB主页</label>
+            <div class="col-sm-8">
+                <select class="form-control select2" id="selectFBPage" multiple="multiple">
+                </select>
+            </div>
+            <div class="col-sm-2">
+                <label title="选中后每个选项创建一个或多个广告系列"><input type="checkbox" checked="checked" class="form-check-input" id="selectFBPageExplode">分离到系列</label>
+            </div>
+        </div>
+
+        <div class="form-group">
             <label for="selectRegion" class="col-sm-2 control-label">国家地区</label>
             <div class="col-sm-7">
                 <select class="form-control select2" id="selectRegion" multiple="multiple">
