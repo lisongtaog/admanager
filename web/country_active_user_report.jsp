@@ -87,7 +87,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.4/js/select2.min.js"></script>
 
 <script>
-    $("li[role='presentation']:eq(5)").addClass("active");
+    $("li[role='presentation']:eq(2)").addClass("active");
     var data = <%=array.toString()%>;
     $("#inputSearch").autocomplete({
         source: data

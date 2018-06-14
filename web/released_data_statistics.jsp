@@ -122,7 +122,7 @@
             return y+"-"+(m<10?"0"+m:m)+"-"+(d<10?"0"+d:d);
         }
 
-        $("li[role='presentation']:eq(4)").addClass("active");
+        $("li[role='presentation']:eq(2)").addClass("active");
         var data = <%=array.toString()%>;
         $("#inputNickname").autocomplete({
             source: data

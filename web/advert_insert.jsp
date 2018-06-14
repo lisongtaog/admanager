@@ -208,7 +208,7 @@
         {"language":"Uzbek","code":"uz"}, {"language":"Vietnamese","code":"vi"}];
     //界面加载好以后初始化的数据
     function init() {
-        $("li[role='presentation']:eq(9)").addClass("active");
+        $("li[role='presentation']:eq(6)").addClass("active");
         $('.select2').select2();
         for(var i = 1; i<=50;i++){
             $("#selectAdvertGroupId").append("<option value='"+i+"'>"+i+"</option>");

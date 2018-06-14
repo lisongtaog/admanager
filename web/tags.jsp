@@ -137,7 +137,7 @@
 <script type="text/javascript">
     var modifyType = 'new';
     var id;
-    $("li[role='presentation']:eq(8)").addClass("active");
+    $("li[role='presentation']:eq(3)").addClass("active");
     $("#btn_add_new_tag").click(function() {
         modifyType = 'new';
         $('#delete_message').hide();

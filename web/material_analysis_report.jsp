@@ -103,7 +103,7 @@
 <script src="js/layer/layer.js" ></script>
 
 <script>
-    $("li[role='presentation']:eq(14)").addClass("active");
+    $("li[role='presentation']:eq(2)").addClass("active");
     var now = new Date(new Date().getTime() - 86400 * 1000);
     $('#inputStartTime').val(now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + now.getDate());
     $('#inputEndTime').val(now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + now.getDate());

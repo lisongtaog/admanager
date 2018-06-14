@@ -241,7 +241,7 @@
         });
     },"json")
 
-    $("li[role='presentation']:eq(3)").addClass("active");
+    $("li[role='presentation']:eq(2)").addClass("active");
     //首先由默认的时间显示
     var now = new Date(new Date().getTime() - 86400 * 1000);
     $('#inputStartTime').val(now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + now.getDate());

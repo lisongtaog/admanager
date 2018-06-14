@@ -241,7 +241,7 @@
     var modifyType;
     var id;
     var _tagName;
-    $("li[role='presentation']:eq(8)").addClass("active");
+    $("li[role='presentation']:eq(3)").addClass("active");
     function bindTableFBOp() {
       $('#tableFBAppRel .link_modify').click(function () {
         clearRelationForm();//清空表单数据
