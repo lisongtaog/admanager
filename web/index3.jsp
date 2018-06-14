@@ -70,62 +70,93 @@
     <%@include file="common/navigationbar.jsp"%>
 
     <div class="panel panel-default" style="margin-top: 10px"  id="panel_title">
-        <div class="panel-heading">
-            <label for="inputStartTime">开始日期</label>
-            <input type="text" value="2012-05-15" id="inputStartTime" readonly>
-            <label for="inputEndTime">结束日期</label>
-            <input type="text" value="2012-05-15" id="inputEndTime" readonly>
-            <input type="checkbox" name="adnetwork" id="facebookCheck"/><label for="facebookCheck">只显示Facebook</label>
-            <input type="checkbox" name="adnetwork" id="adwordsCheck"/><label for="adwordsCheck">只显示AdWords</label>
-            <button id="btnSummary" class="btn btn-default">汇总数据</button>
-        </div>
-        <div class="panel-heading">
-            <label for="inputSearch">标签</label>
-            <input id="inputSearch" class="form-control" style="display: inline; width: auto;" type="text"/>
-            <button id="updateAppMaterialPath" class="btn btn-default glyphicon glyphicon-refresh" >路径</button>
-            <label for="inputCountry">国家</label>
-            <input id="inputCountry" class="form-control" style="display: inline; width: auto;" type="text"/>
-            <input type="checkbox" id="countryCheck"/><label for="countryCheck">细分到国家</label>
-            <label for="inputCampaignCreateTime">系列创建时间</label>
-            <input type="text" id="inputCampaignCreateTime"  placeholder="ChinaTime">
-            <label for="inputLikeCampaignName">系列名称</label>
-            <input type="text" id="inputLikeCampaignName" />
-            <br>
-            <label for="totalInstallOperator">总安装</label>
-            <select id="totalInstallOperator"><option value="1" selected="true">大于</option><option value="2">小于</option><option value="3">等于</option></select>
-            <input id="inputTotalInstallComparisonValue" class="form-control" style="display: inline; width: auto;" type="text"/>
+        <form class="form-inline">
+            <div class="form-group form-group-sm panel-heading">
+                <label class="control-label" for="inputStartTime">开始日期</label>
+                <input class="form-control" type="text" value="2012-05-15" id="inputStartTime" readonly>
+                <label class="control-label" for="inputEndTime">结束日期</label>
+                <input class="form-control" type="text" value="2012-05-15" id="inputEndTime" readonly>
+                <input class="form-control" type="checkbox" name="adnetwork" id="facebookCheck"/>
+                <label class="control-label" for="facebookCheck">只显示Facebook</label>
+                <input class="form-control" type="checkbox" name="adnetwork" id="adwordsCheck"/>
+                <label class="control-label" for="adwordsCheck">只显示AdWords</label>
+                <button id="btnSummary" class="btn btn-success">汇总数据</button>
+            </div>
+            <div class="form-group form-group-sm panel-heading">
+                <label class="control-label" for="inputSearch">标签</label>
+                <div class="input-group input-group-sm">
+                    <input id="inputSearch" class="form-control" type="text"/>
+                    <span class="input-group-btn">
+                    <button id="updateAppMaterialPath" class="btn btn-warning glyphicon glyphicon-refresh" type="button">路径</button>
+                  </span>
+                <%--<input type="text" class="form-control">--%>
+                </div>
+                <label class="control-label" for="inputCountry">国家</label>
+                <input id="inputCountry" class="form-control" type="text"/>
+                <input class="form-control" type="checkbox" id="countryCheck"/><label for="countryCheck">细分到国家</label>
+                <label class="control-label" for="inputCampaignCreateTime">系列创建时间</label>
+                <input class="form-control" type="text" id="inputCampaignCreateTime"  placeholder="ChinaTime">
+                <label class="control-label" for="inputLikeCampaignName">系列名称</label>
+                <input class="form-control" type="text" id="inputLikeCampaignName" />
+            </div>
+            <div class="form-group form-group-sm panel-heading">
+                <label class="control-label" for="totalInstallOperator">总安装</label>
+                <select class="form-control" id="totalInstallOperator">
+                    <option value="1" selected="true">大于</option>
+                    <option value="2">小于</option>
+                    <option value="3">等于</option>
+                </select>
+                <input class="form-control" id="inputTotalInstallComparisonValue" type="text"/>
 
-            <label for="cpaOperator">CPA</label>
-            <select id="cpaOperator"><option value="4" selected="true">大于</option><option value="5">小于</option><option value="6">等于</option></select>
-            <input id="inputCpaComparisonValue" class="form-control" style="display: inline; width: auto;" type="text" />
+                <label class="control-label" for="cpaOperator">CPA</label>
+                <select class="form-control" id="cpaOperator">
+                    <option value="4" selected="true">大于</option>
+                    <option value="5">小于</option>
+                    <option value="6">等于</option>
+                </select>
+                <input class="form-control" id="inputCpaComparisonValue" type="text" />
 
-            <label for="biddingOperator">竞价</label>
-            <select id="biddingOperator"><option value="7" selected="true">大于</option><option value="8">小于</option><option value="9"  selected="true">等于</option></select>
-            <input id="inputBiddingComparisonValue" class="form-control" style="display: inline; width: auto;" type="text"/>
-            <input type="checkbox" name="filtrateCampaign" id="containsNoDataCampaignCheck"/><label for="containsNoDataCampaignCheck">包含无数据的系列</label>
-            <button id="btnSearch" class="btn btn-default glyphicon glyphicon-search"></button>
+                <label class="control-label" for="biddingOperator">竞价</label>
+                <select class="form-control" id="biddingOperator">
+                    <option value="7" selected="true">大于</option>
+                    <option value="8">小于</option>
+                    <option value="9"  selected="true">等于</option>
+                </select>
+                <input class="form-control" id="inputBiddingComparisonValue" type="text"/>
+                <input class="form-control" type="checkbox" name="filtrateCampaign" id="containsNoDataCampaignCheck"/>
+                <label class="control-label" for="containsNoDataCampaignCheck">包含无数据的系列</label>
+            </div>
 
-            <button id="btnQueryNoData" class="btn btn-default">查询无数据的系列</button>
-        </div>
-        <div class="panel-heading">
-            <label for="selectCostOp">花费比例</label>
-            <select id="selectCostOp"><option value="1">大于等于</option><option value="2" selected="true">小于等于</option></select>
-            <input id="inputCostRate" class="form-control" style="display: inline; width: auto;" type="text" value="0.5"/>
-            <label for="selectConversionOp">转化</label>
-            <select id="selectConversionOp"><option value="1">大于等于</option><option value="2" selected="true">小于等于</option></select>
-            <input id="inputConversion" class="form-control" style="display: inline; width: auto;" type="text" value="1"/>
+            <div class="form-group form-group-sm panel-heading">
+                <button id="btnSearch" class="btn btn-info glyphicon glyphicon-search"></button> |
+                <button id="btnQueryNoData" class="btn btn-info">查询无数据的系列</button>
+            </div>
+            <div class="panel-heading">
+                <label for="selectCostOp">花费比例</label>
+                <select class="form-control" id="selectCostOp">
+                    <option value="1">大于等于</option>
+                    <option value="2" selected="true">小于等于</option>
+                </select>
+                <input id="inputCostRate" class="form-control" style="display: inline; width: auto;" type="text" value="0.5"/>
+                <label for="selectConversionOp">转化</label>
+                <select class="form-control" id="selectConversionOp">
+                    <option value="1">大于等于</option>
+                    <option value="2" selected="true">小于等于</option>
+                </select>
+                <input id="inputConversion" class="form-control" type="text" value="1"/>
 
-            <button id="btnQueryZero" class="btn btn-default">查询Zero</button>&nbsp;&nbsp;
-        </div>
+                <button id="btnQueryZero" class="btn btn-danger">查询Zero</button>&nbsp;&nbsp;
+            </div>
 
-        <div class="panel-heading">
-            <label for="inputBatchBidding">出价</label>
-            <input id="inputBatchBidding" class="form-control" style="display: inline; width: auto;" type="text" value="0"/>
+            <div class="form-group form-group-sm panel-heading">
+                <label class="control-label" for="inputBatchBidding">出价</label>
+                <input class="form-control" id="inputBatchBidding" type="text" value="0"/>
 
-            <button id="btnBatchModifyBidding" class="btn btn-default">批量修改出价</button>
-            <button id="btnModifyBatch" class="btn btn-default">批量修改</button>
-            <input type="button" class="btn btn-default" id="btnBatchChangeStatus" value="修改状态监控"/>
-        </div>
+                <button id="btnBatchModifyBidding" class="btn btn-default">批量修改出价</button> |
+                <button id="btnModifyBatch" class="btn btn-default">批量修改</button> |
+                <button type="button" class="btn btn-default" id="btnBatchChangeStatus" >修改状态监控</button>
+            </div>
+        </form>
     </div>
     <div class="panel panel-default">
         <div class="panel-body" id="total_result">
