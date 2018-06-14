@@ -154,10 +154,10 @@ public class Campaign extends HttpServlet {
                             imagesPath = new File(imageRoot + File.separatorChar + imagePath);
                             if (imagesPath.exists()) {
                                 uploadImages = FileUtils.listFiles(imagesPath, null, false);
-                                if(uploadImages != null && uploadImages.size() == 1){
+                                if(uploadImages != null){
                                     result.result = true;
                                 }else{
-                                    result.message = "创建失败，每个系列必须而且只能上传一张图片";
+                                    result.message = "该路径下没有图片文件";
                                 }
                             }else{
                                 result.message = "图片路径不存在";
