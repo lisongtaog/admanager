@@ -255,7 +255,7 @@
         var firebaseProjectId = $(tds.get(6)).text();
 
         //facebook首页信息
-        var fbPages =  $.parseJSON($(this).attr("fbpages"));
+        var fbPages =  $.parseJSON($(this).prev().text());
 
         $('#inputTagName').val(tagName);
         $('#inputAccountId').val(accountId);
@@ -387,7 +387,7 @@
             td = $('<td></td>');
             td.text(one.firebase_project_id);
             tr.append(td);
-          td = $('<td><a class="link_modify glyphicon glyphicon-pencil" href="#" fbpages = '+one.fbPages+'></a>&nbsp;&nbsp;<a class="link_delete glyphicon glyphicon-remove" href="#"></a></td>');
+          td = $('<td><span style="display:none">'+one.fbPages+'</span><a class="link_modify glyphicon glyphicon-pencil" href="#"></a>&nbsp;&nbsp;<a class="link_delete glyphicon glyphicon-remove" href="#"></a></td>');
           tr.append(td);
           $('#tableFBAppRel tbody').append(tr);
         }
@@ -504,7 +504,6 @@
      * 添加FB主页记录
      */
     function add_fb_page(id,pageId,pageName) {
-        console.log(id);
         if(id === undefined) id = "";
         if(pageId === undefined) pageId = "";
         if(pageName === undefined) pageName = "";
