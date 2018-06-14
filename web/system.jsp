@@ -481,7 +481,7 @@
         $('#inputPageId').val("");
         $('#inputGPPackageId').val("");
         $('#inputFirebaseProjectId').val("");
-        $("#fb_page tr:not(:first)").empty();
+        $("#fb_page tr:not(:first)").remove();
     }
 
     /**
