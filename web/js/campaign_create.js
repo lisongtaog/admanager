@@ -411,6 +411,9 @@ function generateFacebookCampaignName(params) {
     var dims = [];
     var appName = $('#selectApp').val();
     dims.push(appName);
+    if(params.fbPageName){
+        dims.push(params.fbPageName);
+    }
     var publisherPlatformsValue = $("#selectPublisherPlatforms").val();
     if(params.publisherPlatforms) {
         var pp = params.publisherPlatforms.split(",");
@@ -870,6 +873,12 @@ function FacebookFormReading(){
     var createCount = $("#inputCreateCount").val();
     var region = $('#selectRegion').val();
     var fbPage = $('#selectFBPage').val();//facebooke主页
+    //facebook主页名称
+    var fbName = $("#selectFBPage").children("option:selected");
+    var fbPageName = [];
+    fbName.each(function(idx){
+        fbPageName.push($(this).text());
+    });
 
     var excludedRegion = $('#selectRegionUnselected').val();
     var language = $('#selectLanguage').val();
@@ -953,12 +962,18 @@ function FacebookFormReading(){
                 values: fbPage.map(function (x) {
                     return x.trim();
                 })
-            })
+            },{
+                key:"fbPageName",
+                values:[fbPageName.join(",")]
+            });
         } else {
             explodeListImage.push({
                 key: 'pageId',
                 values: [fbPage.join(",")]
-            })
+            },{
+                key:"fbPageName",
+                values:[fbPageName.join(",")]
+            });
         }
         if ($("#selectRegionExplode").prop("checked")) {
             explodeListImage.push({
@@ -1131,11 +1146,17 @@ function FacebookFormReading(){
                 values: fbPage.map(function (x) {
                     return x.trim();
                 })
-            })
+            },{
+                key:"fbPageName",
+                values:[fbPageName.join(",")]
+            });
         } else {
             explodeListVideo.push({
                 key: 'pageId',
                 values: [fbPage.join(",")]
+            },{
+                key:"fbPageName",
+                values:[fbPageName.join(",")]
             })
         }
 
@@ -1274,6 +1295,7 @@ function FacebookFormReading(){
     explodeParams.forEach(function(p){
         p.campaignName = generateFacebookCampaignName({
             identification:p.identification,
+            fbPageName:p.fbPageName,
             age: p.age,
             gender: p.gender,
             bidding: p.bidding,
