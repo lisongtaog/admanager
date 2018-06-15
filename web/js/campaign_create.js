@@ -951,9 +951,6 @@ function FacebookFormReading(){
         },{
             key:"appId",
             values:[app.fb_app_id]
-        },{
-            key:"pageId",
-            values:[app.page_id]
         });
 
         if ($("#selectFBPageExplode").prop("checked")) {
@@ -1135,9 +1132,6 @@ function FacebookFormReading(){
         },{
             key:"appId",
             values:[app.fb_app_id]
-        },{
-            key:"pageId",
-            values:[app.page_id]
         });
 
         if ($("#selectFBPageExplode").prop("checked")) {
