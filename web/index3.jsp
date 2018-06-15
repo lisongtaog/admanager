@@ -69,8 +69,8 @@
 <div class="container-fluid">
     <%@include file="common/navigationbar.jsp"%>
 
-    <div class="panel panel-default" style="margin-top: 10px"  id="panel_title">
-        <form class="form-inline">
+    <div class="form-inline panel panel-default" style="margin-top: 10px"  id="panel_title">
+        <div class="form-inline">
             <div class="form-group form-group-sm panel-heading">
                 <label class="control-label" for="inputStartTime">开始日期</label>
                 <input class="form-control" type="text" value="2012-05-15" id="inputStartTime" readonly>
@@ -131,6 +131,7 @@
                 <button id="btnSearch" class="btn btn-info glyphicon glyphicon-search"></button> |
                 <button id="btnQueryNoData" class="btn btn-info">查询无数据的系列</button>
             </div>
+
             <div class="panel-heading">
                 <label for="selectCostOp">花费比例</label>
                 <select class="form-control" id="selectCostOp">
@@ -156,7 +157,7 @@
                 <button id="btnModifyBatch" class="btn btn-default">批量修改</button> |
                 <button type="button" class="btn btn-default" id="btnBatchChangeStatus" >修改状态监控</button>
             </div>
-        </form>
+        </div>
     </div>
     <div class="panel panel-default">
         <div class="panel-body" id="total_result">
