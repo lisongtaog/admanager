@@ -712,7 +712,6 @@ $("#selectApp").change(function() {
     }, "json");
     return false;
 });
-
 $("#selectAppAdmob").change(function(){
     $("#inputImagePath").val("");
     $('#checkAdmob').click();
@@ -1068,7 +1067,7 @@ function FacebookFormReading(){
             });
         }
         if($("#inputImageExplode").prop("checked")){
-            var valueList = imagePath.trim().replace(/,$/, "").split(",");
+            var valueList = imagePath.trim().replace(/\W*,\W*/g,",").replace(/,$/, "").split(",");
             explodeListImage.push({
                 key: 'materialPath',
                 values: valueList
@@ -1250,7 +1249,7 @@ function FacebookFormReading(){
             });
         }
         if($("#inputVideoExplode").prop("checked")){
-            var valueList = videoPath.trim().replace(/,$/, "").split(",");
+            var valueList = videoPath.trim().replace(/\W*,\W*/g,",").replace(/,$/, "").split(",");
             explodeListVideo.push({
                 key: 'materialPath',
                 values: valueList
@@ -1536,7 +1535,7 @@ function AdwordFormReading(){
     }
     //处理图片路径
     if($("#inputImageAdmobExplode").prop("checked")) {
-        var valueList = imagePath.trim().replace(/,$/, "").split(",");    //确保正确地切分为数组
+        var valueList = imagePath.trim().replace(/\W*,\W*/g,",").replace(/,$/, "").split(",");    //确保正确地切分为数组
         explodeList.push({
             key: 'imagePath',
             values: valueList
