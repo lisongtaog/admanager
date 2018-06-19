@@ -58,7 +58,11 @@
         <div style="height: 53%;overflow:scroll;">
             <table class="table-condensed" id="campaigns_table">
                 <thead>
-                <tr><th>序号</th><th>系列ID</th><th>广告账号ID</th><th>系列名称</th><th>创建时间</th><th>状态</th><th>标签</th><th>操作</th></tr>
+                <tr>
+                    <th>序号</th><th>系列ID</th><th>广告账号ID</th><th>系列名称</th><th>创建时间</th><th>状态</th><th>标签</th>
+                    <th><input type="checkbox" id="AllChecked">操作/
+                        <button class="btn btn-link glyphicon glyphicon-file" onclick="CampaignsCopy()">复制</button></th>
+                </tr>
                 </thead>
                 <tbody>
 
@@ -144,7 +148,7 @@
 
     <div class="form-inline">
         <div class="panel panel-default col-xs-6">
-            <div form-group form-group-sm panel-heading style="height: 30%;overflow:scroll;">
+            <div style="height:30%; width:90%; overflow:scroll">
                 <table class="table-condensed subTab" id="campaigns_select">
                     <thead>
                     <tr>
@@ -156,33 +160,38 @@
                     </tr>
                     </thead>
                     <tbody>
+                    <tr>
                         <td>3294827982</td>
                         <td>sudofusoufs973492</td>
                         <td>sdfsfsgdfg</td>
-                        <td>jslkdjflkjflsjfoisdjkflsjdklfjdslkjfdskfjdslkjfdskjfksjflkdsjfklsjdflkdjskfldsjlkfjdsljfieojofsmdlkjfs</td>
-                        <td><button type="button" class="btn btn-link" onclick="del_fb_page(this)">删除</button></td>
+                        <td>adwards_fake_campaigns_name_only_for_this_test</td>
+                        <td><button type="button" class="btn btn-link" onclick="del_rows(this)">删除</button></td>
+                    </tr>
                     </tbody>
                 </table>
             </div>
         </div>
-        <div class="panel panel-default col-xs-6" style="height: 30%;overflow:scroll;">
-            <table class="table-condensed subTab" style="border:#4a98ff 1px solid">
-                <tr>
-                    <th>广告单元ID</th>
-                    <th>属性/network</th>
-                    <th>广告单元名称</th>
-                    <th>广告类型</th>
-                    <th>操作</th>
-                </tr>
-                <tr>
-                    <td><input type="text" /></td>
-                    <td><select name="adNetwork" id="adNetwork"><option value="FB">FB</option><option value="ADMOB">ADMOB</option></select></td>
-                    <td><input type="text" /></td>
-                    <td><select name="adType" id="adType"><option value="1">Interstitial</option><option value="2">Native</option><option value="3">Banner</option></select>
-                    </td>
-                    <td><button type="button" class="btn btn-link" onclick="del_fb_page(this)">删除</button></td>
-                </tr>
-            </table>
+        <div class="panel panel-default col-xs-6">
+            <div class="panel panel-default col-xs-11" style="height: 30%;overflow:scroll">
+                <table class="table-condensed subTab" id="CampaignsUnits" style="border:#4a98ff 1px solid">
+                    <tr>
+                        <th>广告单元ID</th>
+                        <th>属性/network</th>
+                        <th>广告单元名称</th>
+                        <th>广告类型</th>
+                        <th>操作</th>
+                    </tr>
+                    <tr>
+                        <td><input type="text" /></td>
+                        <td><select name="adNetwork" id="adNetwork"><option value="FB">FB</option><option value="ADMOB">ADMOB</option></select></td>
+                        <td><input type="text" /></td>
+                        <td><select name="adType" id="adType"><option value="1">Interstitial</option><option value="2">Native</option><option value="3">Banner</option></select>
+                        </td>
+                        <td><button type="button" class="btn btn-link" onclick="del_rows(this)">删除</button></td>
+                    </tr>
+                </table>
+            </div>
+            <div><button class="btn btn-primary" onclick="AddCampaignUnits()">添加</button></div>
         </div>
     </div>
 </div>
@@ -257,6 +266,54 @@
     }
 
     bindOp();
+
+    $("#AllChecked").click(function(){
+        if($("#AllChecked").prop("checked")){
+            $(".ck").prop("checked",true);
+        }else{
+            $(".ck").prop("checked",false);
+        }
+    });
+
+    //Adwords查询信息复制到待保存表格
+    function CampaignsCopy(){
+        var campaigns = $("#campaigns_table tbody").find("input:checked").parents("tr");
+        campaigns.each(function(idx,e){
+            var tr = $(e);
+            var order = tr.children("td:eq(0)").text();
+            var campaignId = tr.children("td:eq(1)").text();
+            var tag = tr.children("td:eq(6)").text();
+            var campaignName = tr.children("td:eq(3)").text(); //数据库里的名称有双引号
+            $("#campaigns_select tbody").append("<tr><td>"+order+"</td><td>"+campaignId+"</td><td>"+tag
+                +"</td><td>"+campaignName+"</td><td><button type=\"button\" class=\"btn btn-link\" onclick=\"del_rows(this)\">删除</button></td></tr>");
+        });
+    }
+
+    //添加额外横列到广告单元
+    function AddCampaignUnits(){
+        $("#CampaignsUnits").append("<tr>\n" +
+            "<td><input type=\"text\" /></td>\n" +
+            "<td><select name=\"adNetwork\" id=\"adNetwork\"><option value=\"FB\">FB</option><option value=\"ADMOB\">ADMOB</option></select></td>\n" +
+            "<td><input type=\"text\" /></td>\n" +
+            "<td><select name=\"adType\" id=\"adType\"><option value=\"1\">Interstitial</option><option value=\"2\">Native</option><option value=\"3\">Banner</option></select>\n" +
+            "</td>\n" +
+            "<td><button type=\"button\" class=\"btn btn-link\" onclick=\"del_rows(this)\">删除</button></td>\n" +
+            "</tr>");
+    }
+
+    //行删除
+    function del_rows(thizz) {
+        var tr = $(thizz).parents("tr");
+        var table = tr.parents("table");
+        var countTr = table.find("tr").length;
+        //仅保留 表头和第一条数据，至少保留一条数据
+        if(countTr > 2){
+            tr.remove();
+        }else(
+            alert("至少保留一条信息")
+        )
+    }
+
 </script>
 <script src="js/interlaced-color-change.js"></script>
 </body>
