@@ -357,21 +357,18 @@
                     json.type = $(this).find("select:eq(1)").val();
                     UnitsJsonArray.push(json);
                 });
-                var campaignsJson = {};
-                campaignsJson.adUnits = UnitsJsonArray;
-                campaignsJson.campaigns = CamJsonArray;
-                campaignsJson.gId = gid;
-                campaignsJson.gName = gname;
+                var adUnits = JSON.stringify(UnitsJsonArray);
+                var campaigns = JSON.stringify(CamJsonArray);
                 $.post("campaignAdUnit/create",{
-                    gName:campaignsJson.gName,
-                    gId:campaignsJson.gId,
-                    adUnits: campaignsJson.adUnits,
-                    campaigns:campaignsJson.campaigns
+                    gName: gname,
+                    gId: gid,
+                    adUnits:adUnits ,
+                    campaigns:campaigns
                 },function(data){
-                    if(data.result == 1){
+                    if(data.ret == 1){
                         admanager.showCommonDlg("提示","广告单元创建完毕");
                     }else{
-                        admanager.showCommonDlg("错误",data.err);
+                        admanager.showCommonDlg("错误",data.message);
                     }
                 },"json")
             }

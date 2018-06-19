@@ -9,10 +9,7 @@ import com.bestgo.admanager.utils.StringUtil;
 import com.bestgo.admanager.utils.Utils;
 import com.bestgo.common.database.services.DB;
 import com.bestgo.common.database.utils.JSObject;
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import com.google.gson.*;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 
@@ -24,6 +21,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.*;
 import java.lang.System;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -89,7 +87,7 @@ public class CampaignAdUnit extends HttpServlet {
      * @throws ServletException
      * @throws IOException
      */
-    private JsonObject handleCreate(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException{
+    private JsonObject  handleCreate(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException{
         JsonObject json = new JsonObject();
         String gName = request.getParameter("gName");
         String gId = request.getParameter("gId");
@@ -100,8 +98,39 @@ public class CampaignAdUnit extends HttpServlet {
         String adUnits = request.getParameter("adUnits");//广告单元多条记录json对象字符串
         String adCampaigns = request.getParameter("campaigns");//已选的广告系列多条记录json对象字符串
         OperationResult result = new OperationResult();
+        JsonParser parser = new JsonParser();
+        JsonArray campaigns = parser.parse(adCampaigns).getAsJsonArray();
+        JsonArray units = parser.parse(adUnits).getAsJsonArray();
         try {
             result.result = false;
+//            DB.insert("ad_campaigns_adgroup").put("gid",gId).put("gname",gName).execute();
+            for(int i=0;i<campaigns.size();i++){
+                JsonObject jCam = campaigns.get(i).getAsJsonObject();
+                String campaign_name = jCam.get("campaign_name").getAsString();
+                String campaign_id = jCam.get("campaign_id").getAsString();
+                String validstatus = jCam.get("validstatus").getAsString();
+                for(int k=0;k<units.size();k++){
+                    JsonObject jUnit = units.get(k).getAsJsonObject();
+                    String adunit_id = jUnit.get("adunit_id").getAsString();
+                    String network = jUnit.get("network").getAsString();
+                    String name = jUnit.get("name").getAsString();
+                    String type = jUnit.get("type").getAsString();
+                    Date now = new Date();
+                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    String operatetime = dateFormat.format( now );
+                    result.result = DB.insert("ad_campaigns_adunit")
+                            .put("gid",gId)
+                            .put("campaign_id",campaign_id)
+                            .put("campaign_name",campaign_name)
+                            .put("adunit_id",adunit_id)
+                            .put("network",network)
+                            .put("name",name)
+                            .put("type",type)
+                            .put("validstatus",validstatus)
+                            .put("operatetime",operatetime)
+                            .execute();
+                }
+            }
             if (result.result) {
                     /*Calendar calendar = Calendar.getInstance();
                     String campaignNameOld = campaignName.replace("Group_","Group" + groupId) + "_";
