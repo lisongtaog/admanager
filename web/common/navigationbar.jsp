@@ -61,6 +61,7 @@
             </a>
             <ul class="dropdown-menu">
                 <li><a href="system.jsp" >系统管理</a></li>
+                <li><a href="campaigns_adUnit_admob.jsp" >广告单元(开发中)</a></li>
                 <li class="divider"></li>
                 <li><a href="adaccounts.jsp" target="_blank">Facebook广告账号管理</a></li>
                 <li><a href="adaccounts_admob.jsp" target="_blank">Admob广告账号管理</a></li>
