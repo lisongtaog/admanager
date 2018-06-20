@@ -257,7 +257,6 @@
         $('#inputTagName').val(tagName);
         $('#inputAccountId').val(accountId);
         $('#inputFBAppId').val(fbAppId);
-        // $('#inputPageId').val(fbPageId);  //此处待修改
         $('#inputGPPackageId').val(gpPackageId);
         $('#inputFirebaseProjectId').val(firebaseProjectId);
         for(var i = 0 ; i < fbPages.length ;i++){//修改时 将facebook主页信息回显
@@ -429,18 +428,16 @@
           var tagName = $('#inputTagName').val();
           var accountId = $('#inputAccountId').val();
           var fbAppId = $('#inputFBAppId').val();
-          // var pageId = $('#inputPageId').val();
           var gpPackageId = $('#inputGPPackageId').val();
           var firebaseProjectId = $('#inputFirebaseProjectId').val();
           var fbPages = genFBPageJSON();
           $.post('system/fb_app_id_rel/update', {
-            id: id,
-            tagName: tagName,
-            accountId: accountId,
-            fbAppId: fbAppId,
-            pageId: pageId,
-            fbPages:JSON.stringify(fbPages),
-            gpPackageId: gpPackageId,
+              id: id,
+              tagName: tagName,
+              accountId: accountId,
+              fbAppId: fbAppId,
+              fbPages:JSON.stringify(fbPages),
+              gpPackageId: gpPackageId,
               firebaseProjectId: firebaseProjectId
           }, function(data) {
             if (data && data.ret == 1) {
