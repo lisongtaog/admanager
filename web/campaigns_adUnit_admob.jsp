@@ -162,12 +162,11 @@
                         </tr>
                         </thead>
                         <tbody>
-                        <%--以下要显示的其实是从库里取出来的信息,一会儿用java写好--%>
                         <tr>
-                            <td>3294827982</td>
-                            <td>sudofusoufs973492</td>
-                            <td>sdfsfsgdfg</td>
-                            <td>adwards_fake_campaigns_name_only_for_this_test</td>
+                            <td>0123456789</td>
+                            <td>9999999999</td>
+                            <td>somekinds</td>
+                            <td>campaigns_name_only_for_show</td>
                             <td>paused</td>
                             <td><button type="button" class="btn btn-link" onclick="del_rows(this)">删除</button></td>
                         </tr>
@@ -283,6 +282,7 @@
     //Adwords查询信息复制到待保存表格
     function CampaignsCopy(){
         var campaigns = $("#campaigns_table tbody").find("input:checked").parents("tr");
+        $("#campaigns_select tbody").empty();
         campaigns.each(function(idx,e){
             var tr = $(e);
             var order = tr.children("td:eq(0)").text();
@@ -320,7 +320,7 @@
         )
     }
 
-    //更新入库
+    //创建入库
     function DataCreation(){
         var campaigns = $("#campaigns_select").find("tr:gt(0)");
         var campaignUnits = $("#CampaignsUnits").find("tr:gt(0)");
@@ -367,6 +367,9 @@
                 },function(data){
                     if(data.ret == 1){
                         admanager.showCommonDlg("提示","广告单元创建完毕");
+                        setTimeout(function(){
+                            $("#common_message_dialog").modal("hide");
+                        },1500)
                     }else{
                         admanager.showCommonDlg("错误",data.message);
                     }
