@@ -10,6 +10,7 @@ import com.bestgo.common.database.utils.JSObject;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import org.apache.log4j.Logger;
 
 import javax.servlet.ServletException;
@@ -84,7 +85,7 @@ public class System extends HttpServlet {
                                 ex.printStackTrace();
                             }
                         }
-                        OperationResult result = createNewFacebookAppRelation(tagName, accountId, fbAppId, pageId, gpPackageId,firebaseProjectId,fbPages);
+                        OperationResult result = createNewFacebookAppRelation(tagName, accountId, fbAppId,gpPackageId,firebaseProjectId,fbPages);
                         json.addProperty("ret", result.result ? 1 : 0);
                         json.addProperty("message", result.message);
                     }
@@ -276,7 +277,7 @@ public class System extends HttpServlet {
         return ret;
     }
 
-    private OperationResult createNewFacebookAppRelation(String tagName, String accountId, String fbAppId, String pageId, String gpPackageId,String firebaseProjectId,List<JSONObject> fbPages) {
+    private OperationResult createNewFacebookAppRelation(String tagName, String accountId, String fbAppId, String gpPackageId,String firebaseProjectId,List<JSONObject> fbPages) {
         OperationResult ret = new OperationResult();
 
         try {
@@ -285,11 +286,16 @@ public class System extends HttpServlet {
                 ret.result = false;
                 ret.message = "已经存在这个账号了";
             } else {
+                String pageIdString = new String();
+                for(JSONObject fbPage : fbPages){
+                    pageIdString += (String)fbPage.get("page_id")+ ",";
+                }
+                pageIdString = pageIdString.substring(0,pageIdString.length()-2);
                 DB.insert("web_facebook_app_ids_rel")
                         .put("tag_name", tagName)
                         .put("account_id", accountId)
                         .put("fb_app_id", fbAppId)
-                        //.put("page_id", pageId)
+                        .put("page_id", pageIdString)
                         .put("google_package_id", gpPackageId)
                         .put("firebase_project_id", firebaseProjectId)
                         .execute();

@@ -193,12 +193,9 @@
               </div>
               <div class="form-group">
                 <label class="col-sm-2 control-label">
-                  FB主页
                   <button type="button" class="btn btn-info" onclick="add_fb_page()">添加</button>
                 </label>
-
                 <div class="col-sm-10">
-                    <input type="text" class="form-control" id="inputPageId" placeholder="FB主页ID" autocomplete="off">
                   <table id="fb_page" style="border:#4a98ff 1px solid">
                     <tr>
                       <th>facebook主页ID</th>
@@ -260,7 +257,7 @@
         $('#inputTagName').val(tagName);
         $('#inputAccountId').val(accountId);
         $('#inputFBAppId').val(fbAppId);
-        $('#inputPageId').val(fbPageId);
+        // $('#inputPageId').val(fbPageId);  //此处待修改
         $('#inputGPPackageId').val(gpPackageId);
         $('#inputFirebaseProjectId').val(firebaseProjectId);
         for(var i = 0 ; i < fbPages.length ;i++){//修改时 将facebook主页信息回显
@@ -408,17 +405,15 @@
           var tagName = $('#inputTagName').val();
           var accountId = $('#inputAccountId').val();
           var fbAppId = $('#inputFBAppId').val();
-          var pageId = $('#inputPageId').val();
           var gpPackageId = $('#inputGPPackageId').val();
           var firebaseProjectId = $('#inputFirebaseProjectId').val();
 
           var fbPages = genFBPageJSON();
 
           $.post('system/fb_app_id_rel/create', {
-            tagName: tagName,
-            accountId: accountId,
-            fbAppId: fbAppId,
-              pageId: pageId,
+              tagName: tagName,
+              accountId: accountId,
+              fbAppId: fbAppId,
               fbPages:JSON.stringify(fbPages),
               gpPackageId: gpPackageId,
               firebaseProjectId: firebaseProjectId
@@ -434,7 +429,7 @@
           var tagName = $('#inputTagName').val();
           var accountId = $('#inputAccountId').val();
           var fbAppId = $('#inputFBAppId').val();
-          var pageId = $('#inputPageId').val();
+          // var pageId = $('#inputPageId').val();
           var gpPackageId = $('#inputGPPackageId').val();
           var firebaseProjectId = $('#inputFirebaseProjectId').val();
           var fbPages = genFBPageJSON();
@@ -478,7 +473,7 @@
         $('#inputTagName').val("");
         $('#inputAccountId').val("");
         $('#inputFBAppId').val("");
-        $('#inputPageId').val("");
+        $("input[name='page_id']").val("");
         $('#inputGPPackageId').val("");
         $('#inputFirebaseProjectId').val("");
         $("#fb_page tr:not(:first)").remove();
