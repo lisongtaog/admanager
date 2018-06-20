@@ -103,12 +103,19 @@ public class CampaignAdUnit extends HttpServlet {
         JsonArray units = parser.parse(adUnits).getAsJsonArray();
         try {
             result.result = false;
-//            DB.insert("ad_campaigns_adgroup").put("gid",gId).put("gname",gName).execute();
+            DB.insert("ad_campaigns_adgroup").put("gid",gId).put("gname",gName).execute();
             for(int i=0;i<campaigns.size();i++){
                 JsonObject jCam = campaigns.get(i).getAsJsonObject();
                 String campaign_name = jCam.get("campaign_name").getAsString();
                 String campaign_id = jCam.get("campaign_id").getAsString();
                 String validstatus = jCam.get("validstatus").getAsString();
+                if(validstatus == "enabled"){
+                    validstatus = "1";
+                }else if(validstatus == "paused"){
+                    validstatus = "0";
+                }else{
+                    validstatus = "2";  // "removed"
+                }
                 for(int k=0;k<units.size();k++){
                     JsonObject jUnit = units.get(k).getAsJsonObject();
                     String adunit_id = jUnit.get("adunit_id").getAsString();
@@ -118,8 +125,8 @@ public class CampaignAdUnit extends HttpServlet {
                     Date now = new Date();
                     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                     String operatetime = dateFormat.format( now );
-                    result.result = DB.insert("ad_campaigns_adunit")
-                            .put("gid",gId)
+                    result.result=DB.insert("ad_campaigns_adunit")
+                            .put("gid",Integer.parseInt(gId))
                             .put("campaign_id",campaign_id)
                             .put("campaign_name",campaign_name)
                             .put("adunit_id",adunit_id)
