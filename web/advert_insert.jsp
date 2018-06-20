@@ -90,7 +90,7 @@
         <input type="button" class="btn btn-primary" id="inputTranslate" value="翻译&保存"/>
         <input type="button" class="btn btn-primary" id="saveEdition" value="保存修改">
         <br>
-        <div class="pre-scrollable" style="height: 420px; margin-top: 10px;">
+        <div>
         <table class="table table-hover" id="advertisement">
             <thead>
             <tr>
@@ -149,7 +149,7 @@
         <input type="button" class="btn btn-primary" id="inputTranslateAdmob" value="翻译&保存"/>
         <input type="button" class="btn btn-primary" id="saveEditionAdmob" value="保存修改">
         <br>
-        <div class="pre-scrollable" style="height: 420px; margin-top: 10px;">
+        <div>
         <table class="table table-hover" id="advertisement_adwords">
             <thead>
             <tr><th>广告语组合</th><th>语言</th><th>广告语1</th><th>广告语2</th><th>广告语3</th><th>广告语4</th></tr>
