@@ -117,32 +117,33 @@
                 </tbody>
             </table>
         </div>
-        <div>
-            <nav aria-label="Page navigation">
-                <ul class="pagination">
-                    <li>
-                        <a href="campaigns_adUnit_admob.jsp?page_index=<%=preIndex%>" aria-label="Previous">
-                            <span aria-hidden="true">上一页</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="campaigns_adUnit_admob.jsp?page_index=<%=nextPage%>" aria-label="Next">
-                            <span aria-hidden="true">下一页</span>
-                        </a>
-                    </li>
-                    <li>
-                        共<%=totalPage%>页
-                    </li>
-
-                </ul>
-            </nav>
+        <div class="form-inline">
+            <ul class="pagination">
+                <li>
+                    <a href="campaigns_adUnit_admob.jsp?page_index=<%=preIndex%>">
+                        <span aria-hidden="true">上一页</span>
+                    </a>
+                </li>
+                <li>
+                    <span class="input-group">
+                        <a class="glyphicon glyphicon-share-alt input-group-addon"></a>
+                        <input type="text" class="form-control" style="width:100px" id="currentPage" value="<%=index+1%>">
+                        <label class="input-group-addon">&nbsp;/&nbsp;<%=totalPage%>页</label>
+                    </span>
+                </li>
+                <li>
+                    <a href="campaigns_adUnit_admob.jsp?page_index=<%=nextPage%>">
+                        <span aria-hidden="true">下一页</span>
+                    </a>
+                </li>
+            </ul>
         </div>
     </div>
 
     <div class="panel panel-default">
         <div>
-            <label for="gid">广告组ID</label>
-            <input type="text" id="gid" readonly/>
+            <%--<label for="gid">广告组ID</label>--%>
+            <%--<input type="text" id="gid" readonly/>--%>
             <label for="gname">广告组名称</label>
             <input type="text" id="gname"/>
             <button class="btn btn-info" onclick="DataCreation()">保存</button>
@@ -211,6 +212,14 @@
 <script type="text/javascript">
     $("li[role='presentation']:eq(3)").addClass("active");
 
+    //分页跳转
+    $(".glyphicon-share-alt").click(function(){
+        var page = $("#currentPage").val().trim();
+        if(parseInt(page)){
+            var index= (parseInt(page)-1).toString();
+            window.open("campaigns_adUnit_admob.jsp?page_index="+index,"_self");
+        }
+    });
 
     $('#btnSearch').click(function() {
         var query = $("#inputSearch").val();//系列名称或ID

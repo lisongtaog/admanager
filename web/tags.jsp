@@ -77,13 +77,15 @@
                         <span aria-hidden="true">上一页</span>
                     </a>
                 </li>
+                <%
+                    for(int i=0;i<totalPage;i++){
+                %>
+                <li><a href="tags.jsp?page_index=<%=i%>"><span><%=i+1%></span></a></li>
+                <% } %>
                 <li>
                     <a href="tags.jsp?page_index=<%=nextPage%>" aria-label="Next">
                         <span aria-hidden="true">下一页</span>
                     </a>
-                </li>
-                <li>
-                    共<%=totalPage%>页
                 </li>
             </ul>
         </nav>
