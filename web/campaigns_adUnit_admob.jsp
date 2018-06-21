@@ -142,7 +142,7 @@
     <div class="panel panel-default">
         <div>
             <label for="gid">广告组ID</label>
-            <input type="text" id="gid" />
+            <input type="text" id="gid" readonly/>
             <label for="gname">广告组名称</label>
             <input type="text" id="gname"/>
             <button class="btn btn-info" onclick="DataCreation()">保存</button>
@@ -324,11 +324,10 @@
     function DataCreation(){
         var campaigns = $("#campaigns_select").find("tr:gt(0)");
         var campaignUnits = $("#CampaignsUnits").find("tr:gt(0)");
-        var gid = $("#gid").val();
         var gname = $("#gname").val();
 
-        if( gid == "" || gname == ""){
-            admanager.showCommonDlg("warning","广告组ID或广告组名称不能为空")
+        if(gname == ""){
+            admanager.showCommonDlg("warning","广告组名称不能为空");
         }else{
             var emptyInputs = 0;
             campaignUnits.find("input").each(function(idx){
@@ -361,7 +360,6 @@
                 var campaigns = JSON.stringify(CamJsonArray);
                 $.post("campaignAdUnit/create",{
                     gName: gname,
-                    gId: gid,
                     adUnits:adUnits ,
                     campaigns:campaigns
                 },function(data){

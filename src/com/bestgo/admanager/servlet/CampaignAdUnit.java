@@ -90,7 +90,6 @@ public class CampaignAdUnit extends HttpServlet {
     private JsonObject  handleCreate(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException{
         JsonObject json = new JsonObject();
         String gName = request.getParameter("gName");
-        String gId = request.getParameter("gId");
 
         HttpSession session = request.getSession();
         User loginUser = (User) session.getAttribute("loginUser");
@@ -103,7 +102,8 @@ public class CampaignAdUnit extends HttpServlet {
         JsonArray units = parser.parse(adUnits).getAsJsonArray();
         try {
             result.result = false;
-            DB.insert("ad_campaigns_adgroup").put("gid",gId).put("gname",gName).execute();
+            DB.insert("ad_campaigns_adgroup").put("gname",gName).execute();
+            JSObject gId = DB.findOneBySql("select gid from ad_campaigns_adgroup where gname = ?",gName);
             for(int i=0;i<campaigns.size();i++){
                 JsonObject jCam = campaigns.get(i).getAsJsonObject();
                 String campaign_name = jCam.get("campaign_name").getAsString();
@@ -126,7 +126,7 @@ public class CampaignAdUnit extends HttpServlet {
                     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                     String operatetime = dateFormat.format( now );
                     result.result=DB.insert("ad_campaigns_adunit")
-                            .put("gid",Integer.parseInt(gId))
+                            .put("gid",gId.get("gid"))
                             .put("campaign_id",campaign_id)
                             .put("campaign_name",campaign_name)
                             .put("adunit_id",adunit_id)
