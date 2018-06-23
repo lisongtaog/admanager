@@ -105,7 +105,7 @@
 
     // 添加新组
     $("#new_team").click(function(){
-        var tr = $("<tr><td>(自动生成)</td><td><input type='text' style='width:100%'></td>" +
+        var tr = $("<tr><td>(自动生成)</td><td><input type='text' style='width:83.5%'></td>" +
             "<td><a class='glyphicon glyphicon-ok' onclick='team_addition(this)'></a>" +
             "&nbsp;<a class='glyphicon glyphicon-remove' href='#' onclick='delete_itself(this)'></a><td></tr>");
         $("#team_management tbody").prepend(tr);
@@ -114,15 +114,22 @@
         var team = $(thizz).parents("tr").find("input").val().trim();
         var check = confirm("确认添加？");
         if(check){
-            $.post("team_category_management/add_new_team",{
-                team_name:team
-            },function(data){
-                if(data && data.ret==1){
-                    location.reload();
-                }else{
-                    admanager.showCommonDlg("错误",data.message);
-                }
-            },"json")
+            if(team){
+                $.post("team_category_management/add_new_team",{
+                    team_name:team
+                },function(data){
+                    if(data && data.ret==1){
+                        location.reload();
+                    }else{
+                        admanager.showCommonDlg("错误",data.message);
+                    }
+                },"json")
+            }else{
+                admanager.showCommonDlg("warning","非法输入！");
+                setTimeout(function(){
+                    $("#common_message_dialog").modal("hide");
+                },1500)
+            }
         }
     }
 
@@ -175,7 +182,7 @@
 
     //添加新品类
     $("#new_category").click(function(){
-        var tr = $("<tr><td>(自动生成)</td><td><input type='text' style='width:100%'></td><td><select></select></td>" +
+        var tr = $("<tr><td>(自动生成)</td><td><input type='text' style='width:83.5%'></td><td><select></select></td>" +
             "<td><a class='glyphicon glyphicon-ok' href='#' onclick='category_addition(this)'></a>" +
             "&nbsp;<a class='glyphicon glyphicon-remove' href='#' onclick='delete_itself(this)'></a></td></tr>");
         $("#category_management").prepend(tr);
@@ -192,16 +199,23 @@
         var team_id = $(thizz).parents("tr").find("option:selected").val();
         var check = confirm("确认添加吗？");
         if(check){
-            $.post("team_category_management/add_category",{
-                category:category,
-                team_id:team_id,
-            },function(data){
-                if(data && data.ret==1){
-                    location.reload();
-                }else{
-                    admanager.showCommonDlg("提示",data.message);
-                }
-            },"json")
+            if(category){
+                $.post("team_category_management/add_category",{
+                    category:category,
+                    team_id:team_id,
+                },function(data){
+                    if(data && data.ret==1){
+                        location.reload();
+                    }else{
+                        admanager.showCommonDlg("提示",data.message);
+                    }
+                },"json")
+            }else{
+                admanager.showCommonDlg("warning","非法输入！");
+                setTimeout(function(){
+                    $("#common_message_dialog").modal("hide");
+                },1500)
+            }
         }
     }
 
