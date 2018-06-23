@@ -101,6 +101,7 @@
 <script src="js/core.js"></script>
 
 <script type="text/javascript">
+    $("li[role='presentation']:eq(3)").addClass("active");
 
     // 添加新组
     $("#new_team").click(function(){
@@ -113,7 +114,7 @@
         var team = $(thizz).parents("tr").find("input").val().trim();
         var check = confirm("确认添加？");
         if(check){
-            $.post("#",{
+            $.post("team_category_management/add_new_team",{
                 team_name:team
             },function(data){
                 if(data && data.ret==1){
@@ -142,12 +143,12 @@
         var team = $(thizz).parents("tr").find("input").val().trim();
         var id = $(thizz).parents("tr").find("td:eq(0)").text();
         var td = $(thizz).parents("tr").find("td:eq(1)");
-        $.post("#",{
+        $.post("team_category_management/update_team",{
             team_name:team,
             id:id
         },function(data){
             if(data && data.ret == 1){
-                td.empty().text(team);
+                location.reload();
             }else{
                 admanager.showCommonDlg("提示",data.message);
             }
@@ -158,15 +159,18 @@
     function deleteTeam(thizz){
         var id = $(thizz).parents("tr").find("td:eq(0)").text();
         var tr = $(thizz).parents("tr");
-        $.post("#",{
-            id:id
-        },function(data){
-            if(data && data.ret==1){
-                tr.remove();
-            }else{
-                admanager.showCommonDlg("提示",data.message);
-            }
-        },"json")
+        var check = confirm("确认删除？");
+        if(check){
+            $.post("team_category_management/delete_team",{
+                id:id
+            },function(data){
+                if(data && data.ret==1){
+                    tr.remove();
+                }else{
+                    admanager.showCommonDlg("提示",data.message);
+                }
+            },"json")
+        }
     }
 
     //添加新品类
@@ -188,9 +192,9 @@
         var team_id = $(thizz).parents("tr").find("option:selected").val();
         var check = confirm("确认添加吗？");
         if(check){
-            $.post("#",{
+            $.post("team_category_management/add_category",{
                 category:category,
-                team_id:team_id
+                team_id:team_id,
             },function(data){
                 if(data && data.ret==1){
                     location.reload();
@@ -226,11 +230,11 @@
     function category_update(thizz){
         var category_id = $(thizz).parents("tr").find("td:eq(0)").text();
         var category = $(thizz).parents("tr").find("input").val();
-        var team = $(thizz).parents("tr").find("option:selected").val();
-        $.post("#",{
+        var team_id = $(thizz).parents("tr").find("option:selected").val();
+        $.post("team_category_management/update_category",{
             category_id:category_id,
             category:category,
-            team:team
+            team_id:team_id
         },function(data){
             if(data && data.ret==1){
                 location.reload();
@@ -243,15 +247,19 @@
     //删除品类
     function deleteCategory(thizz){
         var category_id = $(thizz).parents("tr").find("td:eq(0)").text();
-        $.post("#",{
-            category_id:category_id
-        },function(data){
-            if(data && data.ret==1){
-                location.reload();
-            }else{
-                admanager.showCommonDlg("提示",data.message);
-            }
-        },"json");
+        var check = confirm("确认删除？");
+        if(check){
+            $.post("team_category_management/delete_category",{
+                category_id:category_id
+            },function(data){
+                if(data && data.ret==1){
+                    location.reload();
+                }else{
+                    admanager.showCommonDlg("提示",data.message);
+                }
+            },"json");
+        }
+
     }
 
 </script>
