@@ -3,6 +3,7 @@
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="com.bestgo.admanager.servlet.Tags" %>
+<%@ page import="com.bestgo.common.database.services.DB" %>
 
 
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
@@ -35,7 +36,7 @@
 
         <table class="table">
             <thead>
-            <tr><th>标签ID</th><th>标签名称</th><th>最大出价</th><th>标签类型ID</th><th>标签类型名称</th><th>操作</th></tr>
+            <tr><th>标签ID</th><th>标签名称</th><th>最大出价</th><th>应用品类ID</th><th>应用品类名称</th><th>操作</th></tr>
             </thead>
             <tbody>
 
@@ -103,20 +104,28 @@
                 <form id="modify_form" class="form-horizontal" action="#" autocomplete="off">
                     <div class="form-group">
                         <label for="inputTagName" class="col-sm-2 control-label">标签名称</label>
-                        <div class="col-sm-10">
+                        <div class="col-sm-8">
                             <input class="form-control" id="inputTagName" placeholder="标签名称" autocomplete="off">
                         </div>
                     </div>
                     <div class="form-group">
                         <label for="inputMaxBidding" class="col-sm-2 control-label">最大出价</label>
-                        <div class="col-sm-10">
+                        <div class="col-sm-8">
                             <input class="form-control" id="inputMaxBidding" placeholder="最大出价" autocomplete="off">
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="inputTagCategoryId" class="col-sm-2 control-label">标签类型ID</label>
-                        <div class="col-sm-10">
-                            <input class="form-control" id="inputTagCategoryId" placeholder="标签类型ID" autocomplete="off">
+                        <label for="category" class="col-sm-2 control-label">应用品类</label>
+                        <div class="col-sm-8">
+                            <select id="category" class="form-control">
+                                <%
+                                    List<JSObject> cag = DB.scan("web_ad_tag_category").select("id").select("category_name").execute();
+                                    for(JSObject j:cag){
+                                %>
+                                <option value="<%=j.get("id")%>"><%=j.get("category_name")%></option>
+                                <%  } %>
+
+                            </select>
                         </div>
                     </div>
                 </form>
@@ -151,7 +160,7 @@
     $("#new_tag_dlg .btn-primary").click(function() {
         var tagName = $("#inputTagName").val();
         var maxBidding = $("#inputMaxBidding").val();
-        var tagCategoryId = $("#inputTagCategoryId").val();
+        var tagCategoryId = $("#category").val();
 
         if (modifyType == 'new') {
             $.post('tags/create', {
@@ -254,7 +263,7 @@
             var tagCategoryId = $(tds.get(3)).text();
             $("#inputTagName").val(tagName);
             $("#inputMaxBidding").val(maxBidding);
-            $("#inputTagCategoryId").val(tagCategoryId);
+            $("#category").val(tagCategoryId);
 
             $("#new_tag_dlg").modal("show");
         });
@@ -273,7 +282,7 @@
             var tagCategoryId = $(tds.get(3)).text();
             $("#inputTagName").val(tagName);
             $("#inputMaxBidding").val(maxBidding);
-            $("#inputTagCategoryId").val(tagCategoryId);
+            $("#category").val(tagCategoryId);
 
             $("#new_tag_dlg").modal("show");
         });
