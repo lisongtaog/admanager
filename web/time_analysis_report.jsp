@@ -77,7 +77,7 @@
         <div class="panel-body" id="total_result">
         </div>
     </div>
-    <button id="line_chart" class="btn btn-link glyphicon glyphicon-zoom-in">折线图</button>
+    <button id="line_chart" class="btn btn-link"><span class="glyphicon glyphicon-zoom-in"></span>折线图</button>
     <canvas id="lineChart"></canvas>
     <table class="table table-hover">
         <thead id="result_header">

@@ -107,7 +107,7 @@
     $("#new_team").click(function(){
         var tr = $("<tr><td>(自动生成)</td><td><input type='text' style='width:100%'></td>" +
             "<td><a class='glyphicon glyphicon-ok' onclick='team_addition(this)'></a>" +
-            "<a class='glyphicon glyphicon-remove' href='#' onclick='delete_itself(this)'></a><td></tr>");
+            "&nbsp;<a class='glyphicon glyphicon-remove' href='#' onclick='delete_itself(this)'></a><td></tr>");
         $("#team_management tbody").prepend(tr);
     });
     function team_addition(thizz){
@@ -177,7 +177,7 @@
     $("#new_category").click(function(){
         var tr = $("<tr><td>(自动生成)</td><td><input type='text' style='width:100%'></td><td><select></select></td>" +
             "<td><a class='glyphicon glyphicon-ok' href='#' onclick='category_addition(this)'></a>" +
-            "<a class='glyphicon glyphicon-remove' href='#' onclick='delete_itself(this)'></a></td></tr>");
+            "&nbsp;<a class='glyphicon glyphicon-remove' href='#' onclick='delete_itself(this)'></a></td></tr>");
         $("#category_management").prepend(tr);
         var team = $("#team_management .glyphicon-pencil").parents("tr");
         team.each(function(e){

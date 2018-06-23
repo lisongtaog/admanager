@@ -33,7 +33,7 @@
     </ul>
 </div>
 
-<ul class="nav nav-pills">
+<ul class="nav nav-pills" style="font-weight:bold;font-size:15px">
 
     <%-- 下标从0开始 --%>
         <li role="presentation"><a href="index.jsp">首页</a></li>

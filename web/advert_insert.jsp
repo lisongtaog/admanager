@@ -91,7 +91,7 @@
         <input type="button" class="btn btn-primary" id="saveEdition" value="保存修改">
         <br>
         <div>
-        <table class="table table-hover" id="advertisement">
+        <table class="table table-striped" id="advertisement">
             <thead>
             <tr>
                 <%--<th><input type="checkbox" id="checkbox_facebook"></th>--%>
@@ -150,7 +150,7 @@
         <input type="button" class="btn btn-primary" id="saveEditionAdmob" value="保存修改">
         <br>
         <div>
-        <table class="table table-hover" id="advertisement_adwords">
+        <table class="table table-striped" id="advertisement_adwords">
             <thead>
             <tr><th>广告语组合</th><th>语言</th><th>广告语1</th><th>广告语2</th><th>广告语3</th><th>广告语4</th></tr>
             </thead>
