@@ -30,7 +30,9 @@ public class ReleasedDataStatistics extends HttpServlet {
     "VpnV2", "VpnV4", "VpnV5", "VpnV7", "VpnV8", "VpnV9", "BubbleV1", "HtSpiderV1", "999", "HtCollectionV1", "SudokuV3",
     "SudokuV5", "pouplarsudoku", "SolitaireYang2", "SolitaireYang3", "BingoV3", "BingoV5", "SlotsV4", "WordsearchV3", "MahjongV1",
     "CpVpn", "CpTimeback", "slimmer", "dressup", "CpAilsa", "CpBattery", "CpDressup", "Cptoyland", "SolitaireV15", "SolitaireV1",
-    "Solitairev12", "Solitairev13", "SolitaireV14", "SolitaireV15", "SlotsV2", "SlotsV5", "ReversiV1", "BarcodeV1", "BarcodeV4"};
+    "Solitairev12", "Solitairev13", "SolitaireV14", "SolitaireV15", "SlotsV2", "SlotsV5", "ReversiV1", "BarcodeV1", "BarcodeV4",
+    "AntivirusV9", "WiFiV3", "HoroscopeV2", "VpnV1", "VpnV3", "VpnV6", "HtSolitaireV1", "FreecellV1", "CpShuangkaiV2",
+    "CpShuangkaiV3", "CoinPusher", "BarcodeV2", "BarcodeV3"};
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         doPost(request, response);
@@ -124,7 +126,7 @@ public class ReleasedDataStatistics extends HttpServlet {
                                     found = true;
                                 }
                             }
-                            if (found) continue;
+//                            if (found) continue;
                             jsonArray.add(d);
 
                         }
