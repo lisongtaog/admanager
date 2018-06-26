@@ -285,6 +285,81 @@ public class Tags extends HttpServlet {
                     ret.result = false;
                     ret.message = "创建失败，不存在此标签类型ID";
                 }
+
+                //根据标签名称创建分表
+                try {
+                    DB.updateBySql("CREATE TABLE `web_ad_campaigns_history_" + tagName + "`(" +
+                            " `id` int(10) unsigned NOT NULL AUTO_INCREMENT," +
+                            "  `campaign_id` varchar(50) NOT NULL," +
+                            "  `date` date DEFAULT NULL," +
+                            "  `account_id` varchar(50) not null," +
+                            "  `short_name` varchar(50) not null," +
+                            "  `total_spend` double NOT NULL DEFAULT '0'," +
+                            "  `total_click` int(11) NOT NULL DEFAULT '0'," +
+                            "  `total_installed` int(11) NOT NULL DEFAULT '0'," +
+                            "  `total_impressions` int(11) NOT NULL DEFAULT '0'," +
+                            "  `cpa` double NOT NULL DEFAULT '0'," +
+                            "  `ctr` double NOT NULL DEFAULT '0'," +
+                            "  PRIMARY KEY (`id`)," +
+                            "  UNIQUE KEY `idx_date_campaign` (`date`,`campaign_id`)," +
+                            "  KEY `idx_campaign_id` (`campaign_id`)," +
+                            "  KEY `idx_date` (`date`)" +
+                            ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
+                    DB.updateBySql("CREATE TABLE `web_ad_campaigns_history_admob_" + tagName + "`(" +
+                            " `id` int(10) unsigned NOT NULL AUTO_INCREMENT," +
+                            " `campaign_id` varchar(50) NOT NULL," +
+                            " `date` date DEFAULT NULL," +
+                            " `account_id` varchar(50) not null," +
+                            " `short_name` varchar(50) not null,  `total_spend` double NOT NULL DEFAULT '0'," +
+                            " `total_click` int(11) NOT NULL DEFAULT '0'," +
+                            " `total_installed` int(11) NOT NULL DEFAULT '0'," +
+                            " `total_impressions` int(11) NOT NULL DEFAULT '0'," +
+                            " `cpa` double NOT NULL DEFAULT '0'," +
+                            " `ctr` double NOT NULL DEFAULT '0'," +
+                            " PRIMARY KEY (`id`)," +
+                            " UNIQUE KEY `idx_date_campaign` (`date`,`campaign_id`)," +
+                            " KEY `idx_campaign_id` (`campaign_id`)," +
+                            " KEY `idx_date` (`date`)" +
+                            ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
+                    DB.updateBySql("CREATE TABLE `web_ad_campaigns_country_history_" + tagName + "`(" +
+                            "`id` int(10) unsigned NOT NULL AUTO_INCREMENT," +
+                            "`campaign_id` varchar(50) NOT NULL," +
+                            " `country_code` varchar(4) NOT NULL," +
+                            " `date` date DEFAULT NULL," +
+                            " `account_id` varchar(50) not null," +
+                            " `short_name` varchar(50) not null," +
+                            " `total_spend` double NOT NULL DEFAULT '0'," +
+                            " `total_click` int(11) NOT NULL DEFAULT '0'," +
+                            " `total_installed` int(11) NOT NULL DEFAULT '0'," +
+                            " `total_impressions` int(11) NOT NULL DEFAULT '0'," +
+                            " `cpa` double NOT NULL DEFAULT '0'," +
+                            " `ctr` double NOT NULL DEFAULT '0'," +
+                            " PRIMARY KEY (`id`)," +
+                            " UNIQUE KEY `idx_date_campaign` (`date`,`campaign_id`,`country_code`)," +
+                            " KEY `idx_campaign_id` (`campaign_id`)," +
+                            " KEY `idx_date` (`date`)" +
+                            ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
+                    DB.updateBySql("CREATE TABLE `web_ad_campaigns_country_history_admob_" + tagName + "`(" +
+                            "`id` int(10) unsigned NOT NULL AUTO_INCREMENT," +
+                            "`campaign_id` varchar(50) NOT NULL," +
+                            " `country_code` varchar(4) NOT NULL," +
+                            " `date` date DEFAULT NULL," +
+                            " `account_id` varchar(50) not null," +
+                            " `short_name` varchar(50) not null," +
+                            " `total_spend` double NOT NULL DEFAULT '0'," +
+                            " `total_click` int(11) NOT NULL DEFAULT '0'," +
+                            " `total_installed` int(11) NOT NULL DEFAULT '0'," +
+                            " `total_impressions` int(11) NOT NULL DEFAULT '0'," +
+                            " `cpa` double NOT NULL DEFAULT '0'," +
+                            " `ctr` double NOT NULL DEFAULT '0'," +
+                            " PRIMARY KEY (`id`)," +
+                            " UNIQUE KEY `idx_date_campaign` (`date`,`campaign_id`,`country_code`)," +
+                            " KEY `idx_campaign_id` (`campaign_id`)," +
+                            " KEY `idx_date` (`date`)" +
+                            ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         } catch (Exception e) {
             ret.result = false;
