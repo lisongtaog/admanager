@@ -36,7 +36,7 @@
 
         <table class="table">
             <thead>
-            <tr><th>标签ID</th><th>标签名称</th><th>最大出价</th><th>应用品类ID</th><th>应用品类名称</th><th>操作</th></tr>
+            <tr><th>标签ID</th><th>标签名称</th><th>最大出价</th><th>应用品类名称</th><th>期望收入</th><th>期望盈利</th><th>投放人员</th><th>是否计入统计</th><th>操作</th></tr>
             </thead>
             <tbody>
 
@@ -62,8 +62,11 @@
                 <td><%=one.get("id")%></td>
                 <td><%=one.get("tag_name")%></td>
                 <td><%=one.get("max_bidding")%></td>
-                <td><%=one.get("tag_category_id")%></td>
                 <td><%=one.get("category_name")%></td>
+                <td><%=one.get("anticipated_revenue")%></td>
+                <td><%=one.get("anticipated_incoming")%></td>
+                <td><%=one.get("nickname")%></td>
+                <td><%=Integer.parseInt(one.get("is_statistics").toString())== 1 ? "是" : "否"%></td>
                 <td><a class="link_modify glyphicon glyphicon-pencil" href="#"></a><a class="link_delete glyphicon glyphicon-remove" href="#"></a></td>
             </tr>
             <% } %>
@@ -128,6 +131,41 @@
                             </select>
                         </div>
                     </div>
+                    <div class="form-group">
+                        <label for="inputRevenue" class="col-sm-2 control-label">期望收入</label>
+                        <div class="col-sm-8">
+                            <input class="form-control" id="inputRevenue" autocomplete="off">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="inputIncoming" class="col-sm-2 control-label">期望盈利</label>
+                        <div class="col-sm-8">
+                            <input class="form-control" id="inputIncoming" autocomplete="off">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="user" class="col-sm-2 control-label">投放人员</label>
+                        <div class="col-sm-8">
+                            <select id="user" class="form-control">
+                                <%
+                                    List<JSObject> user = DB.scan("web_ad_login_user").select("id").select("nickname").execute();
+                                    for(JSObject j:user){
+                                %>
+                                <option value="<%=j.get("id")%>"><%=j.get("nickname")%></option>
+                                <%  } %>
+
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="isStatistics" class="col-sm-2 control-label">是否计入统计</label>
+                        <div class="col-sm-8">
+                            <select id="isStatistics" class="form-control">
+                                <option value="1">是</option>
+                                <option value="0">否</option>
+                            </select>
+                        </div>
+                    </div>
                 </form>
                 <p id="delete_message">确认要删除吗?</p>
             </div>
@@ -161,12 +199,20 @@
         var tagName = $("#inputTagName").val();
         var maxBidding = $("#inputMaxBidding").val();
         var tagCategoryId = $("#category").val();
+        var anticipated_revenue = $("#inputRevenue").val();
+        var anticipated_incoming = $("#inputIncoming").val();
+        var user_id = $("#user").val();
+        var is_statistics = $("#isStatistics").val();
 
         if (modifyType == 'new') {
             $.post('tags/create', {
                 name: tagName,
                 maxBidding: maxBidding,
-                tagCategoryId: tagCategoryId
+                tagCategoryId: tagCategoryId,
+                anticipated_revenue:anticipated_revenue,
+                anticipated_incoming:anticipated_incoming,
+                user_id:user_id,
+                is_statistics:is_statistics
             }, function(data) {
                 if (data && data.ret == 1) {
                     $("#new_tag_dlg").modal("hide");
@@ -178,10 +224,15 @@
         } else if (modifyType == 'update') {
             $.post('tags/update', {
                 id: id,
-                name: tagName,
+                name:tagName,
                 maxBidding: maxBidding,
-                tagCategoryId: tagCategoryId
+                tagCategoryId: tagCategoryId,
+                anticipated_revenue:anticipated_revenue,
+                anticipated_incoming:anticipated_incoming,
+                user_id:user_id,
+                is_statistics:is_statistics
             }, function(data) {
+                $("#inputTagName").prop("disabled",false);
                 if (data && data.ret == 1) {
                     $("#new_tag_dlg").modal("hide");
                     location.reload();
@@ -206,7 +257,7 @@
 
     $('#btnSearch').click(function() {
         var query = $("#inputSearch").val();
-        $.post('tags/query', {
+        $.post("tags/query", {
             word: query
         }, function(data) {
             if (data && data.ret == 1) {
@@ -234,12 +285,25 @@
             td = $('<td></td>');
             td.text(one.max_bidding);
             tr.append(td);
-            td = $('<td></td>');
-            td.text(one.tag_category_id);
-            tr.append(td);
 
             td = $('<td></td>');
             td.text(one.category_name);
+            tr.append(td);
+
+            td = $('<td></td>');
+            td.text(one.anticipated_revenue);
+            tr.append(td);
+
+            td = $('<td></td>');
+            td.text(one.anticipated_incoming);
+            tr.append(td);
+
+            td = $('<td></td>');
+            td.text(one.user);
+            tr.append(td);
+
+            td = $('<td></td>');
+            td.text(one.is_statistics == "1"? "是":"否");
             tr.append(td);
 
             td = $('<td><a class="link_modify glyphicon glyphicon-pencil" href="#"></a><a class="link_delete glyphicon glyphicon-remove" href="#"></a></td>');
@@ -261,9 +325,35 @@
             var tagName = $(tds.get(1)).text();
             var maxBidding = $(tds.get(2)).text();
             var tagCategoryId = $(tds.get(3)).text();
-            $("#inputTagName").val(tagName);
+            var revenue = $(tds.get(4)).text();
+            var incoming = $(tds.get(5)).text();
+            var user = $(tds.get(6)).text();
+            var isStatistics = $(tds.get(7)).text();
+            $("#inputTagName").val(tagName).prop("disabled",true);
             $("#inputMaxBidding").val(maxBidding);
-            $("#category").val(tagCategoryId);
+            $("#category option").each(function(idx){
+                var name = $(this).text();
+                if(name == tagCategoryId){
+                    $("#category").val($(this).val());
+                    return;
+                }
+            });
+            $("#inputRevenue").val(revenue);
+            $("#inputIncoming").val(incoming);
+            $("#user option").each(function(idx){
+                var name = $(this).text();
+                if(name == user){
+                    $("#user").val($(this).val());
+                    return;
+                }
+            });
+            $("#isStatistics option").each(function(idx){
+                var name = $(this).text();
+                if(name == isStatistics){
+                    $("#isStatistics").val($(this).val());
+                    return;
+                }
+            });
 
             $("#new_tag_dlg").modal("show");
         });
