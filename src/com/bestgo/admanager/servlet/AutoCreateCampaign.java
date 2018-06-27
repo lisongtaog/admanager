@@ -800,8 +800,8 @@ public class AutoCreateCampaign extends HttpServlet {
             if (result.result) {
                 String s = String.valueOf(System.currentTimeMillis());
                 campaignName = campaignName+"_"+s.substring(s.length() - 6, s.length());
-                if (campaignName.length() > 100) {
-                    campaignName = campaignName.substring(0, 100);
+                if (campaignName.length() > 110) {
+                    campaignName = campaignName.substring(0, 110);
                 }
                 if (maxCPA == null) maxCPA = "";
                 long recordId = DB.insert("ad_campaigns_admob_auto_create")
@@ -917,8 +917,8 @@ public class AutoCreateCampaign extends HttpServlet {
                 result.result = false;
                 result.message = "图片路径不存在";
             }
-            if (campaignName.length() > 100) {
-                campaignName = campaignName.substring(0, 100);
+            if (campaignName.length() > 110) {
+                campaignName = campaignName.substring(0, 110);
             }
             if (result.result) {
                 DB.update("ad_campaigns_admob_auto_create")
