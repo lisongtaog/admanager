@@ -960,7 +960,9 @@ function FacebookFormReading(){
                 })
             },{
                 key:"fbPageName",
-                values:[fbPageName.join(",")]
+                values:fbPageName.map(function (x) {
+                    return x.trim();
+                })
             });
         } else {
             explodeListImage.push({
@@ -1141,7 +1143,9 @@ function FacebookFormReading(){
                 })
             },{
                 key:"fbPageName",
-                values:[fbPageName.join(",")]
+                values:fbPageName.map(function (x) {
+                    return x.trim();
+                })
             });
         } else {
             explodeListVideo.push({
