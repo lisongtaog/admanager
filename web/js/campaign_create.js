@@ -873,7 +873,7 @@ function FacebookFormReading(){
     var region = $('#selectRegion').val();
     var fbPage = $('#selectFBPage').val();//facebooke主页
     //facebook主页名称
-    var fbName = $("#selectFBPage").children("option:selected");
+    var fbName = $("#selectFBPage").children("option:selected"); //这里仅用于拼写
     var fbPageName = [];
     fbName.each(function(idx){
         fbPageName.push($(this).text());
@@ -953,24 +953,24 @@ function FacebookFormReading(){
         });
 
         if ($("#selectFBPageExplode").prop("checked")) {
+            var FBarray = [];
+            for(var j = 0;j<fbPage.length;j++){
+                var p = {};
+                p.pageId = fbPage[j];
+                p.pageName = fbPageName[j];
+                FBarray.push(p);
+            }
             explodeListImage.push({
-                key: 'pageId',
-                values: fbPage.map(function (x) {
-                    return x.trim();
-                })
-            },{
-                key:"fbPageName",
-                values:fbPageName.map(function (x) {
-                    return x.trim();
-                })
+                key: 'FBpage',
+                values: FBarray
             });
         } else {
+            var p = {};
+            p.pageId = fbPage.join(",");
+            p.pageName = fbPageName.join(",");
             explodeListImage.push({
-                key: 'pageId',
-                values: [fbPage.join(",")]
-            },{
-                key:"fbPageName",
-                values:[fbPageName.join(",")]
+                key: 'FBpage',
+                values:[p]
             });
         }
         if ($("#selectRegionExplode").prop("checked")) {
@@ -1136,25 +1136,25 @@ function FacebookFormReading(){
         });
 
         if ($("#selectFBPageExplode").prop("checked")) {
+            var FBarray = [];
+            for(var j = 0;j<fbPage.length;j++){
+                var p = {};
+                p.pageId = fbPage[j];
+                p.pageName = fbPageName[j];
+                FBarray.push(p);
+            }
             explodeListVideo.push({
-                key: 'pageId',
-                values: fbPage.map(function (x) {
-                    return x.trim();
-                })
-            },{
-                key:"fbPageName",
-                values:fbPageName.map(function (x) {
-                    return x.trim();
-                })
+                key: 'FBpage',
+                values: FBarray
             });
         } else {
+            var p = {};
+            p.pageId = fbPage.join(",");
+            p.pageName = fbPageName.join(",");
             explodeListVideo.push({
-                key: 'pageId',
-                values: [fbPage.join(",")]
-            },{
-                key:"fbPageName",
-                values:[fbPageName.join(",")]
-            })
+                key: 'FBpage',
+                values: [p]
+            });
         }
 
         if ($("#selectRegionExplode").prop("checked")) {
@@ -1292,7 +1292,7 @@ function FacebookFormReading(){
     explodeParams.forEach(function(p){
         p.campaignName = generateFacebookCampaignName({
             identification:p.identification,
-            fbPageName:p.fbPageName,
+            fbPageName:p.FBpage.pageName,
             age: p.age,
             gender: p.gender,
             bidding: p.bidding,
