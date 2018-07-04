@@ -251,6 +251,7 @@ function initFormData() {
                     $('#selectUserOs').trigger('change');
                     $('#inputUserDevices').val(campaignData.user_devices);
                     $('#inputBudget').val(campaignData.bugdet);
+                    $('#selectBidStrategy').val(campaignData.bidStrategy);
                     $('#inputBidding').val(campaignData.bidding);
                     $('#inputBiddingExplode').prop('checked', campaignData.explode_bidding == 1);
                     $('#inputMaxCpa').val(campaignData.max_cpa);
@@ -334,6 +335,7 @@ function indexInitFormData(isIndexCreate,campaign_id) {
                     $('#selectRegion').trigger('change');
 
                     $('#inputBudget').val(IndexBudget);
+                    $('#selectBidStrategy').val(IndexBudget);
 
                     $('#inputBidding').val(IndexBidding);
                     $('#inputBiddingExplode').prop('checked', campaignData.explode_bidding == 1);
@@ -886,8 +888,11 @@ function FacebookFormReading(){
     var interest = $('#inputInterest').val();
     var userOs = $('#selectUserOs').val();
     var userDevice = $('#inputUserDevices').val();
-    var bugdet = $('#inputBudget').val();
-    var bidding = $('#inputBidding').val();
+    var bugdet = $('#inputBudget').val();//预算
+    var bidding = $('#inputBidding').val();//出价/竞价
+
+    var bidStrategy = $('#selectBidStrategy').val();//竞价策略
+
     var maxCPA = $('#inputMaxCpa').val();
     var PublisherPlatforms = $("#selectPublisherPlatforms").val();
 
@@ -944,6 +949,9 @@ function FacebookFormReading(){
         },{
             key:"bugdet",
             values:[bugdet]
+        },{
+            key:"bidStrategy",
+            values:[bidStrategy]
         },{
             key:"maxCPA",
             values:[maxCPA]
@@ -1127,6 +1135,9 @@ function FacebookFormReading(){
         },{
             key:"bugdet",
             values:[bugdet]
+        },{
+            key:"bidStrategy",
+            values:[bidStrategy]
         },{
             key:"maxCPA",
             values:[maxCPA]

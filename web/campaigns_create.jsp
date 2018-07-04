@@ -41,6 +41,7 @@
     //以下接收的是从index2传来的页面
     String campaignId = request.getParameter("campaignId");
     String budget = request.getParameter("budget");
+    String bidStrategy = request.getParameter("bidStrategy");
     String bidding = request.getParameter("bidding");
     boolean isIndexCreate = "auto_create".equals(type);
 %>
@@ -231,7 +232,16 @@
             </div>
         </div>
         <div class="form-group">
-            <label for="inputBidding" class="col-sm-2 control-label">出价</label>
+            <label for="selectBidStrategy" class="col-sm-2 control-label" >竞价策略</label>
+            <div class="col-sm-10">
+                <select class="form-control" id="selectBidStrategy">
+                    <option value="1">TARGET_COST</option> <%--设置 出价 平均费用--%>
+                    <option value="2">LOWEST_COST_WITH_BID_CAP</option><%--需要 设置竞价上限--%>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="inputBidding" class="col-sm-2 control-label">出价/竞价上限</label>
             <div class="col-sm-8">
                 <input class="form-control" id="inputBidding" type="text" />
             </div>
@@ -420,6 +430,7 @@
     var isIndexCreate = <%=isIndexCreate%>;
     var campaign_id = "<%=campaignId%>";
     var IndexBudget = <%=budget%>;
+    var bidStrategy = <%=bidStrategy%>;
     var IndexBidding = <%=bidding%>;
 
     //国家后面的“分离到系列”一旦选中的互动

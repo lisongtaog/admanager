@@ -85,6 +85,7 @@ public class Campaign extends HttpServlet {
             String identification = request.getParameter("identification");
             String materialPath = request.getParameter("materialPath");
             String publisherPlatforms = request.getParameter("publisherPlatforms");
+            String bidStrategy = request.getParameter("bidStrategy");
             String imagePath = new String();
             String videoPath = new String();
             if(identification.equals("image")){
@@ -199,7 +200,7 @@ public class Campaign extends HttpServlet {
                                     calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), calendar.get(Calendar.SECOND));
                             String s = String.valueOf(System.currentTimeMillis());
                             s = s.substring(9,s.length());
-                            campaignName = campaignNameOld.replace(accountNameArrStr,accountNameArr[j]) + s + "_" + i;
+                            campaignName = campaignNameOld.replace(accountNameArrStr,accountNameArr[j]) + "_Strategy" + bidStrategy + "_" + i + s;
                             if (campaignName.length() > 100) {
                                 campaignName = campaignName.substring(0, 100);
                             }
@@ -226,6 +227,7 @@ public class Campaign extends HttpServlet {
                                     .put("user_devices", userDevice)
                                     .put("user_os", userOs)
                                     .put("publisher_platforms", publisherPlatforms)
+                                    .put("bid_strategy", bidStrategy)
                                     .executeReturnId();
                             if(genId >0){
                                 boolean flag = false;
@@ -568,10 +570,18 @@ public class Campaign extends HttpServlet {
                                 .where(DB.filter().whereEqualTo("id", id))
                                 .execute();
                     } else {
+                        int bidStrategy = 1;
+                        if ("facebook".equals(item.network)) {
+                            JSObject one = DB.findOneBySql("SELECT bid_strategy from ad_campaigns where campaign_id = '" + item.campaignId + "'");
+                            if (one.hasObjectData()) {
+                                bidStrategy = Utils.parseInt(one.get("bid_strategy"),1);
+                            }
+                        }
                         DB.insert("web_ad_batch_change_campaigns")
                                 .put("enabled", enabled)
                                 .put("bugdet", item.budget)
                                 .put("bidding", item.bidding)
+                                .put("bid_strategy", bidStrategy)
                                 .put("network", item.network)
                                 .put("account_id", item.accountId)
                                 .put("campaign_id", item.campaignId)
