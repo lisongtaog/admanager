@@ -209,8 +209,10 @@ public class AutoCreateCampaign extends HttpServlet {
 
 
     static String[] FB_CAMPAIGN_FIELDS = {"id", "app_name", "create_count", "account_id", "country_region", "explode_country",
-    "excluded_region", "language", "age", "explode_age", "gender", "explode_gender", "detail_target", "user_os", "user_devices",
-    "campaign_name", "bugdet", "bidding", "explode_bidding", "max_cpa", "title", "message", "image_path", "create_time", "update_time", "enabled","video_path","group_id"};
+                                           "excluded_region", "language", "age", "explode_age", "gender", "explode_gender",
+                                           "detail_target", "user_os", "user_devices","campaign_name", "bugdet", "bidding",
+                                           "explode_bidding", "max_cpa", "title", "message", "image_path", "create_time",
+                                           "update_time", "enabled","video_path","group_id","bid_strategy"};
 
     public static JSObject facebookFetchById(String id) {
         try {
@@ -329,6 +331,7 @@ public class AutoCreateCampaign extends HttpServlet {
             String identification = request.getParameter("identification");
             String materialPath = request.getParameter("materialPath");
             String publisherPlatforms = request.getParameter("publisherPlatforms");
+            String bidStrategy = request.getParameter("bidStrategy");
             String imagePath = new String();
             String videoPath = new String();
             if(identification.equals("image")){
@@ -443,6 +446,7 @@ public class AutoCreateCampaign extends HttpServlet {
                         .put("video_path", videoPath)
                         .put("create_time", DateUtil.getNowTime())
                         .put("publisher_platforms",publisherPlatforms)
+                        .put("bid_strategy",bidStrategy)
                         .execute();
                 if (record) {
                     result.result = true;
@@ -478,8 +482,6 @@ public class AutoCreateCampaign extends HttpServlet {
             String groupId = request.getParameter("groupId");
             String title = request.getParameter("title");
             String message = request.getParameter("message");
-//            String imagePath = request.getParameter("imagePath");
-//            String videoPath = request.getParameter("videoPath");
             String materialPath = request.getParameter("materialPath");
             String identification = request.getParameter("identification");
             String region = request.getParameter("region");

@@ -15,4 +15,5 @@ public class BatchChangeItem {
     public double bidding;
     public String excludedCountry;
     public int success;
+    public int bid_strategy;
 }
