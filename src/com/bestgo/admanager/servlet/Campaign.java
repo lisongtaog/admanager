@@ -199,10 +199,10 @@ public class Campaign extends HttpServlet {
                             String now  = String.format("%d-%02d-%02d %02d:%02d:%02d", calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH),
                                     calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), calendar.get(Calendar.SECOND));
                             String s = String.valueOf(System.currentTimeMillis());
-                            s = s.substring(9,s.length());
-                            campaignName = campaignNameOld.replace(accountNameArrStr,accountNameArr[j]) + "_Strategy" + bidStrategy + "_" + i + s;
-                            if (campaignName.length() > 100) {
-                                campaignName = campaignName.substring(0, 100);
+                            String part = new StringBuffer(i + s + "").reverse().toString();
+                            campaignName = campaignNameOld.replace(accountNameArrStr,accountNameArr[j]) + "_Strategy" + bidStrategy + "_" + part;
+                            if (campaignName.length() > 110) {
+                                campaignName = campaignName.substring(0, 110);
                             }
                             long genId = DB.insert("ad_campaigns")
                                     .put("facebook_app_id", appId)
@@ -574,7 +574,7 @@ public class Campaign extends HttpServlet {
                         if ("facebook".equals(item.network)) {
                             JSObject one = DB.findOneBySql("SELECT bid_strategy from ad_campaigns where campaign_id = '" + item.campaignId + "'");
                             if (one.hasObjectData()) {
-                                bidStrategy = Utils.parseInt(one.get("bid_strategy"),1);
+                                bidStrategy = one.get("bid_strategy");
                             }
                         }
                         DB.insert("web_ad_batch_change_campaigns")
