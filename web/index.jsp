@@ -3,17 +3,11 @@
 <%@ page import="com.bestgo.common.database.utils.JSObject" %>
 <%@ page import="java.util.List" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@include file="common/rootBase.jsp" %>
 
 <html>
 <head>
     <title>首页</title>
-    <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css"/>
-    <link rel="stylesheet" href="bootstrap/css/bootstrap-theme.min.css"/>
-    <link rel="stylesheet" href="css/core.css"/>
-    <link rel="stylesheet" href="css/bootstrap-tagsinput.css"/>
-    <link rel="stylesheet" href="css/bootstrap-datetimepicker.css"/>
-    <link rel="stylesheet" href="jqueryui/jquery-ui.css"/>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.4/css/select2.min.css" rel="stylesheet" />
 
     <style>
         td.editable {
@@ -204,14 +198,6 @@
 
 <jsp:include page="loading_dialog.jsp"></jsp:include>
 
-
-<script src="js/jquery.js"></script>
-<script src="bootstrap/js/bootstrap.min.js"></script>
-<script src="js/core.js"></script>
-<script src="js/bootstrap-datetimepicker.js"></script>
-<script src="jqueryui/jquery-ui.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.4/js/select2.min.js"></script>
-<script src="js/country-name-code-dict.js"></script>
 <script src="js/index.js?t=20180531"></script>
 
 <script>

@@ -3,11 +3,8 @@
 <%@ page import="java.util.List" %>
 <%@ page import="com.bestgo.admanager.servlet.AdAccount" %>
 <%@ page import="java.util.ArrayList" %>
-
-
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<link rel="stylesheet" href="bootstrap/css/bootstrap.min.css" />
-<link rel="stylesheet" href="bootstrap/css/bootstrap-theme.min.css" />
+<%@include file="common/rootBase.jsp"%>
 
 <html>
   <head>
@@ -130,10 +127,6 @@
   </div>
 
   <jsp:include page="loading_dialog.jsp"></jsp:include>
-
-  <script src="js/jquery.js"></script>
-  <script src="bootstrap/js/bootstrap.min.js"></script>
-  <script src="js/core.js"></script>
 
   <script type="text/javascript">
     var modifyType = 'new';
