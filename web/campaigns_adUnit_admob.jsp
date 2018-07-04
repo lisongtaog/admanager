@@ -8,16 +8,12 @@
 <%@ page import="com.bestgo.admanager.servlet.Tags" %>
 <%@ page import="com.google.gson.JsonArray" %>
 <%@ page import="com.bestgo.admanager.servlet.CampaignAdmob" %>
-
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@include file="common/rootBase.jsp"%>
 
 <html>
 <head>
     <title>Admob广告系列-广告单元</title>
-    <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="bootstrap/css/bootstrap-theme.min.css" />
-    <link rel="stylesheet" href="css/core.css" />
-    <link rel="stylesheet" href="css/bootstrap-tagsinput.css" />
     <style>
         table td{
             max-width:43em;
@@ -203,9 +199,6 @@
 
 <jsp:include page="loading_dialog.jsp"></jsp:include>
 
-<script src="js/jquery.js"></script>
-<script src="bootstrap/js/bootstrap.min.js"></script>
-<script src="js/core.js"></script>
 <script src="js/typeahead.js"></script>
 <script src="js/bootstrap-tagsinput.js"></script>
 

@@ -2,11 +2,8 @@
 <%@ page import="com.bestgo.common.database.utils.JSObject" %>
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.ArrayList" %>
-
-
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<link rel="stylesheet" href="bootstrap/css/bootstrap.min.css" />
-<link rel="stylesheet" href="bootstrap/css/bootstrap-theme.min.css" />
+<%@include file="common/rootBase.jsp" %>
 
 <html>
   <head>
@@ -52,10 +49,6 @@
 
 
   <jsp:include page="loading_dialog.jsp"></jsp:include>
-
-  <script src="js/jquery.js"></script>
-  <script src="bootstrap/js/bootstrap.min.js"></script>
-  <script src="js/core.js"></script>
 
   <script type="text/javascript">
       $("li[role='presentation']:eq(5)").addClass("active");

@@ -4,11 +4,9 @@
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="com.bestgo.admanager.servlet.Logs" %>
 <%@ page import="com.bestgo.admanager.DailyCpaEcpmReport" %>
-
-
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<link rel="stylesheet" href="bootstrap/css/bootstrap.min.css" />
-<link rel="stylesheet" href="bootstrap/css/bootstrap-theme.min.css" />
+<%@include file="common/rootBase.jsp"%>
+
 
 <html>
   <head>
@@ -46,8 +44,6 @@
     </div>
   </div>
 
-  <script src="js/jquery.js"></script>
-  <script src="bootstrap/js/bootstrap.min.js"></script>
 
   <script>
     function fetchData() {

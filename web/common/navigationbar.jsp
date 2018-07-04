@@ -5,11 +5,7 @@
   Desc: 共有的导航栏部分
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<html>
-<head>
-    <title>Title</title>
-</head>
-<body>
+
 <div id="navbar" class="navbar-collapse collapse">
     <ul class="nav navbar-nav navbar-right">
         <li style="padding-top:8px;">
@@ -19,7 +15,7 @@
                 </button>
                 <ul class="dropdown-menu" role="menu">
                     <li><a href="#"><i class="glyphicon glyphicon-cog"></i> 个人设置</a></li>
-                    <li><a href="#"><i class="glyphicon glyphicon-comment"></i> 消息</a></li>
+                    <li><a href="#" id="type${sessionScope.loginUser.userType}"><i class="glyphicon glyphicon-comment"></i> 消息</a></li>
                     <li class="divider"></li>
                     <li><a href="login.jsp"><i class="glyphicon glyphicon-off"></i> 退出系统</a></li>
                 </ul>
@@ -86,5 +82,18 @@
         <li role="presentation"><a href="app_image_video_rel_insert.jsp">应用图片视频关联录入</a></li>
 
 </ul>
-</body>
-</html>
+
+<script>
+    var privilege = document.getElementById("type1");
+    if(privilege){
+        $.post("login/applicationCheck",function(data){
+            if(data && (data.count > 0)){
+                var a = $(privilege);
+                a.append("<span class='badge'>"+data.count+"</span>");
+            }
+        },"json");
+        privilege.setAttribute("href","system_management.jsp");
+        privilege.setAttribute("target","_blank");
+    }
+</script>
+
