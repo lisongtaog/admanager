@@ -332,6 +332,7 @@ public class AutoCreateCampaign extends HttpServlet {
             String materialPath = request.getParameter("materialPath");
             String publisherPlatforms = request.getParameter("publisherPlatforms");
             String bidStrategy = request.getParameter("bidStrategy");
+            String pageId = request.getParameter("FBpage[pageId]");
             String imagePath = new String();
             String videoPath = new String();
             if(identification.equals("image")){
@@ -413,8 +414,9 @@ public class AutoCreateCampaign extends HttpServlet {
             }
 
             if (result.result) {
-                if (campaignName.length() > 100) {
-                    campaignName = campaignName.substring(0, 100);
+                campaignName = campaignName + "_Strategy" + bidStrategy;
+                if (campaignName.length() > 110) {
+                    campaignName = campaignName.substring(0, 110);
                 }
                 interest = (interest == null) ? "" : interest;
                 userOs = (userOs == null) ? "" : userOs;
@@ -447,6 +449,7 @@ public class AutoCreateCampaign extends HttpServlet {
                         .put("create_time", DateUtil.getNowTime())
                         .put("publisher_platforms",publisherPlatforms)
                         .put("bid_strategy",bidStrategy)
+                        .put("page_id",pageId)
                         .execute();
                 if (record) {
                     result.result = true;
@@ -558,8 +561,8 @@ public class AutoCreateCampaign extends HttpServlet {
                     result.message = "视频路径不存在";
                 }
             }
-            if (campaignName.length() > 100) {
-                campaignName = campaignName.substring(0, 100);
+            if (campaignName.length() > 110) {
+                campaignName = campaignName.substring(0, 110);
             }
             if (result.result) {
                 DB.update("ad_campaigns_auto_create")
