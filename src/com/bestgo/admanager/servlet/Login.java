@@ -57,7 +57,7 @@ public class Login extends HttpServlet {
                 String user_name = request.getParameter("user_name");
                 String password = request.getParameter("password");
                 String email = request.getParameter("email");
-                String sql = "SELECT user_name FROM new_user_application WHERE user_name = '" + user_name + "'";
+                String sql = "SELECT user_name FROM web_new_register_user WHERE user_name = '" + user_name + "'";
                 try{
                     JSObject user = DB.findOneBySql(sql);
                     if(user.hasObjectData()){
@@ -86,7 +86,7 @@ public class Login extends HttpServlet {
                 }
             }else if(path.startsWith("/applicationCheck")){
                 try{
-                    JSObject count = DB.simpleScan("new_user_application").select(DB.func(DB.COUNT, "id")).execute();
+                    JSObject count = DB.simpleScan("web_new_register_user").select(DB.func(DB.COUNT, "id")).execute();
                     Long count_id = count.get("count(id)");
                     json.addProperty("count",count_id);
                     response.getWriter().write(json.toString());
