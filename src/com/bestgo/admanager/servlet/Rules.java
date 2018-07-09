@@ -1,6 +1,7 @@
 package com.bestgo.admanager.servlet;
 
 import com.bestgo.admanager.OperationResult;
+import com.bestgo.admanager.utils.NumberUtil;
 import com.bestgo.admanager.utils.Utils;
 import com.bestgo.common.database.services.DB;
 import com.bestgo.common.database.utils.JSObject;
@@ -39,13 +40,13 @@ public class Rules extends HttpServlet {
                 json.addProperty("message", result.message);
             } else if (path.startsWith("/delete")) {
                 String id = request.getParameter("id");
-                OperationResult result = deleteRule(Utils.parseInt(id, 0));
+                OperationResult result = deleteRule(NumberUtil.parseInt(id, 0));
                 json.addProperty("ret", result.result ? 1 : 0);
                 json.addProperty("message", result.message);
             } else if (path.startsWith("/update")) {
                 String ruleType = request.getParameter("ruleType");
                 String ruleContent = request.getParameter("ruleContent");
-                int id = Utils.parseInt(request.getParameter("id"), 0);
+                int id = NumberUtil.parseInt(request.getParameter("id"), 0);
                 OperationResult result = updateRule(id, ruleType, ruleContent);
                 json.addProperty("ret", result.result ? 1 : 0);
                 json.addProperty("message", result.message);

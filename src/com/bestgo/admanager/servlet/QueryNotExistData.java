@@ -1,6 +1,7 @@
 package com.bestgo.admanager.servlet;
 
 import com.bestgo.admanager.utils.StringUtil;
+import com.bestgo.admanager.utils.NumberUtil;
 import com.bestgo.admanager.utils.Utils;
 import com.bestgo.common.database.services.DB;
 import com.bestgo.common.database.utils.JSObject;
@@ -61,9 +62,9 @@ public class QueryNotExistData extends HttpServlet {
                     admob.addProperty("total_installed", total_installed);
                     admob.addProperty("total_impressions", total_impressions);
                     admob.addProperty("total_click", total_click);
-                    admob.addProperty("total_ctr", Utils.trimDouble(total_ctr,3));
-                    admob.addProperty("total_cpa", Utils.trimDouble(total_cpa,3));
-                    admob.addProperty("total_cvr", Utils.trimDouble(total_cvr,3));
+                    admob.addProperty("total_ctr", NumberUtil.trimDouble(total_ctr,3));
+                    admob.addProperty("total_cpa", NumberUtil.trimDouble(total_cpa,3));
+                    admob.addProperty("total_cvr", NumberUtil.trimDouble(total_cvr,3));
                     JsonArray array = admob.getAsJsonArray("array");
                     JsonArray array1 = facebook.getAsJsonArray("array");
                     for (int i = 0; i < array1.size(); i++) {
@@ -218,8 +219,8 @@ public class QueryNotExistData extends HttpServlet {
             double budget = one.get("budget");
             double bidding = one.get("bidding");
 
-            double spend = Utils.convertDouble(one.get("total_spend"), 0);
-            double installed = Utils.convertDouble(one.get("total_installed"), 0);
+            double spend = NumberUtil.convertDouble(one.get("total_spend"), 0);
+            double installed = NumberUtil.convertDouble(one.get("total_installed"), 0);
             double cpa =  0;
             double cvr = 0;
             double click = 0;
@@ -240,8 +241,8 @@ public class QueryNotExistData extends HttpServlet {
             d.addProperty("spend", spend);
             d.addProperty("installed", installed);
             d.addProperty("click", click);
-            d.addProperty("cpa", Utils.trimDouble(cpa,3));
-            d.addProperty("cvr", Utils.trimDouble(cvr,3));
+            d.addProperty("cpa", NumberUtil.trimDouble(cpa,3));
+            d.addProperty("cvr", NumberUtil.trimDouble(cvr,3));
             if (admobCheck) {
                 d.addProperty("network", "admob");
             } else {
@@ -258,9 +259,9 @@ public class QueryNotExistData extends HttpServlet {
         jsonObject.addProperty("total_installed", total_installed);
         jsonObject.addProperty("total_impressions", 0);
         jsonObject.addProperty("total_click", 0);
-        jsonObject.addProperty("total_ctr", Utils.trimDouble(total_ctr,3));
-        jsonObject.addProperty("total_cpa", Utils.trimDouble(total_cpa,3));
-        jsonObject.addProperty("total_cvr", Utils.trimDouble(total_cvr,3));
+        jsonObject.addProperty("total_ctr", NumberUtil.trimDouble(total_ctr,3));
+        jsonObject.addProperty("total_cpa", NumberUtil.trimDouble(total_cpa,3));
+        jsonObject.addProperty("total_cvr", NumberUtil.trimDouble(total_cvr,3));
         return jsonObject;
     }
 }

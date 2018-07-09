@@ -2,6 +2,7 @@ package com.bestgo.admanager.servlet;
 
 import com.bestgo.admanager.utils.DateUtil;
 import com.bestgo.admanager.utils.StringUtil;
+import com.bestgo.admanager.utils.NumberUtil;
 import com.bestgo.admanager.utils.Utils;
 import com.bestgo.common.database.services.DB;
 import com.bestgo.common.database.utils.JSObject;
@@ -117,9 +118,9 @@ public class ReleasedDataStatistics extends HttpServlet {
                                     totalSpend = one.get("spend");
                                     totalRevenue = one.get("revenue");
                                 }
-                                d.addProperty("total_revenue" + i, Utils.trimDouble(totalRevenue, 0));
-                                d.addProperty("total_spend" + i, Utils.trimDouble(totalSpend, 0));
-                                d.addProperty("total_incoming" + i, Utils.trimDouble(totalIncoming, 0));
+                                d.addProperty("total_revenue" + i, NumberUtil.trimDouble(totalRevenue, 0));
+                                d.addProperty("total_spend" + i, NumberUtil.trimDouble(totalSpend, 0));
+                                d.addProperty("total_incoming" + i, NumberUtil.trimDouble(totalIncoming, 0));
                                 if (totalSpend > 0 || totalRevenue >= 100) {//收入小月100刀，或者没有投放的，都隐藏掉
                                     found = false;
                                 } else {

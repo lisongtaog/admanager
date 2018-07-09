@@ -1,5 +1,6 @@
 package com.bestgo.admanager.servlet;
 
+import com.bestgo.admanager.utils.NumberUtil;
 import com.bestgo.admanager.utils.Utils;
 import com.bestgo.common.database.services.DB;
 import com.bestgo.common.database.utils.JSObject;
@@ -55,7 +56,7 @@ public class ProjectTeamTotalRevenueAndTotalCost extends HttpServlet {
                                         "and date between '" + startDate + "' and '" + endDate + "'";
                                 JSObject x = DB.findOneBySql(sqlG);
                                 if (x.hasObjectData()) {
-                                    totalSpends += Utils.convertDouble(x.get("spend"), 0);
+                                    totalSpends += NumberUtil.convertDouble(x.get("spend"), 0);
                                 }
                                 sqlG = "select sum(ch.total_spend) as spend " +
                                         " from web_ad_campaigns_admob c, web_ad_campaigns_history_admob ch, " +
@@ -64,7 +65,7 @@ public class ProjectTeamTotalRevenueAndTotalCost extends HttpServlet {
                                         "and date between '" + startDate + "' and '" + endDate + "'";
                                 x = DB.findOneBySql(sqlG);
                                 if (x.hasObjectData()) {
-                                    totalSpends += Utils.convertDouble(x.get("spend"), 0);
+                                    totalSpends += NumberUtil.convertDouble(x.get("spend"), 0);
                                 }
 
 
@@ -74,16 +75,16 @@ public class ProjectTeamTotalRevenueAndTotalCost extends HttpServlet {
                                             + google_package_id + "' and date between '" + startDate + "' and '" + endDate + "' ";
                                     x = DB.findOneBySql(sqlG);
                                     if (x.hasObjectData()) {
-                                        totalRevenues += Utils.convertDouble(x.get("revenues"), 0);
+                                        totalRevenues += NumberUtil.convertDouble(x.get("revenues"), 0);
                                     }
                                 }
                             }
                         }
                     }
                     double totalIncomings = totalRevenues - totalSpends;
-                    d.addProperty("total_revenues", Utils.trimDouble(totalRevenues, 0));
-                    d.addProperty("total_spends", Utils.trimDouble(totalSpends, 0));
-                    d.addProperty("total_incomings", Utils.trimDouble(totalIncomings, 0));
+                    d.addProperty("total_revenues", NumberUtil.trimDouble(totalRevenues, 0));
+                    d.addProperty("total_spends", NumberUtil.trimDouble(totalSpends, 0));
+                    d.addProperty("total_incomings", NumberUtil.trimDouble(totalIncomings, 0));
                     jsonArray.add(d);
                 }
 

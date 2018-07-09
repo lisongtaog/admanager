@@ -1,10 +1,9 @@
 package com.bestgo.admanager.servlet;
 
 import com.bestgo.admanager.Config;
-import com.bestgo.admanager.utils.DateUtil;
+import com.bestgo.admanager.utils.*;
 import com.bestgo.admanager.OperationResult;
 import com.bestgo.admanager.utils.StringUtil;
-import com.bestgo.admanager.utils.Utils;
 import com.bestgo.admanager.bean.BatchChangeItem;
 import com.bestgo.common.database.services.DB;
 import com.bestgo.common.database.utils.JSObject;
@@ -45,7 +44,7 @@ public class Campaign extends HttpServlet {
         if(list != null && list.size() > 0){
             for(JSObject j : list){
                 String currTagName = j.get("tag_name");
-                double currMaxBidding = Utils.convertDouble(j.get("max_bidding"),0);
+                double currMaxBidding = NumberUtil.convertDouble(j.get("max_bidding"),0);
                 if (currMaxBidding > 0) {
                     tagMaxBiddingRelationMap.put(currTagName, currMaxBidding);
                 }
@@ -103,7 +102,7 @@ public class Campaign extends HttpServlet {
                 File videosPath = null;
                 Collection<File> uploadImages = null;
                 Collection<File> uploadVideos = null;
-                int groupId = Utils.parseInt(groupIdStr,0);
+                int groupId = NumberUtil.parseInt(groupIdStr,0);
                 if (groupId == 0) {
                     result.message = "广告组ID不存在！请联系管理员";
                 }else if (createCount.isEmpty()) {
@@ -129,12 +128,12 @@ public class Campaign extends HttpServlet {
                 }else if(publisherPlatforms.isEmpty()){
                     result.message = "版位不能为空";
                 }else {
-                    double dBidding = Utils.parseDouble(bidding, 0);
+                    double dBidding = NumberUtil.parseDouble(bidding, 0);
                     Double maxBiddingDouble = tagMaxBiddingRelationMap.get(appName);
                     if(maxBiddingDouble == null){
                         JSObject one = DB.findOneBySql("select max_bidding from web_tag where tag_name = '" + appName + "'");
                         if(one != null && one.hasObjectData()){
-                            maxBiddingDouble = Utils.convertDouble(one.get("max_bidding"),0);
+                            maxBiddingDouble = NumberUtil.convertDouble(one.get("max_bidding"),0);
                             if (maxBiddingDouble > 0) {
                                 tagMaxBiddingRelationMap.put(appName, maxBiddingDouble);
                             }
@@ -424,7 +423,7 @@ public class Campaign extends HttpServlet {
                         } else if (value instanceof Long) {
                             one.addProperty(key, (Long)value);
                         } else if (value instanceof Double) {
-                            one.addProperty(key, Utils.trimDouble((Double)value,3));
+                            one.addProperty(key, NumberUtil.trimDouble((Double)value,3));
                         } else {
                             one.addProperty(key, value.toString());
                         }
@@ -437,10 +436,10 @@ public class Campaign extends HttpServlet {
                     if (tagStr.length() > 0) {
                         tagStr = tagStr.substring(0, tagStr.length() - 1);
                     }
-                    double installed = Utils.convertDouble(one.get("total_installed").getAsDouble(), 0);
-                    double click = Utils.convertDouble(one.get("total_click").getAsDouble(), 0);
+                    double installed = NumberUtil.convertDouble(one.get("total_installed").getAsDouble(), 0);
+                    double click = NumberUtil.convertDouble(one.get("total_click").getAsDouble(), 0);
                     double cvr = click > 0 ? installed / click : 0;
-                    one.addProperty("cvr", Utils.trimDouble(cvr,3));
+                    one.addProperty("cvr", NumberUtil.trimDouble(cvr,3));
                     one.addProperty("tagStr", tagStr);
                     array.add(one);
 
@@ -466,15 +465,15 @@ public class Campaign extends HttpServlet {
                             } else if (value instanceof Long) {
                                 one.addProperty(key, (Long)value);
                             } else if (value instanceof Double) {
-                                one.addProperty(key, Utils.trimDouble((Double)value,3));
+                                one.addProperty(key, NumberUtil.trimDouble((Double)value,3));
                             } else {
                                 one.addProperty(key, value.toString());
                             }
                         }
-                        double installed = Utils.convertDouble(one.get("total_installed").getAsDouble(), 0);
-                        double click = Utils.convertDouble(one.get("total_click").getAsDouble(), 0);
+                        double installed = NumberUtil.convertDouble(one.get("total_installed").getAsDouble(), 0);
+                        double click = NumberUtil.convertDouble(one.get("total_click").getAsDouble(), 0);
                         double cvr = click > 0 ? installed / click : 0;
-                        one.addProperty("cvr", Utils.trimDouble(cvr,3));
+                        one.addProperty("cvr", NumberUtil.trimDouble(cvr,3));
                         //one.addProperty("tagStr", "_");
                         array.add(one);
 
@@ -506,7 +505,7 @@ public class Campaign extends HttpServlet {
                         } else if (value instanceof Long) {
                             one.addProperty(key, (Long)value);
                         } else if (value instanceof Double) {
-                            one.addProperty(key, Utils.trimDouble((Double)value,3));
+                            one.addProperty(key, NumberUtil.trimDouble((Double)value,3));
                         } else {
                             one.addProperty(key, value.toString());
                         }
@@ -542,7 +541,7 @@ public class Campaign extends HttpServlet {
                     if(maxBiddingDouble == null){
                         JSObject one = DB.findOneBySql("select max_bidding from web_tag where tag_name = '" + appName + "'");
                         if(one != null && one.hasObjectData()){
-                            maxBiddingDouble = Utils.convertDouble(one.get("max_bidding"),0);
+                            maxBiddingDouble = NumberUtil.convertDouble(one.get("max_bidding"),0);
                             if (maxBiddingDouble > 0) {
                                 tagMaxBiddingRelationMap.put(appName, maxBiddingDouble);
                             }
@@ -671,7 +670,7 @@ public class Campaign extends HttpServlet {
         OperationResult ret = new OperationResult();
 
         try {
-            JSObject campaign = DB.simpleScan("web_ad_campaigns").select("id", "campaign_id", "adset_id", "campaign_name", "status", "budget", "bidding").where(DB.filter().whereEqualTo("id", Utils.parseInt(id, 0))).execute();
+            JSObject campaign = DB.simpleScan("web_ad_campaigns").select("id", "campaign_id", "adset_id", "campaign_name", "status", "budget", "bidding").where(DB.filter().whereEqualTo("id", NumberUtil.parseInt(id, 0))).execute();
             if (campaign.hasObjectData()) {
                 String campaign_id = campaign.get("campaign_id");
                 String adset_id = campaign.get("adset_id");
@@ -680,7 +679,7 @@ public class Campaign extends HttpServlet {
                 double oldBudget = (double)campaign.get("budget") / 100;
                 double oldBidding = (double)campaign.get("bidding")/ 100;
 
-                if (!oldCampaignName.equals(campaignName) || !oldStatus.equals(status) || oldBudget != Utils.parseDouble(budget, 0) || oldBidding != Utils.parseDouble(bidding, 0)) {
+                if (!oldCampaignName.equals(campaignName) || !oldStatus.equals(status) || oldBudget != NumberUtil.parseDouble(budget, 0) || oldBidding != NumberUtil.parseDouble(bidding, 0)) {
                     JSObject record = DB.simpleScan("web_system_config").select("config_value").where(DB.filter().whereEqualTo("config_key", "adtools_path")).execute();
                     if (record.hasObjectData()) {
                         String jarPath = record.get("config_value");
@@ -694,11 +693,11 @@ public class Campaign extends HttpServlet {
                             }
                         }
 
-                        if (oldBudget != Utils.parseDouble(budget, 0) || oldBidding != Utils.parseDouble(bidding, 0)) {
+                        if (oldBudget != NumberUtil.parseDouble(budget, 0) || oldBidding != NumberUtil.parseDouble(bidding, 0)) {
                             cmd += "-adset_id " + adset_id + " ";
-                            if (oldBudget != Utils.parseDouble(budget, 0))
+                            if (oldBudget != NumberUtil.parseDouble(budget, 0))
                                 cmd += "-budget \"" + budget + "\" ";
-                            if (oldBidding != Utils.parseDouble(bidding, 0))
+                            if (oldBidding != NumberUtil.parseDouble(bidding, 0))
                                 cmd += "-bidding \"" + bidding + "\" ";
                         }
 
@@ -720,9 +719,9 @@ public class Campaign extends HttpServlet {
                             DB.update("web_ad_campaigns")
                                     .put("campaign_name", campaignName)
                                     .put("status", status)
-                                    .put("budget", Utils.parseDouble(budget, 0) * 100)
-                                    .put("bidding", Utils.parseDouble(bidding, 0) * 100)
-                                    .where(DB.filter().whereEqualTo("id", Utils.parseInt(id, 0)))
+                                    .put("budget", NumberUtil.parseDouble(budget, 0) * 100)
+                                    .put("bidding", NumberUtil.parseDouble(bidding, 0) * 100)
+                                    .where(DB.filter().whereEqualTo("id", NumberUtil.parseInt(id, 0)))
                                     .execute();
                         } else  {
                             ret.result = false;

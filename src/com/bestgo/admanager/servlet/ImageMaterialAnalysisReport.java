@@ -1,6 +1,7 @@
 package com.bestgo.admanager.servlet;
 
 import com.bestgo.admanager.utils.DateUtil;
+import com.bestgo.admanager.utils.NumberUtil;
 import com.bestgo.admanager.utils.Utils;
 import com.bestgo.common.database.services.DB;
 import com.bestgo.common.database.utils.JSObject;
@@ -114,10 +115,10 @@ public class ImageMaterialAnalysisReport extends HttpServlet {
                                         " AND campaign_id IN(" + facebookCampaignIdsStr + ")";
                                 one = DB.findOneBySql(sql);
                                 if(one.hasObjectData()){
-                                    totalSpends = Utils.convertDouble(one.get("total_spends"),0);
-                                    totalClicks = Utils.convertDouble(one.get("total_clicks"),0);
-                                    totalImpressionses = Utils.convertDouble(one.get("total_impressionses"),0);
-                                    totalInstalleds = Utils.convertDouble(one.get("total_installeds"),0);
+                                    totalSpends = NumberUtil.convertDouble(one.get("total_spends"),0);
+                                    totalClicks = NumberUtil.convertDouble(one.get("total_clicks"),0);
+                                    totalImpressionses = NumberUtil.convertDouble(one.get("total_impressionses"),0);
+                                    totalInstalleds = NumberUtil.convertDouble(one.get("total_installeds"),0);
                                 }
                             }
                             if(!"noData".equals(adwordsCampaignIdsStr)){
@@ -129,16 +130,16 @@ public class ImageMaterialAnalysisReport extends HttpServlet {
                                         " AND campaign_id IN(" + adwordsCampaignIdsStr + ")";
                                 one = DB.findOneBySql(sql);
                                 if(one.hasObjectData()){
-                                    totalSpends += Utils.convertDouble(one.get("total_spends"),0);
-                                    totalClicks += Utils.convertDouble(one.get("total_clicks"),0);
-                                    totalImpressionses += Utils.convertDouble(one.get("total_impressionses"),0);
-                                    totalInstalleds += Utils.convertDouble(one.get("total_installeds"),0);
+                                    totalSpends += NumberUtil.convertDouble(one.get("total_spends"),0);
+                                    totalClicks += NumberUtil.convertDouble(one.get("total_clicks"),0);
+                                    totalImpressionses += NumberUtil.convertDouble(one.get("total_impressionses"),0);
+                                    totalInstalleds += NumberUtil.convertDouble(one.get("total_installeds"),0);
                                 }
                             }
-                            double cpa = totalInstalleds == 0 ? 0 : Utils.trimDouble(totalSpends / totalInstalleds, 3);
-                            double ctr = totalImpressionses == 0 ? 0 :  Utils.trimDouble(totalClicks / totalImpressionses, 3);
-                            double cvr = totalClicks == 0 ? 0 :  Utils.trimDouble(totalInstalleds / totalClicks, 3);
-                            totalInstalleds = Utils.trimDouble(totalInstalleds, 3);
+                            double cpa = totalInstalleds == 0 ? 0 : NumberUtil.trimDouble(totalSpends / totalInstalleds, 3);
+                            double ctr = totalImpressionses == 0 ? 0 :  NumberUtil.trimDouble(totalClicks / totalImpressionses, 3);
+                            double cvr = totalClicks == 0 ? 0 :  NumberUtil.trimDouble(totalInstalleds / totalClicks, 3);
+                            totalInstalleds = NumberUtil.trimDouble(totalInstalleds, 3);
                             paramStr += "," + cpa + "," + totalInstalleds + "," + ctr + "," + cvr;
                         }
                         countryParam.addProperty("country_param_" + c, paramStr);

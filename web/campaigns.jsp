@@ -1,6 +1,6 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
-<%@ page import="com.bestgo.admanager.utils.Utils" %>
+<%@ page import="com.bestgo.admanager.utils.NumberUtil" %>
 <%@ page import="com.bestgo.common.database.utils.JSObject" %>
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.ArrayList" %>
@@ -45,8 +45,8 @@
                 List<JSObject> data = new ArrayList<>();
                 long totalPage = 0;
                 long count = Campaign.count();  //得到系列总数
-                int index = Utils.parseInt(request.getParameter("page_index"), 0);
-                int size = Utils.parseInt(request.getParameter("page_size"), 20);
+                int index = NumberUtil.parseInt(request.getParameter("page_index"), 0);
+                int size = NumberUtil.parseInt(request.getParameter("page_size"), 20);
                 totalPage = count / size + (count % size == 0 ? 0 : 1);
 
                 int preIndex = index > 0 ? index-1 : 0;
@@ -73,8 +73,8 @@
                     if (tagStr.length() > 0) {
                         tagStr = tagStr.substring(0, tagStr.length() - 1);
                     }
-                    double installed = Utils.convertDouble(one.get("total_installed"), 0);
-                    double click = Utils.convertDouble(one.get("total_click"), 0);
+                    double installed = NumberUtil.convertDouble(one.get("total_installed"), 0);
+                    double click = NumberUtil.convertDouble(one.get("total_click"), 0);
                     double cvr = click > 0 ? installed / click : 0;
             %>
             <tr>

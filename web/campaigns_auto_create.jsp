@@ -1,9 +1,8 @@
-<%@ page import="com.bestgo.admanager.utils.Utils" %>
+<%@ page import="com.bestgo.admanager.utils.NumberUtil" %>
 <%@ page import="com.bestgo.common.database.utils.JSObject" %>
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="com.bestgo.admanager.servlet.AutoCreateCampaign" %>
-<%@ page import="java.lang.reflect.Array" %>
 <%@ page import="com.bestgo.admanager.servlet.Tags" %>
 <%@ page import="com.google.gson.JsonArray" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
@@ -62,8 +61,8 @@
         }
         if ("facebook".equals(network)) {
           long count = AutoCreateCampaign.facebookCount();
-          int index = Utils.parseInt(request.getParameter("page_index"), 0);
-          int size = Utils.parseInt(request.getParameter("page_size"), 20);
+          int index = NumberUtil.parseInt(request.getParameter("page_index"), 0);
+          int size = NumberUtil.parseInt(request.getParameter("page_size"), 20);
           totalPage = count / size + (count % size == 0 ? 0 : 1);
 
           preIndex = index > 0 ? index - 1 : 0;
@@ -72,8 +71,8 @@
           data = AutoCreateCampaign.facebookFetchData(index, size);
         } else {
           long count = AutoCreateCampaign.adwordsCount();
-          int index = Utils.parseInt(request.getParameter("page_index"), 0);
-          int size = Utils.parseInt(request.getParameter("page_size"), 20);
+          int index = NumberUtil.parseInt(request.getParameter("page_index"), 0);
+          int size = NumberUtil.parseInt(request.getParameter("page_size"), 20);
           totalPage = count / size + (count % size == 0 ? 0 : 1);
 
           preIndex = index > 0 ? index - 1 : 0;

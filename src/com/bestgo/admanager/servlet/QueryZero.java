@@ -1,6 +1,7 @@
 package com.bestgo.admanager.servlet;
 
 import com.bestgo.admanager.utils.DateUtil;
+import com.bestgo.admanager.utils.NumberUtil;
 import com.bestgo.admanager.utils.Utils;
 import com.bestgo.common.database.services.DB;
 import com.bestgo.common.database.utils.JSObject;
@@ -81,7 +82,7 @@ public class QueryZero extends HttpServlet {
     private boolean closeCampaigns(String startTime, String endTime,
                                     String costOp, String cost, String conversionOp, String conversion) throws Exception {
         String[] adNetwork = {"admob", "facebook"};
-        double dCost = Utils.parseDouble(cost, 0);
+        double dCost = NumberUtil.parseDouble(cost, 0);
 
         for (String network : adNetwork) {
             String op = "1".equals(conversionOp) ? ">=" : "<=";
@@ -99,7 +100,7 @@ public class QueryZero extends HttpServlet {
                         "and history.total_installed " + op + " ?";
             }
 
-            List<JSObject> list = DB.findListBySql(sql, startTime, endTime, Utils.parseInt(conversion, 0));
+            List<JSObject> list = DB.findListBySql(sql, startTime, endTime, NumberUtil.parseInt(conversion, 0));
 
             for (int i = 0; i < list.size(); i++) {
                 JSObject one = list.get(i);
@@ -107,7 +108,7 @@ public class QueryZero extends HttpServlet {
                     String campaign_id = one.get("campaign_id");
                     String account_id = one.get("account_id");
                     double budget = one.get("budget");
-                    double spend = Utils.convertDouble(one.get("total_spend"), 0);
+                    double spend = NumberUtil.convertDouble(one.get("total_spend"), 0);
 
                     if ("1".equals(costOp)) {
                         if (spend * 100 / budget < dCost) {
@@ -165,7 +166,7 @@ public class QueryZero extends HttpServlet {
         double total_ctr = 0;
         double total_cpa = 0;
         double total_cvr = 0;
-        double dCost = Utils.parseDouble(cost, 0);
+        double dCost = NumberUtil.parseDouble(cost, 0);
 
         for (String network : adNetwork) {
             String op = "1".equals(conversionOp) ? ">=" : "<=";
@@ -183,7 +184,7 @@ public class QueryZero extends HttpServlet {
                         "and history.total_installed " + op + " ?";
             }
 
-            List<JSObject> list = DB.findListBySql(sql, startTime, endTime, Utils.parseInt(conversion, 0));
+            List<JSObject> list = DB.findListBySql(sql, startTime, endTime, NumberUtil.parseInt(conversion, 0));
 
             for (int i = 0; i < list.size(); i++) {
                 JSObject one = list.get(i);
@@ -195,10 +196,10 @@ public class QueryZero extends HttpServlet {
                 create_time = create_time.substring(0, create_time.length() - 5);
                 double budget = one.get("budget");
                 double bidding = one.get("bidding");
-                double spend = Utils.convertDouble(one.get("total_spend"), 0);
-                double installed = Utils.convertDouble(one.get("total_installed"), 0);
-                double impressions = Utils.convertDouble(one.get("total_impressions"), 0);
-                double click = Utils.convertDouble(one.get("total_click"), 0);
+                double spend = NumberUtil.convertDouble(one.get("total_spend"), 0);
+                double installed = NumberUtil.convertDouble(one.get("total_installed"), 0);
+                double impressions = NumberUtil.convertDouble(one.get("total_impressions"), 0);
+                double click = NumberUtil.convertDouble(one.get("total_click"), 0);
                 double ctr = impressions > 0 ? click / impressions : 0;
                 double cpa = installed > 0 ? spend / installed : 0;
                 double cvr = click > 0 ? installed / click : 0;
@@ -234,9 +235,9 @@ public class QueryZero extends HttpServlet {
                 d.addProperty("spend", spend);
                 d.addProperty("installed", installed);
                 d.addProperty("click", click);
-                d.addProperty("ctr", Utils.trimDouble(ctr,4));
-                d.addProperty("cpa", Utils.trimDouble(cpa,4));
-                d.addProperty("cvr", Utils.trimDouble(cvr,4));
+                d.addProperty("ctr", NumberUtil.trimDouble(ctr,4));
+                d.addProperty("cpa", NumberUtil.trimDouble(cpa,4));
+                d.addProperty("cvr", NumberUtil.trimDouble(cvr,4));
                 if (network.equals("admob")) {
                     d.addProperty("network", "admob");
                 } else {
@@ -252,9 +253,9 @@ public class QueryZero extends HttpServlet {
         jsonObject.addProperty("total_installed", total_installed);
         jsonObject.addProperty("total_impressions", total_impressions);
         jsonObject.addProperty("total_click", total_click);
-        jsonObject.addProperty("total_ctr", Utils.trimDouble(total_ctr,4));
-        jsonObject.addProperty("total_cpa", Utils.trimDouble(total_cpa,4));
-        jsonObject.addProperty("total_cvr", Utils.trimDouble(total_cvr,4));
+        jsonObject.addProperty("total_ctr", NumberUtil.trimDouble(total_ctr,4));
+        jsonObject.addProperty("total_cpa", NumberUtil.trimDouble(total_cpa,4));
+        jsonObject.addProperty("total_cvr", NumberUtil.trimDouble(total_cvr,4));
         return jsonObject;
     }
 }

@@ -1,6 +1,7 @@
 package com.bestgo.admanager.servlet;
 
 import com.bestgo.admanager.utils.DateUtil;
+import com.bestgo.admanager.utils.NumberUtil;
 import com.bestgo.admanager.utils.Utils;
 import com.bestgo.common.database.services.DB;
 import com.bestgo.common.database.utils.JSObject;
@@ -67,7 +68,7 @@ public class ActiveUserReport extends HttpServlet {
                         " from ad_report_active_user_admob_rel_result where tag_name = '" + tagName + "' ";
                 int sorter = 0;
                 if (sorterId != null) {
-                    sorter = Utils.parseInt(sorterId, 0);
+                    sorter = NumberUtil.parseInt(sorterId, 0);
                     switch(sorter) {
                         case 2090:
                             sql += " order by total_installeds desc";
@@ -124,13 +125,13 @@ public class ActiveUserReport extends HttpServlet {
                                 countryCode + "' AND date BETWEEN '" + sevenDayAgo + "' and '" + yesterday + "'";
                         one = DB.findOneBySql(sql);
                         if(one.hasObjectData()){
-                            sevenDaysAvgARPU = Utils.trimDouble(Utils.convertDouble(one.get("seven_days_avg_arpu"),0),3);
+                            sevenDaysAvgARPU = NumberUtil.trimDouble(NumberUtil.convertDouble(one.get("seven_days_avg_arpu"),0),3);
                         }
-                        double totalInstalleds = Utils.trimDouble(Utils.convertDouble(j.get("total_installeds"), 0),3);
-                        double avgSevenDayActive = Utils.trimDouble(Utils.convertDouble(j.get("avg_7_day_active"), 0),3);
-                        double avgFourteenDayActive = Utils.trimDouble(Utils.convertDouble(j.get("avg_14_day_active"), 0),3);
-                        double avgThirtyDayActive = Utils.trimDouble(Utils.convertDouble(j.get("avg_30_day_active"), 0),3);
-                        double avgSixtyDayActive = Utils.trimDouble(Utils.convertDouble(j.get("avg_60_day_active"), 0),3);
+                        double totalInstalleds = NumberUtil.trimDouble(NumberUtil.convertDouble(j.get("total_installeds"), 0),3);
+                        double avgSevenDayActive = NumberUtil.trimDouble(NumberUtil.convertDouble(j.get("avg_7_day_active"), 0),3);
+                        double avgFourteenDayActive = NumberUtil.trimDouble(NumberUtil.convertDouble(j.get("avg_14_day_active"), 0),3);
+                        double avgThirtyDayActive = NumberUtil.trimDouble(NumberUtil.convertDouble(j.get("avg_30_day_active"), 0),3);
+                        double avgSixtyDayActive = NumberUtil.trimDouble(NumberUtil.convertDouble(j.get("avg_60_day_active"), 0),3);
 
                         //业务逻辑上，这里不应该出现空值，所以不用判断
                         Date sevenDaysDataUpdateDate = j.get("seven_days_data_update_date");
@@ -151,10 +152,10 @@ public class ActiveUserReport extends HttpServlet {
                         jo.addProperty("thirty_days_data_update_date", thirtyDaysDataUpdateDate.toString());
                         jo.addProperty("sixty_days_data_update_date", sixtyDaysDataUpdateDate.toString());
 
-                        jo.addProperty("avg_7_day_active_mul_arpu", Utils.trimDouble(avgSevenDayActive * sevenDaysAvgARPU,3));
-                        jo.addProperty("avg_14_day_active_mul_arpu", Utils.trimDouble(avgFourteenDayActive * sevenDaysAvgARPU,3));
-                        jo.addProperty("avg_30_day_active_mul_arpu", Utils.trimDouble(avgThirtyDayActive * sevenDaysAvgARPU,3));
-                        jo.addProperty("avg_60_day_active_mul_arpu", Utils.trimDouble(avgSixtyDayActive * sevenDaysAvgARPU,3));
+                        jo.addProperty("avg_7_day_active_mul_arpu", NumberUtil.trimDouble(avgSevenDayActive * sevenDaysAvgARPU,3));
+                        jo.addProperty("avg_14_day_active_mul_arpu", NumberUtil.trimDouble(avgFourteenDayActive * sevenDaysAvgARPU,3));
+                        jo.addProperty("avg_30_day_active_mul_arpu", NumberUtil.trimDouble(avgThirtyDayActive * sevenDaysAvgARPU,3));
+                        jo.addProperty("avg_60_day_active_mul_arpu", NumberUtil.trimDouble(avgSixtyDayActive * sevenDaysAvgARPU,3));
                         jsonArray.add(jo);
                     }
                 }

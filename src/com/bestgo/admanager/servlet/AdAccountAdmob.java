@@ -1,6 +1,7 @@
 package com.bestgo.admanager.servlet;
 
 import com.bestgo.admanager.OperationResult;
+import com.bestgo.admanager.utils.NumberUtil;
 import com.bestgo.admanager.utils.Utils;
 import com.bestgo.common.database.services.DB;
 import com.bestgo.common.database.utils.JSObject;
@@ -44,7 +45,7 @@ public class AdAccountAdmob extends HttpServlet {
             } else if (path.startsWith("/update")) {
                 String account = request.getParameter("account");
                 String shortName = request.getParameter("shortName");
-                int id = Utils.parseInt(request.getParameter("id"), 0);
+                int id = NumberUtil.parseInt(request.getParameter("id"), 0);
                 OperationResult result = updateAdAccount(id, account, shortName);
                 json.addProperty("ret", result.result ? 1 : 0);
                 json.addProperty("message", result.message);
@@ -64,8 +65,8 @@ public class AdAccountAdmob extends HttpServlet {
                     json.add("data", array);
                 } else {
                     long count = count();
-                    int index = Utils.parseInt(request.getParameter("page_index"), 0);
-                    int size = Utils.parseInt(request.getParameter("page_size"), 20);
+                    int index = NumberUtil.parseInt(request.getParameter("page_index"), 0);
+                    int size = NumberUtil.parseInt(request.getParameter("page_size"), 20);
                     long totalPage = count / size + (count % size == 0 ? 0 : 1);
                     List<JSObject> data = fetchData(index, size);
                     json.addProperty("ret", 1);

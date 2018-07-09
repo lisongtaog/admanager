@@ -2,6 +2,7 @@ package com.bestgo.admanager.servlet;
 
 import com.bestgo.admanager.CPAHistory;
 import com.bestgo.admanager.utils.DateUtil;
+import com.bestgo.admanager.utils.NumberUtil;
 import com.bestgo.admanager.utils.Utils;
 import com.bestgo.common.database.services.DB;
 import com.bestgo.common.database.utils.JSObject;
@@ -16,7 +17,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.*;
-import java.util.regex.*;
 
 /**
  * 国家分析报告
@@ -92,10 +92,10 @@ public class CountryAnalysisReport extends HttpServlet {
             try {
                 String sqlG = "select t.id, google_package_id from web_facebook_app_ids_rel r,web_tag t WHERE t.tag_name = r.tag_name AND t.tag_name = '" + tagName + "'";
                 JSObject oneG = DB.findOneBySql(sqlG);
-                if(oneG != null){
+                if (oneG.hasObjectData()) {
                     String appId = oneG.get("google_package_id");
                     long tagId = oneG.get("id");
-                    if(appId != null){
+                    if (appId != null) {
                         JsonArray jsonArray = new JsonArray();
                         String sql = "SELECT country_code, sum(cost) as total_cost, sum(purchased_user) as total_purchased_user," +
                                 " sum(total_installed) as installed, sum(today_uninstalled) as total_today_uninstalled," +
@@ -108,7 +108,7 @@ public class CountryAnalysisReport extends HttpServlet {
                                 " and app_id = '" + appId + "' GROUP BY country_code";
                         int sorter = 0;
                         if (sorterId != null) {
-                            sorter = Utils.parseInt(sorterId, 0);
+                            sorter = NumberUtil.parseInt(sorterId, 0);
                         }
                         switch(sorter){
                             case 1031:
@@ -178,7 +178,7 @@ public class CountryAnalysisReport extends HttpServlet {
                                 JSObject oneC = DB.findOneBySql(sql);
                                 double thirtyDaysActiveUser = 0;
                                 if(oneC.hasObjectData()){
-                                    thirtyDaysActiveUser = Utils.convertDouble(oneC.get("avg_30_day_active"),0);
+                                    thirtyDaysActiveUser = NumberUtil.convertDouble(oneC.get("avg_30_day_active"),0);
                                 }
 
 
@@ -196,9 +196,9 @@ public class CountryAnalysisReport extends HttpServlet {
                                 double sevenDaysImpressions = 0;
                                 for(JSObject one : listCR){
                                     if(one.hasObjectData()){
-                                        double cost = Utils.convertDouble(one.get("cost"), 0);
-                                        double revenue = Utils.convertDouble(one.get("revenue"), 0);
-                                        double impression = Utils.convertDouble(one.get("impression"), 0);
+                                        double cost = NumberUtil.convertDouble(one.get("cost"), 0);
+                                        double revenue = NumberUtil.convertDouble(one.get("revenue"), 0);
+                                        double impression = NumberUtil.convertDouble(one.get("impression"), 0);
                                         sevenDaysCosts  += cost;
                                         sevenDaysRevenues  += revenue;
                                         sevenDaysImpressions  += impression;
@@ -232,25 +232,25 @@ public class CountryAnalysisReport extends HttpServlet {
                                 for(JSObject one : listCR){
                                     if(one.hasObjectData()){
                                         Date date = one.get("date");
-                                        double cost = Utils.convertDouble(one.get("cost"), 0);
-                                        double purchasedUser = Utils.convertDouble(one.get("purchased_user"), 0);
-                                        double installed = Utils.convertDouble(one.get("total_installed"), 0);
-                                        double uninstallRate = Utils.convertDouble(one.get("uninstall_rate"), 0);
-                                        double activeUser = Utils.convertDouble(one.get("active_user"), 0);
-                                        double revenue = Utils.convertDouble(one.get("revenue"), 0);
-                                        double ecpm = Utils.convertDouble(one.get("ecpm"), 0);
-                                        double cpa = Utils.convertDouble(one.get("cpa"), 0);
+                                        double cost = NumberUtil.convertDouble(one.get("cost"), 0);
+                                        double purchasedUser = NumberUtil.convertDouble(one.get("purchased_user"), 0);
+                                        double installed = NumberUtil.convertDouble(one.get("total_installed"), 0);
+                                        double uninstallRate = NumberUtil.convertDouble(one.get("uninstall_rate"), 0);
+                                        double activeUser = NumberUtil.convertDouble(one.get("active_user"), 0);
+                                        double revenue = NumberUtil.convertDouble(one.get("revenue"), 0);
+                                        double ecpm = NumberUtil.convertDouble(one.get("ecpm"), 0);
+                                        double cpa = NumberUtil.convertDouble(one.get("cpa"), 0);
                                         double cpaDivEcpm = ecpm == 0 ? 0 : cpa / ecpm;
                                         double incoming = revenue - cost;
                                         everyDayCostForFourteenDays += date + "("+ (int)cost + ")" + "\n";
                                         everyDayPurchasedUserForFourteenDays +=  date + "("+ (int)purchasedUser + ")" + "\n";
                                         everyDayInstalledForFourteenDays +=  date + "("+ (int)installed + ")" + "\n";
-                                        everyDayUninstalledRateForFourteenDays +=  date + "("+ Utils.trimDouble(uninstallRate,3) + ")" + "\n";
+                                        everyDayUninstalledRateForFourteenDays +=  date + "("+ NumberUtil.trimDouble(uninstallRate,3) + ")" + "\n";
                                         everyDayActiveUserForFourteenDays +=  date + "("+ (int)activeUser + ")" + "\n";
                                         everyDayRevenueForFourteenDays +=  date + "("+ (int)revenue + ")" + "\n";
-                                        everyDayEcpmForFourteenDays +=  date + "("+ Utils.trimDouble(ecpm,3) + ")" + "\n";
-                                        everyDayCpaForFourteenDays +=  date + "("+ Utils.trimDouble(cpa,3) + ")" + "\n";
-                                        everyDayCpaDivEcpmForFourteenDays +=  date + "("+ Utils.trimDouble(cpaDivEcpm,3) + ")" + "\n";
+                                        everyDayEcpmForFourteenDays +=  date + "("+ NumberUtil.trimDouble(ecpm,3) + ")" + "\n";
+                                        everyDayCpaForFourteenDays +=  date + "("+ NumberUtil.trimDouble(cpa,3) + ")" + "\n";
+                                        everyDayCpaDivEcpmForFourteenDays +=  date + "("+ NumberUtil.trimDouble(cpaDivEcpm,3) + ")" + "\n";
                                         everyDayIncomingForFourteenDays +=  date + "("+ (int)incoming + ")" + "\n";
                                     }
                                 }
@@ -265,9 +265,9 @@ public class CountryAnalysisReport extends HttpServlet {
                                 String everyDayPiForFourteenDays = "";
                                 if(listCR != null && listCR.size()>0){
                                     for(JSObject one : listCR){
-                                        double pi = Utils.convertDouble(one.get("pi"), 0);
+                                        double pi = NumberUtil.convertDouble(one.get("pi"), 0);
                                         Date date = one.get("date");
-                                        everyDayPiForFourteenDays += date + "(" + Utils.trimDouble(pi,3) + ")" + "\n";
+                                        everyDayPiForFourteenDays += date + "(" + NumberUtil.trimDouble(pi,3) + ")" + "\n";
                                     }
                                 }
 
@@ -281,12 +281,12 @@ public class CountryAnalysisReport extends HttpServlet {
                                 double pi = 0;
                                 double aCpa = 0;
                                 if(oneC.hasObjectData()){
-                                    pi = Utils.convertDouble(oneC.get("pi"),0);
-                                    aCpa = Utils.convertDouble(oneC.get("a_cpa"),0);
+                                    pi = NumberUtil.convertDouble(oneC.get("pi"),0);
+                                    aCpa = NumberUtil.convertDouble(oneC.get("a_cpa"),0);
                                 }
 
-                                double revenues = Utils.convertDouble(j.get("revenues"),0);
-                                double ecpm = Utils.convertDouble(j.get("ecpm"),0);
+                                double revenues = NumberUtil.convertDouble(j.get("revenues"),0);
+                                double ecpm = NumberUtil.convertDouble(j.get("ecpm"),0);
                                 sql = "select country_name from app_country_code_dict where country_code = '" + countryCode + "'";
                                 oneC = DB.findOneBySql(sql);
                                 String countryName = "";
@@ -295,20 +295,20 @@ public class CountryAnalysisReport extends HttpServlet {
                                 }else{
                                     countryName = countryCode;
                                 }
-                                double costs = Utils.convertDouble(j.get("total_cost"),0);
-                                double impressions = Utils.convertDouble(j.get("impressions"),0);
+                                double costs = NumberUtil.convertDouble(j.get("total_cost"),0);
+                                double impressions = NumberUtil.convertDouble(j.get("impressions"),0);
                                 double cEcpm = impressions == 0 ? 0 : costs * 1000 / impressions;
-                                double purchasedUsers = Utils.convertDouble(j.get("total_purchased_user"),0);
-                                double installed = Utils.convertDouble(j.get("installed"),0);
-                                double totalTodayUninstalled = Utils.convertDouble(j.get("total_today_uninstalled"),0);
+                                double purchasedUsers = NumberUtil.convertDouble(j.get("total_purchased_user"),0);
+                                double installed = NumberUtil.convertDouble(j.get("installed"),0);
+                                double totalTodayUninstalled = NumberUtil.convertDouble(j.get("total_today_uninstalled"),0);
                                 double uninstalledRate = installed != 0 ? totalTodayUninstalled / installed : 0;
 
 
-                                double activeUsers = Utils.convertDouble(j.get("active_users"),0);
+                                double activeUsers = NumberUtil.convertDouble(j.get("active_users"),0);
 
 
-                                double cpa = Utils.convertDouble(j.get("cpa"),0);
-                                double incoming = Utils.convertDouble(j.get("incoming"),0);
+                                double cpa = NumberUtil.convertDouble(j.get("cpa"),0);
+                                double incoming = NumberUtil.convertDouble(j.get("incoming"),0);
                                 double cpaDivEcpm = (ecpm == 0) ? 0 : (cpa / ecpm);
 
                                 double arpu = activeUsers > 0 ? revenues / activeUsers : 0;
@@ -322,7 +322,7 @@ public class CountryAnalysisReport extends HttpServlet {
                                 oneC = DB.findOneBySql(sql);
                                 double sevenDaysAvgPi = 0;
                                 if(oneC.hasObjectData()){
-                                    sevenDaysAvgPi = Utils.convertDouble(oneC.get("avg_pi"),0);
+                                    sevenDaysAvgPi = NumberUtil.convertDouble(oneC.get("avg_pi"),0);
                                 }
 
                                 //RT回报时长=CPA * 1000 / sevenDaysAvgPi / sevenDaysAvgEcpm
@@ -351,8 +351,8 @@ public class CountryAnalysisReport extends HttpServlet {
                                 if(biddingList.size() > 0){
                                     for(JSObject js : biddingList){
                                         if(js.hasObjectData()){
-                                            double bidding = Utils.convertDouble(js.get("bidding"),0);
-                                            bidding = Utils.trimDouble(bidding / 100,2);
+                                            double bidding = NumberUtil.convertDouble(js.get("bidding"),0);
+                                            bidding = NumberUtil.trimDouble(bidding / 100,2);
                                             if(bidding > 0){
                                                 biddingSet.add(bidding + ",");
                                             }
@@ -368,8 +368,8 @@ public class CountryAnalysisReport extends HttpServlet {
                                 if(biddingList.size() > 0){
                                     for(JSObject js : biddingList){
                                         if(js.hasObjectData()){
-                                            double bidding = Utils.convertDouble(js.get("bidding"),0);
-                                            bidding = Utils.trimDouble(bidding / 100,2);
+                                            double bidding = NumberUtil.convertDouble(js.get("bidding"),0);
+                                            bidding = NumberUtil.trimDouble(bidding / 100,2);
                                             if(bidding > 0){
                                                 biddingSet.add(bidding + ",");
                                             }
@@ -391,27 +391,27 @@ public class CountryAnalysisReport extends HttpServlet {
                                 JsonObject d = new JsonObject();
                                 d.addProperty("country_name", countryName);
                                 d.addProperty("bidding_summary", biddingSummaryStr);
-                                d.addProperty("costs", Utils.trimDouble(costs,0));
-                                d.addProperty("c_ecpm", Utils.trimDouble(cEcpm,3));
+                                d.addProperty("costs", NumberUtil.trimDouble(costs,0));
+                                d.addProperty("c_ecpm", NumberUtil.trimDouble(cEcpm,3));
                                 d.addProperty("purchased_users", purchasedUsers);
                                 d.addProperty("installed", installed);
-                                d.addProperty("uninstalled_rate", Utils.trimDouble(uninstalledRate,3));
+                                d.addProperty("uninstalled_rate", NumberUtil.trimDouble(uninstalledRate,3));
                                 d.addProperty("active_users", activeUsers);
-                                d.addProperty("revenues", Utils.trimDouble(revenues,0));
+                                d.addProperty("revenues", NumberUtil.trimDouble(revenues,0));
                                 HashMap<String, CPAHistory.CPAItem> history = CPAHistory.historyMaps.get(appId);
                                 double rpi = 0;
                                 if (history != null) {
                                     CPAHistory.CPAItem item = history.get(countryCode);
                                     if (item != null) rpi = item.rpi;
                                 }
-                                d.addProperty("revenue_per_install", Utils.trimDouble(rpi, 2));
-                                d.addProperty("pi", Utils.trimDouble(pi,3));
-                                d.addProperty("arpu", Utils.trimDouble(arpu,3));
-                                d.addProperty("ecpm", Utils.trimDouble(ecpm,3));
-                                d.addProperty("cpa_div_ecpm", Utils.trimDouble(cpaDivEcpm,3));
-                                d.addProperty("seven_days_costs", Utils.trimDouble(sevenDaysCosts,0));
-                                d.addProperty("seven_days_incoming", Utils.trimDouble(sevenDaysIncoming,0));
-                                d.addProperty("seven_days_revenues", Utils.trimDouble(sevenDaysRevenues,0));
+                                d.addProperty("revenue_per_install", NumberUtil.trimDouble(rpi, 2));
+                                d.addProperty("pi", NumberUtil.trimDouble(pi,3));
+                                d.addProperty("arpu", NumberUtil.trimDouble(arpu,3));
+                                d.addProperty("ecpm", NumberUtil.trimDouble(ecpm,3));
+                                d.addProperty("cpa_div_ecpm", NumberUtil.trimDouble(cpaDivEcpm,3));
+                                d.addProperty("seven_days_costs", NumberUtil.trimDouble(sevenDaysCosts,0));
+                                d.addProperty("seven_days_incoming", NumberUtil.trimDouble(sevenDaysIncoming,0));
+                                d.addProperty("seven_days_revenues", NumberUtil.trimDouble(sevenDaysRevenues,0));
 
 
                                 d.addProperty("every_day_cost_for_fourteen_days", everyDayCostForFourteenDays);
@@ -426,11 +426,11 @@ public class CountryAnalysisReport extends HttpServlet {
                                 d.addProperty("every_day_cpa_div_ecpm_for_fourteen_days", everyDayCpaDivEcpmForFourteenDays);
                                 d.addProperty("every_day_incoming_for_fourteen_days", everyDayIncomingForFourteenDays);
 
-                                d.addProperty("a_cpa", Utils.trimDouble(aCpa,3));
-                                d.addProperty("incoming", Utils.trimDouble(incoming,0));
-                                d.addProperty("cpa", Utils.trimDouble(cpa,3));
-                                d.addProperty("rt", Utils.trimDouble(rt,3));
-                                d.addProperty("thirty_days_active_user", Utils.trimDouble(thirtyDaysActiveUser,3));
+                                d.addProperty("a_cpa", NumberUtil.trimDouble(aCpa,3));
+                                d.addProperty("incoming", NumberUtil.trimDouble(incoming,0));
+                                d.addProperty("cpa", NumberUtil.trimDouble(cpa,3));
+                                d.addProperty("rt", NumberUtil.trimDouble(rt,3));
+                                d.addProperty("thirty_days_active_user", NumberUtil.trimDouble(thirtyDaysActiveUser,3));
                                 d.addProperty("cost_upper_limit", costUpperLimit);
 
                                 jsonArray.add(d);
@@ -438,19 +438,22 @@ public class CountryAnalysisReport extends HttpServlet {
 
                         }
                         double total_cpa = totalPuserchaedUser != 0 ? totalCost / totalPuserchaedUser : 0;
-                        jsonObject.add("array", jsonArray);
-
-                        jsonObject.addProperty("total_cost", Utils.trimDouble(totalCost,0));
-                        jsonObject.addProperty("total_puserchaed_user", Utils.trimDouble(totalPuserchaedUser,0));
-                        jsonObject.addProperty("total_cpa", Utils.trimDouble(total_cpa,3));
-                        jsonObject.addProperty("total_revenue", Utils.trimDouble(totalRevenue,0));
-                        jsonObject.addProperty("ret", 1);
-
+                        if (jsonArray.size() == 0) {
+                            jsonObject.addProperty("ret", 0);
+                            jsonObject.addProperty("message", "此应用下当前日期中没有数据!");
+                        } else {
+                            jsonObject.add("array", jsonArray);
+                            jsonObject.addProperty("total_cost", NumberUtil.trimDouble(totalCost,0));
+                            jsonObject.addProperty("total_puserchaed_user", NumberUtil.trimDouble(totalPuserchaedUser,0));
+                            jsonObject.addProperty("total_cpa", NumberUtil.trimDouble(total_cpa,3));
+                            jsonObject.addProperty("total_revenue", NumberUtil.trimDouble(totalRevenue,0));
+                            jsonObject.addProperty("ret", 1);
+                        }
                     }
+                } else {
+                    jsonObject.addProperty("ret", 0);
+                    jsonObject.addProperty("message", "此应用未在web_facebook_app_ids_rel表中关联");
                 }
-
-                jsonObject.addProperty("message", "执行成功");
-
             } catch (Exception e) {
                 jsonObject.addProperty("ret", 0);
                 jsonObject.addProperty("message", e.getMessage());

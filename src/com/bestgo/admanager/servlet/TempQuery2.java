@@ -1,5 +1,6 @@
 package com.bestgo.admanager.servlet;
 
+import com.bestgo.admanager.utils.NumberUtil;
 import com.bestgo.admanager.utils.Utils;
 import com.bestgo.common.database.services.DB;
 import com.bestgo.common.database.utils.JSObject;
@@ -61,9 +62,9 @@ public class TempQuery2 extends HttpServlet {
                         admob.addProperty("total_installed", total_installed);
                         admob.addProperty("total_impressions", total_impressions);
                         admob.addProperty("total_click", total_click);
-                        admob.addProperty("total_ctr", Utils.trimDouble(total_ctr,4));
-                        admob.addProperty("total_cpa", Utils.trimDouble(total_cpa,4));
-                        admob.addProperty("total_cvr", Utils.trimDouble(total_cvr,4));
+                        admob.addProperty("total_ctr", NumberUtil.trimDouble(total_ctr,4));
+                        admob.addProperty("total_cpa", NumberUtil.trimDouble(total_cpa,4));
+                        admob.addProperty("total_cvr", NumberUtil.trimDouble(total_cvr,4));
                         admob.addProperty("name", tagName);
                         arr.add(admob);
                     }
@@ -90,7 +91,7 @@ public class TempQuery2 extends HttpServlet {
             try {
                 int sorter = 0;
                 if (sorterId != null) {
-                    sorter = Utils.parseInt(sorterId, 0);
+                    sorter = NumberUtil.parseInt(sorterId, 0);
                 }
                 JSObject tagObject = DB.simpleScan("web_tag")
                         .select("id", "tag_name")
@@ -112,9 +113,9 @@ public class TempQuery2 extends HttpServlet {
                         admob.addProperty("total_installed", total_installed);
                         admob.addProperty("total_impressions", total_impressions);
                         admob.addProperty("total_click", total_click);
-                        admob.addProperty("total_ctr", Utils.trimDouble(total_ctr,4));
-                        admob.addProperty("total_cpa", Utils.trimDouble(total_cpa,4));
-                        admob.addProperty("total_cvr", Utils.trimDouble(total_cvr,4));
+                        admob.addProperty("total_ctr", NumberUtil.trimDouble(total_ctr,4));
+                        admob.addProperty("total_cpa", NumberUtil.trimDouble(total_cpa,4));
+                        admob.addProperty("total_cvr", NumberUtil.trimDouble(total_cvr,4));
                         JsonArray array = admob.getAsJsonArray("array");
                         JsonArray array1 = facebook.getAsJsonArray("array");
                         for (int i = 0; i < array1.size(); i++) {
@@ -155,10 +156,10 @@ public class TempQuery2 extends HttpServlet {
                             one.addProperty("impressions", dataSets.get(key).impressions);
                             one.addProperty("installed", dataSets.get(key).installed);
                             one.addProperty("click", dataSets.get(key).click);
-                            one.addProperty("spend", Utils.trimDouble(dataSets.get(key).spend,4));
-                            one.addProperty("ctr", Utils.trimDouble(dataSets.get(key).ctr,4));
-                            one.addProperty("cpa", Utils.trimDouble(dataSets.get(key).cpa,4));
-                            one.addProperty("cvr", Utils.trimDouble(dataSets.get(key).cvr,4));
+                            one.addProperty("spend", NumberUtil.trimDouble(dataSets.get(key).spend,4));
+                            one.addProperty("ctr", NumberUtil.trimDouble(dataSets.get(key).ctr,4));
+                            one.addProperty("cpa", NumberUtil.trimDouble(dataSets.get(key).cpa,4));
+                            one.addProperty("cvr", NumberUtil.trimDouble(dataSets.get(key).cvr,4));
                             newArr.add(one);
                         }
                         jsonObject.add("array", newArr);
@@ -322,10 +323,10 @@ public class TempQuery2 extends HttpServlet {
             String country_code = one.get("country_code");
             double budget = one.get("budget");
             double bidding = one.get("bidding");
-            double spend = Utils.convertDouble(one.get("spend"), 0);
-            double installed = Utils.convertDouble(one.get("installed"), 0);
-            double impressions = Utils.convertDouble(one.get("impressions"), 0);
-            double click = Utils.convertDouble(one.get("click"), 0);
+            double spend = NumberUtil.convertDouble(one.get("spend"), 0);
+            double installed = NumberUtil.convertDouble(one.get("installed"), 0);
+            double impressions = NumberUtil.convertDouble(one.get("impressions"), 0);
+            double click = NumberUtil.convertDouble(one.get("click"), 0);
             double ctr = impressions > 0 ? click / impressions : 0;
             double cpa = installed > 0 ? spend / installed : 0;
             double cvr = click > 0 ? installed / click : 0;
@@ -354,9 +355,9 @@ public class TempQuery2 extends HttpServlet {
             d.addProperty("spend", spend);
             d.addProperty("installed", installed);
             d.addProperty("click", click);
-            d.addProperty("ctr", Utils.trimDouble(ctr,4));
-            d.addProperty("cpa", Utils.trimDouble(cpa,4));
-            d.addProperty("cvr", Utils.trimDouble(cvr,4));
+            d.addProperty("ctr", NumberUtil.trimDouble(ctr,4));
+            d.addProperty("cpa", NumberUtil.trimDouble(cpa,4));
+            d.addProperty("cvr", NumberUtil.trimDouble(cvr,4));
             array.add(d);
         }
         jsonObject.add("array", array);
@@ -364,9 +365,9 @@ public class TempQuery2 extends HttpServlet {
         jsonObject.addProperty("total_installed", total_installed);
         jsonObject.addProperty("total_impressions", total_impressions);
         jsonObject.addProperty("total_click", total_click);
-        jsonObject.addProperty("total_ctr", Utils.trimDouble(total_ctr,4));
-        jsonObject.addProperty("total_cpa", Utils.trimDouble(total_cpa,4));
-        jsonObject.addProperty("total_cvr", Utils.trimDouble(total_cvr,4));
+        jsonObject.addProperty("total_ctr", NumberUtil.trimDouble(total_ctr,4));
+        jsonObject.addProperty("total_cpa", NumberUtil.trimDouble(total_cpa,4));
+        jsonObject.addProperty("total_cvr", NumberUtil.trimDouble(total_cvr,4));
         return jsonObject;
     }
 }

@@ -1,8 +1,8 @@
-<%@ page import="com.bestgo.admanager.utils.Utils" %>
 <%@ page import="com.bestgo.common.database.utils.JSObject" %>
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="com.bestgo.admanager.servlet.AdAccountAdmob" %>
+<%@ page import="com.bestgo.admanager.utils.NumberUtil" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@include file="common/rootBase.jsp"%>
 
@@ -39,8 +39,8 @@
           List<JSObject> data = new ArrayList<>();
           long totalPage = 0;
           long count = AdAccountAdmob.count();
-          int index = Utils.parseInt(request.getParameter("page_index"), 0);
-          int size = Utils.parseInt(request.getParameter("page_size"), 20);
+          int index = NumberUtil.parseInt(request.getParameter("page_index"), 0);
+          int size = NumberUtil.parseInt(request.getParameter("page_size"), 20);
           totalPage = count / size + (count % size == 0 ? 0 : 1);
 
           int preIndex = index > 0 ? index-1 : 0;

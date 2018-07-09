@@ -1,8 +1,5 @@
-<%@ page import="com.bestgo.admanager.utils.Utils" %>
 <%@ page import="com.bestgo.common.database.utils.JSObject" %>
 <%@ page import="java.util.List" %>
-<%@ page import="com.bestgo.admanager.servlet.AdAccount" %>
-<%@ page import="java.util.ArrayList" %>
 <%@ page import="com.bestgo.admanager.servlet.Tags" %>
 <%@ page import="com.google.gson.JsonArray" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>

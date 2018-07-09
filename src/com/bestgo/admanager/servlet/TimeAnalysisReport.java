@@ -1,6 +1,7 @@
 package com.bestgo.admanager.servlet;
 
 import com.bestgo.admanager.utils.StringUtil;
+import com.bestgo.admanager.utils.NumberUtil;
 import com.bestgo.admanager.utils.Utils;
 import com.bestgo.common.database.services.DB;
 import com.bestgo.common.database.utils.JSObject;
@@ -97,7 +98,7 @@ public class TimeAnalysisReport extends HttpServlet {
                     //这些数据取出来形成了一个临时表，并没有改变数据表的结构和内容
                     int sorter = 0;
                     if (sorterId != null) {
-                        sorter = Utils.parseInt(sorterId, 0);
+                        sorter = NumberUtil.parseInt(sorterId, 0);
                     }
                     //根据sorterId拼凑不同的SQL排序语句（以不同列进行排序）
                     switch (sorter) {
@@ -209,8 +210,8 @@ public class TimeAnalysisReport extends HttpServlet {
                                         " and country_code = '" + country_filter_code + "' and date = '" + date + "'";
                                 JSObject oneC = DB.findOneBySql(sql);
                                 if(oneC.hasObjectData()){
-                                    pi = Utils.convertDouble(oneC.get("pi"),0);
-                                    a_cpa = Utils.convertDouble(oneC.get("a_cpa"),0);
+                                    pi = NumberUtil.convertDouble(oneC.get("pi"),0);
+                                    a_cpa = NumberUtil.convertDouble(oneC.get("a_cpa"),0);
                                 }
                             }
 
@@ -219,23 +220,23 @@ public class TimeAnalysisReport extends HttpServlet {
                                 date_wfc = new SimpleDateFormat("yyyy-MM-dd");  //这里是设置一个日期的格式
                                 date = date_wfc.format(j.get("date"));    //这里要把 SQL里的 date 格式转成 String 类型
                             }
-                            double costs = Utils.convertDouble(j.get("total_cost"), 0);
-                            double purchased_users = Utils.convertDouble(j.get("total_purchased_user"), 0);
-                            double installed = Utils.convertDouble(j.get("installed"), 0);
-                            double uninstalled = Utils.convertDouble(j.get("uninstalled"), 0);
-                            double total_today_uninstalled = Utils.convertDouble(j.get("total_today_uninstalled"), 0);
+                            double costs = NumberUtil.convertDouble(j.get("total_cost"), 0);
+                            double purchased_users = NumberUtil.convertDouble(j.get("total_purchased_user"), 0);
+                            double installed = NumberUtil.convertDouble(j.get("installed"), 0);
+                            double uninstalled = NumberUtil.convertDouble(j.get("uninstalled"), 0);
+                            double total_today_uninstalled = NumberUtil.convertDouble(j.get("total_today_uninstalled"), 0);
                             double uninstalledRate = installed != 0 ? total_today_uninstalled / installed : 0;
 
 
-                            double users = Utils.convertDouble(j.get("users"), 0);
-                            double active_users = Utils.convertDouble(j.get("active_users"), 0);
-                            double revenues = Utils.convertDouble(j.get("revenues"), 0);
-                            double estimated_revenues = Utils.convertDouble(j.get("estimated_revenues"), 0);
-//                                double ecpm = impressions == 0 ? 0 : Utils.trimDouble3(revenues * 1000 / impressions );
-                            double ecpm = Utils.convertDouble(j.get("ecpm"), 0);
-                            double estRevDevCost = Utils.convertDouble(j.get("est_rev_dev_cost"), 0);
-                            double cpa = Utils.convertDouble(j.get("cpa"), 0);
-                            double incoming = Utils.convertDouble(j.get("incoming"), 0);
+                            double users = NumberUtil.convertDouble(j.get("users"), 0);
+                            double active_users = NumberUtil.convertDouble(j.get("active_users"), 0);
+                            double revenues = NumberUtil.convertDouble(j.get("revenues"), 0);
+                            double estimated_revenues = NumberUtil.convertDouble(j.get("estimated_revenues"), 0);
+//                                double ecpm = impressions == 0 ? 0 : NumberUtil.trimDouble3(revenues * 1000 / impressions );
+                            double ecpm = NumberUtil.convertDouble(j.get("ecpm"), 0);
+                            double estRevDevCost = NumberUtil.convertDouble(j.get("est_rev_dev_cost"), 0);
+                            double cpa = NumberUtil.convertDouble(j.get("cpa"), 0);
+                            double incoming = NumberUtil.convertDouble(j.get("incoming"), 0);
                             double cpa_dev_ecpm = (ecpm == 0) ? 0 : (cpa / ecpm);
 
                             total_cost += costs;
@@ -246,24 +247,24 @@ public class TimeAnalysisReport extends HttpServlet {
                             JsonObject d = new JsonObject(); // 仍在由 List<JSObject> countryDetailJSObjectList控制的大循环里，每次 d 只得到一行的数据
 
                             d.addProperty("date", date);
-                            d.addProperty("costs", Utils.trimDouble(costs, 0));
+                            d.addProperty("costs", NumberUtil.trimDouble(costs, 0));
                             d.addProperty("purchased_users", purchased_users);
                             d.addProperty("installed", installed);
                             d.addProperty("uninstalled", uninstalled);
-                            d.addProperty("uninstalled_rate", Utils.trimDouble(uninstalledRate, 3));
+                            d.addProperty("uninstalled_rate", NumberUtil.trimDouble(uninstalledRate, 3));
                             d.addProperty("users", users);
                             d.addProperty("active_users", active_users);
-                            d.addProperty("revenues", Utils.trimDouble(revenues, 0));
+                            d.addProperty("revenues", NumberUtil.trimDouble(revenues, 0));
                             if(StringUtil.isNotEmpty(country_filter)){
-                                d.addProperty("pi", Utils.trimDouble(pi,3));
-                                d.addProperty("a_cpa", Utils.trimDouble(a_cpa,3));
+                                d.addProperty("pi", NumberUtil.trimDouble(pi,3));
+                                d.addProperty("a_cpa", NumberUtil.trimDouble(a_cpa,3));
                             }
-                            d.addProperty("ecpm", Utils.trimDouble(ecpm, 3));
-                            d.addProperty("cpa_dev_ecpm", Utils.trimDouble(cpa_dev_ecpm, 3));
-                            d.addProperty("incoming", Utils.trimDouble(incoming, 0));
-                            d.addProperty("estimated_revenues", Utils.trimDouble(estimated_revenues, 0));
-                            d.addProperty("estimated_revenues_dev_cost", Utils.trimDouble(estRevDevCost, 3));
-                            d.addProperty("cpa", Utils.trimDouble(cpa, 3));
+                            d.addProperty("ecpm", NumberUtil.trimDouble(ecpm, 3));
+                            d.addProperty("cpa_dev_ecpm", NumberUtil.trimDouble(cpa_dev_ecpm, 3));
+                            d.addProperty("incoming", NumberUtil.trimDouble(incoming, 0));
+                            d.addProperty("estimated_revenues", NumberUtil.trimDouble(estimated_revenues, 0));
+                            d.addProperty("estimated_revenues_dev_cost", NumberUtil.trimDouble(estRevDevCost, 3));
+                            d.addProperty("cpa", NumberUtil.trimDouble(cpa, 3));
                             jsonArray.add(d);
                         }
                     }
@@ -271,12 +272,12 @@ public class TimeAnalysisReport extends HttpServlet {
                     double total_cpa = total_puserchaed_user != 0 ? total_cost / total_puserchaed_user : 0;
                     jsonObject.add("array", jsonArray);
 
-                    jsonObject.addProperty("total_cost", Utils.trimDouble(total_cost, 0));
-                    jsonObject.addProperty("total_puserchaed_user", Utils.trimDouble(total_puserchaed_user, 0));
-                    jsonObject.addProperty("total_cpa", Utils.trimDouble(total_cpa, 3));
-                    jsonObject.addProperty("total_revenue", Utils.trimDouble(total_revenue, 0));
-                    jsonObject.addProperty("total_es14", Utils.trimDouble(total_es14, 0));
-                    jsonObject.addProperty("es14_dev_cost", Utils.trimDouble(es14_dev_cost, 3));
+                    jsonObject.addProperty("total_cost", NumberUtil.trimDouble(total_cost, 0));
+                    jsonObject.addProperty("total_puserchaed_user", NumberUtil.trimDouble(total_puserchaed_user, 0));
+                    jsonObject.addProperty("total_cpa", NumberUtil.trimDouble(total_cpa, 3));
+                    jsonObject.addProperty("total_revenue", NumberUtil.trimDouble(total_revenue, 0));
+                    jsonObject.addProperty("total_es14", NumberUtil.trimDouble(total_es14, 0));
+                    jsonObject.addProperty("es14_dev_cost", NumberUtil.trimDouble(es14_dev_cost, 3));
                     jsonObject.addProperty("ret", 1);
                 }
             }

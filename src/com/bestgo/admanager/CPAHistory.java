@@ -1,6 +1,6 @@
 package com.bestgo.admanager;
 
-import com.bestgo.admanager.utils.Utils;
+import com.bestgo.admanager.utils.NumberUtil;
 
 import java.io.*;
 import java.util.HashMap;
@@ -37,10 +37,10 @@ public class CPAHistory {
                         history.put(countryCode, item);
                     }
                     item.countryCode = countryCode;
-                    item.revenue = Utils.parseDouble(values[2], 0);
-                    item.installed = Utils.parseInt(values[3], 0);
-                    item.rpi = Utils.parseDouble(values[4], 0);
-                    item.cpa = Utils.parseDouble(values[5], 0);
+                    item.revenue = NumberUtil.parseDouble(values[2], 0);
+                    item.installed = NumberUtil.parseInt(values[3], 0);
+                    item.rpi = NumberUtil.parseDouble(values[4], 0);
+                    item.cpa = NumberUtil.parseDouble(values[5], 0);
                 }
                 line = reader.readLine();
             }

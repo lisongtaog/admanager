@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.bestgo.admanager.OperationResult;
+import com.bestgo.admanager.utils.NumberUtil;
 import com.bestgo.admanager.utils.Utils;
 import com.bestgo.common.database.services.DB;
 import com.bestgo.common.database.utils.JSObject;
@@ -41,7 +42,7 @@ public class System extends HttpServlet {
                 json.addProperty("ret", result.result ? 1 : 0);
                 json.addProperty("message", result.message);
             } else {
-                int id = Utils.parseInt(request.getParameter("id"), 0);
+                int id = NumberUtil.parseInt(request.getParameter("id"), 0);
                 String tagName = request.getParameter("tagName");
                 if (tagName != null) tagName = tagName.trim();
                 String accountId = request.getParameter("accountId");
@@ -141,8 +142,8 @@ public class System extends HttpServlet {
                             json.add("data", array);
                         } else {
                             long count = countFacebookAppRelation();
-                            int index = Utils.parseInt(request.getParameter("page_index"), 0);
-                            int size = Utils.parseInt(request.getParameter("page_size"), 20);
+                            int index = NumberUtil.parseInt(request.getParameter("page_index"), 0);
+                            int size = NumberUtil.parseInt(request.getParameter("page_size"), 20);
                             long totalPage = count / size + (count % size == 0 ? 0 : 1);
                             List<JSObject> data = fetchFacebookAppRelationData(index, size);
                             json.addProperty("ret", 1);

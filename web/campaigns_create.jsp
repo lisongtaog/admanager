@@ -3,7 +3,7 @@
 <%@ page import="com.bestgo.common.database.utils.JSObject" %>
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.ArrayList" %>
-<%@ page import="com.bestgo.admanager.utils.Utils" %>
+<%@ page import="com.bestgo.admanager.utils.NumberUtil" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@include file="common/rootBase.jsp" %>
 
@@ -36,7 +36,7 @@
     if (networks.indexOf(network) == -1) {
         network = "facebook";
     }
-    int recordId = Utils.parseInt(request.getParameter("id"), 0);
+    int recordId = NumberUtil.parseInt(request.getParameter("id"), 0);
 
     //以下接收的是从index2传来的页面
     String campaignId = request.getParameter("campaignId");

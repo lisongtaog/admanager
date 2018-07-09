@@ -1,8 +1,9 @@
 package com.bestgo.admanager.servlet;
 
 import com.bestgo.admanager.OperationResult;
-import com.bestgo.admanager.utils.Utils;
+import com.bestgo.admanager.utils.NumberUtil;
 import com.bestgo.admanager.bean.CountryRecord;
+import com.bestgo.admanager.utils.Utils;
 import com.bestgo.common.database.services.DB;
 import com.bestgo.common.database.utils.JSObject;
 import com.google.gson.JsonArray;
@@ -67,8 +68,8 @@ public class CountryRevenueSpend extends HttpServlet {
                             CountryRecord record = new CountryRecord();
                             String countryCode1 = cf.get("country_code");
                             record.country_code = countryCode1;
-                            record.installed = Utils.convertDouble(cf.get("installed"),0.0);
-                            record.spend = Utils.convertDouble(cf.get("spend"),0.0);
+                            record.installed = NumberUtil.convertDouble(cf.get("installed"),0.0);
+                            record.spend = NumberUtil.convertDouble(cf.get("spend"),0.0);
                             if(record.installed >0){
                                 record.cpa = record.spend / record.installed;
                             }else{
@@ -93,8 +94,8 @@ public class CountryRevenueSpend extends HttpServlet {
                     if(campaignIdAJSObjectList != null && campaignIdAJSObjectList.size()>0){
                         for (JSObject ca : countryAdwordsList) {
                             String country_code2 = ca.get("country_code");
-                            double spend2 = Utils.convertDouble(ca.get("spend"), 0.0);
-                            double installed2 = Utils.convertDouble(ca.get("installed"), 0.0);
+                            double spend2 = NumberUtil.convertDouble(ca.get("spend"), 0.0);
+                            double installed2 = NumberUtil.convertDouble(ca.get("installed"), 0.0);
                             CountryRecord record2 = null;
                             if (map.containsKey(country_code2)) {
                                 record2 = map.get(country_code2);
@@ -147,7 +148,7 @@ public class CountryRevenueSpend extends HttpServlet {
                         String country_code3 = r.get("country_code");
                         if (map.containsKey(country_code3)) {
                             CountryRecord record3 = map.get(country_code3);
-                            record3.revenue = Utils.convertDouble(r.get("total_revenue"),0.0);
+                            record3.revenue = NumberUtil.convertDouble(r.get("total_revenue"),0.0);
                             //收益减去花费
                             record3.incoming = record3.revenue - record3.spend;
                             countryRecordList.add(record3);

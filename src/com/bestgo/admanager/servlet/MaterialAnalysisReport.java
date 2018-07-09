@@ -1,5 +1,6 @@
 package com.bestgo.admanager.servlet;
 
+import com.bestgo.admanager.utils.NumberUtil;
 import com.bestgo.admanager.utils.Utils;
 import com.bestgo.common.database.services.DB;
 import com.bestgo.common.database.utils.JSObject;
@@ -67,8 +68,8 @@ public class MaterialAnalysisReport extends HttpServlet {
                 String tagName = request.getParameter("tagName");
                 String startTime = request.getParameter("startTime");
                 String endTime = request.getParameter("endTime");
-                int sortId = Utils.parseInt(request.getParameter("sortId"), 1001);
-                int inputCount = Utils.parseInt(request.getParameter("inputCount"), 100);
+                int sortId = NumberUtil.parseInt(request.getParameter("sortId"), 1001);
+                int inputCount = NumberUtil.parseInt(request.getParameter("inputCount"), 100);
                 if (tagName != null && tagName.isEmpty()) {
                     json.addProperty("ret", 0);
                     json.addProperty("message", "标签不能为空");
@@ -96,10 +97,10 @@ public class MaterialAnalysisReport extends HttpServlet {
                 List<JSObject> list = DB.findListBySql(sql, startTime, endTime, tagId);
                 for (int i = 0; i < list.size(); i++) {
                     String campaignId = list.get(i).get("campaign_id");
-                    double spend = Utils.convertDouble(list.get(i).get("total_spend"), 0);
-                    long installed = Utils.convertLong(list.get(i).get("total_installed"), 0);
-                    long impressions = Utils.convertLong(list.get(i).get("total_impressions"), 0);
-                    long click = Utils.convertLong(list.get(i).get("total_click"), 0);
+                    double spend = NumberUtil.convertDouble(list.get(i).get("total_spend"), 0);
+                    long installed = NumberUtil.convertLong(list.get(i).get("total_installed"), 0);
+                    long impressions = NumberUtil.convertLong(list.get(i).get("total_impressions"), 0);
+                    long click = NumberUtil.convertLong(list.get(i).get("total_click"), 0);
 
                     CampaignResourceItem item = cacheCampaigns.get(campaignId);
                     if (item == null) {
@@ -138,8 +139,8 @@ public class MaterialAnalysisReport extends HttpServlet {
                         resourceAnalysisItem.installed += installed;
                         resourceAnalysisItem.impressions += impressions;
                         resourceAnalysisItem.click += click;
-                        resourceAnalysisItem.ctr = Utils.trimDouble(resourceAnalysisItem.impressions > 0 ? resourceAnalysisItem.click * 1.0 / resourceAnalysisItem.impressions : 0, 3);
-                        resourceAnalysisItem.cpa = Utils.trimDouble(resourceAnalysisItem.installed > 0 ? resourceAnalysisItem.spend / resourceAnalysisItem.installed : 0, 3);
+                        resourceAnalysisItem.ctr = NumberUtil.trimDouble(resourceAnalysisItem.impressions > 0 ? resourceAnalysisItem.click * 1.0 / resourceAnalysisItem.impressions : 0, 3);
+                        resourceAnalysisItem.cpa = NumberUtil.trimDouble(resourceAnalysisItem.installed > 0 ? resourceAnalysisItem.spend / resourceAnalysisItem.installed : 0, 3);
                     }
                 }
 
@@ -149,10 +150,10 @@ public class MaterialAnalysisReport extends HttpServlet {
                 list = DB.findListBySql(sql, startTime, endTime, tagId);
                 for (int i = 0; i < list.size(); i++) {
                     String campaignId = list.get(i).get("campaign_id");
-                    double spend = Utils.convertDouble(list.get(i).get("total_spend"), 0);
-                    long installed = Utils.convertLong(list.get(i).get("total_installed"), 0);
-                    long impressions = Utils.convertLong(list.get(i).get("total_impressions"), 0);
-                    long click = Utils.convertLong(list.get(i).get("total_click"), 0);
+                    double spend = NumberUtil.convertDouble(list.get(i).get("total_spend"), 0);
+                    long installed = NumberUtil.convertLong(list.get(i).get("total_installed"), 0);
+                    long impressions = NumberUtil.convertLong(list.get(i).get("total_impressions"), 0);
+                    long click = NumberUtil.convertLong(list.get(i).get("total_click"), 0);
 
                     CampaignResourceItem item = cacheCampaigns.get(campaignId);
                     if (item == null) {
@@ -190,8 +191,8 @@ public class MaterialAnalysisReport extends HttpServlet {
                     resourceAnalysisItem.installed += installed;
                     resourceAnalysisItem.impressions += impressions;
                     resourceAnalysisItem.click += click;
-                    resourceAnalysisItem.ctr = Utils.trimDouble(resourceAnalysisItem.impressions > 0 ? resourceAnalysisItem.click * 1.0 / resourceAnalysisItem.impressions : 0, 3);
-                    resourceAnalysisItem.cpa = Utils.trimDouble(resourceAnalysisItem.installed > 0 ? resourceAnalysisItem.spend / resourceAnalysisItem.installed : 0, 3);
+                    resourceAnalysisItem.ctr = NumberUtil.trimDouble(resourceAnalysisItem.impressions > 0 ? resourceAnalysisItem.click * 1.0 / resourceAnalysisItem.impressions : 0, 3);
+                    resourceAnalysisItem.cpa = NumberUtil.trimDouble(resourceAnalysisItem.installed > 0 ? resourceAnalysisItem.spend / resourceAnalysisItem.installed : 0, 3);
                 }
 
                 Collection<ResourceAnalysisItem> results = resultMap.values();
@@ -283,7 +284,7 @@ public class MaterialAnalysisReport extends HttpServlet {
                     one.addProperty("installed", sortArr.get(i).installed);
                     one.addProperty("click", sortArr.get(i).click);
                     one.addProperty("impressions", sortArr.get(i).impressions);
-                    one.addProperty("spend", Utils.trimDouble(sortArr.get(i).spend, 2));
+                    one.addProperty("spend", NumberUtil.trimDouble(sortArr.get(i).spend, 2));
                     one.addProperty("ctr", sortArr.get(i).ctr);
                     one.addProperty("cpa", sortArr.get(i).cpa);
                     array.add(one);

@@ -1,6 +1,7 @@
 package com.bestgo.admanager.servlet;
 
 import com.bestgo.admanager.utils.DateUtil;
+import com.bestgo.admanager.utils.NumberUtil;
 import com.bestgo.admanager.utils.Utils;
 import com.bestgo.common.database.services.DB;
 import com.bestgo.common.database.utils.JSObject;
@@ -49,8 +50,8 @@ public class QueryTwo extends HttpServlet {
                 String biddingsStr = "出价=<[";
                 HashSet<Double> doubles = new HashSet<>();
                 for(JSObject j : objectList){
-                    double enabled = Utils.convertDouble(j.get("enabled"),0);
-                    Double bidding = Utils.convertDouble(j.get("bidding"),0);
+                    double enabled = NumberUtil.convertDouble(j.get("enabled"),0);
+                    Double bidding = NumberUtil.convertDouble(j.get("bidding"),0);
                     if(enabled == 1){
                         flag = true;
                     }

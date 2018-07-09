@@ -1,7 +1,8 @@
 package com.bestgo.admanager.servlet;
 
-import com.bestgo.admanager.utils.Utils;
+import com.bestgo.admanager.utils.NumberUtil;
 import com.bestgo.admanager.bean.AppBean;
+import com.bestgo.admanager.utils.Utils;
 import com.bestgo.common.database.services.DB;
 import com.bestgo.common.database.utils.JSObject;
 import com.google.gson.JsonArray;
@@ -53,7 +54,7 @@ public class Query extends HttpServlet {
 
         int sorter = 0;
         if (sorterId != null) {
-            sorter = Utils.parseInt(sorterId, 0);
+            sorter = NumberUtil.parseInt(sorterId, 0);
         }
         try {
             JsonArray arr = new JsonArray();
@@ -80,7 +81,7 @@ public class Query extends HttpServlet {
                             }else{
                                 JsonObject admob1 = fetchOneAppDataSummary(id, endTime, endTime, true,true);
                                 JsonObject facebook1 = fetchOneAppDataSummary(id, endTime, endTime, false,true);
-                                appBean.end_time_total_spend = Utils.trimDouble(admob1.get("total_spend").getAsDouble() + facebook1.get("total_spend").getAsDouble(), 0);
+                                appBean.end_time_total_spend = NumberUtil.trimDouble(admob1.get("total_spend").getAsDouble() + facebook1.get("total_spend").getAsDouble(), 0);
                             }
 
                             appBean.total_installed = admob.get("total_installed").getAsDouble() + facebook.get("total_installed").getAsDouble();
@@ -96,7 +97,7 @@ public class Query extends HttpServlet {
                                 appBean.end_time_total_spend = appBean.total_spend;
                             }else{
                                 JsonObject admob1 = fetchOneAppDataSummary(id, endTime, endTime, true,true);
-                                appBean.end_time_total_spend = Utils.trimDouble(admob1.get("total_spend").getAsDouble(),0);
+                                appBean.end_time_total_spend = NumberUtil.trimDouble(admob1.get("total_spend").getAsDouble(),0);
                             }
 
                             appBean.total_installed = admob.get("total_installed").getAsDouble();
@@ -112,7 +113,7 @@ public class Query extends HttpServlet {
                                 appBean.end_time_total_spend = appBean.total_spend;
                             }else{
                                 JsonObject facebook1 = fetchOneAppDataSummary(id, endTime, endTime, false,true);
-                                appBean.end_time_total_spend = Utils.trimDouble(facebook1.get("total_spend").getAsDouble(), 0);
+                                appBean.end_time_total_spend = NumberUtil.trimDouble(facebook1.get("total_spend").getAsDouble(), 0);
                             }
 
                             appBean.total_installed = facebook.get("total_installed").getAsDouble();
@@ -130,7 +131,7 @@ public class Query extends HttpServlet {
                                         + google_package_id + "' and date = '" + endTime + "'";
                                 JSObject oneR = DB.findOneBySql(sqlR);
                                 if (oneR.hasObjectData()) {
-                                    appBean.total_revenue = Utils.convertDouble(oneR.get("revenues"), 0);
+                                    appBean.total_revenue = NumberUtil.convertDouble(oneR.get("revenues"), 0);
                                     appBean.end_time_total_revenue = appBean.total_revenue;
                                 }
                             }else{
@@ -140,14 +141,14 @@ public class Query extends HttpServlet {
 
                                 JSObject oneR = DB.findOneBySql(sqlR);
                                 if (oneR.hasObjectData()) {
-                                    appBean.total_revenue = Utils.convertDouble(oneR.get("revenues"), 0);
+                                    appBean.total_revenue = NumberUtil.convertDouble(oneR.get("revenues"), 0);
                                 }
                                 sqlR = "select sum(revenue) as revenues " +
                                         "from web_ad_country_analysis_report_history where app_id = '"
                                         + google_package_id + "' and date = '" + endTime + "'";
                                 oneR = DB.findOneBySql(sqlR);
                                 if (oneR.hasObjectData()) {
-                                    appBean.end_time_total_revenue = Utils.trimDouble(Utils.convertDouble(oneR.get("revenues"), 0), 0);
+                                    appBean.end_time_total_revenue = NumberUtil.trimDouble(NumberUtil.convertDouble(oneR.get("revenues"), 0), 0);
                                 }
                             }
 
@@ -174,18 +175,18 @@ public class Query extends HttpServlet {
                                 int warningLevel = one.get("warning_level");             //指标warning_level 仅仅与endTime有关
                                 j.addProperty("warning_level", warningLevel);
                             }
-                            j.addProperty("total_spend", Utils.trimDouble(cs.total_spend, 0));
-                            j.addProperty("endTime_total_spend", Utils.trimDouble(cs.end_time_total_spend, 0));
-                            j.addProperty("endTime_total_revenue", Utils.trimDouble(cs.end_time_total_revenue, 0));
+                            j.addProperty("total_spend", NumberUtil.trimDouble(cs.total_spend, 0));
+                            j.addProperty("endTime_total_spend", NumberUtil.trimDouble(cs.end_time_total_spend, 0));
+                            j.addProperty("endTime_total_revenue", NumberUtil.trimDouble(cs.end_time_total_revenue, 0));
                             j.addProperty("total_installed", cs.total_installed);
                             j.addProperty("total_impressions", cs.total_impressions);
                             j.addProperty("total_click", cs.total_click);
-                            j.addProperty("total_ctr", Utils.trimDouble(cs.total_ctr, 3));
-                            j.addProperty("total_cpa", Utils.trimDouble(cs.total_cpa, 3));
-                            j.addProperty("total_cvr", Utils.trimDouble(cs.total_cvr, 3));
-                            j.addProperty("total_revenue", Utils.trimDouble(cs.total_revenue, 0));
-                            j.addProperty("ecpm",Utils.trimDouble(cs.ecpm,3));
-                            j.addProperty("incoming",Utils.trimDouble(cs.incoming,0));
+                            j.addProperty("total_ctr", NumberUtil.trimDouble(cs.total_ctr, 3));
+                            j.addProperty("total_cpa", NumberUtil.trimDouble(cs.total_cpa, 3));
+                            j.addProperty("total_cvr", NumberUtil.trimDouble(cs.total_cvr, 3));
+                            j.addProperty("total_revenue", NumberUtil.trimDouble(cs.total_revenue, 0));
+                            j.addProperty("ecpm",NumberUtil.trimDouble(cs.ecpm,3));
+                            j.addProperty("incoming",NumberUtil.trimDouble(cs.incoming,0));
 
 
                             //在 数组arr 里添加 fourteen系列键值对，用于传回jsp生成悬浮窗
@@ -264,14 +265,14 @@ public class Query extends HttpServlet {
                         double total_cvr = total_click > 0 ? total_installed / total_click : 0;
 
                         JsonObject j = new JsonObject();
-                        j.addProperty("endTime_total_spend", Utils.trimDouble(endTime_total_spend, 0));
-                        j.addProperty("total_spend", Utils.trimDouble(total_spend, 0));
+                        j.addProperty("endTime_total_spend", NumberUtil.trimDouble(endTime_total_spend, 0));
+                        j.addProperty("total_spend", NumberUtil.trimDouble(total_spend, 0));
                         j.addProperty("total_installed", total_installed);
                         j.addProperty("total_impressions", total_impressions);
                         j.addProperty("total_click", total_click);
-                        j.addProperty("total_ctr", Utils.trimDouble(total_ctr, 3));
-                        j.addProperty("total_cpa", Utils.trimDouble(total_cpa, 3));
-                        j.addProperty("total_cvr", Utils.trimDouble(total_cvr, 3));
+                        j.addProperty("total_ctr", NumberUtil.trimDouble(total_ctr, 3));
+                        j.addProperty("total_cpa", NumberUtil.trimDouble(total_cpa, 3));
+                        j.addProperty("total_cvr", NumberUtil.trimDouble(total_cvr, 3));
                         j.addProperty("name", tagName);
                         String sql = "select warning_level from  web_app_logs where app_name = '" + tagName + "' and log_date = '" + endTime + "'";
                         JSObject one = DB.findOneBySql(sql);
@@ -291,7 +292,7 @@ public class Query extends HttpServlet {
                                         + googlePackageId + "' and date = '" + endTime + "'";
                                 JSObject oneR = DB.findOneBySql(sqlR);
                                 if (oneR.hasObjectData()) {
-                                    endTimeTotalRevenue = Utils.convertDouble(oneR.get("revenues"), 0);
+                                    endTimeTotalRevenue = NumberUtil.convertDouble(oneR.get("revenues"), 0);
                                     totalRevenue = endTimeTotalRevenue;
                                 }
                             }else{
@@ -300,28 +301,28 @@ public class Query extends HttpServlet {
                                         + googlePackageId + "' and date BETWEEN '" + startTime + "' AND '" + endTime + "'";
                                 JSObject oneR = DB.findOneBySql(sqlR);
                                 if (oneR.hasObjectData()) {
-                                    totalRevenue = Utils.convertDouble(oneR.get("revenues"), 0);
+                                    totalRevenue = NumberUtil.convertDouble(oneR.get("revenues"), 0);
                                 }
                                 sqlR = "select sum(revenue) as revenues " +
                                         "from web_ad_country_analysis_report_history where app_id = '"
                                         + googlePackageId + "' and date = '" + endTime + "'";
                                 oneR = DB.findOneBySql(sqlR);
                                 if (oneR.hasObjectData()) {
-                                    endTimeTotalRevenue = Utils.convertDouble(oneR.get("revenues"), 0);
+                                    endTimeTotalRevenue = NumberUtil.convertDouble(oneR.get("revenues"), 0);
                                 }
                             }
 
                             //14行悬浮窗：用一个静态方法FourteenData 来生成一个用于返回的数组 fourteen_arr,
 //                            fourteen_arr = FourteenData(id,endTime,googlePackageId);
                         }
-                        j.addProperty("endTime_total_revenue", Utils.trimDouble(endTimeTotalRevenue, 0));
-                        j.addProperty("total_revenue", Utils.trimDouble(totalRevenue, 0));
+                        j.addProperty("endTime_total_revenue", NumberUtil.trimDouble(endTimeTotalRevenue, 0));
+                        j.addProperty("total_revenue", NumberUtil.trimDouble(totalRevenue, 0));
 
                         //计算ECPM和incoming
                         double ecpm = totalRevenue * 1000 / total_impressions;
                         double incoming = totalRevenue - total_spend;
-                        j.addProperty("ecpm",Utils.trimDouble(ecpm,3));
-                        j.addProperty("incoming",Utils.trimDouble(incoming,0));
+                        j.addProperty("ecpm",NumberUtil.trimDouble(ecpm,3));
+                        j.addProperty("incoming",NumberUtil.trimDouble(incoming,0));
 
 
                         //在admob里添加14天数据
@@ -377,22 +378,22 @@ public class Query extends HttpServlet {
         JSObject one = DB.findOneBySql(sql);
 
         JsonObject jsonObject = new JsonObject();
-        double total_spend = Utils.convertDouble(one.get("spend"), 0);
-        double total_installed = Utils.convertDouble(one.get("installed"), 0);
-        double total_impressions = Utils.convertDouble(one.get("impressions"), 0);
-        double total_click = Utils.convertDouble(one.get("click"), 0);
+        double total_spend = NumberUtil.convertDouble(one.get("spend"), 0);
+        double total_installed = NumberUtil.convertDouble(one.get("installed"), 0);
+        double total_impressions = NumberUtil.convertDouble(one.get("impressions"), 0);
+        double total_click = NumberUtil.convertDouble(one.get("click"), 0);
 
         double total_ctr = total_impressions > 0 ? total_click / total_impressions : 0;
         double total_cpa = total_installed > 0 ? total_spend / total_installed : 0;
         double total_cvr = total_click > 0 ? total_installed / total_click : 0;
 
-        jsonObject.addProperty("total_spend", Utils.trimDouble(total_spend, 0));
+        jsonObject.addProperty("total_spend", NumberUtil.trimDouble(total_spend, 0));
         jsonObject.addProperty("total_installed", total_installed);
         jsonObject.addProperty("total_impressions", total_impressions);
         jsonObject.addProperty("total_click", total_click);
-        jsonObject.addProperty("total_ctr", Utils.trimDouble(total_ctr, 3));
-        jsonObject.addProperty("total_cpa", Utils.trimDouble(total_cpa, 3));
-        jsonObject.addProperty("total_cvr", Utils.trimDouble(total_cvr, 3));
+        jsonObject.addProperty("total_ctr", NumberUtil.trimDouble(total_ctr, 3));
+        jsonObject.addProperty("total_cpa", NumberUtil.trimDouble(total_cpa, 3));
+        jsonObject.addProperty("total_cvr", NumberUtil.trimDouble(total_cvr, 3));
         return jsonObject;
     }
 
@@ -411,14 +412,14 @@ public class Query extends HttpServlet {
 //            JsonObject a = admob_14.get(j);
 //            JsonObject f = facebook_14.get(j);
 //            JsonObject r = revenue_14.get(j);
-//            double spend = Utils.trimDouble(a.get("one_day_spend").getAsDouble() + f.get("one_day_spend").getAsDouble(), 0);
-//            double installed = Utils.trimDouble(a.get("one_day_installed").getAsDouble() + f.get("one_day_spend").getAsDouble(), 0);
+//            double spend = NumberUtil.trimDouble(a.get("one_day_spend").getAsDouble() + f.get("one_day_spend").getAsDouble(), 0);
+//            double installed = NumberUtil.trimDouble(a.get("one_day_installed").getAsDouble() + f.get("one_day_spend").getAsDouble(), 0);
 //            double click = a.get("one_day_click").getAsDouble() + f.get("one_day_click").getAsDouble();
 //            double cpa_rough = installed > 0 ? spend / installed : 0;
-//            double cpa = Utils.trimDouble(cpa_rough, 3);
+//            double cpa = NumberUtil.trimDouble(cpa_rough, 3);
 //            double cvr_rough = click > 0 ? installed / click : 0;
-//            double cvr = Utils.trimDouble(cvr_rough, 3);
-//            double revenue = Utils.trimDouble(r.get("revenue").getAsDouble(),0);   //如这类，取到空值时会报异常
+//            double cvr = NumberUtil.trimDouble(cvr_rough, 3);
+//            double revenue = NumberUtil.trimDouble(r.get("revenue").getAsDouble(),0);   //如这类，取到空值时会报异常
 //            //以下开始拼接用于悬浮显示的字符串
 //            FourteenList.one_day_spend_for_fourteen_days += spend + "\n";
 //            FourteenList.one_day_installed_for_fourteen_days += installed + "\n";
@@ -457,17 +458,17 @@ public class Query extends HttpServlet {
 //                    "where rt.campaign_id = ch.campaign_id and c.campaign_id = ch.campaign_id " +
 //                    "and date = '" + DayCount + "'";
 //            JSObject one = DB.findOneBySql(sql);
-//            double total_installed = Utils.convertDouble(one.get("installed"), 0);
-//            double total_spend = Utils.convertDouble(one.get("spend"), 0);
-//            double total_click = Utils.convertDouble(one.get("click"), 0);
+//            double total_installed = NumberUtil.convertDouble(one.get("installed"), 0);
+//            double total_spend = NumberUtil.convertDouble(one.get("spend"), 0);
+//            double total_click = NumberUtil.convertDouble(one.get("click"), 0);
 //            double total_cpa = total_installed > 0 ? total_spend / total_installed : 0;
 //            double total_cvr = total_click > 0 ? total_installed / total_click : 0;
 //
 //            jsonObject.addProperty("one_day_spend", total_spend);
 //            jsonObject.addProperty("one_day_installed", total_installed);
 //            jsonObject.addProperty("one_day_click", total_click);
-//            jsonObject.addProperty("one_day_cpa", Utils.trimDouble(total_cpa, 3));
-//            jsonObject.addProperty("one_day_cvr", Utils.trimDouble(total_cvr, 3));
+//            jsonObject.addProperty("one_day_cpa", NumberUtil.trimDouble(total_cpa, 3));
+//            jsonObject.addProperty("one_day_cvr", NumberUtil.trimDouble(total_cvr, 3));
 //            title.add(jsonObject);
 //        }
 //        return title;
@@ -497,7 +498,7 @@ public class Query extends HttpServlet {
 //                revenues = one.get("revenues");
 //            } catch (Exception e) {}
 //
-//            jsonObject.addProperty("revenue", Utils.trimDouble(revenues,0));
+//            jsonObject.addProperty("revenue", NumberUtil.trimDouble(revenues,0));
 //            revenue.add(jsonObject);   //List是一个接口而不是实际类，接口内只有方法。其对象的实例化需要调用方法。
 //        }
 //        return revenue;

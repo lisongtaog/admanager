@@ -1,5 +1,6 @@
 package com.bestgo.admanager;
 
+import com.bestgo.admanager.utils.NumberUtil;
 import com.bestgo.admanager.utils.Utils;
 import com.bestgo.common.database.services.DB;
 import com.bestgo.common.database.utils.JSObject;
@@ -66,8 +67,8 @@ public class DailyCpaEcpmReport {
                 List<JSObject> fbCountryList = DB.findListBySql(sql, date, tagId);
                 for (JSObject two : fbCountryList) {
                     String countryCode = two.get("country_code");
-                    double spend = Utils.convertDouble(two.get("total_spend"), 0);
-                    long installed = Utils.convertLong(two.get("total_installed"), 0);
+                    double spend = NumberUtil.convertDouble(two.get("total_spend"), 0);
+                    long installed = NumberUtil.convertLong(two.get("total_installed"), 0);
                     String key = appId + "_" + countryCode;
                     Item item = countryReportMap.get(key);
                     if (item == null) {
@@ -92,8 +93,8 @@ public class DailyCpaEcpmReport {
                 List<JSObject> adwordsCountryList = DB.findListBySql(sql, date, tagId);
                 for (JSObject two : adwordsCountryList) {
                     String countryCode = two.get("country_code");
-                    double spend = Utils.convertDouble(two.get("total_spend"), 0);
-                    long installed = Utils.convertLong(two.get("total_installed"), 0);
+                    double spend = NumberUtil.convertDouble(two.get("total_spend"), 0);
+                    long installed = NumberUtil.convertLong(two.get("total_installed"), 0);
                     String key = appId + "_" + countryCode;
                     Item item = countryReportMap.get(key);
                     if (item == null) {
@@ -118,8 +119,8 @@ public class DailyCpaEcpmReport {
                 List<JSObject> revenueList = DB.findListBySql(sql, date, appId);
                 for (JSObject two : revenueList) {
                     String countryCode = two.get("country_code");
-                    double revenue = Utils.convertDouble(two.get("revenue"), 0);
-                    long impression = Utils.convertLong(two.get("impression"), 0);
+                    double revenue = NumberUtil.convertDouble(two.get("revenue"), 0);
+                    long impression = NumberUtil.convertLong(two.get("impression"), 0);
                     String key = appId + "_" + countryCode;
                     Item item = countryReportMap.get(key);
                     if (item == null) {

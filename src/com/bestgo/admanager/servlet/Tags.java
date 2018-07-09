@@ -3,6 +3,7 @@ package com.bestgo.admanager.servlet;
 import com.bestgo.admanager.utils.DateUtil;
 import com.bestgo.admanager.OperationResult;
 import com.bestgo.admanager.utils.StringUtil;
+import com.bestgo.admanager.utils.NumberUtil;
 import com.bestgo.admanager.utils.Utils;
 import com.bestgo.common.database.services.DB;
 import com.bestgo.common.database.utils.JSObject;
@@ -100,8 +101,8 @@ public class Tags extends HttpServlet {
                     json.add("data", array);
                 } else {
                     long count = count();
-                    int index = Utils.parseInt(request.getParameter("page_index"), 0);
-                    int size = Utils.parseInt(request.getParameter("page_size"), 20);
+                    int index = NumberUtil.parseInt(request.getParameter("page_index"), 0);
+                    int size = NumberUtil.parseInt(request.getParameter("page_size"), 20);
                     long totalPage = count / size + (count % size == 0 ? 0 : 1);
                     List<JSObject> data = fetchData(index, size);
                     json.addProperty("ret", 1);
@@ -143,9 +144,9 @@ public class Tags extends HttpServlet {
                             String account_id = j.get("account_id");
                             String campaign_name = j.get("campaign_name");
                             String create_time = DateUtil.timeStamp2Date(j.get("create_time"),"yyyy-MM-dd HH:mm:ss");
-                            double budget = Utils.parseDouble(j.get("bugdet"),0);
+                            double budget = NumberUtil.parseDouble(j.get("bugdet"),0);
                             total_budget += budget;
-                            double bidding = Utils.parseDouble(j.get("bidding"),0);
+                            double bidding = NumberUtil.parseDouble(j.get("bidding"),0);
                             String country_region = j.get("country_name");
                             one.addProperty("app_name", app_name);
                             one.addProperty("campaign_id", campaign_id);
@@ -165,9 +166,9 @@ public class Tags extends HttpServlet {
                             String campaign_name = j.get("campaign_name");
                             String create_time = DateUtil.timeStamp2Date(j.get("create_time"),"yyyy-MM-dd HH:mm:ss");
 
-                            double budget = Utils.parseDouble(j.get("bugdet"),0);
+                            double budget = NumberUtil.parseDouble(j.get("bugdet"),0);
                             total_budget += budget;
-                            double bidding = Utils.parseDouble(j.get("bidding"),0);
+                            double bidding = NumberUtil.parseDouble(j.get("bidding"),0);
                             String country_region = j.get("country_region");
                             one.addProperty("app_name", app_name);
                             one.addProperty("campaign_id", campaign_id);

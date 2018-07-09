@@ -1,9 +1,7 @@
 package com.bestgo.admanager.servlet;
 
-import com.bestgo.admanager.utils.DateUtil;
+import com.bestgo.admanager.utils.*;
 import com.bestgo.admanager.OperationResult;
-import com.bestgo.admanager.utils.StringUtil;
-import com.bestgo.admanager.utils.Utils;
 import com.bestgo.common.database.services.DB;
 import com.bestgo.common.database.utils.JSObject;
 import com.google.gson.JsonArray;
@@ -74,7 +72,7 @@ public class AutoCreateCampaign extends HttpServlet {
                                 } else if (value instanceof Long) {
                                     one.addProperty(key, (Long) value);
                                 } else if (value instanceof Double) {
-                                    one.addProperty(key, Utils.trimDouble((Double) value,4));
+                                    one.addProperty(key, NumberUtil.trimDouble((Double) value,4));
                                 } else {
                                     one.addProperty(key, value.toString());
                                 }
@@ -102,7 +100,7 @@ public class AutoCreateCampaign extends HttpServlet {
                             } else if (value instanceof Long) {
                                 jsonObject.addProperty(key, (Long) value);
                             } else if (value instanceof Double) {
-                                jsonObject.addProperty(key, Utils.trimDouble((Double) value,4));
+                                jsonObject.addProperty(key, NumberUtil.trimDouble((Double) value,4));
                             } else {
                                 jsonObject.addProperty(key, value.toString());
                             }
@@ -151,7 +149,7 @@ public class AutoCreateCampaign extends HttpServlet {
                             } else if (value instanceof Long) {
                                 one.addProperty(key, (Long) value);
                             } else if (value instanceof Double) {
-                                one.addProperty(key, Utils.trimDouble((Double) value,4));
+                                one.addProperty(key, NumberUtil.trimDouble((Double) value,4));
                             } else {
                                 one.addProperty(key, value.toString());
                             }
@@ -178,7 +176,7 @@ public class AutoCreateCampaign extends HttpServlet {
                             } else if (value instanceof Long) {
                                 jsonObject.addProperty(key, (Long) value);
                             } else if (value instanceof Double) {
-                                jsonObject.addProperty(key, Utils.trimDouble((Double) value,4));
+                                jsonObject.addProperty(key, NumberUtil.trimDouble((Double) value,4));
                             } else {
                                 jsonObject.addProperty(key, value.toString());
                             }
@@ -367,7 +365,7 @@ public class AutoCreateCampaign extends HttpServlet {
             }else if(publisherPlatforms.isEmpty()){
                 result.message = "版位不能为空";
             }else {
-                double dBidding = Utils.parseDouble(bidding, 0);
+                double dBidding = NumberUtil.parseDouble(bidding, 0);
                 Double maxBiddingDouble = Campaign.tagMaxBiddingRelationMap.get(appName);
                 if (maxBiddingDouble != null && maxBiddingDouble != 0 && dBidding > maxBiddingDouble) {
                     result.message = "bidding超过了本应用的最大出价,   " + bidding + " > " + maxBiddingDouble;
@@ -423,7 +421,7 @@ public class AutoCreateCampaign extends HttpServlet {
                 userDevice = (userDevice == null) ? "" : userDevice;
                 boolean record = DB.insert("ad_campaigns_auto_create")
                         .put("app_name", appName)
-                        .put("create_count", Utils.parseInt(createCount, 0))
+                        .put("create_count", NumberUtil.parseInt(createCount, 0))
                         .put("account_id", accountId)
                         .put("country_region", region)
                         .put("explode_country", Boolean.parseBoolean(explodeCountry) ? 1 : 0)
@@ -542,7 +540,7 @@ public class AutoCreateCampaign extends HttpServlet {
                 result.result = false;
                 result.message = "国家不能为空";
             }
-            double dBidding = Utils.parseDouble(bidding, 0);
+            double dBidding = NumberUtil.parseDouble(bidding, 0);
             if (dBidding >= 0.5) {
                 result.result = false;
                 result.message = "bidding超过了0.5,   " + bidding;
@@ -567,7 +565,7 @@ public class AutoCreateCampaign extends HttpServlet {
             if (result.result) {
                 DB.update("ad_campaigns_auto_create")
                         .put("app_name", appName)
-                        .put("create_count", Utils.parseInt(createCount, 0))
+                        .put("create_count", NumberUtil.parseInt(createCount, 0))
                         .put("account_id", accountId)
                         .put("country_region", region)
                         .put("explode_country", Boolean.parseBoolean(explodeCountry) ? 1 : 0)
@@ -784,7 +782,7 @@ public class AutoCreateCampaign extends HttpServlet {
             } else if (bidding.isEmpty()) {
                 result.message = "出价不能为空";
             } else {
-                double dBidding = Utils.parseDouble(bidding, 0);
+                double dBidding = NumberUtil.parseDouble(bidding, 0);
                 Double maxBiddingDouble = CampaignAdmob.tagMaxBiddingRelationMap.get(appName);
                 if (maxBiddingDouble != null && maxBiddingDouble != 0 && dBidding > maxBiddingDouble) {
                     result.message = "bidding超过了本应用的最大出价,   " + bidding + " > " + maxBiddingDouble;
@@ -811,7 +809,7 @@ public class AutoCreateCampaign extends HttpServlet {
                 if (maxCPA == null) maxCPA = "";
                 long recordId = DB.insert("ad_campaigns_admob_auto_create")
                         .put("app_name", appName)
-                        .put("create_count", Utils.parseInt(createCount, 0))
+                        .put("create_count", NumberUtil.parseInt(createCount, 0))
                         .put("account_id", accountId)
                         .put("country_region", region)
                         .put("explode_country", Boolean.parseBoolean(explodeCountry) ? 1 : 0)
@@ -911,7 +909,7 @@ public class AutoCreateCampaign extends HttpServlet {
                 result.result = false;
                 result.message = "出价不能为空";
             }
-            double dBidding = Utils.parseDouble(bidding, 0);
+            double dBidding = NumberUtil.parseDouble(bidding, 0);
             if (dBidding >= 0.5) {
                 result.result = false;
                 result.message = "bidding超过了0.5,   " + bidding;
@@ -928,7 +926,7 @@ public class AutoCreateCampaign extends HttpServlet {
             if (result.result) {
                 DB.update("ad_campaigns_admob_auto_create")
                         .put("app_name", appName)
-                        .put("create_count", Utils.parseInt(createCount, 0))
+                        .put("create_count", NumberUtil.parseInt(createCount, 0))
                         .put("account_id", accountId)
                         .put("country_region", region)
                         .put("explode_country", Boolean.parseBoolean(explodeCountry) ? 1 : 0)

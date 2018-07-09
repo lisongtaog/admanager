@@ -1,8 +1,3 @@
-<%@ page import="com.bestgo.admanager.utils.Utils" %>
-<%@ page import="com.bestgo.common.database.utils.JSObject" %>
-<%@ page import="java.util.List" %>
-<%@ page import="java.util.ArrayList" %>
-<%@ page import="com.bestgo.admanager.servlet.Logs" %>
 <%@ page import="com.bestgo.admanager.DailyCpaEcpmReport" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@include file="common/rootBase.jsp"%>
