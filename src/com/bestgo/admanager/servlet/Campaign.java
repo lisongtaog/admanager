@@ -200,8 +200,8 @@ public class Campaign extends HttpServlet {
                             String s = String.valueOf(System.currentTimeMillis());
                             String part = new StringBuffer(i + s + "").reverse().toString();
                             campaignName = campaignNameOld.replace(accountNameArrStr,accountNameArr[j]) + "_Strategy" + bidStrategy + "_" + part;
-                            if (campaignName.length() > 110) {
-                                campaignName = campaignName.substring(0, 110);
+                            if (campaignName.length() > 150) {
+                                campaignName = campaignName.substring(0, 150);
                             }
                             long genId = DB.insert("ad_campaigns")
                                     .put("facebook_app_id", appId)

@@ -413,8 +413,8 @@ public class AutoCreateCampaign extends HttpServlet {
 
             if (result.result) {
                 campaignName = campaignName + "_Strategy" + bidStrategy;
-                if (campaignName.length() > 110) {
-                    campaignName = campaignName.substring(0, 110);
+                if (campaignName.length() > 150) {
+                    campaignName = campaignName.substring(0, 150);
                 }
                 interest = (interest == null) ? "" : interest;
                 userOs = (userOs == null) ? "" : userOs;

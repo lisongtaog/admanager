@@ -171,8 +171,8 @@ public class CampaignAdmob extends HttpServlet {
                                     String part = new StringBuffer(i + r + s + "").reverse().toString();
                                     campaignName = campaignNameOld + accountNameArr[j] + "_"+ (i + j) + part;
 
-                                    if (campaignName.length() > 110) {
-                                        campaignName = campaignName.substring(0, 110);
+                                    if (campaignName.length() > 150) {
+                                        campaignName = campaignName.substring(0, 150);
                                     }
                                     long genId = DB.insert("ad_campaigns_admob")
                                             .put("account_id", accountIdArr[j])
