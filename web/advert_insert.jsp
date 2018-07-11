@@ -460,8 +460,8 @@
             } else {
                 admanager.showCommonDlg("提示", data.message);
             }
-        },"json")
-        return false;  //为什么要返回false?
+        },"json");
+        return false;
     });
 
     //facebook表单的【保存原文】按钮

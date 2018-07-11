@@ -70,13 +70,9 @@ public class Advert extends HttpServlet {
             String groupNumber = request.getParameter("groupNumber");
             String title = request.getParameter("title");
             String message = request.getParameter("message");
-            String saveVersion = request.getParameter("version");  //仅在把保存部分用于判断
-            try{
-                if(saveVersion.equals("English")){
-                    language = "English";
-                }
-            }catch(Exception e){
-                e.printStackTrace();
+            String saveVersion = request.getParameter("version");
+            if ("English".equals(saveVersion)) {
+                language = "English";
             }
             String sql = "select group_id from web_ad_descript_dict where app_name='" + appName + "' and language = '" + language + "'and group_id = '"+groupNumber+"'";
             JSObject item = fetchOneData(sql);

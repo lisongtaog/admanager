@@ -92,18 +92,14 @@ public class AdvertAdmob extends HttpServlet {
             String language = request.getParameter("language");
             String groupNumber = request.getParameter("groupNumber");
             String saveVersion = request.getParameter("version");
+            if ("English".equals(saveVersion)) {
+                language = "English";
+            }
             String[] messageArr = new String[4];
             messageArr[0] = request.getParameter("message1");
             messageArr[1] = request.getParameter("message2");
             messageArr[2] = request.getParameter("message3");
             messageArr[3] = request.getParameter("message4");
-            try{
-                if(saveVersion.equals("English")){   //这里如果没有传入saveVersion的值会出现空指针错误
-                    language = "English";
-                }
-            }catch(Exception e){
-                e.printStackTrace();
-            }
 
             for(int i=0;i<4;i++){
                 String m1 = messageArr[i];
