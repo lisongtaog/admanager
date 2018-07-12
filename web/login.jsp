@@ -29,7 +29,7 @@
             <span class="glyphicon glyphicon-lock form-control-feedback"></span>
         </div>
         <button class="btn btn-lg btn-primary btn-block" type="submit" id="btnLogin">登录</button>
-        <button class="btn btn-lg btn-success btn-block" id="btnRegister">注册(开发中)</button>
+        <%--<button class="btn btn-lg btn-success btn-block" id="btnRegister">注册(开发中)</button>--%>
     </form>
 
     <jsp:include page="loading_dialog.jsp" ></jsp:include>

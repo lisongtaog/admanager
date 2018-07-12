@@ -65,7 +65,6 @@ public class QueryByMulConditions extends HttpServlet {
         String likeCampaignName = request.getParameter("likeCampaignName");
         HashMap<String, String> countryMap = Utils.getCountryMap();
 
-        String beforeThreeDays = DateUtil.addDay(endTime,-3,"yyyy-MM-dd");//不包括endTime
         try {
             JSObject tagObject = DB.simpleScan("web_tag")
                     .select("id", "tag_name")
@@ -87,10 +86,10 @@ public class QueryByMulConditions extends HttpServlet {
                 if ("false".equals(adwordsCheck) && "false".equals(facebookCheck)) {
                     JsonObject admob = fetchOneAppData(id, tag,startTime, endTime, true, "true".equals(countryCheck), countryCode,
                             likeCampaignName,campaignCreateTime,countryMap,totalInstallComparisonValue, "true".equals(containsNoDataCampaignCheck),countryCode,
-                            cpaComparisonValue,biddingComparisonValue,biddingOperator,totalInstallOperator,cpaOperator,beforeThreeDays);
+                            cpaComparisonValue,biddingComparisonValue,biddingOperator,totalInstallOperator,cpaOperator);
                     JsonObject facebook = fetchOneAppData(id, tag,startTime, endTime,false, "true".equals(countryCheck), countryCode,likeCampaignName,
                             campaignCreateTime,countryMap,totalInstallComparisonValue, "true".equals(containsNoDataCampaignCheck),countryName,
-                            cpaComparisonValue, biddingComparisonValue,biddingOperator,totalInstallOperator,cpaOperator,beforeThreeDays);
+                            cpaComparisonValue, biddingComparisonValue,biddingOperator,totalInstallOperator,cpaOperator);
                     total_spend = admob.get("total_spend").getAsDouble() + facebook.get("total_spend").getAsDouble();
                     total_installed = admob.get("total_installed").getAsDouble() + facebook.get("total_installed").getAsDouble();
                     total_impressions = admob.get("total_impressions").getAsDouble() + facebook.get("total_impressions").getAsDouble();
@@ -102,7 +101,7 @@ public class QueryByMulConditions extends HttpServlet {
                 }else if ("true".equals(adwordsCheck)) { //如果只选中【Adwords】
                     JsonObject admob = fetchOneAppData(id, tag,startTime, endTime, true, "true".equals(countryCheck), countryCode,likeCampaignName,
                             campaignCreateTime,countryMap,totalInstallComparisonValue, "true".equals(containsNoDataCampaignCheck),countryCode,cpaComparisonValue,
-                            biddingComparisonValue,biddingOperator,totalInstallOperator,cpaOperator,beforeThreeDays);
+                            biddingComparisonValue,biddingOperator,totalInstallOperator,cpaOperator);
                     total_spend = admob.get("total_spend").getAsDouble();
                     total_installed = admob.get("total_installed").getAsDouble();
                     total_impressions = admob.get("total_impressions").getAsDouble();
@@ -112,7 +111,7 @@ public class QueryByMulConditions extends HttpServlet {
                 }else{ //如果只选中【Facebook】
                     JsonObject facebook = fetchOneAppData(id, tag,startTime, endTime,false, "true".equals(countryCheck), countryCode,likeCampaignName,
                             campaignCreateTime,countryMap,totalInstallComparisonValue, "true".equals(containsNoDataCampaignCheck),countryName,cpaComparisonValue,
-                            biddingComparisonValue,biddingOperator,totalInstallOperator,cpaOperator,beforeThreeDays);
+                            biddingComparisonValue,biddingOperator,totalInstallOperator,cpaOperator);
                     total_spend = facebook.get("total_spend").getAsDouble();
                     total_installed = facebook.get("total_installed").getAsDouble();
                     total_impressions = facebook.get("total_impressions").getAsDouble();
@@ -805,17 +804,15 @@ public class QueryByMulConditions extends HttpServlet {
      * @param biddingOperator 竞价比较符号
      * @param totalInstallOperator  总安装的条件符号
      * @param cpaOperator cpa的条件符号
-     * @param beforeThreeDays  endTime的三天前，不包括endTime
      * @return
      * @throws Exception
      */
     private JsonObject fetchOneAppData(long tagId, String tagName, String startTime, String endTime, boolean admobCheck, boolean countryCheck,
                                        String countryCode,String likeCampaignName,String campaignCreateTime,HashMap<String ,String> countryMap,
                                        String totalInstallComparisonValue, boolean containsNoDataCampaignCheck,String country,String cpaComparisonValue,
-                                       String biddingComparisonValue,String biddingOperator,String totalInstallOperator,String cpaOperator,
-                                       String beforeThreeDays)
+                                       String biddingComparisonValue,String biddingOperator,String totalInstallOperator,String cpaOperator)
             throws Exception {
-        String webAdCampaignTagRelTable = "web_ad_campaign_tag_rel";
+//        String webAdCampaignTagRelTable = "web_ad_campaign_tag_rel";
         String webAdCampaignsTable = "web_ad_campaigns";
         String adCampaignsTable = "ad_campaigns";
         String webAdCampaignsHistoryTable = "web_ad_campaigns_history";
@@ -826,22 +823,22 @@ public class QueryByMulConditions extends HttpServlet {
         List<JSObject> listNoData = null;
         if (admobCheck) {
             adCampaignsTable = "ad_campaigns_admob";
-            webAdCampaignTagRelTable = "web_ad_campaign_tag_admob_rel";
+//            webAdCampaignTagRelTable = "web_ad_campaign_tag_admob_rel";
             webAdCampaignsTable = "web_ad_campaigns_admob";
             webAdCampaignsHistoryTable = "web_ad_campaigns_history_admob";
             webAccountIdTable = "web_account_id_admob";
             webAdCampaignsCountryHistoryTable = "web_ad_campaigns_country_history_admob";
             openStatus = "enabled";
         }
-
-        List<JSObject> list = DB.scan(webAdCampaignTagRelTable).select("campaign_id")
-                .where(DB.filter().whereEqualTo("tag_id", tagId)).execute();
-
-
-        Set<String> campaignIdSet = new HashSet<>();
-        for(JSObject j : list){
-            campaignIdSet.add(j.get("campaign_id"));
-        }
+        List<JSObject> list = null;
+//        List<JSObject> list = DB.scan(webAdCampaignTagRelTable).select("campaign_id")
+//                .where(DB.filter().whereEqualTo("tag_id", tagId)).execute();
+//
+//
+//        Set<String> campaignIdSet = new HashSet<>();
+//        for(JSObject j : list){
+//            campaignIdSet.add(j.get("campaign_id"));
+//        }
 
         List<JSObject> listCampaignSpend4CountryCode = new ArrayList<>();
         Map<String,JSObject> countryCampaignspendMap = new HashMap<>();
@@ -873,18 +870,16 @@ public class QueryByMulConditions extends HttpServlet {
         String sql = "";
         if(StringUtil.isNotEmpty(countryCode)){
             sql = "select ch.campaign_id, sum(ch.total_spend) as campaign_spends " +
-                    " from " + webAdCampaignsTable + " c, " + webAdCampaignsCountryHistoryTable + " ch, " +
-                    "(SELECT DISTINCT campaign_id FROM " + webAdCampaignTagRelTable + " WHERE tag_id = "+tagId+") r " +
-                    " where c.campaign_id = ch.campaign_id and r.campaign_id = ch.campaign_id " +
+                    " from " + webAdCampaignsTable + " c, " + webAdCampaignsCountryHistoryTable + " ch " +
+                    " where c.campaign_id = ch.campaign_id and tag_id = " + tagId +
                     " and date between '" + startTime + "' and '" + endTime + "' " +
                     (likeCampaignName.isEmpty() ? " " : " and campaign_name like '%" + likeCampaignName +"%' " )  +
                     " group by ch.campaign_id";
             if(StringUtil.isNotEmpty(campaignCreateTime)){
                 String afterCampaignCreateTime = DateUtil.addDay(campaignCreateTime,1,"yyyy-MM-dd");
                 sql = "select ch.campaign_id, sum(ch.total_spend) as campaign_spends " +
-                        " from " + webAdCampaignsTable + " c, " + webAdCampaignsCountryHistoryTable + " ch, " +
-                        "(SELECT DISTINCT campaign_id FROM " + webAdCampaignTagRelTable + " WHERE tag_id = "+tagId+") r " +
-                        " where c.campaign_id = ch.campaign_id and r.campaign_id = ch.campaign_id " +
+                        " from " + webAdCampaignsTable + " c, " + webAdCampaignsCountryHistoryTable + " ch " +
+                        " where c.campaign_id = ch.campaign_id and tag_id = " + tagId +
                         " and date between '" + startTime + "' and '" + endTime + "' " +
                         " AND create_time >= '" + campaignCreateTime + "' AND create_time < '"+ afterCampaignCreateTime +"' " +
                         (likeCampaignName.isEmpty() ? " " : " and campaign_name like '%" + likeCampaignName +"%' " )  +
@@ -900,9 +895,8 @@ public class QueryByMulConditions extends HttpServlet {
                     "select ch.campaign_id, account_id, campaign_name,c.status, create_time, c.budget, c.bidding, sum(ch.total_spend) as spend, " +
                     "sum(ch.total_installed) as installed, sum(ch.total_impressions) as impressions,sum(ch.total_click) as click, " +
                     "(case when sum(ch.total_installed) > 0 then sum(ch.total_spend) / sum(ch.total_installed) else 0 end) as cpa " +
-                    " from " + webAdCampaignsTable + " c, " + webAdCampaignsCountryHistoryTable + " ch, " +
-                    "(SELECT DISTINCT campaign_id FROM " + webAdCampaignTagRelTable + " WHERE tag_id = "+tagId+") r " +
-                    "where c.campaign_id=ch.campaign_id  and r.campaign_id = ch.campaign_id and country_code= '" + countryCode + "' " +
+                    " from " + webAdCampaignsTable + " c, " + webAdCampaignsCountryHistoryTable + " ch " +
+                    "where c.campaign_id=ch.campaign_id  and tag_id = " + tagId + " and country_code= '" + countryCode + "' " +
                     (likeCampaignName.isEmpty() ? " " : " and campaign_name like '%" + likeCampaignName +"%' " )  +
                     " and date between '" + startTime + "' and '" + endTime + "' " +
                     " group by ch.campaign_id " + havingField +
@@ -914,9 +908,8 @@ public class QueryByMulConditions extends HttpServlet {
                         "select ch.campaign_id, account_id, campaign_name,c.status, create_time, c.budget, c.bidding, sum(ch.total_spend) as spend, " +
                         "sum(ch.total_installed) as installed, sum(ch.total_impressions) as impressions,sum(ch.total_click) as click, " +
                         "(case when sum(ch.total_installed) > 0 then sum(ch.total_spend) / sum(ch.total_installed) else 0 end) as cpa " +
-                        " from " + webAdCampaignsTable + " c, " + webAdCampaignsCountryHistoryTable + " ch, " +
-                        "(SELECT DISTINCT campaign_id FROM " + webAdCampaignTagRelTable + " WHERE tag_id = "+tagId+") r " +
-                        "where c.campaign_id=ch.campaign_id  and r.campaign_id = ch.campaign_id and country_code= '" + countryCode + "' " +
+                        " from " + webAdCampaignsTable + " c, " + webAdCampaignsCountryHistoryTable + " ch " +
+                        "where c.campaign_id=ch.campaign_id  and tag_id = " + tagId + " and country_code= '" + countryCode + "' " +
                         " and date between '" + startTime + "' and '" + endTime + "' " +
                         " AND create_time >= '" + campaignCreateTime + "' AND create_time < '"+ afterCampaignCreateTime +"' " +
                         (likeCampaignName.isEmpty() ? " " : " and campaign_name like '%" + likeCampaignName +"%' " )  +
@@ -939,8 +932,8 @@ public class QueryByMulConditions extends HttpServlet {
                 }
 
                 listAll = DB.findListBySql(sql);
-                sql = "select ch.campaign_id from " + webAdCampaignsHistoryTable + " ch, " + "(SELECT DISTINCT campaign_id FROM " + webAdCampaignTagRelTable + " WHERE tag_id = "+tagId+") r " +
-                        " where date between '" + startTime + "' and '" + endTime + "' and r.campaign_id = ch.campaign_id";
+                sql = "select ch.campaign_id from " + webAdCampaignsHistoryTable + " ch," + webAdCampaignsTable + " c " +
+                        " where c.campaign_id = ch.campaign_id and tag_id = " + tagId + " and date between '" + startTime + "' and '" + endTime + "'";
                 List<JSObject> dataList = DB.findListBySql(sql);
                 if(dataList != null && dataList.size() > 0){
                     listNoData = Utils.getDiffJSObjectList(listAll, dataList, "campaign_id");
@@ -954,9 +947,8 @@ public class QueryByMulConditions extends HttpServlet {
                     "select ch.campaign_id, country_code, account_id, campaign_name,c.status, create_time, c.budget, c.bidding, sum(ch.total_spend) as spend, " +
                     "sum(ch.total_installed) as installed, sum(ch.total_impressions) as impressions, " +
                     "(case when sum(ch.total_installed) > 0 then sum(ch.total_spend) / sum(ch.total_installed) else 0 end) as cpa, " +
-                    " sum(ch.total_click) as click from " + webAdCampaignsTable + " c, " + webAdCampaignsCountryHistoryTable + " ch, " +
-                    "(SELECT DISTINCT campaign_id FROM " + webAdCampaignTagRelTable + " WHERE tag_id = "+tagId+") r " +
-                    "where c.campaign_id=ch.campaign_id and r.campaign_id = ch.campaign_id " +
+                    " sum(ch.total_click) as click from " + webAdCampaignsTable + " c, " + webAdCampaignsCountryHistoryTable + " ch " +
+                    "where c.campaign_id = ch.campaign_id and tag_id = " + tagId +
                     " and date between '" + startTime + "' and '" + endTime + "' " +
                     (likeCampaignName.isEmpty() ? " " : " and campaign_name like '%" + likeCampaignName +"%' " )  +
                     " group by ch.campaign_id, country_code " + havingField +
@@ -968,9 +960,8 @@ public class QueryByMulConditions extends HttpServlet {
                     "select ch.campaign_id, account_id, campaign_name,c.status, create_time, c.budget, c.bidding, sum(ch.total_spend) as spend, " +
                     "sum(ch.total_installed) as installed, sum(ch.total_impressions) as impressions, " +
                     "(case when sum(ch.total_installed) > 0 then sum(ch.total_spend) / sum(ch.total_installed) else 0 end) as cpa, " +
-                    " sum(ch.total_click) as click from " + webAdCampaignsTable + " c, " + webAdCampaignsHistoryTable + " ch, " +
-                    "(SELECT DISTINCT campaign_id FROM " + webAdCampaignTagRelTable + " WHERE tag_id = "+tagId+") r " +
-                    "where c.campaign_id=ch.campaign_id and r.campaign_id = ch.campaign_id " +
+                    " sum(ch.total_click) as click from " + webAdCampaignsTable + " c, " + webAdCampaignsHistoryTable + " ch " +
+                    "where c.campaign_id = ch.campaign_id and tag_id = " + tagId +
                     " and date between '" + startTime + "' and '" + endTime + "' " +
                     (likeCampaignName.isEmpty() ? " " : " and campaign_name like '%" + likeCampaignName +"%' " )  +
                     " group by ch.campaign_id "  + havingField +
@@ -982,9 +973,8 @@ public class QueryByMulConditions extends HttpServlet {
                         "select ch.campaign_id, account_id, campaign_name,c.status, create_time, c.budget, c.bidding, sum(ch.total_spend) as spend, " +
                         "sum(ch.total_installed) as installed, sum(ch.total_impressions) as impressions, " +
                         "(case when sum(ch.total_installed) > 0 then sum(ch.total_spend) / sum(ch.total_installed) else 0 end) as cpa, " +
-                        " sum(ch.total_click) as click from " + webAdCampaignsTable + " c, " + webAdCampaignsHistoryTable + " ch, " +
-                        "(SELECT DISTINCT campaign_id FROM " + webAdCampaignTagRelTable + " WHERE tag_id = "+tagId+") r " +
-                        "where c.campaign_id=ch.campaign_id and r.campaign_id = ch.campaign_id " +
+                        " sum(ch.total_click) as click from " + webAdCampaignsTable + " c, " + webAdCampaignsHistoryTable + " ch " +
+                        "where c.campaign_id=ch.campaign_id and tag_id = " + tagId +
                         " and date between '" + startTime + "' and '" + endTime + "' " +
                         " AND create_time >= '" + campaignCreateTime + "' AND create_time < '"+ afterCampaignCreateTime +"' " +
                         (likeCampaignName.isEmpty() ? " " : " and campaign_name like '%" + likeCampaignName +"%' " )  +
@@ -995,21 +985,19 @@ public class QueryByMulConditions extends HttpServlet {
             if(containsNoDataCampaignCheck){
                 if(admobCheck){
                     sql = "select c.campaign_id, c.account_id, short_name, c.campaign_name, create_time, c.status, budget, bidding, c.total_spend " +
-                            "  from " + webAdCampaignsTable + " c," + webAccountIdTable + " b," +
-                            "(SELECT DISTINCT campaign_id FROM " + webAdCampaignTagRelTable + " WHERE tag_id = "+tagId+") r " +
-                            " where c.account_id = b.account_id and r.campaign_id = c.campaign_id and c.status = '" + openStatus + "'" +
+                            "  from " + webAdCampaignsTable + " c," + webAccountIdTable + " b " +
+                            " where c.account_id = b.account_id and tag_id = " + tagId + " and c.status = '" + openStatus + "'" +
                             (likeCampaignName.isEmpty() ? " " : " and campaign_name like '%" + likeCampaignName +"%' " );
                 }else{
                     sql = "select c.campaign_id, c.account_id, short_name, c.campaign_name, create_time, c.status, budget, bidding, c.total_spend " +
-                            "  from " + webAdCampaignsTable + " c, " + webAccountIdTable + " b, " +
-                            "(SELECT DISTINCT campaign_id FROM " + webAdCampaignTagRelTable + " WHERE tag_id = "+tagId+") r " +
-                            "where c.account_id = b.account_id and r.campaign_id = c.campaign_id and c.status = '" + openStatus + "' AND b.status = 1 " +
+                            "  from " + webAdCampaignsTable + " c, " + webAccountIdTable + " b " +
+                            "where c.account_id = b.account_id and tag_id = " + tagId + " and c.status = '" + openStatus + "' AND b.status = 1 " +
                             (likeCampaignName.isEmpty() ? " " : " and campaign_name like '%" + likeCampaignName +"%' " );
                 }
 
                 listAll = DB.findListBySql(sql);
-                sql = "select ch.campaign_id from " + webAdCampaignsHistoryTable + " ch, " + "(SELECT DISTINCT campaign_id FROM " + webAdCampaignTagRelTable + " WHERE tag_id = "+tagId+") r " +
-                        " where date between '" + startTime + "' and '" + endTime + "' and r.campaign_id = ch.campaign_id";
+                sql = "select ch.campaign_id from " + webAdCampaignsHistoryTable + " ch," + webAdCampaignsTable + " c " +
+                        " where c.campaign_id = ch.campaign_id and tag_id = " + tagId + " and date between '" + startTime + "' and '" + endTime + "'";
                 List<JSObject> dataList = DB.findListBySql(sql);
                 if(dataList != null && dataList.size() > 0){
                     listNoData = Utils.getDiffJSObjectList(listAll, dataList, "campaign_id");

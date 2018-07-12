@@ -43,8 +43,11 @@ public class UpdateAppImageVideoPathRel extends HttpServlet {
                             DB.delete("ad_app_image_path_rel").where(DB.filter().whereEqualTo("app_name", appName)).execute();
                             for(String imagePath : PathList){
                                 imagePath = imagePath.replace(ParentPath + "/","");
-                                imagePath = imagePath.substring(0,imagePath.lastIndexOf("/"));
-                                set.add(imagePath);
+                                int i = imagePath.lastIndexOf("/");
+                                if (i > 0) {
+                                    imagePath = imagePath.substring(0,imagePath.lastIndexOf("/"));
+                                    set.add(imagePath);
+                                }
                             }
                         }
                         for(String path:set){
@@ -72,8 +75,11 @@ public class UpdateAppImageVideoPathRel extends HttpServlet {
                             HashSet<String> set = new HashSet<>();
                             for(String videoPath : PathList){
                                 videoPath = videoPath.replace(ParentPath + "/","");
-                                videoPath =  videoPath.substring(0,videoPath.lastIndexOf("/"));
-                                set.add(videoPath);
+                                int i = videoPath.lastIndexOf("/");
+                                if (i > 0) {
+                                    videoPath =  videoPath.substring(0,videoPath.lastIndexOf("/"));
+                                    set.add(videoPath);
+                                }
                             }
                             for(String path:set){
                                 try{
@@ -101,10 +107,12 @@ public class UpdateAppImageVideoPathRel extends HttpServlet {
             err = 0;
             e.printStackTrace();
         }
+
         json.addProperty("message",message);
         json.addProperty("err",err);
         response.setCharacterEncoding("UTF-8");
         response.getWriter().write(json.toString());
     }
+
 }
 

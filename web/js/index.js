@@ -960,6 +960,7 @@ function bindBatchModifyOperation() {
             one.network = tr.origCampaignData.network;
             one.campaignId = tr.origCampaignData.campaign_id;
             one.accountId = tr.origCampaignData.account_id;
+            one.campaignName = tr.origCampaignData.campaign_name;
             for (var i = 0; i < list.length; i++) {
                 if (list[i].campaignId == one.campaignId) {
                     return;
