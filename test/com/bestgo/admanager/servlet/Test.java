@@ -6,25 +6,29 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class Test {
+    //关于日期加减的测试
+    public static String addDay(String s, int n,String format) {
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat(format);
+            long s_time = sdf.parse(s).getTime();  //得到传入日期 s 的距格林时间毫秒数
+            long limit_time = s_time + n*24*60*60*1000;   // 加上差时
+            Date Target = new Date();
+            Target.setTime(limit_time);  //将处理后的时间毫秒数转为Date对象
+            String target_date = sdf.format(Target);  //将Date对象转为 yyyy-MM-dd 的格式字符串
+            return target_date;
+
+        } catch (Exception e) {
+            return null;
+        }
+    }
 
     public static void main(String[] args) {
-        Random random = new Random();
-        for(int i=0;i<3;i++){
-            String r = String.valueOf(random.nextInt());
-            r = r.substring(3,r.length());
-            System.out.println(r);
+        String installedDate = "2018-06-12";
 
-        }
-        System.out.println("================================");
-        String s = String.valueOf(System.currentTimeMillis());
-        s = s.substring(4,s.length());
-        String r2 = String.valueOf(random.nextInt());
-        System.out.println(s);
-        System.out.println(r2);
-//        js.put("aaaa","");
-//        list.add(js);
-//        String aaaa = Utils.getStrForListDistinctByAttrWithCommmas(list, "aaaa");
-//        System.out.println(aaaa);
+        //得到上限共20天内符合条件的最大日期
+        String limitDate = addDay(installedDate,20,"yyyy-MM-dd");
+        System.out.print(limitDate);
+
     }
            /* try {
                 //中文

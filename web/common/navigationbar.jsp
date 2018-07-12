@@ -45,7 +45,7 @@
                 <li><a href="country_analysis_report.jsp">国家分析报告</a></li>
                 <li><a href="time_analysis_report.jsp">时间分析报告</a></li>
                 <li><a href="released_data_statistics.jsp">投放数据统计</a></li>
-                <li><a href="country_active_user_report.jsp">活跃用户报告</a></li>
+                <li><a href="campaign_active_user_analysis.jsp">活跃用户报告</a></li>
                 <li><a href="material_analysis_report.jsp">素材分析报告</a></li>
             </ul>
         </li>
