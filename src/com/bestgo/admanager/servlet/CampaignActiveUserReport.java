@@ -26,36 +26,21 @@ import java.util.Map;
  */
 @WebServlet(name = "CampaignActiveUserReport", urlPatterns = {"/campaign_active_user_report/*"})
 public class CampaignActiveUserReport extends HttpServlet {
-    private static Map<String,String> countryCodeMap;
-    static{
-        if(countryCodeMap == null){
-            countryCodeMap = new HashMap<>();
-        }
-        String sql = "select country_code,country_name from app_country_code_dict";
-        List<JSObject> list = null;
-        try {
-            list = DB.findListBySql(sql);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        if(list != null){
-            for(JSObject j : list){
-                if(j != null && j.hasObjectData()){
-                    String countryCode = j.get("country_code");
-                    String countryName = j.get("country_name");
-                    if(countryCode != null && countryName != null){
-                        countryCodeMap.put(countryCode,countryName);
-                    }
-                }
-            }
-        }
-    }
+
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         doPost(request, response);
     }
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        try{
+            doRequest(request,response);
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    private void doRequest(HttpServletRequest request, HttpServletResponse response)  throws ServletException, IOException{
         JsonObject json = new JsonObject();
-        String path = request.getPathInfo();
+//        String path = request.getPathInfo();
         String tagName = request.getParameter("tagName");
         String installedDate = request.getParameter("installedDate");
 

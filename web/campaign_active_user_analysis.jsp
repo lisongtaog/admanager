@@ -9,23 +9,20 @@
     <title>活跃用户报告</title>
 
     <style>
-        td.changed {
-            background-color: #0f0;
-        }
-        #total_result.editable {
-            background-color: yellow;
-        }
-        .red {
-            color: red;
-        }
-        .green {
-            color: green;
-        }
-        .orange {
-            color: orange;
-        }
-        td,th{
+        table td,th{
             text-align:center;
+            max-width: 20em;
+            word-wrap:break-word;
+            text-overflow:ellipsis;
+            overflow:hidden;
+            white-space:nowrap;
+        }
+        table td:hover{
+            white-space:normal;
+            overflow:auto;
+        }
+        table th{
+            background-color:lightskyblue;
         }
     </style>
 </head>
@@ -60,7 +57,7 @@
         <%--<div class="panel-body" id="total_result">--%>
         <%--</div>--%>
     <%--</div>--%>
-    <table class="table table-hover">
+    <table class="table table-hover table-bordered">
         <thead id="result_header">
         <tr>
             <th>系列ID</th>
@@ -120,7 +117,6 @@
     }
 
     function setData(data) {
-        console.log(data);
         var installedDate = new Date($("#installedDate").val());
         data.forEach(function(el){
             var tr = $("<tr></tr>");
@@ -131,7 +127,7 @@
             //由 event_date 与 installed_date之间的日期差值 插入相应的天数列
             var event_date = new Date(el.event_date);
             var diff = Date_Diff(installedDate,event_date);
-            console.log(el.event_date+" "+installedDate+" "+diff);
+
             for (var i=0;i<20;i++){
                 if(i!=diff){
                     tr.append("<td></td>");
