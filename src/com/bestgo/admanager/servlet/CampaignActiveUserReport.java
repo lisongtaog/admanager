@@ -40,36 +40,57 @@ public class CampaignActiveUserReport extends HttpServlet {
 
     private void doRequest(HttpServletRequest request, HttpServletResponse response)  throws ServletException, IOException{
         JsonObject json = new JsonObject();
-//        String path = request.getPathInfo();
         String tagName = request.getParameter("tagName");
         String installedDate = request.getParameter("installedDate");
+        int index = Integer.parseInt(request.getParameter("page_index"));
+        int size = Integer.parseInt(request.getParameter("page_size"));
+        int order = Integer.parseInt(request.getParameter("order"));
+        boolean desc = order < 1000;
+        if (order >= 1000) order = order - 1000;
 
-        //得到上限共20天内符合条件的最大日期
-        String limitDate = DateUtil.addDay(installedDate,19,"yyyy-MM-dd");
+        String[] orders = {" order by campaign_id "," order by campaign_name", " order by country_name",
+                " order by 1_day "," order by 2_day "," order by 3_day "," order by 4_day "," order by 5_day "," order by 6_day ",
+                " order by 7_day "," order by 8_day "," order by 9_day "," order by 10_day "," order by 11_day "," order by 12_day ",
+                " order by 13_day "," order by 14_day "," order by 15_day "," order by 16_day "," order by 17_day "," order by 18_day ",
+                " order by 19_day "," order by 20_day "
+        };
+
+        //从视图里查询
         try{
+            JsonArray array = new JsonArray();
             String sql = "SELECT id FROM web_tag WHERE tag_name = '"+ tagName + "'";
             long tagId = DB.findOneBySql(sql).get("id");
-            sql = "SELECT a.event_date,a.campaign_name,a.campaign_id,a.active_num,b.country_name FROM " +
-                    "web_ad_tag_campaign_active_user_history_admob a,app_country_code_dict b "+
-                    "WHERE tag_id = "+tagId+" AND event_date BETWEEN '"+installedDate+"' AND '"+ limitDate + "' AND a.country_code = b.country_code";
+            sql = "SELECT campaign_id,campaign_name,1_day,2_day,3_day,4_day,5_day,6_day,7_day,8_day,9_day,10_day,11_day,12_day,13_day,14_day," +
+                    "15_day,16_day,17_day,18_day,19_day,20_day,country_name FROM view_active_user WHERE tag_id = "+tagId+
+                    " AND installed_date = '"+ installedDate + "'";
+            int count = DB.findListBySql(sql).size();
+            if (order < orders.length) {//单列排序
+                sql += orders[order] + (desc ? " desc" : "");
+            }
+            sql += " limit " + index * size + "," + size;
+
             List<JSObject> list = DB.findListBySql(sql);
-            JsonArray array = new JsonArray();
+
             if(list.size()>0){
                 for(JSObject j: list){
                     JsonObject ji = new JsonObject();
                     ji.addProperty("campaign_id",j.get("campaign_id").toString());
                     ji.addProperty("campaign_name",j.get("campaign_name").toString());
                     ji.addProperty("country_name",j.get("country_name").toString());
-                    ji.addProperty("event_date",j.get("event_date").toString());
-                    ji.addProperty("active_num",j.get("active_num").toString());
+                    for (int k = 1;k<21;k++){
+                        String num = String.valueOf(k);
+                        ji.addProperty(num+"_day",j.get(num+"_day").toString());
+                    }
                     array.add(ji);
                 }
                 json.addProperty("ret",1);
+                json.addProperty("total",count);
                 json.add("data",array);
             }else{
                 json.addProperty("ret",0);
                 json.addProperty("message","此条件下无数据");
             }
+
         }catch(Exception e){
             e.printStackTrace();
             json.addProperty("ret",0);

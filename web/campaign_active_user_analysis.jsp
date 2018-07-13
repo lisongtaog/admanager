@@ -8,8 +8,9 @@
 <head>
     <title>活跃用户报告</title>
 
+    <%--配合原来的<table>使用的--%>
     <style>
-        table td,th{
+        #metricTable td,th{
             text-align:center;
             max-width: 20em;
             word-wrap:break-word;
@@ -17,7 +18,7 @@
             overflow:hidden;
             white-space:nowrap;
         }
-        table td:hover{
+        #metricTable td:hover{
             white-space:normal;
             overflow:auto;
         }
@@ -25,6 +26,12 @@
             background-color:lightskyblue;
         }
     </style>
+
+    <!-- DataTables -->
+    <link rel="stylesheet" href="http://money.uugame.info/admin_lte/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.4.1/css/buttons.dataTables.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/select/1.2.2/css/select.dataTables.min.css">
+
 </head>
 <body>
 
@@ -53,29 +60,38 @@
             <button id="btnSearch" class="btn btn-default glyphicon glyphicon-search"></button>
         </div>
     </div>
-    <%--<div class="panel panel-default">--%>
-        <%--<div class="panel-body" id="total_result">--%>
-        <%--</div>--%>
-    <%--</div>--%>
-    <table class="table table-hover table-bordered">
-        <thead id="result_header">
-        <tr>
-            <th>系列ID</th>
-            <th>系列名称</th>
-            <th>国家</th>
-            <th>1_天</th><th>2_天</th><th>3_天</th><th>4_天</th><th>5_天</th><th>6_天</th>
-            <th>7_天</th><th>8_天</th><th>9_天</th><th>10_天</th><th>11_天</th><th>12_天</th>
-            <th>13_天</th><th>14_天</th><th>15_天</th><th>16_天</th><th>17_天</th><th>18_天</th>
-            <th>19_天</th><th>20_天</th>
-        </tr>
-        </thead>
-        <tbody id="results_body">
-        </tbody>
-    </table>
+
+    <div class="box box-default">
+
+        <div class="box-body" style="overflow-x: auto">
+            <table id="metricTable" class="table table-bordered table-hover" cellspacing="0" width="100%">
+                <thead>
+                <tr>
+                    <th>系列ID</th>
+                    <th>系列名称</th>
+                    <th>国家</th>
+                    <th>1_天</th><th>2_天</th><th>3_天</th><th>4_天</th><th>5_天</th><th>6_天</th>
+                    <th>7_天</th><th>8_天</th><th>9_天</th><th>10_天</th><th>11_天</th><th>12_天</th>
+                    <th>13_天</th><th>14_天</th><th>15_天</th><th>16_天</th><th>17_天</th><th>18_天</th>
+                    <th>19_天</th><th>20_天</th>
+                </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
 
 </div>
 
 <jsp:include page="loading_dialog.jsp"></jsp:include>
+
+<!-- DataTables -->
+<script src="http://money.uugame.info/admin_lte/bower_components/datatables.net/js/jquery.dataTables.min.js"></script>
+<script src="http://money.uugame.info/admin_lte/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+<script type="text/javascript" language="javascript" src="https://cdn.datatables.net/buttons/1.4.1/js/dataTables.buttons.min.js"></script>
+<script type="text/javascript" language="javascript" src="https://cdn.datatables.net/select/1.2.2/js/dataTables.select.min.js"></script>
+<script type="text/javascript" src="http://money.uugame.info/admin_lte/plugins/Editor-1.6.5/js/dataTables.editor.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/buttons/1.4.2/js/buttons.html5.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/buttons/1.4.2/js/buttons.print.min.js"></script>
 
 <script>
     $("li[role='presentation']:eq(2)").addClass("active");
@@ -98,16 +114,7 @@
         var inputTag = $("#inputTag").val();
         var installedDate = $('#installedDate').val();
 
-        $.post("campaign_active_user_report", {
-            tagName: inputTag,
-            installedDate: installedDate
-        },function(data){
-            if(data && data.ret == 1){
-                setData(data.data);
-            } else {
-                admanager.showCommonDlg("错误", data.message);
-            }
-        },'json');
+        setData(inputTag,installedDate);
     });
 
     //计算两个日期的相差天数
@@ -116,27 +123,62 @@
         return diff;
     }
 
-    function setData(data) {
-        var installedDate = new Date($("#installedDate").val());
-        data.forEach(function(el){
-            var tr = $("<tr></tr>");
+    //jQuery.dateTable插件回显
+    function setData(tagName,installedDate){
+        var columns = [
+            {data:"campaign_id"},{data:"campaign_name"},{data:"country_name"},{data:"1_day"},
+            {data:"2_day"},{data:"3_day"}, {data:"4_day"},{data:"5_day"},{data:"6_day"},{data:"7_day"},
+            {data:"8_day"},{data:"9_day"}, {data:"10_day"},{data:"11_day"},{data:"12_day"},
+            {data:"13_day"},{data:"14_day"}, {data:"15_day"},{data:"16_day"},{data:"17_day"},
+            {data:"18_day"},{data:"19_day"}, {data:"20_day"}
+        ];
 
-            //插入前三列
-            tr.append("<td>"+el.campaign_id+"</td>").append("<td>"+el.campaign_name+"</td>").append("<td>"+el.country_name+"</td>");
+        if ($.fn.DataTable.isDataTable("#metricTable")) {
+            $('#metricTable').DataTable().clear().destroy();
+        }
+        $('#metricTable').DataTable({
+            "ordering": true,
+            "processing": true,
+            "serverSide": true,
+            "searching": false,
+            "pageLength": 100,
+            "lengthMenu": [[100, 250,500, 1000], [100,250, 500, 1000]],
+            "ajax": function (data, callback, settings) {
+                var postData = {};
+                postData.tagName = tagName;
+                postData.installedDate = installedDate;
+                postData.page_index = data.start / data.length;
+                postData.page_size = data.length;
+                postData.order = data.order[0].column + (data.order[0].dir == 'asc' ? 1000 : 0);
 
-            //由 event_date 与 installed_date之间的日期差值 插入相应的天数列
-            var event_date = new Date(el.event_date);
-            var diff = Date_Diff(installedDate,event_date);
-
-            for (var i=0;i<20;i++){
-                if(i!=diff){
-                    tr.append("<td></td>");
-                }else{
-                    tr.append("<td>"+el.active_num+"</td>");
-                }
-            }
-            $("#results_body").append(tr);
-        })
+                $.post("campaign_active_user_report", postData, function (data) {
+                    if (data && data.ret == 1) {
+                        var list = [];
+                        for (var i = 0; i < data.data.length; i++) {
+                            list.push(data.data[i]
+                            );
+                        }
+                        callback(
+                            {
+                                "recordsTotal": data.total,
+                                "recordsFiltered": data.total,
+                                "data": list
+                            }
+                        );
+                    } else {
+                        alert(data.message);
+                    }
+                }, "json");
+            },
+            columns: columns,
+            select: true,
+            dom: 'Blfrtip',
+            buttons: [{
+                extend: 'collection',
+                text: 'Export',
+                buttons: ['copy', 'excel', 'csv', 'pdf', 'print']
+            }],
+        });
     }
 
 </script>
