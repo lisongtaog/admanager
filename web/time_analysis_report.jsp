@@ -158,6 +158,10 @@
         var startTime = $('#inputStartTime').val();
         var endTime = $('#inputEndTime').val();
 
+        if ($.fn.DataTable.isDataTable("#metricTable")) {
+            $('#metricTable').DataTable().clear().destroy();
+        }
+
         if(!country_filter){
             $('#result_header').html("<tr><th>Date</th><th>Cost</th><th>PurchasedUser</th><th>Installed</th><th>Uninstalled</th>" +
                 "<th>UninstalledRate</th><th>TotalUser</th><th>ActiveUser</th><th>Revenue</th><th>ECPM</th><th>CPA</th>" +
@@ -167,43 +171,34 @@
                 "<th>UninstalledRate</th><th>TotalUser</th><th>ActiveUser</th><th>Revenue</th><th>PI</th><th>ECPM</th><th>CPA</th>" +
                 "<th>ACPA</th><th>CPA/ECPM</th><th>Incoming</th><th>EstimatedRevenue14</th><th>Revenue14/Cost</th>");
         }
-
         setData(tagName,country_filter,startTime,endTime);
 
-        var str = "Cost: " + data.total_cost + "&nbsp;&nbsp;&nbsp;&nbsp;PuserchaedUser: " + data.total_puserchaed_user +
-            "&nbsp;&nbsp;&nbsp;&nbsp;CPA: " + data.total_cpa + "&nbsp;&nbsp;&nbsp;&nbsp;Revenue: " + data.total_revenue +
-            "&nbsp;&nbsp;&nbsp;&nbsp;Es14: " + data.total_es14 + "&nbsp;&nbsp;&nbsp;&nbsp;Es14/Cost: " + data.es14_dev_cost;
-        $('#total_result').html(str);
     });
 
     //这里输入的 data 是一个array
     function setData(tagName,country_filter,startTime,endTime) {
-        console.log(data);
 
         var columns;
         //jQuery.dateTable插件回显
         if(!country_filter){
             columns = [{data:"date"},{data:"costs"},{data:"purchased_users"},{data:"installed"},{data:"uninstalled"},
-                       {data:"uninstalled_rate"},{data:"users"},{data:"active_users"},{data:"revenues"},{data:"ecpm"},{data:"cpa"},
-                       {data:"cpa_dev_ecpm"},{data:"incoming"},{data:"estimated_revenues"},{data:"estimated_revenues_dev_cost"}];
+                {data:"uninstalled_rate"},{data:"users"},{data:"active_users"},{data:"revenues"},{data:"ecpm"},{data:"cpa"},
+                {data:"cpa_dev_ecpm"},{data:"incoming"},{data:"estimated_revenues"},{data:"estimated_revenues_dev_cost"}];
         }else{
             columns = [{data:"date"},{data:"costs"},{data:"purchased_users"},{data:"installed"},{data:"uninstalled"},
                 {data:"uninstalled_rate"},{data:"users"},{data:"active_users"},{data:"revenues"},{data:"pi"},{data:"ecpm"},{data:"cpa"},
                 {data:"a_cpa"},{data:"cpa_dev_ecpm"},{data:"incoming"},{data:"estimated_revenues"},{data:"estimated_revenues_dev_cost"}];
         }
 
-        if ($.fn.DataTable.isDataTable("#metricTable")) {
-            $('#metricTable').DataTable().clear().destroy();
-        }
-
         $('#metricTable').DataTable({
-            "ordering": true,
-            "processing": true,
-            "serverSide": true,
-            "searching": false,
-            "pageLength": 20,
-            "lengthMenu": [[20,25,30,35,50,100],[20,25,30,35,50,100]],
-            "ajax": function (data, callback, settings) {
+            destroy:true,
+            ordering: true,
+            processing: true,
+            serverSide: true,
+            searching: false,
+            pageLength: 20,
+            lengthMenu: [[20,25,30,35,50,100],[20,25,30,35,50,100]],
+            ajax: function (data, callback, settings) {
                 var postData = {};
                 postData.tagName = tagName;
                 postData.country_filter = country_filter;
@@ -213,6 +208,7 @@
                 postData.page_size = data.length;
                 postData.order = data.order[0].column + (data.order[0].dir == 'asc' ? 1000 : 0);
 
+                //使用ajax作为数据源，但内部函数使用回调给dataTable的参数赋值
                 $.post("time_analysis_report/time_query", postData, function (data) {
                     if (data && data.ret == 1) {
                         var list = [];
@@ -221,12 +217,17 @@
                         }
                         callback(
                             {
-                                "recordsTotal": data.total,
-                                "recordsFiltered": data.total,
-                                "data": list
+                                recordsTotal: data.total,
+                                recordsFiltered: data.total,
+                                data: list
                             }
                         );
+                        var str = "Cost: " + data.total_cost + "&nbsp;&nbsp;&nbsp;&nbsp;PuserchaedUser: " + data.total_puserchaed_user +
+                            "&nbsp;&nbsp;&nbsp;&nbsp;CPA: " + data.total_cpa + "&nbsp;&nbsp;&nbsp;&nbsp;Revenue: " + data.total_revenue +
+                            "&nbsp;&nbsp;&nbsp;&nbsp;Es14: " + data.total_es14 + "&nbsp;&nbsp;&nbsp;&nbsp;Es14/Cost: " + data.es14_dev_cost;
+                        $('#total_result').html(str);
                         //这里加入标色（红色，绿色，橙色）
+                        marking(data.es14_dev_cost);
                     } else {
                         alert(data.message);
                     }
@@ -240,6 +241,25 @@
                 text: 'Export',
                 buttons: ['copy', 'excel', 'csv', 'pdf', 'print']
             }]
+        });
+    }
+
+    function marking(es14_dev_cost){
+        var IncmIdx = $("th:contains('Incoming')").index();
+        var RvDevCstIdx = $("th:contains('Revenue14/Cost')").index();
+        var tbodyTr = $("#metricTable tbody tr");
+        //遍历渲染
+        tbodyTr.each(function(idx,el){
+            var Incm = parseInt($(el).find("td:eq("+IncmIdx+")").text().toString());
+            if( Incm < 0){
+                $(el).find("td:eq("+IncmIdx+")").addClass("red");
+            }
+            var RvDevCst = parseFloat($(el).find("td:eq("+RvDevCstIdx+")").text().toString());
+            if(RvDevCst < parseFloat(es14_dev_cost)){
+                $(el).find("td:eq("+RvDevCstIdx+")").addClass("orange");
+            }else{
+                $(el).find("td:eq("+RvDevCstIdx+")").addClass("green");
+            }
         });
     }
 </script>
