@@ -201,4 +201,47 @@ public class Utils {
         return resultAll;
     }
 
+    /**
+     * 图片目录遍历:获取这个目录下的所有文件夹路径和文件路径,并且只返回有效文件的路径
+     * @param file
+     * @param resultAll 经校验合法的文件路径
+     * @param returnDirectory 如果为true，则返回所有文件夹路径
+     * @param returnFile  如果为true，则返回所有文件路径
+     * @return
+     */
+    public static List<String> ergodicImageDirectory(File file, List<String> resultAll, boolean returnDirectory,boolean returnFile){
+        File[] files = file.listFiles();
+        if(files == null) return resultAll;// 判断目录下是不是空的
+        for (File f : files) {
+            if(f.isDirectory()){
+                if(returnDirectory){
+                    resultAll.add(f.getPath());
+                }
+                ergodicImageDirectory(f,resultAll,returnDirectory,returnFile);
+            }else{
+                //需要在判断为文件以后判断文件后缀名是否合法
+                String[] allowType = new String[]{".jpeg",".gif",".jpg",".png"};
+                String fileName = f.toString();
+                if(typeValid(fileName,allowType)){
+                    resultAll.add(f.getPath());
+                }
+            }
+        }
+        return resultAll;
+    }
+
+    /**
+     * 文件后缀检查方法
+     */
+    public static boolean typeValid(String contentType, String[] allowTypes) {
+        if (null == contentType || "".equals(contentType)) {
+            return false;
+        }
+        for (String type : allowTypes) {
+            if (contentType.indexOf(type) > -1 || contentType.indexOf(type.toUpperCase())>-1) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
