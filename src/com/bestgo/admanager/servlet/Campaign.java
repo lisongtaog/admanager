@@ -282,23 +282,34 @@ public class Campaign extends HttpServlet {
             json.addProperty("warning",result.warning); //目前仅在Media导致的系列创建后又删除下有用
         } else if (path.startsWith("/update")) {
             String id = request.getParameter("id");
-            String campaignId = request.getParameter("campaignId");
-            String campaignName = request.getParameter("campaignName");
-            String status = request.getParameter("status");
-            String budget = request.getParameter("budget");
-            String bidding = request.getParameter("bidding");
             String tags = request.getParameter("tags");
 
-            if (id == null) {
+            OperationResult result = new OperationResult();
+            if (id != null) {
                 try {
-                    JSObject campaign = DB.simpleScan("web_ad_campaigns").select("id", "campaign_id", "adset_id", "campaign_name", "status", "budget", "bidding").where(DB.filter().whereEqualTo("campaign_id", campaignId)).execute();
-                    if (campaign.hasObjectData()) {
-                        id = campaign.get("id").toString();
+                    String sql = "SELECT id FROM web_tag WHERE tag_name = '"+tags+"'";
+                    JSObject one = DB.findOneBySql(sql);
+                    if (one.hasObjectData()) {
+                        long tagId = one.get("id");
+                        sql = "UPDATE web_ad_campaigns SET tag_id = " + tagId + " WHERE id = " + id;
+                        boolean b = DB.updateBySql(sql);
+                        if (b) {
+                            result.result = true;
+                            result.message = "更新成功！";
+                        }
+                    } else {
+                        result.result = false;
+                        result.message = "没有在web_tag表找到这个应用！";
                     }
+
                 } catch (Exception e) {
+                    e.printStackTrace();
                 }
+
+            }else {
+                result.result = false;
+                result.message = "ID为空！传参异常，联系管理员！";
             }
-            OperationResult result = updateCampaign(id, campaignName, status, budget, bidding, tags);
             json.addProperty("ret", result.result ? 1 : 0);
             json.addProperty("message", result.message);
         } else if (path.startsWith("/query_batch_change_status")) {
@@ -679,7 +690,7 @@ public class Campaign extends HttpServlet {
                 double oldBudget = (double)campaign.get("budget") / 100;
                 double oldBidding = (double)campaign.get("bidding")/ 100;
 
-                if (!oldCampaignName.equals(campaignName) || !oldStatus.equals(status) || oldBudget != NumberUtil.parseDouble(budget, 0) || oldBidding != NumberUtil.parseDouble(bidding, 0)) {
+                if (!oldCampaignName.equals(campaignName) || oldBudget != NumberUtil.parseDouble(budget, 0) || oldBidding != NumberUtil.parseDouble(bidding, 0)) {
                     JSObject record = DB.simpleScan("web_system_config").select("config_value").where(DB.filter().whereEqualTo("config_key", "adtools_path")).execute();
                     if (record.hasObjectData()) {
                         String jarPath = record.get("config_value");
