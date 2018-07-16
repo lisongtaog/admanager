@@ -220,22 +220,34 @@ public class CampaignAdmob extends HttpServlet {
             json.addProperty("message", result.message);
         } else if (path.startsWith("/update")) {
             String id = request.getParameter("id");
-            String campaignId = request.getParameter("campaignId");
             String tags = request.getParameter("tags");
 
-            if (id == null) {
+            OperationResult result = new OperationResult();
+            if (id != null) {
                 try {
-                    JSObject campaign = DB.simpleScan("web_ad_campaigns_admob")
-                            .select("id")
-                            .where(DB.filter().whereEqualTo("campaign_id", campaignId))
-                            .execute();
-                    if (campaign.hasObjectData()) {
-                        id = campaign.get("id").toString();
+                    String sql = "SELECT id FROM web_tag WHERE tag_name = '"+tags+"'";
+                    JSObject one = DB.findOneBySql(sql);
+                    if (one.hasObjectData()) {
+                        long tagId = one.get("id");
+                        sql = "UPDATE web_ad_campaigns_admob SET tag_id = " + tagId + " WHERE id = " + id;
+                        boolean b = DB.updateBySql(sql);
+                        if (b) {
+                            result.result = true;
+                            result.message = "更新成功！";
+                        }
+                    } else {
+                        result.result = false;
+                        result.message = "没有在web_tag表找到这个应用！";
                     }
+
                 } catch (Exception e) {
+                    e.printStackTrace();
                 }
+
+            }else {
+                result.result = false;
+                result.message = "ID为空！传参异常，联系管理员！";
             }
-            OperationResult result = updateCampaign(id, tags);
             json.addProperty("ret", result.result ? 1 : 0);
             json.addProperty("message", result.message);
         } else if (path.startsWith("/select_messages_by_app_and_region_and_group_id")) {
