@@ -177,6 +177,8 @@
 
     //这里输入的 data 是一个array
     function setData(tagName,country_filter,startTime,endTime) {
+        var UninstalledRate_idx = $("th:contains('UninstalledRate')").index();
+        var CPA_ECPM_idx = $("th:contains('CPA/ECPM')").index();
 
         var columns;
         //jQuery.dateTable插件回显
@@ -198,6 +200,10 @@
             searching: false,
             pageLength: 20,
             lengthMenu: [[20,25,30,35,50,100],[20,25,30,35,50,100]],
+            columnDefs: [
+                { "orderable": false, "targets": UninstalledRate_idx },
+                { "orderable": false, "targets": CPA_ECPM_idx }
+            ],
             ajax: function (data, callback, settings) {
                 var postData = {};
                 postData.tagName = tagName;

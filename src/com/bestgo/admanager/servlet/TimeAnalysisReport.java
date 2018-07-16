@@ -55,13 +55,13 @@ public class TimeAnalysisReport extends HttpServlet {
             orders.add(" order by total_purchased_user ");
             orders.add(" order by installed ");
             orders.add(" order by uninstalled ");
-            orders.add(" order by uninstalledRate "); //这列是程序计算出来无法后端排序（可在前端禁用该列）
+            orders.add(" order by uninstalledRate "); //这列是程序计算出来无法后端排序（前端禁用，这里占位）
             orders.add(" order by users ");
             orders.add(" order by active_users ");
             orders.add(" order by revenues ");
             orders.add(" order by ecpm ");
             orders.add(" order by cpa ");
-            orders.add(" order by cpa/ecpm");//这列是程序计算出来无法后端排序（可在前端禁用该列）
+            orders.add(" order by cpa/ecpm"); //这列是程序计算出来无法后端排序（前端禁用，这里占位）
             orders.add(" order by incoming ");
             orders.add(" order by estimated_revenues ");
             orders.add(" order by est_rev_dev_cost");
@@ -71,7 +71,7 @@ public class TimeAnalysisReport extends HttpServlet {
             orders.add(" order by total_purchased_user ");
             orders.add(" order by installed ");
             orders.add(" order by uninstalled ");
-            orders.add(" order by uninstalledRate "); //这列是程序计算出来无法后端排序（可在前端禁用该列）
+            orders.add(" order by uninstalledRate "); //这列是程序计算出来无法后端排序（前端禁用，这里占位）
             orders.add(" order by users ");
             orders.add(" order by active_users ");
             orders.add(" order by revenues ");
@@ -79,7 +79,7 @@ public class TimeAnalysisReport extends HttpServlet {
             orders.add(" order by ecpm ");
             orders.add(" order by cpa ");
             orders.add(" order by a_cpa ");
-            orders.add(" order by cpa/ecpm");//这列是程序计算出来无法后端排序（可在前端禁用该列）
+            orders.add(" order by cpa/ecpm"); //这列是程序计算出来无法后端排序（前端禁用，这里占位）
             orders.add(" order by incoming ");
             orders.add(" order by estimated_revenues ");
             orders.add(" order by est_rev_dev_cost");
