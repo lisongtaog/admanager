@@ -84,7 +84,7 @@
 </ul>
 
 <script>
-    var privilege = document.getElementById("type1");
+    /*var privilege = document.getElementById("type1");
     if(privilege){
         $.post("login/applicationCheck",function(data){
             if(data && (data.count > 0)){
@@ -94,6 +94,6 @@
         },"json");
         privilege.setAttribute("href","system_management.jsp");
         privilege.setAttribute("target","_blank");
-    }
+    }*/
 </script>
 
