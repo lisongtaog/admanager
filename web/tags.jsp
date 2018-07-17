@@ -34,7 +34,7 @@
 
         <table class="table">
             <thead>
-            <tr><th>标签ID</th><th>标签名称</th><th>最大出价</th><th>应用品类名称</th><th>期望收入</th><th>期望盈利</th><th>投放人员</th><th>是否计入统计</th><th>操作</th></tr>
+            <tr><th>标签ID</th><th>标签名称</th><th>最大出价</th><th>应用品类名称</th><th>期望收入</th><th>期望盈利</th><th>投放人员</th><th>是否计入统计</th><th>是否显示</th><th>操作</th></tr>
             </thead>
             <tbody>
 
@@ -65,6 +65,7 @@
                 <td><%=one.get("anticipated_incoming")%></td>
                 <td><%=one.get("nickname")%></td>
                 <td><%=Integer.parseInt(one.get("is_statistics").toString())== 1 ? "是" : "否"%></td>
+                <td><%=Integer.parseInt(one.get("is_display").toString())== 1 ? "是" : "否"%></td>
                 <td><a class="link_modify glyphicon glyphicon-pencil" href="#"></a><a class="link_delete glyphicon glyphicon-remove" href="#"></a></td>
             </tr>
             <% } %>
@@ -164,6 +165,18 @@
                             </select>
                         </div>
                     </div>
+
+                    <div class="form-group">
+                        <label for="isDisplay" class="col-sm-2 control-label">是否显示</label>
+                        <div class="col-sm-8">
+                            <select id="isDisplay" class="form-control">
+                                <option value="1">是</option>
+                                <option value="0">否</option>
+                            </select>
+                        </div>
+                    </div>
+
+
                 </form>
                 <p id="delete_message">确认要删除吗?</p>
             </div>
@@ -197,7 +210,7 @@
         var anticipated_incoming = $("#inputIncoming").val();
         var user_id = $("#user").val();
         var is_statistics = $("#isStatistics").val();
-
+        var is_display = $("#isDisplay").val();
         if (modifyType == 'new') {
             $.post('tags/create', {
                 name: tagName,
@@ -206,7 +219,8 @@
                 anticipated_revenue:anticipated_revenue,
                 anticipated_incoming:anticipated_incoming,
                 user_id:user_id,
-                is_statistics:is_statistics
+                is_statistics:is_statistics,
+                is_display:is_display
             }, function(data) {
                 if (data && data.ret == 1) {
                     $("#new_tag_dlg").modal("hide");
@@ -216,6 +230,7 @@
                 }
             }, 'json');
         } else if (modifyType == 'update') {
+
             $.post('tags/update', {
                 id: id,
                 name:tagName,
@@ -224,7 +239,8 @@
                 anticipated_revenue:anticipated_revenue,
                 anticipated_incoming:anticipated_incoming,
                 user_id:user_id,
-                is_statistics:is_statistics
+                is_statistics:is_statistics,
+                is_display:is_display
             }, function(data) {
                 $("#inputTagName").prop("disabled",false);
                 if (data && data.ret == 1) {
@@ -300,6 +316,10 @@
             td.text(one.is_statistics == "1"? "是":"否");
             tr.append(td);
 
+            td = $('<td></td>');
+            td.text(one.is_display == "1"? "是":"否");
+            tr.append(td);
+
             td = $('<td><a class="link_modify glyphicon glyphicon-pencil" href="#"></a><a class="link_delete glyphicon glyphicon-remove" href="#"></a></td>');
             tr.append(td);
             $('.table tbody').append(tr);
@@ -323,6 +343,7 @@
             var incoming = $(tds.get(5)).text();
             var user = $(tds.get(6)).text();
             var isStatistics = $(tds.get(7)).text();
+            var isDisplay = $(tds.get(8)).text();
             $("#inputTagName").val(tagName).prop("disabled",true);
             $("#inputMaxBidding").val(maxBidding);
             $("#category option").each(function(idx){
@@ -345,6 +366,14 @@
                 var name = $(this).text();
                 if(name == isStatistics){
                     $("#isStatistics").val($(this).val());
+                    return;
+                }
+            });
+
+            $("#isDisplay option").each(function(idx){
+                var name = $(this).text();
+                if(name == isDisplay){
+                    $("#isDisplay").val($(this).val());
                     return;
                 }
             });

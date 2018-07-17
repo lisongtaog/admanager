@@ -44,9 +44,10 @@ public class Tags extends HttpServlet {
                 String anticipated_incoming = request.getParameter("anticipated_incoming");
                 String user_id = request.getParameter("user_id");
                 String is_statistics = request.getParameter("is_statistics");
+                String is_display = request.getParameter("is_display");
 
                 if(!tagName.isEmpty() && tagCategoryIdStr.matches("[0-9]{1,}") && (maxBiddingStr.matches("^\\d+(\\.\\d+)?$") || StringUtil.isEmpty(maxBiddingStr))){
-                    result = createNewTag(tagName,maxBiddingStr,tagCategoryIdStr,anticipated_revenue,anticipated_incoming,user_id,is_statistics);
+                    result = createNewTag(tagName,maxBiddingStr,tagCategoryIdStr,anticipated_revenue,anticipated_incoming,user_id,is_statistics,is_display);
                     json.addProperty("ret", result.result ? 1 : 0);
                     json.addProperty("message", result.message);
                 }else{
@@ -67,12 +68,13 @@ public class Tags extends HttpServlet {
                 String anticipated_incoming = request.getParameter("anticipated_incoming");
                 String user_id = request.getParameter("user_id");
                 String is_statistics = request.getParameter("is_statistics");
+                String is_display = request.getParameter("is_display");
 
                 if(!tagName.isEmpty() && tagCategoryIdStr.matches("[0-9]{1,}") && (maxBiddingStr.matches("^\\d+(\\.\\d+)?$") || StringUtil.isEmpty(maxBiddingStr))){
                     if(maxBiddingStr.isEmpty()){
                         maxBiddingStr = "NULL";
                     }
-                    result = updateTag(idStr, tagName,maxBiddingStr,tagCategoryIdStr,anticipated_revenue,anticipated_incoming,user_id,is_statistics);
+                    result = updateTag(idStr, tagName,maxBiddingStr,tagCategoryIdStr,anticipated_revenue,anticipated_incoming,user_id,is_statistics,is_display);
                     json.addProperty("ret", result.result ? 1 : 0);
                     json.addProperty("message", result.message);
                 }else{
@@ -96,6 +98,7 @@ public class Tags extends HttpServlet {
                         one.addProperty("anticipated_incoming",(Double)data.get(i).get("anticipated_incoming"));
                         one.addProperty("user",(String)data.get(i).get("nickname"));
                         one.addProperty("is_statistics",(Integer)data.get(i).get("is_statistics"));
+                        one.addProperty("is_display",(Integer)data.get(i).get("is_display"));
                         array.add(one);
                     }
                     json.add("data", array);
@@ -205,7 +208,7 @@ public class Tags extends HttpServlet {
         try {
             //return DB.scan("web_tag").select("id", "tag_name")
             //        .where(DB.filter().whereLikeTo("tag_name", "%" + word + "%")).orderByAsc("id").execute();
-            String sql = "SELECT t.id,t.tag_name,t.max_bidding,t.anticipated_revenue,t.anticipated_incoming,t.is_statistics,td.nickname,tc.category_name FROM " +
+            String sql = "SELECT t.id,t.tag_name,t.max_bidding,t.anticipated_revenue,t.anticipated_incoming,t.is_statistics,is_display,td.nickname,tc.category_name FROM " +
                     "web_tag t LEFT JOIN web_ad_login_user td ON t.user_id = td.id " +
                     "LEFT JOIN web_ad_tag_category tc ON t.tag_category_id = tc.id WHERE t.tag_name LIKE ?";
             return DB.findListBySql(sql,"%"+word+"%");
@@ -230,7 +233,7 @@ public class Tags extends HttpServlet {
     public static List<JSObject> fetchData(int index, int size) {
         List<JSObject> list = new ArrayList<>();
         try {
-            String sql = "SELECT t.id,t.tag_name,t.max_bidding,t.anticipated_revenue,t.anticipated_incoming,t.is_statistics,td.nickname,tc.category_name FROM " +
+            String sql = "SELECT t.id,t.tag_name,t.max_bidding,t.anticipated_revenue,t.anticipated_incoming,t.is_statistics,is_display,td.nickname,tc.category_name FROM " +
                     "web_tag t LEFT JOIN web_ad_login_user td ON t.user_id = td.id " +
                     "LEFT JOIN web_ad_tag_category tc ON t.tag_category_id = tc.id LIMIT "+(index * size)+","+size;
             return DB.findListBySql(sql);
@@ -272,7 +275,7 @@ public class Tags extends HttpServlet {
     }
 
     private OperationResult createNewTag(String tagName, String maxBiddingStr, String tagCategoryIdStr,String anticipated_revenue,String
-            anticipated_incoming,String user_id,String is_statistics) {
+            anticipated_incoming,String user_id,String is_statistics,String is_display) {
         OperationResult ret = new OperationResult();
 
         try {
@@ -292,6 +295,7 @@ public class Tags extends HttpServlet {
                                 .put("anticipated_incoming",Double.parseDouble(anticipated_incoming))
                                 .put("user_id",Integer.parseInt(user_id))
                                 .put("is_statistics",Integer.parseInt(is_statistics))
+                                .put("is_display",Integer.parseInt(is_display))
                                 .execute();
                     }else{
                         DB.insert("web_tag")
@@ -302,6 +306,7 @@ public class Tags extends HttpServlet {
                                 .put("anticipated_incoming",anticipated_incoming)
                                 .put("user_id",user_id)
                                 .put("is_statistics",is_statistics)
+                                .put("is_display",is_display)
                                 .execute();
                     }
                     ret.result = true;
@@ -397,7 +402,7 @@ public class Tags extends HttpServlet {
     }
 
     private OperationResult updateTag(String idStr, String tagName, String maxBiddingStr, String tagCategoryIdStr,String anticipated_revenue,String
-            anticipated_incoming, String user_id,String is_statistics) {
+            anticipated_incoming, String user_id,String is_statistics,String is_display) {
         OperationResult ret = new OperationResult();
 
         try {
@@ -420,6 +425,7 @@ public class Tags extends HttpServlet {
                             .put("anticipated_incoming",anticipated_incoming)
                             .put("user_id",user_id)
                             .put("is_statistics",is_statistics)
+                            .put("is_display",is_display)
                             .where(DB.filter().whereEqualTo("id",idStr))
                             .execute();
                     ret.message = "修改成功";

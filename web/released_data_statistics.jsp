@@ -82,6 +82,10 @@
             <span>投放人员</span>
             <input id="inputNickname" class="form-control" style="display: inline; width: auto;" type="text"/>
             <button id="btnSearch" class="btn btn-default">模糊查询</button>
+
+            <input type="radio" name="radio" value="0" checked>全显示
+            <input type="radio" name="radio" value="1">非下架的
+
         </div>
     </div>
 
@@ -127,6 +131,9 @@
         });
 
         $("#btnSearch").click(function(){
+
+            var radio = $("input[name='radio']:checked") .val();
+
             var endTime = $('#inputEndTime').val();
             var likeTeamName = $('#inputLikeTeamName').val();
             var likeCategoryName = $('#inputLikeCategoryName').val();
@@ -138,7 +145,8 @@
                 endTime: endTime,
                 likeTeamName: likeTeamName,
                 likeCategoryName: likeCategoryName,
-                nickname: nickname
+                nickname: nickname,
+                radio:radio
             },function(data){
                 layer.close(loadingIndex);
                 if(data && data.ret == 1){
@@ -171,6 +179,7 @@
 
                     var dateG = getDate(nowDate,-1);
                     $('#dateG').text(dateG);
+
                     setData(data);
                 } else {
                     admanager.showCommonDlg("错误", data.message);

@@ -25,15 +25,15 @@ import java.util.List;
 @WebServlet(name = "ReleasedDataStatistics", urlPatterns = {"/released_data_statistics/*"}, asyncSupported = true)
 public class ReleasedDataStatistics extends HttpServlet {
     private static final String[] filterApps = {"CleanV3", "WeatherV6", "PedometerV1", "PedometerV2", "BrowserV1", "AntivirusV3",
-    "WeatherV3", "WeatherV8", "WeatherV9", "WeatherV11", "AntivirusV1", "CleanerV1", "CleanerV2", "BatteryV2", "SecurityV3",
-    "BatteryV3", "SecurityV4", "BatteryV4", "Wifi", "Plusapplock", "ApplockV9", "ApplockV11", "VideoV9", "NewMusicV2",
-    "Callflash", "callflashV5", "CallflashV7", "CallflashV9", "RecorderV1", "VideoV7", "VideoV8", "ClockV1", "ClockV2", "FlashlightV35",
-    "VpnV2", "VpnV4", "VpnV5", "VpnV7", "VpnV8", "VpnV9", "BubbleV1", "HtSpiderV1", "999", "HtCollectionV1", "SudokuV3",
-    "SudokuV5", "pouplarsudoku", "SolitaireYang2", "SolitaireYang3", "BingoV3", "BingoV5", "SlotsV4", "WordsearchV3", "MahjongV1",
-    "CpVpn", "CpTimeback", "slimmer", "dressup", "CpAilsa", "CpBattery", "CpDressup", "Cptoyland", "SolitaireV15", "SolitaireV1",
-    "Solitairev12", "Solitairev13", "SolitaireV14", "SolitaireV15", "SlotsV2", "SlotsV5", "ReversiV1", "BarcodeV1", "BarcodeV4",
-    "AntivirusV9", "HoroscopeV2", "VpnV1", "VpnV3", "VpnV6", "HtSolitaireV1", "FreecellV1", "CpShuangkaiV2",
-    "CpShuangkaiV3", "CoinPusher", "BarcodeV2", "BarcodeV3"};
+            "WeatherV3", "WeatherV8", "WeatherV9", "WeatherV11", "AntivirusV1", "CleanerV1", "CleanerV2", "BatteryV2", "SecurityV3",
+            "BatteryV3", "SecurityV4", "BatteryV4", "Wifi", "Plusapplock", "ApplockV9", "ApplockV11", "VideoV9", "NewMusicV2",
+            "Callflash", "callflashV5", "CallflashV7", "CallflashV9", "RecorderV1", "VideoV7", "VideoV8", "ClockV1", "ClockV2", "FlashlightV35",
+            "VpnV2", "VpnV4", "VpnV5", "VpnV7", "VpnV8", "VpnV9", "BubbleV1", "HtSpiderV1", "999", "HtCollectionV1", "SudokuV3",
+            "SudokuV5", "pouplarsudoku", "SolitaireYang2", "SolitaireYang3", "BingoV3", "BingoV5", "SlotsV4", "WordsearchV3", "MahjongV1",
+            "CpVpn", "CpTimeback", "slimmer", "dressup", "CpAilsa", "CpBattery", "CpDressup", "Cptoyland", "SolitaireV15", "SolitaireV1",
+            "Solitairev12", "Solitairev13", "SolitaireV14", "SolitaireV15", "SlotsV2", "SlotsV5", "ReversiV1", "BarcodeV1", "BarcodeV4",
+            "AntivirusV9", "HoroscopeV2", "VpnV1", "VpnV3", "VpnV6", "HtSolitaireV1", "FreecellV1", "CpShuangkaiV2",
+            "CpShuangkaiV3", "CoinPusher", "BarcodeV2", "BarcodeV3"};
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         doPost(request, response);
@@ -51,27 +51,38 @@ public class ReleasedDataStatistics extends HttpServlet {
         likeTeamName = likeTeamName.trim();
         String nickname = request.getParameter("nickname");
         String endTime = request.getParameter("endTime");
+
+        String radio = request.getParameter("radio");
+
         if (path.matches("/query_released_data_statistics")) {
             JsonArray jsonArray = new JsonArray();
             try {
-                String sql = "select team_name,category_name,t.tag_name,anticipated_incoming,anticipated_revenue,t.user_id " +
+                String str = "";
+                //非下架显示拼接
+                if ("1".equals(radio)) {
+                    str = " and is_display = 1 ";
+                }
+
+                String sql = "select team_name,category_name,t.tag_name,anticipated_incoming,anticipated_revenue,t.user_id,is_display " +
                         "from web_ad_category_team ct, web_ad_tag_category tc, web_tag t " +
-                        "where tc.id = t.tag_category_id and ct.id = tc.team_id and is_statistics = 1 " +
+                        "where tc.id = t.tag_category_id and ct.id = tc.team_id and is_statistics = 1" + str +
                         (StringUtil.isEmpty(likeTeamName) ? " " : " and team_name like '%" + likeTeamName + "%' ") +
                         (StringUtil.isEmpty(likeCategoryName) ? " " : " and category_name like '%" + likeCategoryName + "%' ") +
                         " ORDER BY ct.id,tc.id,t.id ";
-                if(StringUtil.isNotEmpty(nickname)){
+                if (StringUtil.isNotEmpty(nickname)) {
                     JSObject one = DB.findOneBySql("select id from web_ad_login_user where nickname = '" + nickname + "'");
-                    if(one.hasObjectData()){
+                    if (one.hasObjectData()) {
                         long id = one.get("id");
                         sql = "select team_name,category_name,t.tag_name,anticipated_incoming,anticipated_revenue,t.user_id " +
                                 "from web_ad_category_team ct, web_ad_tag_category tc, web_tag t " +
-                                "where tc.id = t.tag_category_id and ct.id = tc.team_id and is_statistics = 1 and t.user_id = " + id +
+                                "where tc.id = t.tag_category_id and ct.id = tc.team_id and is_statistics = 1 and t.user_id = " + id + str +
                                 (StringUtil.isEmpty(likeTeamName) ? " " : " and team_name like '%" + likeTeamName + "%' ") +
                                 (StringUtil.isEmpty(likeCategoryName) ? " " : " and category_name like '%" + likeCategoryName + "%' ") +
                                 " ORDER BY ct.id,tc.id,t.id ";
                     }
                 }
+
+
                 List<JSObject> listTag = DB.findListBySql(sql);
                 if (listTag != null && listTag.size() > 0) {
                     for (JSObject t : listTag) {
@@ -94,10 +105,10 @@ public class ReleasedDataStatistics extends HttpServlet {
                             double anticipatedRevenue = t.get("anticipated_revenue");
                             int userId = t.get("user_id");
                             JSObject user = DB.findOneBySql("select nickname from web_ad_login_user where id = " + userId);
-                            if(user.hasObjectData()){
+                            if (user.hasObjectData()) {
                                 String currNickname = user.get("nickname");
                                 d.addProperty("nickname", currNickname);
-                            }else{
+                            } else {
                                 d.addProperty("nickname", "--");
                             }
                             d.addProperty("tag_name", tagName);
@@ -110,10 +121,10 @@ public class ReleasedDataStatistics extends HttpServlet {
                                 double totalIncoming = 0;
                                 String date = DateUtil.addDay(endTime, i, "yyyy-MM-dd");
                                 sql = "SELECT incoming,spend,revenue FROM web_ad_tag_released_data_statistics " +
-                                      "WHERE team_name = '" + teamName + "' AND date = '" + date +"' " +
-                                      "AND category_name = '" + categoryName + "' AND tag_name = '" + tagName + "'";
+                                        "WHERE team_name = '" + teamName + "' AND date = '" + date + "' " +
+                                        "AND category_name = '" + categoryName + "' AND tag_name = '" + tagName + "'";
                                 JSObject one = DB.findOneBySql(sql);
-                                if(one.hasObjectData()){
+                                if (one.hasObjectData()) {
                                     totalIncoming = one.get("incoming");
                                     totalSpend = one.get("spend");
                                     totalRevenue = one.get("revenue");
