@@ -98,9 +98,12 @@
     var now = new Date(new Date().getTime() - 86400 * 1000);
     $('#installedDate').val(now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + now.getDate());
 
+    var startDateLimit = new Date("2018-06-27");
     $('#installedDate').datetimepicker({
         minView: "month",
         format: 'yyyy-mm-dd',
+        startDate:startDateLimit,
+        endDate:new Date(),
         autoclose: true,
         todayBtn: true
     });
