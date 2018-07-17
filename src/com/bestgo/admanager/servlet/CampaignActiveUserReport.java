@@ -96,6 +96,7 @@ public class CampaignActiveUserReport extends HttpServlet {
             json.addProperty("ret",0);
             json.addProperty("message",e.getMessage());
         }
+        response.setCharacterEncoding("utf-8");
         response.getWriter().write(json.toString());
     }
 

@@ -35,7 +35,7 @@ public class UpdateAppImageVideoPathRel extends HttpServlet {
                     if ("fb_image_path".equals(configKey)){
                         String ParentPath = config.get("config_value"); // ParentPath 里是表格里存的根路径
                         ParentPath = ParentPath.replace("/",File.separator);
-                        ParentPath = ParentPath.replace("\\",File.separator);
+//                        ParentPath = ParentPath.replace("\\",File.separator);
                         String appParentPath = ParentPath + File.separatorChar + appName;
                         File file = new File(appParentPath);
                         List<String> PathList = Utils.ergodicImageDirectory(file, new ArrayList<>(), false);
@@ -44,7 +44,11 @@ public class UpdateAppImageVideoPathRel extends HttpServlet {
                             DB.delete("ad_app_image_path_rel").where(DB.filter().whereEqualTo("app_name", appName)).execute();
                             for(String imagePath : PathList){
                                 String imageRelativePath = imagePath.replace(ParentPath + File.separatorChar,"");
+
                                 try{
+                                    if (imageRelativePath.lastIndexOf("/") == imageRelativePath.length() -1) {
+                                        imageRelativePath = imageRelativePath.substring(0,imageRelativePath.length() -1);
+                                    }
                                     DB.insert("ad_app_image_path_rel")
                                             .put("app_name",appName)
                                             .put("image_path",imageRelativePath)
@@ -60,7 +64,7 @@ public class UpdateAppImageVideoPathRel extends HttpServlet {
                         // "fb_video_path"的情况
                         String ParentPath = config.get("config_value");
                         ParentPath = ParentPath.replace("/",File.separator);
-                        ParentPath = ParentPath.replace("\\",File.separator);
+//                        ParentPath = ParentPath.replace("\\",File.separator);
                         String appParentPath = ParentPath + File.separatorChar + appName;
                         File file = new File(appParentPath);
                         List<String> PathList = Utils.ergodicVideoDirectory(file, new ArrayList<>(), false);
@@ -69,6 +73,9 @@ public class UpdateAppImageVideoPathRel extends HttpServlet {
                             for(String videoPath : PathList){
                                 String videoRelativePath = videoPath.replace(ParentPath + File.separatorChar,"");
                                 try{
+                                    if (videoRelativePath.lastIndexOf("/") == videoRelativePath.length() - 1) {
+                                        videoRelativePath = videoRelativePath.substring(0,videoRelativePath.length() - 1);
+                                    }
                                     DB.insert("ad_app_video_path_rel")
                                             .put("app_name",appName)
                                             .put("video_path",videoRelativePath)
