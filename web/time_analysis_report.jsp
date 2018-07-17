@@ -10,21 +10,6 @@
     <title>时间分析报告</title>
 
     <style>
-        td.editable {
-
-        }
-        td.editable.checkbox {
-
-        }
-        td.changed {
-            background-color: #0f0;
-        }
-        #total_result.editable {
-            background-color: yellow;
-        }
-        .estimateResult {
-            color: red;
-        }
         .red {
             color: red;
         }
@@ -34,7 +19,27 @@
         .orange{
             color: orange;
         }
+        #metricTable td,th{
+            text-align:center;
+            max-width: 20em;
+            word-wrap:break-word;
+            text-overflow:ellipsis;
+            overflow:hidden;
+            white-space:nowrap;
+        }
+        #metricTable td:hover{
+            white-space:normal;
+            overflow:auto;
+        }
+        table th{
+            background-color:lightskyblue;
+        }
     </style>
+
+    <!-- DataTables -->
+    <link rel="stylesheet" href="http://money.uugame.info/admin_lte/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.4.1/css/buttons.dataTables.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/select/1.2.2/css/select.dataTables.min.css">
 </head>
 <body>
 
@@ -71,150 +76,45 @@
         <div class="panel-body" id="total_result">
         </div>
     </div>
-    <button id="line_chart" class="btn btn-link"><span class="glyphicon glyphicon-zoom-in"></span>折线图</button>
-    <canvas id="lineChart"></canvas>
-    <table class="table table-hover">
-        <thead id="result_header">
-        <tr>
-            <th>Date</th>
-            <th>Cost</th>
-            <th>PurchasedUser</th>
-            <th>Installed</th>
-            <th>Uninstalled</th>
-            <th>UninstalledRate</th>
-            <th>TotalUser</th>
-            <th>ActiveUser</th>
-            <th>Revenue</th>
-            <th>ECPM</th>
-            <th>CPA</th>
-            <th>CPA/ECPM</th>
-            <th>Incoming</th>
-            <th>EstimatedRevenue14</th>
-            <th>Revenue14/Cost</th>
-        </tr>
-        </thead>
-        <tbody id="results_body">
-        </tbody>
-    </table>
 
+    <div class="box box-default">
+        <div class="box-body" style="overflow-x: auto">
+            <table id="metricTable" class="table table-bordered table-hover" cellspacing="0" width="100%">
+                <thead id="result_header">
+                <tr>
+                    <th>Date</th>
+                    <th>Cost</th>
+                    <th>PurchasedUser</th>
+                    <th>Installed</th>
+                    <th>Uninstalled</th>
+                    <th>UninstalledRate</th>
+                    <th>TotalUser</th>
+                    <th>ActiveUser</th>
+                    <th>Revenue</th>
+                    <th>ECPM</th>
+                    <th>CPA</th>
+                    <th>CPA/ECPM</th>
+                    <th>Incoming</th>
+                    <th>EstimatedRevenue14</th>
+                    <th>Revenue14/Cost</th>
+                </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
 </div>
 
 <jsp:include page="loading_dialog.jsp"></jsp:include>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.js"></script>
+<!-- DataTables -->
+<script src="http://money.uugame.info/admin_lte/bower_components/datatables.net/js/jquery.dataTables.min.js"></script>
+<script src="http://money.uugame.info/admin_lte/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+<script type="text/javascript" language="javascript" src="https://cdn.datatables.net/buttons/1.4.1/js/dataTables.buttons.min.js"></script>
+<script type="text/javascript" language="javascript" src="https://cdn.datatables.net/select/1.2.2/js/dataTables.select.min.js"></script>
+<script type="text/javascript" src="http://money.uugame.info/admin_lte/plugins/Editor-1.6.5/js/dataTables.editor.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/buttons/1.4.2/js/buttons.html5.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/buttons/1.4.2/js/buttons.print.min.js"></script>
 
-<script>
-    $("canvas").hide();
-    $("#line_chart").click(function(){
-        $("canvas").show();
-        var Date_chart = [];
-        var Cost = [];
-        var PurchasedUser = [];
-        var Installed = [];
-        var Uninstalled = [];
-        var TotalUser = [];
-        var ActiveUser = [];
-        var Revenue = [];
-        var ECPM = [];
-        var CPA = [];
-        var CPA_ECPM = [];
-        var Incoming = [];
-        var EstimatedRevenue14 = [];
-        var Revenue14_Cost = [];
-        var trArray = $("#results_body").children("tr");
-        trArray.each(function(){
-            var theTr = $(this);
-            Date_chart.push(theTr.children("td:eq(0)").text());
-            Cost.push(theTr.children("td:eq(1)").text());
-            PurchasedUser.push(theTr.children("td:eq(2)").text());
-            Installed.push(theTr.children("td:eq(3)").text());
-            Uninstalled.push(theTr.children("td:eq(4)").text());
-            TotalUser.push(theTr.children("td:eq(5)").text());
-            ActiveUser.push(theTr.children("td:eq(6)").text());
-            Revenue.push(theTr.children("td:eq(7)").text());
-            ECPM.push(theTr.children("td:eq(8)").text());
-            CPA.push(theTr.children("td:eq(9)").text());
-            CPA_ECPM.push(theTr.children("td:eq(10)").text());
-            Incoming.push(theTr.children("td:eq(11)").text());
-            EstimatedRevenue14.push(theTr.children("td:eq(12)").text());
-            Revenue14_Cost.push(theTr.children("td:eq(13)").text());
-        });
-        var chrt = $("canvas");
-        var chart = new Chart(chrt, {
-            type: "line",
-            data: {
-                datasets: [{
-                    label: 'Cost',
-                    data: Cost,
-                    borderColor: "rgba(160,82,45,1)",
-                    backgroundColor:"rgba(160,82,45,0.1)"
-                }, {
-                    label: 'PurchasedUser',
-                    data: PurchasedUser,
-                    borderColor: "rgba(238,0,0,1)",
-                    backgroundColor:"rgba(238,0,0,0.1)"
-                }, {
-                    label: 'Installed',
-                    data: Installed,
-                    borderColor:"rgba(142,142,56,1)",
-                    backgroundColor:"rgba(142,142,56,0.1)"
-                }, {
-                    label: 'Uninstalled',
-                    data: Uninstalled,
-                    borderColor:'rgba(124,252,0,1)',
-                    backgroundColor:"rgba(124,252,0,0.1)"
-                },{
-                    label: 'TotalUser',
-                    data: TotalUser,
-                    borderColor:'rgba(0,0,170,1)',
-                    backgroundColor:"rgba(0,0,170,0.1)"
-                },{
-                    label: 'ActiveUser',
-                    data: ActiveUser,
-                    borderColor:'rgba(99,184,255,1)',
-                    backgroundColor:"rgba(99,184,255,0.1)"
-                },{
-                    label: 'Revenue',
-                    data: Revenue,
-                    borderColor:'rgba(122,55,139,1)',
-                    backgroundColor:"rgba(122,55,139,0.1)"
-                },{
-                    label: 'ECPM',
-                    data: ECPM,
-                    borderColor:'rgba(171,130,255,1)',
-                    backgroundColor:"rgba(171,130,255,0.1)"
-                },{
-                    label: 'CPA',
-                    data: CPA,
-                    borderColor:'rgba(110,110,110,1)',
-                    backgroundColor:"rgba(110,110,110,0.1)"
-                },{
-                    label: 'CPA/ECPM',
-                    data: CPA_ECPM,
-                    borderColor:'rgba(124,205,124,1)',
-                    backgroundColor:"rgba(124,205,124,0.1)"
-                },{
-                    label: 'Incoming',
-                    data: Incoming,
-                    borderColor:'rgba(205,173,0,1)',
-                    backgroundColor:"rgba(205,173,0,0.1)"
-                },{
-                    label: 'EstimatedRevenue14',
-                    data: EstimatedRevenue14,
-                    borderColor:'rgba(255,215,0,1)',
-                    backgroundColor:"rgba(255,215,0,0.1)"
-                },{
-                    label: 'Revenue14/Cost',
-                    data: Revenue14_Cost,
-                    borderColor:'rgba(160,82,45,1)',
-                    backgroundColor:"rgba(255,215,0,0.1)"
-                }],
-                labels: Date_chart
-            },
-        });
-    });
-
-</script>
 <script>
     $.post("time_analysis_report/setOption",function(data){
         var options = new Array();
@@ -251,178 +151,122 @@
         source: data   //label属性显示在建议菜单里
     });
 
+    //最主要的事件
     $("#btnSearch").click(function(){
-        $("canvas").hide();
-        var query = $("#inputSearch").val();
+        var tagName = $("#inputSearch").val();
         var country_filter = $("#country_filter").val();
         var startTime = $('#inputStartTime').val();
         var endTime = $('#inputEndTime').val();
-        $.post('time_analysis_report/time_query', {   //用于排序
-            tagName: query,
-            startTime: startTime,
-            endTime: endTime,
-            country_filter: country_filter
-        },function(data){
-            if(data && data.ret == 1){
-                if(!country_filter){
-                    $('#result_header').html("<tr><th>Date<button sorterId=\"1032\" class=\"btn btn-link glyphicon glyphicon-arrow-down\"></button></th>"+
-                        "<th>Cost<button sorterId=\"1031\" class=\"btn btn-link glyphicon glyphicon-arrow-down\"></button></th>" +
-                        "<th>PurchasedUser<button sorterId=\"1033\" class=\"btn btn-link glyphicon glyphicon-arrow-down\"></button></th>" +
-                        "<th>Installed<button sorterId=\"1034\" class=\"btn btn-link glyphicon glyphicon-arrow-down\"></button></th>" +
-                        "<th>Uninstalled<button sorterId=\"1035\" class=\"btn btn-link glyphicon glyphicon-arrow-down\"></button></th>" +
-                        "<th>UninstalledRate</th><th>TotalUser<button sorterId=\"1037\" class=\"btn btn-link glyphicon glyphicon-arrow-down\"></button></th>" +
-                        "<th>ActiveUser<button sorterId=\"1038\" class=\"btn btn-link glyphicon glyphicon-arrow-down\"></button></th>" +
-                        "<th>Revenue<button sorterId=\"1039\" class=\"btn btn-link glyphicon glyphicon-arrow-down\"></button></th>" +
-                        "<th>ECPM<button sorterId=\"1040\" class=\"btn btn-link glyphicon glyphicon-arrow-down\"></button></th>" +
-                        "<th>CPA<button sorterId=\"1041\" class=\"btn btn-link glyphicon glyphicon-arrow-down\"></button></th>" +
-                        "<th>CPA/ECPM</th>" +
-                        "<th>Incoming<button sorterId=\"1042\" class=\"btn btn-link glyphicon glyphicon-arrow-down\"></button></th>" +
-                        "<th>EstimatedRevenue14<button sorterId=\"1044\" class=\"btn btn-link glyphicon glyphicon-arrow-down\"></button></th>" +
-                        "<th>Revenue14/Cost<button sorterId=\"1045\" class=\"btn btn-link glyphicon glyphicon-arrow-down\"></button></th>");
-                }else{
-                    $('#result_header').html("<tr><th>Date<button sorterId=\"1032\" class=\"btn btn-link glyphicon glyphicon-arrow-down\"></button></th>"+
-                        "<th>Cost<button sorterId=\"1031\" class=\"btn btn-link glyphicon glyphicon-arrow-down\"></button></th>" +
-                        "<th>PurchasedUser<button sorterId=\"1033\" class=\"btn btn-link glyphicon glyphicon-arrow-down\"></button></th>" +
-                        "<th>Installed<button sorterId=\"1034\" class=\"btn btn-link glyphicon glyphicon-arrow-down\"></button></th>" +
-                        "<th>Uninstalled<button sorterId=\"1035\" class=\"btn btn-link glyphicon glyphicon-arrow-down\"></button></th>" +
-                        "<th>UninstalledRate</th><th>TotalUser<button sorterId=\"1037\" class=\"btn btn-link glyphicon glyphicon-arrow-down\"></button></th>" +
-                        "<th>ActiveUser<button sorterId=\"1038\" class=\"btn btn-link glyphicon glyphicon-arrow-down\"></button></th>" +
-                        "<th>Revenue<button sorterId=\"1039\" class=\"btn btn-link glyphicon glyphicon-arrow-down\"></button></th>" +
-                        "<th>PI</th>"  +
-                        "<th>ECPM<button sorterId=\"1040\" class=\"btn btn-link glyphicon glyphicon-arrow-down\"></button></th>" +
-                        "<th>CPA<button sorterId=\"1041\" class=\"btn btn-link glyphicon glyphicon-arrow-down\"></button></th>" +
-                        "<th>ACPA</th>"+
-                        "<th>CPA/ECPM</th>" +
-                        "<th>Incoming<button sorterId=\"1042\" class=\"btn btn-link glyphicon glyphicon-arrow-down\"></button></th>" +
-                        "<th>EstimatedRevenue14<button sorterId=\"1044\" class=\"btn btn-link glyphicon glyphicon-arrow-down\"></button></th>" +
-                        "<th>Revenue14/Cost<button sorterId=\"1045\" class=\"btn btn-link glyphicon glyphicon-arrow-down\"></button></th>");
-                }
-                setData(data,query,country_filter);  //这里是往表格里添加项目，并设置某三列的颜色
-                var str = "Cost: " + data.total_cost + "&nbsp;&nbsp;&nbsp;&nbsp;PuserchaedUser: " + data.total_puserchaed_user +
-                    "&nbsp;&nbsp;&nbsp;&nbsp;CPA: " + data.total_cpa + "&nbsp;&nbsp;&nbsp;&nbsp;Revenue: " + data.total_revenue +
-                    "&nbsp;&nbsp;&nbsp;&nbsp;Es14: " + data.total_es14 + "&nbsp;&nbsp;&nbsp;&nbsp;Es14/Cost: " + data.es14_dev_cost;
-                str += "<br/><span class='estimateResult'></span>";
-                $('#total_result').html(str);
-                $('#total_result').removeClass("editable");
-            } else {
-                admanager.showCommonDlg("错误", data.message);
-            }
-        },'json');
-    });
 
-    //排序
-    $("#result_header").on('click',"button",function(){
-        var table = $(this).parents('table').eq(0);
-        if ($(this).hasClass("glyphicon-arrow-up")) {
-            $(this).removeClass("glyphicon-arrow-up");
-            $(this).addClass("glyphicon-arrow-down");
-        } else {
-            $(this).removeClass("glyphicon-arrow-down");
-            $(this).addClass("glyphicon-arrow-up");
+        if ($.fn.DataTable.isDataTable("#metricTable")) {
+            $('#metricTable').DataTable().clear().destroy();
         }
-        var rows = table.find('tr:gt(0)').toArray().sort(comparer($(this).parents("th").index()));
-        this.asc = !this.asc;
-        if (!this.asc){rows = rows.reverse();}
-        table.children('tbody').empty().html(rows);
+
+        if(!country_filter){
+            $('#result_header').html("<tr><th>Date</th><th>Cost</th><th>PurchasedUser</th><th>Installed</th><th>Uninstalled</th>" +
+                "<th>UninstalledRate</th><th>TotalUser</th><th>ActiveUser</th><th>Revenue</th><th>ECPM</th><th>CPA</th>" +
+                "<th>CPA/ECPM</th><th>Incoming</th><th>EstimatedRevenue14</th><th>Revenue14/Cost</th>");
+        }else{
+            $('#result_header').html("<tr><th>Date</th><th>Cost</th><th>PurchasedUser</th><th>Installed</th><th>Uninstalled</th>" +
+                "<th>UninstalledRate</th><th>TotalUser</th><th>ActiveUser</th><th>Revenue</th><th>PI</th><th>ECPM</th><th>CPA</th>" +
+                "<th>ACPA</th><th>CPA/ECPM</th><th>Incoming</th><th>EstimatedRevenue14</th><th>Revenue14/Cost</th>");
+        }
+        setData(tagName,country_filter,startTime,endTime);
+
     });
-    function comparer(index) {
-        return function(a, b) {
-            var valA = getCellValue(a, index), valB = getCellValue(b, index);
-            return $.isNumeric(valA) && $.isNumeric(valB) ?
-                valA - valB : valA.localeCompare(valB);
-        };
-    }
-    function getCellValue(row, index){
-        return $(row).children('td').eq(index).text();
-    }
 
-    // function bindSortOp() {    //在后端排序
-    //     $('.sorter').click(function() {
-    //         var sorterId = $(this).attr('sorterId');
-    //         sorterId = parseInt(sorterId);
-    //         if ($(this).hasClass("glyphicon-arrow-down")) {
-    //             $(this).removeClass("glyphicon-arrow-down");
-    //             $(this).addClass("glyphicon-arrow-up");
-    //             sorterId -= 1000; //便于在升序和降序间切换
-    //         } else {
-    //             $(this).removeClass("glyphicon-arrow-up");
-    //             $(this).addClass("glyphicon-arrow-down");
-    //         }
-    //
-    //         var query = $("#inputSearch").val();
-    //         var startTime = $('#inputStartTime').val();
-    //         var endTime = $('#inputEndTime').val();
-    //         var country_filter = $("#country_filter").val();
-    //         $.post('time_analysis_report/time_query', {
-    //             tagName: query,   //query是在标签一栏输入的应用名(实操时候用了输入才会触发的下拉列表)
-    //             startTime: startTime,
-    //             endTime: endTime,
-    //             sorterId: sorterId,
-    //             country_filter: country_filter
-    //         },function(data){
-    //             if (data && data.ret == 1) {
-    //                 setData(data,query,country_filter);
-    //                 var str = "Cost: " + data.total_cost + "&nbsp;&nbsp;&nbsp;&nbsp;PuserchaedUser: " + data.total_puserchaed_user +  // &nbsp; 在html语言里表示空格
-    //                     "&nbsp;&nbsp;&nbsp;&nbsp;CPA: " + data.total_cpa + "&nbsp;&nbsp;&nbsp;&nbsp;Revenue: " + data.total_revenue +
-    //                     "&nbsp;&nbsp;&nbsp;&nbsp;Es14: " + data.total_es14 + "&nbsp;&nbsp;&nbsp;&nbsp;Es14/Cost: " + data.es14_dev_cost;
-    //
-    //                 str += "<br/><span class='estimateResult'></span>"
-    //                 $('#total_result').removeClass("editable");  //移除 类editable
-    //                 $('#total_result').html(str); //把选中元素的内容替换成 str：结果是页面动态出现了一行字
-    //             } else {
-    //                 admanager.showCommonDlg("错误", data.message);
-    //             }
-    //         }, 'json');
-    //     });
-    // }
+    //这里输入的 data 是一个array
+    function setData(tagName,country_filter,startTime,endTime) {
+        var UninstalledRate_idx = $("th:contains('UninstalledRate')").index();
+        var CPA_ECPM_idx = $("th:contains('CPA/ECPM')").index();
 
-    function setData(data,tagName,countryFilter) {
-        $('#results_body > tr').remove();  //2018-2-9：多层级选择器
-        var arr = data.array;   //array是从后台取出来的原始、未改动数据
-        var len = arr.length;
-        var one;
-        //底下这个for循环是用于往数组array的其中三项添加属性以显示不同颜色,并在表格里添加数据
-        for (var i = 0; i < len; i++) {
-            one = arr[i];  //每个数组成员都是一个JS对象
+        var columns;
+        //jQuery.dateTable插件回显
+        if(!country_filter){
+            columns = [{data:"date"},{data:"costs"},{data:"purchased_users"},{data:"installed"},{data:"uninstalled"},
+                {data:"uninstalled_rate"},{data:"users"},{data:"active_users"},{data:"revenues"},{data:"ecpm"},{data:"cpa"},
+                {data:"cpa_dev_ecpm"},{data:"incoming"},{data:"estimated_revenues"},{data:"estimated_revenues_dev_cost"}];
+        }else{
+            columns = [{data:"date"},{data:"costs"},{data:"purchased_users"},{data:"installed"},{data:"uninstalled"},
+                {data:"uninstalled_rate"},{data:"users"},{data:"active_users"},{data:"revenues"},{data:"pi"},{data:"ecpm"},{data:"cpa"},
+                {data:"a_cpa"},{data:"cpa_dev_ecpm"},{data:"incoming"},{data:"estimated_revenues"},{data:"estimated_revenues_dev_cost"}];
+        }
 
-            var tr = $('<tr></tr>');   //创建一个空的行元素：$("<></>")
-            var keyset = [];
-            if(countryFilter){
-                keyset = ["date","costs", "purchased_users", "installed",
-                    "uninstalled", "uninstalled_rate", "users", "active_users", "revenues","pi",
-                    "ecpm","cpa","a_cpa","cpa_dev_ecpm", "incoming","estimated_revenues","estimated_revenues_dev_cost"];
-            }else{
-                keyset = ["date","costs", "purchased_users", "installed",
-                    "uninstalled", "uninstalled_rate", "users", "active_users", "revenues",
-                    "ecpm","cpa","cpa_dev_ecpm", "incoming","estimated_revenues","estimated_revenues_dev_cost"];
-            }
+        $('#metricTable').DataTable({
+            destroy:true,
+            ordering: true,
+            processing: true,
+            serverSide: true,
+            searching: false,
+            pageLength: 20,
+            lengthMenu: [[20,25,30,35,50,100],[20,25,30,35,50,100]],
+            columnDefs: [
+                { "orderable": false, "targets": UninstalledRate_idx },
+                { "orderable": false, "targets": CPA_ECPM_idx }
+            ],
+            ajax: function (data, callback, settings) {
+                var postData = {};
+                postData.tagName = tagName;
+                postData.country_filter = country_filter;
+                postData.startTime = startTime;
+                postData.endTime = endTime;
+                postData.page_index = data.start / data.length;
+                postData.page_size = data.length;
+                postData.order = data.order[0].column + (data.order[0].dir == 'asc' ? 1000 : 0);
 
-            for (var j = 0; j < keyset.length; j++) {
-                var r = one[keyset[j]]; //得到集里的某个键的value
-                //下面先判是否有空键
-                if(r === null || r === ""){
-                    var td = $('<td></td>');
-                    td.text(" -- ");
-                    tr.append(td);
-                    continue;
-                }
-                var td = $('<td></td>');
-                if('incoming' == keyset[j]){
-                    if(r <0){
-                        td.addClass("red");
-                    }''
-                }else if('estimated_revenues_dev_cost' == keyset[j]){
-                    if(r > data.es14_dev_cost){
-                        td.addClass("green");
-                    }else if(r < data.es14_dev_cost){
-                        td.addClass("orange");
+                //使用ajax作为数据源，但内部函数使用回调给dataTable的参数赋值
+                $.post("time_analysis_report/time_query", postData, function (data) {
+                    if (data && data.ret == 1) {
+                        var list = [];
+                        for (var i = 0; i < data.array.length; i++) {
+                            list.push(data.array[i]);
+                        }
+                        callback(
+                            {
+                                recordsTotal: data.total,
+                                recordsFiltered: data.total,
+                                data: list
+                            }
+                        );
+                        var str = "Cost: " + data.total_cost + "&nbsp;&nbsp;&nbsp;&nbsp;PuserchaedUser: " + data.total_puserchaed_user +
+                            "&nbsp;&nbsp;&nbsp;&nbsp;CPA: " + data.total_cpa + "&nbsp;&nbsp;&nbsp;&nbsp;Revenue: " + data.total_revenue +
+                            "&nbsp;&nbsp;&nbsp;&nbsp;Es14: " + data.total_es14 + "&nbsp;&nbsp;&nbsp;&nbsp;Es14/Cost: " + data.es14_dev_cost;
+                        $('#total_result').html(str);
+                        //这里加入标色（红色，绿色，橙色）
+                        marking(data.es14_dev_cost);
+                    } else {
+                        alert(data.message);
                     }
-                }
-                td.text(r);  //把某键的值以文本形式返回
-                tr.append(td);
+                }, "json");
+            },
+            columns: columns,
+            select: true,
+            dom: 'Blfrtip',
+            buttons: [{
+                extend: 'collection',
+                text: 'Export',
+                buttons: ['copy', 'excel', 'csv', 'pdf', 'print']
+            }]
+        });
+    }
+
+    function marking(es14_dev_cost){
+        var IncmIdx = $("th:contains('Incoming')").index();
+        var RvDevCstIdx = $("th:contains('Revenue14/Cost')").index();
+        var tbodyTr = $("#metricTable tbody tr");
+        //遍历渲染
+        tbodyTr.each(function(idx,el){
+            var Incm = parseInt($(el).find("td:eq("+IncmIdx+")").text().toString());
+            if( Incm < 0){
+                $(el).find("td:eq("+IncmIdx+")").addClass("red");
             }
-            $('#results_body').append(tr);
-        }
+            var RvDevCst = parseFloat($(el).find("td:eq("+RvDevCstIdx+")").text().toString());
+            if(RvDevCst < parseFloat(es14_dev_cost)){
+                $(el).find("td:eq("+RvDevCstIdx+")").addClass("orange");
+            }else{
+                $(el).find("td:eq("+RvDevCstIdx+")").addClass("green");
+            }
+        });
     }
 </script>
 </body>

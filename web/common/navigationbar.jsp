@@ -32,7 +32,7 @@
 <ul class="nav nav-pills" style="font-weight:bold;font-size:15px">
 
     <%-- 下标从0开始 --%>
-        <li role="presentation"><a href="index.jsp">首页</a></li>
+        <li role="presentation"><a href="index3.jsp">首页</a></li>
         <li role="presentation"><a href="campaigns_create.jsp">创建广告</a></li>
 
         <%-- 2 --%>
@@ -84,7 +84,7 @@
 </ul>
 
 <script>
-    var privilege = document.getElementById("type1");
+    /*var privilege = document.getElementById("type1");
     if(privilege){
         $.post("login/applicationCheck",function(data){
             if(data && (data.count > 0)){
@@ -94,6 +94,6 @@
         },"json");
         privilege.setAttribute("href","system_management.jsp");
         privilege.setAttribute("target","_blank");
-    }
+    }*/
 </script>
 
