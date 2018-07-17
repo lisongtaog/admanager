@@ -14,7 +14,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 
 @WebServlet(name="UpdateAppImageVideoPathRel",urlPatterns = "/update_app_material_path_rel")
@@ -39,7 +38,7 @@ public class UpdateAppImageVideoPathRel extends HttpServlet {
                         ParentPath = ParentPath.replace("\\",File.separator);
                         String appParentPath = ParentPath + File.separatorChar + appName;
                         File file = new File(appParentPath);
-                        List<String> PathList = Utils.ergodicImageDirectory(file, new ArrayList<>(), false,true);
+                        List<String> PathList = Utils.ergodicImageDirectory(file, new ArrayList<>(), false);
 
                         if(PathList.size() > 0){
                             DB.delete("ad_app_image_path_rel").where(DB.filter().whereEqualTo("app_name", appName)).execute();
@@ -60,31 +59,20 @@ public class UpdateAppImageVideoPathRel extends HttpServlet {
                     }else{
                         // "fb_video_path"的情况
                         String ParentPath = config.get("config_value");
-                        File file = new File(ParentPath);
-                        List<String> PathList = Utils.ergodicDirectory(file, new ArrayList<>(), false,true);
+                        ParentPath = ParentPath.replace("/",File.separator);
+                        ParentPath = ParentPath.replace("\\",File.separator);
+                        String appParentPath = ParentPath + File.separatorChar + appName;
+                        File file = new File(appParentPath);
+                        List<String> PathList = Utils.ergodicVideoDirectory(file, new ArrayList<>(), false);
                         if(PathList.size() > 0){
                             DB.delete("ad_app_video_path_rel").where(DB.filter().whereEqualTo("app_name", appName)).execute();
-                            //截取，判视频，去重
-                            HashSet<String> set = new HashSet<>();
                             for(String videoPath : PathList){
-                                videoPath = videoPath.replace(ParentPath + "/","");
-                                int i = videoPath.lastIndexOf("/");
-                                if (i > 0) {
-                                    videoPath =  videoPath.substring(0,videoPath.lastIndexOf("/"));
-                                    set.add(videoPath);
-                                }
-                            }
-                            for(String path:set){
+                                String videoRelativePath = videoPath.replace(ParentPath + File.separatorChar,"");
                                 try{
-                                    if(path.startsWith(appName)){
-                                        boolean execute = DB.insert("ad_app_video_path_rel")
-                                                .put("app_name", appName)
-                                                .put("video_path", path)
-                                                .execute();
-                                        if(!execute){
-                                            err++;
-                                        }
-                                    }
+                                    DB.insert("ad_app_video_path_rel")
+                                            .put("app_name",appName)
+                                            .put("video_path",videoRelativePath)
+                                            .execute();
                                 }catch(Exception e){
                                     message = e.getMessage();
                                     err++;
