@@ -1,8 +1,5 @@
 package com.bestgo.admanager.servlet;
 
-import com.bestgo.admanager.utils.DateUtil;
-import com.bestgo.admanager.utils.NumberUtil;
-import com.bestgo.admanager.utils.Utils;
 import com.bestgo.common.database.services.DB;
 import com.bestgo.common.database.utils.JSObject;
 import com.google.gson.JsonArray;
@@ -14,18 +11,15 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Author: Xixi
  * Date: 7/12/2018
- * Desc: 按标签和安装日期查询活跃用户数量
+ * Desc: 按标签和安装日期查询广告收益
  */
-@WebServlet(name = "CampaignActiveUserReport", urlPatterns = {"/campaign_active_user_report/*"})
-public class CampaignActiveUserReport extends HttpServlet {
+@WebServlet(name = "CampaignImpressionsRevenueAnalysis", urlPatterns = {"/campaign_impressions_revenue_report/*"})
+public class CampaignImpressionsRevenueAnalysis extends HttpServlet {
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         doPost(request, response);
@@ -55,14 +49,45 @@ public class CampaignActiveUserReport extends HttpServlet {
                 " order by 19_day "," order by 20_day "
         };
 
-        //从视图里查询
         try{
             JsonArray array = new JsonArray();
             String sql = "SELECT id FROM web_tag WHERE tag_name = '"+ tagName + "'";
             long tagId = DB.findOneBySql(sql).get("id");
-            sql = "SELECT campaign_id,campaign_name,1_day,2_day,3_day,4_day,5_day,6_day,7_day,8_day,9_day,10_day,11_day,12_day,13_day,14_day," +
-                    "15_day,16_day,17_day,18_day,19_day,20_day,country_name FROM view_active_user WHERE tag_id = "+tagId+
-                    " AND installed_date = '"+ installedDate + "'";
+            sql = "SELECT m.installed_date,m.campaign_id,m.campaign_name,m.tag_id,m.country_code,m.country_name,\n" +
+                    "m.1_day,m.2_day,m.3_day,m.4_day,m.5_day,m.6_day,m.7_day,m.8_day,m.9_day,m.10_day,m.11_day,m.12_day,m.13_day,m.14_day,m.15_day,m.16_day,m.17_day,m.18_day,m.19_day,m.20_day\n" +
+                    "FROM\n" +
+                    "(\n" +
+                    "\tSELECT v.installed_date,v.campaign_id,v.campaign_name,v.tag_id,v.country_code,v.country_name,\n" +
+                    "\tCASE WHEN DATEDIFF(event_date,installed_date)=0 THEN revenue ELSE 0 END  AS 1_day,\n" +
+                    "\tCASE WHEN DATEDIFF(event_date,installed_date)=1 THEN revenue ELSE 0 END  AS 2_day,\n" +
+                    "\tCASE WHEN DATEDIFF(event_date,installed_date)=2 THEN revenue ELSE 0 END  AS 3_day,\n" +
+                    "\tCASE WHEN DATEDIFF(event_date,installed_date)=3 THEN revenue ELSE 0 END  AS 4_day,\n" +
+                    "\tCASE WHEN DATEDIFF(event_date,installed_date)=4 THEN revenue ELSE 0 END  AS 5_day,\n" +
+                    "\tCASE WHEN DATEDIFF(event_date,installed_date)=5 THEN revenue ELSE 0 END  AS 6_day,\n" +
+                    "\tCASE WHEN DATEDIFF(event_date,installed_date)=6 THEN revenue ELSE 0 END  AS 7_day,\n" +
+                    "\tCASE WHEN DATEDIFF(event_date,installed_date)=7 THEN revenue ELSE 0 END  AS 8_day,\n" +
+                    "\tCASE WHEN DATEDIFF(event_date,installed_date)=8 THEN revenue ELSE 0 END  AS 9_day,\n" +
+                    "\tCASE WHEN DATEDIFF(event_date,installed_date)=9 THEN revenue ELSE 0 END  AS 10_day,\n" +
+                    "\tCASE WHEN DATEDIFF(event_date,installed_date)=10 THEN revenue ELSE 0 END  AS 11_day,\n" +
+                    "\tCASE WHEN DATEDIFF(event_date,installed_date)=11 THEN revenue ELSE 0 END  AS 12_day,\n" +
+                    "\tCASE WHEN DATEDIFF(event_date,installed_date)=12 THEN revenue ELSE 0 END  AS 13_day,\n" +
+                    "\tCASE WHEN DATEDIFF(event_date,installed_date)=13 THEN revenue ELSE 0 END  AS 14_day,\n" +
+                    "\tCASE WHEN DATEDIFF(event_date,installed_date)=14 THEN revenue ELSE 0 END  AS 15_day,\n" +
+                    "\tCASE WHEN DATEDIFF(event_date,installed_date)=15 THEN revenue ELSE 0 END  AS 16_day,\n" +
+                    "\tCASE WHEN DATEDIFF(event_date,installed_date)=16 THEN revenue ELSE 0 END  AS 17_day,\n" +
+                    "\tCASE WHEN DATEDIFF(event_date,installed_date)=17 THEN revenue ELSE 0 END  AS 18_day,\n" +
+                    "\tCASE WHEN DATEDIFF(event_date,installed_date)=18 THEN revenue ELSE 0 END  AS 19_day,\n" +
+                    "\tCASE WHEN DATEDIFF(event_date,installed_date)=19 THEN revenue ELSE 0 END  AS 20_day\n" +
+                    "\tfrom\n" +
+                    "\t(\n" +
+                    "\t\t\tSELECT d.installed_date,d.event_date,campaign_id,d.campaign_name,d.tag_id,d.country_code,c.country_name,\n" +
+                    "\t\t\tSUM(impressions) AS impressions,SUM(revenue) AS revenue\n" +
+                    "\t\t\tFROM web_ad_tag_campaign_impressions_revenue_history_admob d,app_country_code_dict c WHERE d.country_code = c.country_code\n" +
+                    "\t\t\tGROUP BY installed_date,event_date,tag_id,campaign_id,campaign_name,country_code\n" +
+                    "\t) v\n" +
+                    ") m";
+            sql += " WHERE tag_id = "+tagId+" AND installed_date = '"+ installedDate + "'" ;
+
             int count = DB.findListBySql(sql).size();
             if (order < orders.length) {//单列排序
                 sql += orders[order] + (desc ? " desc" : "");

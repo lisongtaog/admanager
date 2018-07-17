@@ -6,7 +6,7 @@
 <%@include file="common/rootBase.jsp"%>
 <html>
 <head>
-    <title>活跃用户报告</title>
+    <title>广告收益报告</title>
 
     <%--配合原来的<table>使用的--%>
     <style>
@@ -120,14 +120,9 @@
         setData(inputTag,installedDate);
     });
 
-    //计算两个日期的相差天数
-    function Date_Diff(date,dateTarget){
-        var diff = parseInt(Math.abs(dateTarget.getTime()- date.getTime())/1000/3600/24);
-        return diff;
-    }
-
     //jQuery.dateTable插件回显
     function setData(tagName,installedDate){
+        // columns：与后台返回数据的list键名一致
         var columns = [
             {data:"campaign_id"},{data:"campaign_name"},{data:"country_name"},{data:"1_day"},
             {data:"2_day"},{data:"3_day"}, {data:"4_day"},{data:"5_day"},{data:"6_day"},{data:"7_day"},
@@ -154,7 +149,7 @@
                 postData.page_size = data.length;
                 postData.order = data.order[0].column + (data.order[0].dir == 'asc' ? 1000 : 0);
 
-                $.post("campaign_active_user_report", postData, function (data) {
+                $.post("campaign_impressions_revenue_report", postData, function (data) {
                     if (data && data.ret == 1) {
                         var list = [];
                         for (var i = 0; i < data.data.length; i++) {
