@@ -46,6 +46,7 @@
                 <li><a href="time_analysis_report.jsp">时间分析报告</a></li>
                 <li><a href="released_data_statistics.jsp">投放数据统计</a></li>
                 <li><a href="campaign_active_user_analysis.jsp">活跃用户报告</a></li>
+                <li><a href="campaign_impressions_revenue_analysis.jsp">广告收益报告</a></li>
                 <li><a href="material_analysis_report.jsp">素材分析报告</a></li>
             </ul>
         </li>
