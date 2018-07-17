@@ -1086,22 +1086,24 @@ function bindQueryZero() {
 //由“标签”刷新路径
 $("#updateAppMaterialPath").click(function(){
     var app_name_for_path = $("#inputSearch").val();
-    if(app_name_for_path){
-        $("#updateAppMaterialPath").prop("disabled",true);
-        $.post("update_app_material_path_rel",{
-            app_name:app_name_for_path
-        },function(data){
-            $("#updateAppMaterialPath").prop("disabled",false);
-            if(data.err==0){
-                admanager.showCommonDlg("提示",data.message);
-                setTimeout(function(){
-                    $("#common_message_dialog").modal("hide");
-                },1500);
-            }else{
-                admanager.showCommonDlg("提示",data.message);
-            }
-        },"json");
+    if(!app_name_for_path || ""===app_name_for_path){
+        admanager.showCommonDlg("提示","标签为必录信息!");
+        return;
     }
+    $("#updateAppMaterialPath").prop("disabled",true);
+    $.post("update_app_material_path_rel",{
+        app_name:app_name_for_path
+    },function(data){
+        if(data.err==0){
+            admanager.showCommonDlg("提示",data.message);
+            setTimeout(function(){
+                $("#common_message_dialog").modal("hide");
+            },1500);
+        }else{
+            admanager.showCommonDlg("提示",data.message);
+        }
+        $("#updateAppMaterialPath").prop("disabled",false);
+    },"json");
 });
 
 init();
