@@ -5,7 +5,6 @@
   Desc: 共有的导航栏部分
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-
 <div id="navbar" class="navbar-collapse collapse">
     <ul class="nav navbar-nav navbar-right">
         <li style="padding-top:8px;">
@@ -17,7 +16,7 @@
                     <li><a href="#"><i class="glyphicon glyphicon-cog"></i> 个人设置</a></li>
                     <li><a href="#" id="type${sessionScope.loginUser.userType}"><i class="glyphicon glyphicon-comment"></i> 消息</a></li>
                     <li class="divider"></li>
-                    <li><a href="login.jsp"><i class="glyphicon glyphicon-off"></i> 退出系统</a></li>
+                    <li><a href="login/logout"><i class="glyphicon glyphicon-off"></i> 退出系统</a></li>
                 </ul>
             </div>
         </li>

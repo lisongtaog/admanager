@@ -96,6 +96,11 @@ public class Login extends HttpServlet {
                     json.addProperty("message",e.getMessage());
                     response.getWriter().write(json.toString());
                 }
+            }else if(path.startsWith("/logout")){
+                HttpSession session = request.getSession();
+                session.invalidate();
+                session = null;
+                response.sendRedirect(request.getContextPath()+"/login.jsp");
             }
         }
     }
