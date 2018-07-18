@@ -83,8 +83,8 @@
             <input id="inputNickname" class="form-control" style="display: inline; width: auto;" type="text"/>
             <button id="btnSearch" class="btn btn-default">模糊查询</button>
 
-            <input type="radio" name="radio" value="0" checked>全显示
-            <input type="radio" name="radio" value="1">非下架的
+            <input type="radio" name="radio" value="0">全显示
+            <input type="radio" name="radio" value="1" checked>非下架的
 
         </div>
     </div>
