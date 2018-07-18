@@ -3,7 +3,7 @@
 <%@ page import="com.bestgo.common.database.utils.JSObject" %>
 <%@ page import="java.util.List" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@include file="common/rootBase.jsp"%>
+<%@include file="common/rootBase.jsp" %>
 
 <html>
 <head>
@@ -15,7 +15,7 @@
         }
 
         .td_left_border {
-            border-left:#000000 solid 1px;
+            border-left: #000000 solid 1px;
         }
 
         .td_top_bottom_border {
@@ -26,6 +26,7 @@
         .aqua {
             background-color: #d1ffc1;
         }
+
         .qianse {
             background-color: #fefff6;
         }
@@ -41,7 +42,6 @@
         .pink {
             color: #ff615d;
         }
-
 
         .orange {
             color: orange;
@@ -69,7 +69,7 @@
 %>
 
 <div class="container-fluid">
-    <%@include file="common/navigationbar.jsp"%>
+    <%@include file="common/navigationbar.jsp" %>
 
     <div class="panel panel-default" style="margin-top: 10px">
         <div class="panel-heading" id="panel_title">
@@ -103,12 +103,12 @@
 
 <script>
     function init() {
-        function getDate(dd,AddDayCount) {
-            dd.setDate(dd.getDate()+AddDayCount);//获取AddDayCount天后的日期
+        function getDate(dd, AddDayCount) {
+            dd.setDate(dd.getDate() + AddDayCount);//获取AddDayCount天后的日期
             var y = dd.getFullYear();
-            var m = dd.getMonth()+1;//获取当前月份的日期
+            var m = dd.getMonth() + 1;//获取当前月份的日期
             var d = dd.getDate();
-            return y+"-"+(m<10?"0"+m:m)+"-"+(d<10?"0"+d:d);
+            return y + "-" + (m < 10 ? "0" + m : m) + "-" + (d < 10 ? "0" + d : d);
         }
 
         $("li[role='presentation']:eq(2)").addClass("active");
@@ -130,9 +130,9 @@
             todayBtn: true
         });
 
-        $("#btnSearch").click(function(){
+        $("#btnSearch").click(function () {
 
-            var radio = $("input[name='radio']:checked") .val();
+            var radio = $("input[name='radio']:checked").val();
 
             var endTime = $('#inputEndTime').val();
             var likeTeamName = $('#inputLikeTeamName').val();
@@ -140,16 +140,16 @@
             var nickname = $('#inputNickname').val();
             $('#result_header > tr').remove();
             $('#results_body > tr').remove();
-            var loadingIndex = layer.load(2,{time: 10000});
+            var loadingIndex = layer.load(2, {time: 10000});
             $.post('released_data_statistics/query_released_data_statistics', {
                 endTime: endTime,
                 likeTeamName: likeTeamName,
                 likeCategoryName: likeCategoryName,
                 nickname: nickname,
-                radio:radio
-            },function(data){
+                radio: radio
+            }, function (data) {
                 layer.close(loadingIndex);
-                if(data && data.ret == 1){
+                if (data && data.ret == 1) {
                     $('#result_header').html("<tr class='aqua'><th rowspan=\"2\">项目组</th><th rowspan=\"2\">品类名称</th><th rowspan=\"2\">应用名称</th><th rowspan=\"2\">投放人员</th>" +
                         "<th></th><th></th><th colspan=\"3\" id=\"dateA\" class='td_left_border'></th><th colspan=\"3\" id=\"dateB\"  class='td_left_border'></th><th colspan=\"3\" id=\"dateC\"  class='td_left_border'></th>" +
                         "<th colspan=\"3\" id=\"dateD\" class='td_left_border'></th><th colspan=\"3\" id=\"dateE\" class='td_left_border'></th><th colspan=\"3\" id=\"dateF\" class='td_left_border'></th>" +
@@ -162,29 +162,29 @@
                     $('#dateA').text(endTime);
                     var nowDate = new Date(endTime);
 
-                    var dateB = getDate(nowDate,-1);
+                    var dateB = getDate(nowDate, -1);
                     $('#dateB').text(dateB);
 
-                    var dateC = getDate(nowDate,-1);
+                    var dateC = getDate(nowDate, -1);
                     $('#dateC').text(dateC);
 
-                    var dateD = getDate(nowDate,-1);
+                    var dateD = getDate(nowDate, -1);
                     $('#dateD').text(dateD);
 
-                    var dateE = getDate(nowDate,-1);
+                    var dateE = getDate(nowDate, -1);
                     $('#dateE').text(dateE);
 
-                    var dateF = getDate(nowDate,-1);
+                    var dateF = getDate(nowDate, -1);
                     $('#dateF').text(dateF);
 
-                    var dateG = getDate(nowDate,-1);
+                    var dateG = getDate(nowDate, -1);
                     $('#dateG').text(dateG);
 
                     setData(data);
                 } else {
                     admanager.showCommonDlg("错误", data.message);
                 }
-            },'json');
+            }, 'json');
         });
 
         function setData(data) {
@@ -232,18 +232,18 @@
                 var teamName = one['team_name'];
                 var categoryName = one['category_name'];
 
-                if(i == 0){
+                if (i == 0) {
                     currTeam = teamName;
                     currCategory = categoryName;
-                }else{
-                    if(currCategory != categoryName){
+                } else {
+                    if (currCategory != categoryName) {
                         var tTr = $('<tr class="blue"></tr>');
 
                         var tTd = $('<td class="td_top_bottom_border"></td>');
                         tTr.append(tTd);
 
                         tTd = $('<td colspan="3" class="td_top_bottom_border"></td>');
-                        tTd.text("["+currCategory + "]品类汇总");
+                        tTd.text("[" + currCategory + "]品类汇总");
                         tTr.append(tTd);
 
                         tTd = $('<td class="td_top_bottom_border"></td>');
@@ -357,10 +357,10 @@
                         categoryTotalSpend6 = 0;
                         categoryTotalRevenue6 = 0;
                     }
-                    if(currTeam != teamName){
+                    if (currTeam != teamName) {
                         var tTr = $('<tr class="red background_modena td_top_bottom_border"></tr>');
                         var tTd = $('<td colspan="4" class="td_top_bottom_border"></td>');
-                        tTd.text("【"+currTeam + "】项目组汇总");
+                        tTd.text("【" + currTeam + "】项目组汇总");
                         tTr.append(tTd);
 
                         tTd = $('<td class="td_top_bottom_border"></td>');
@@ -475,6 +475,9 @@
                         teamTotalRevenue6 = 0;
                     }
                 }
+
+                var is_display = one['is_display'];
+
                 var tr = $('<tr class="qianse"></tr>');
                 var td = $('<td></td>');
                 td.text(teamName);
@@ -649,15 +652,19 @@
                 teamTotalRevenue6 += totalRevenue6;
                 categoryTotalRevenue6 += totalRevenue6;
 
-                $('#results_body').append(tr);
-                if(i == len - 1){
+                if (1 == is_display) {
+                    $('#results_body').append(tr);
+                }
+
+
+                if (i == len - 1) {
                     var tTr = $('<tr class="blue category_tr_bottom_border"></tr>');
 
                     var tTd = $('<td class="td_top_bottom_border"></td>');
                     tTr.append(tTd);
 
                     tTd = $('<td colspan="3" class="td_top_bottom_border"></td>');
-                    tTd.text("["+currCategory + "]品类汇总");
+                    tTd.text("[" + currCategory + "]品类汇总");
                     tTr.append(tTd);
 
                     tTd = $('<td class="td_top_bottom_border"></td>');
@@ -755,7 +762,7 @@
 
                     tTr = $('<tr class="red background_modena td_top_bottom_border"></tr>');
                     tTd = $('<td colspan="4" class="td_top_bottom_border"></td>');
-                    tTd.text("【"+currTeam + "】项目组汇总");
+                    tTd.text("【" + currTeam + "】项目组汇总");
                     tTr.append(tTd);
 
                     tTd = $('<td class="green td_top_bottom_border"></td>');
@@ -854,6 +861,7 @@
             }
         }
     }
+
     init();
 
 </script>

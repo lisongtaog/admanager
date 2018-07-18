@@ -57,15 +57,10 @@ public class ReleasedDataStatistics extends HttpServlet {
         if (path.matches("/query_released_data_statistics")) {
             JsonArray jsonArray = new JsonArray();
             try {
-                String str = "";
-                //非下架显示拼接
-                if ("1".equals(radio)) {
-                    str = " and is_display = 1 ";
-                }
 
                 String sql = "select team_name,category_name,t.tag_name,anticipated_incoming,anticipated_revenue,t.user_id,is_display " +
                         "from web_ad_category_team ct, web_ad_tag_category tc, web_tag t " +
-                        "where tc.id = t.tag_category_id and ct.id = tc.team_id and is_statistics = 1" + str +
+                        "where tc.id = t.tag_category_id and ct.id = tc.team_id and is_statistics = 1" +
                         (StringUtil.isEmpty(likeTeamName) ? " " : " and team_name like '%" + likeTeamName + "%' ") +
                         (StringUtil.isEmpty(likeCategoryName) ? " " : " and category_name like '%" + likeCategoryName + "%' ") +
                         " ORDER BY ct.id,tc.id,t.id ";
@@ -75,7 +70,7 @@ public class ReleasedDataStatistics extends HttpServlet {
                         long id = one.get("id");
                         sql = "select team_name,category_name,t.tag_name,anticipated_incoming,anticipated_revenue,t.user_id " +
                                 "from web_ad_category_team ct, web_ad_tag_category tc, web_tag t " +
-                                "where tc.id = t.tag_category_id and ct.id = tc.team_id and is_statistics = 1 and t.user_id = " + id + str +
+                                "where tc.id = t.tag_category_id and ct.id = tc.team_id and is_statistics = 1 and t.user_id = " + id +
                                 (StringUtil.isEmpty(likeTeamName) ? " " : " and team_name like '%" + likeTeamName + "%' ") +
                                 (StringUtil.isEmpty(likeCategoryName) ? " " : " and category_name like '%" + likeCategoryName + "%' ") +
                                 " ORDER BY ct.id,tc.id,t.id ";
@@ -87,6 +82,8 @@ public class ReleasedDataStatistics extends HttpServlet {
                 if (listTag != null && listTag.size() > 0) {
                     for (JSObject t : listTag) {
                         if (t.hasObjectData()) {
+                            Integer is_display = t.get("is_display");
+
                             String teamName = t.get("team_name");
                             String categoryName = t.get("category_name");
                             JsonObject d = new JsonObject();
@@ -139,6 +136,16 @@ public class ReleasedDataStatistics extends HttpServlet {
                                 }
                             }
 //                            if (found) continue;
+                            if ("0".equals(radio)) {
+                                d.addProperty("is_display",1);
+                            }else {
+                                if (1 == is_display){
+                                    d.addProperty("is_display",1);
+                                }else {
+                                    d.addProperty("is_display",0);
+                                }
+                            }
+
                             jsonArray.add(d);
 
                         }
