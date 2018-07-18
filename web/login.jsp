@@ -102,8 +102,8 @@
                     pass: userPass
                 }, function (data) {
                     if (data && data.ret == 1) {
-                        //location.href = "index.jsp";
-                        location.href = "index3.jsp";
+                        location.href = "index.jsp";
+                        //location.href = "index3.jsp";
                     } else {
                         layer.msg("用户名或密码错误！",{time:2000,icon:5,shift:6},function () {
                             $('#inputUserName').focus();
