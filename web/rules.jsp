@@ -198,10 +198,9 @@
 
 
     function checkNum(theObj) {//校验位正数
-        var reg = /^[0-9]+.?[0-9]*$/;
+        var reg = /^[0-9]+.?[0-9]+$/;
         return reg.test(theObj);
     }
-
     $("#new_rule_dlg .btn-primary").click(function() {
         if(!validData()){//规则语法不正确
             return false;
