@@ -812,7 +812,10 @@ public class QueryByMulConditions extends HttpServlet {
                                        String totalInstallComparisonValue, boolean containsNoDataCampaignCheck,String country,String cpaComparisonValue,
                                        String biddingComparisonValue,String biddingOperator,String totalInstallOperator,String cpaOperator)
             throws Exception {
-//        String webAdCampaignTagRelTable = "web_ad_campaign_tag_rel";
+        String afterCampaignCreateTime = "";
+        if(StringUtil.isNotEmpty(campaignCreateTime)){
+            afterCampaignCreateTime = DateUtil.addDay(campaignCreateTime,1,"yyyy-MM-dd"); //系列创建日期的第二天
+        }
         String webAdCampaignsTable = "web_ad_campaigns";
         String adCampaignsTable = "ad_campaigns";
         String webAdCampaignsHistoryTable = "web_ad_campaigns_history";
@@ -823,7 +826,6 @@ public class QueryByMulConditions extends HttpServlet {
         List<JSObject> listNoData = null;
         if (admobCheck) {
             adCampaignsTable = "ad_campaigns_admob";
-//            webAdCampaignTagRelTable = "web_ad_campaign_tag_admob_rel";
             webAdCampaignsTable = "web_ad_campaigns_admob";
             webAdCampaignsHistoryTable = "web_ad_campaigns_history_admob";
             webAccountIdTable = "web_account_id_admob";
@@ -831,14 +833,6 @@ public class QueryByMulConditions extends HttpServlet {
             openStatus = "enabled";
         }
         List<JSObject> list = null;
-//        List<JSObject> list = DB.scan(webAdCampaignTagRelTable).select("campaign_id")
-//                .where(DB.filter().whereEqualTo("tag_id", tagId)).execute();
-//
-//
-//        Set<String> campaignIdSet = new HashSet<>();
-//        for(JSObject j : list){
-//            campaignIdSet.add(j.get("campaign_id"));
-//        }
 
         List<JSObject> listCampaignSpend4CountryCode = new ArrayList<>();
         Map<String,JSObject> countryCampaignspendMap = new HashMap<>();
@@ -873,18 +867,9 @@ public class QueryByMulConditions extends HttpServlet {
                     " from " + webAdCampaignsTable + " c, " + webAdCampaignsCountryHistoryTable + " ch " +
                     " where c.campaign_id = ch.campaign_id and tag_id = " + tagId +
                     " and date between '" + startTime + "' and '" + endTime + "' " +
+                    (StringUtil.isNotEmpty(campaignCreateTime) ? " AND create_time >= '" + campaignCreateTime + "' AND create_time < '"+ afterCampaignCreateTime +"' " : "") +
                     (likeCampaignName.isEmpty() ? " " : " and campaign_name like '%" + likeCampaignName +"%' " )  +
                     " group by ch.campaign_id";
-            if(StringUtil.isNotEmpty(campaignCreateTime)){
-                String afterCampaignCreateTime = DateUtil.addDay(campaignCreateTime,1,"yyyy-MM-dd");
-                sql = "select ch.campaign_id, sum(ch.total_spend) as campaign_spends " +
-                        " from " + webAdCampaignsTable + " c, " + webAdCampaignsCountryHistoryTable + " ch " +
-                        " where c.campaign_id = ch.campaign_id and tag_id = " + tagId +
-                        " and date between '" + startTime + "' and '" + endTime + "' " +
-                        " AND create_time >= '" + campaignCreateTime + "' AND create_time < '"+ afterCampaignCreateTime +"' " +
-                        (likeCampaignName.isEmpty() ? " " : " and campaign_name like '%" + likeCampaignName +"%' " )  +
-                        " group by ch.campaign_id";
-            }
             listCampaignSpend4CountryCode = DB.findListBySql(sql);
 
             for(JSObject j : listCampaignSpend4CountryCode){
@@ -897,37 +882,25 @@ public class QueryByMulConditions extends HttpServlet {
                     "(case when sum(ch.total_installed) > 0 then sum(ch.total_spend) / sum(ch.total_installed) else 0 end) as cpa " +
                     " from " + webAdCampaignsTable + " c, " + webAdCampaignsCountryHistoryTable + " ch " +
                     "where c.campaign_id=ch.campaign_id  and tag_id = " + tagId + " and country_code= '" + countryCode + "' " +
+                    (StringUtil.isNotEmpty(campaignCreateTime) ? " AND create_time >= '" + campaignCreateTime + "' AND create_time < '"+ afterCampaignCreateTime +"' " : "") +
                     (likeCampaignName.isEmpty() ? " " : " and campaign_name like '%" + likeCampaignName +"%' " )  +
                     " and date between '" + startTime + "' and '" + endTime + "' " +
                     " group by ch.campaign_id " + havingField +
                     ") a left join " + webAccountIdTable + " b on a.account_id = b.account_id";
-            if(StringUtil.isNotEmpty(campaignCreateTime)){
-                String afterCampaignCreateTime = DateUtil.addDay(campaignCreateTime,1,"yyyy-MM-dd");
-                sql = "select campaign_id, a.account_id,short_name, campaign_name, a.status, create_time, budget, bidding, spend, installed, impressions, click,cpa" +
-                        " from (" +
-                        "select ch.campaign_id, account_id, campaign_name,c.status, create_time, c.budget, c.bidding, sum(ch.total_spend) as spend, " +
-                        "sum(ch.total_installed) as installed, sum(ch.total_impressions) as impressions,sum(ch.total_click) as click, " +
-                        "(case when sum(ch.total_installed) > 0 then sum(ch.total_spend) / sum(ch.total_installed) else 0 end) as cpa " +
-                        " from " + webAdCampaignsTable + " c, " + webAdCampaignsCountryHistoryTable + " ch " +
-                        "where c.campaign_id=ch.campaign_id  and tag_id = " + tagId + " and country_code= '" + countryCode + "' " +
-                        " and date between '" + startTime + "' and '" + endTime + "' " +
-                        " AND create_time >= '" + campaignCreateTime + "' AND create_time < '"+ afterCampaignCreateTime +"' " +
-                        (likeCampaignName.isEmpty() ? " " : " and campaign_name like '%" + likeCampaignName +"%' " )  +
-                        " group by ch.campaign_id " + havingField +
-                        ") a left join " + webAccountIdTable + " b on a.account_id = b.account_id";
-            }
             list = DB.findListBySql(sql);
             if(containsNoDataCampaignCheck){
                 if(admobCheck){
                     sql = "SELECT c.campaign_id, c.account_id, short_name, c.campaign_name, c.create_time, budget, c.bidding, c.total_spend " +
                             " FROM " + adCampaignsTable + " a, " + webAdCampaignsTable + " c, " + webAccountIdTable + " b WHERE a.campaign_id = c.campaign_id " +
                             " AND c.account_id = b.account_id AND c.status = '" + openStatus + "' AND a.country_region = '" + country + "' AND app_name = '" + tagName + "' " +
+                            (StringUtil.isNotEmpty(campaignCreateTime) ? " AND c.create_time >= '" + campaignCreateTime + "' AND c.create_time < '"+ afterCampaignCreateTime +"' " : "") +
                             (likeCampaignName.isEmpty() ? " " : " and c.campaign_name like '%" + likeCampaignName +"%' " );
                 }else{
                     sql = "SELECT c.campaign_id, c.account_id, short_name, c.campaign_name, c.create_time, budget, c.bidding, c.total_spend " +
                             " FROM " + adCampaignsTable + " a, " + webAdCampaignsTable + " c, " + webAccountIdTable + " b WHERE a.campaign_id = c.campaign_id " +
                             " AND c.account_id = b.account_id AND b.status = 1 " +
                             " AND c.status = '" + openStatus + "' AND a.country_region = '" + country + "' AND app_name = '" + tagName + "' " +
+                            (StringUtil.isNotEmpty(campaignCreateTime) ? " AND c.create_time >= '" + campaignCreateTime + "' AND c.create_time < '"+ afterCampaignCreateTime +"' " : "") +
                             (likeCampaignName.isEmpty() ? " " : " and c.campaign_name like '%" + likeCampaignName +"%' " );
                 }
 
@@ -963,24 +936,10 @@ public class QueryByMulConditions extends HttpServlet {
                     " sum(ch.total_click) as click from " + webAdCampaignsTable + " c, " + webAdCampaignsHistoryTable + " ch " +
                     "where c.campaign_id = ch.campaign_id and tag_id = " + tagId +
                     " and date between '" + startTime + "' and '" + endTime + "' " +
+                    (StringUtil.isNotEmpty(campaignCreateTime) ? " AND c.create_time >= '" + campaignCreateTime + "' AND c.create_time < '"+ afterCampaignCreateTime +"' " : "") +
                     (likeCampaignName.isEmpty() ? " " : " and campaign_name like '%" + likeCampaignName +"%' " )  +
                     " group by ch.campaign_id "  + havingField +
                     ") a left join " + webAccountIdTable + " b on a.account_id = b.account_id";
-            if(StringUtil.isNotEmpty(campaignCreateTime)){
-                String afterCampaignCreateTime = DateUtil.addDay(campaignCreateTime,1,"yyyy-MM-dd");
-                sql = "select campaign_id, a.account_id,short_name, campaign_name, a.status, create_time, budget, bidding, spend, installed, impressions, click,cpa" +
-                        " from (" +
-                        "select ch.campaign_id, account_id, campaign_name,c.status, create_time, c.budget, c.bidding, sum(ch.total_spend) as spend, " +
-                        "sum(ch.total_installed) as installed, sum(ch.total_impressions) as impressions, " +
-                        "(case when sum(ch.total_installed) > 0 then sum(ch.total_spend) / sum(ch.total_installed) else 0 end) as cpa, " +
-                        " sum(ch.total_click) as click from " + webAdCampaignsTable + " c, " + webAdCampaignsHistoryTable + " ch " +
-                        "where c.campaign_id=ch.campaign_id and tag_id = " + tagId +
-                        " and date between '" + startTime + "' and '" + endTime + "' " +
-                        " AND create_time >= '" + campaignCreateTime + "' AND create_time < '"+ afterCampaignCreateTime +"' " +
-                        (likeCampaignName.isEmpty() ? " " : " and campaign_name like '%" + likeCampaignName +"%' " )  +
-                        " group by ch.campaign_id "  + havingField +
-                        ") a left join " + webAccountIdTable + " b on a.account_id = b.account_id";
-            }
             list = DB.findListBySql(sql);
             if(containsNoDataCampaignCheck){
                 if(admobCheck){
@@ -1020,12 +979,6 @@ public class QueryByMulConditions extends HttpServlet {
             for (JSObject one : list) {
                 JsonObject d = new JsonObject();
                 double bidding = one.get("bidding");
-//                if(StringUtil.isNotEmpty(biddingComparisonValue)){
-//                    double v = Double.parseDouble(biddingComparisonValue);
-//                    if(bidding != v){
-//                        continue;
-//                    }
-//                }
                 double installed = NumberUtil.convertDouble(one.get("installed"), 0);
                 String campaignId = one.get("campaign_id");
                 double spend = NumberUtil.convertDouble(one.get("spend"), 0);
