@@ -46,9 +46,6 @@ public class UpdateAppImageVideoPathRel extends HttpServlet {
                                 String imageRelativePath = imagePath.replace(ParentPath + File.separatorChar,"");
 
                                 try{
-                                    if (imageRelativePath.lastIndexOf("/") == imageRelativePath.length() -1) {
-                                        imageRelativePath = imageRelativePath.substring(0,imageRelativePath.length() -1);
-                                    }
                                     DB.insert("ad_app_image_path_rel")
                                             .put("app_name",appName)
                                             .put("image_path",imageRelativePath)
@@ -73,9 +70,6 @@ public class UpdateAppImageVideoPathRel extends HttpServlet {
                             for(String videoPath : PathList){
                                 String videoRelativePath = videoPath.replace(ParentPath + File.separatorChar,"");
                                 try{
-                                    if (videoRelativePath.lastIndexOf("/") == videoRelativePath.length() - 1) {
-                                        videoRelativePath = videoRelativePath.substring(0,videoRelativePath.length() - 1);
-                                    }
                                     DB.insert("ad_app_video_path_rel")
                                             .put("app_name",appName)
                                             .put("video_path",videoRelativePath)
