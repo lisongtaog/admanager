@@ -130,6 +130,8 @@
     $("li[role='presentation']:eq(4)").addClass("active");
 
     $("#btn_add_new_rule").click(function() {
+      document.getElementById("modify_form").reset();
+      $('#inputRuleContent').val("campaign_id=xxx,conversions>xxx,cpa>xxx")
       modifyType = 'new';
       $('#delete_message').hide();
       $('#modify_form').show();
@@ -141,18 +143,70 @@
     $('#inputRuleType').change(function() {
       var ruleContent = $('#inputRuleContent').val();
       var ruleType = $('#inputRuleType').val();
-      if (ruleContent.indexOf('xxx') >= 0 || ruleContent == '') {
-        if (ruleType == 1) {
-          $('#inputRuleContent').val("campaign_id=xxx,conversions>xxx,cpa>xxx")
-        } else if (ruleType == 2) {
-          $('#inputRuleContent').val("app_name=xxx,cost>xxx,cpa>xxx")
-        }
+      if (ruleType == 1) {
+        $('#inputRuleContent').val("campaign_id=xxx,conversions>xxx,cpa>xxx")
+      } else if (ruleType == 2) {//是应用维度    app_name=应用名称,cost>花费数字,cpa>cpa值
+        $('#inputRuleContent').val("app_name=xxx,cost>xxx,cpa>xxx")
+      } else if(ruleType == 3){//是应用+国家维度 app_name=应用名称,country_code=国家代号,cpa_div_ecpm>cpa除以ecpm,cost>花费
+        $('#inputRuleContent').val("app_name=xxx,country_code=xxx,cpa_div_ecpm>xxx,cost>xxx")
       }
     });
 
+    /**
+     * 检验规则语法是否正确
+     * @returns {boolean}
+     */
+    function validData() {
+        var ruleType = $("#inputRuleType").val();
+        var ruleContent = $("#inputRuleContent").val();
+        ruleContent = ruleContent.toLowerCase().replace(/\s/g,"").replace(/xxx/g,"");
+
+        var ruleParam = ruleContent.split(",");
+        var rule = {};
+        for(var i = 0; i < ruleParam.length; i++) {
+            var item = ruleParam[i].replace(">","=").replace("<","=").split("=");
+            rule[item[0]] = item[1];
+        }
+        console.info(rule);
+
+        var checkFlag = true;
+
+        if (ruleType == 1) {
+            if(!checkNum(rule["conversions"]) || !checkNum(rule["cpa"])){
+                checkFlag = false;
+                alert("conversions、cpa 必须为正数数字");
+            }
+        } else if (ruleType == 2) {//是应用维度    app_name=应用名称,cost>花费数字,cpa>cpa值
+            if(!checkNum(rule["cost"]) || !checkNum(rule["cpa"])){
+                checkFlag = false;
+                alert("cost、cpa 必须为正数数字");
+            }
+        } else if(ruleType == 3){//是应用+国家维度 app_name=应用名称,country_code=国家代号,cpa_div_ecpm>cpa除以ecpm,cost>花费
+            //$('#inputRuleContent').val("app_name=xxx,country_code=xxx,cpa_div_ecpm>xxx,cost>xxx");
+            if(!checkNum(rule["cost"]) || !checkNum(rule["cpa_div_ecpm"])){
+                checkFlag = false;
+                alert("cost、cpa_div_ecpm 必须为正数数字");
+            }
+            var reg = /^[A-Z]{2}$/ ;
+            if(!reg.test(rule["country_code"])){
+                checkFlag = false;
+                alert("country_code必须为2位大写字母");
+            }
+        }
+        return checkFlag;
+    }
+
+
+    function checkNum(theObj) {//校验位正数
+        var reg = /^[0-9]+.?[0-9]+$/;
+        return reg.test(theObj);
+    }
     $("#new_rule_dlg .btn-primary").click(function() {
-      var ruleType = $("#inputRuleType").val();
-      var ruleContent = $("#inputRuleContent").val();
+        if(!validData()){//规则语法不正确
+            return false;
+        }
+        var ruleType = $("#inputRuleType").val();
+        var ruleContent = $("#inputRuleContent").val();
 
       if (modifyType == 'new') {
         $.post('rules/create', {
@@ -216,6 +270,7 @@
 
     function bindOp() {
       $(".link_modify").click(function() {
+        document.getElementById("modify_form").reset();
         modifyType = "update";
         $('#delete_message').hide();
         $('#modify_form').show();
