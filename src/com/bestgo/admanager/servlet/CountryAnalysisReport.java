@@ -1,6 +1,5 @@
 package com.bestgo.admanager.servlet;
 
-import com.bestgo.admanager.CPAHistory;
 import com.bestgo.admanager.utils.DateUtil;
 import com.bestgo.admanager.utils.NumberUtil;
 import com.bestgo.admanager.utils.Utils;
@@ -96,6 +95,14 @@ public class CountryAnalysisReport extends HttpServlet {
                     String appId = oneG.get("google_package_id");
                     long tagId = oneG.get("id");
                     if (appId != null) {
+                        HashMap<String, Double> cpiMap = new HashMap<>();
+                        String sqlCpi = "select country_code, cpi from web_ad_app_cpi where app_id=?";
+                        List<JSObject> cpiList = DB.findListBySql(sqlCpi, appId);
+                        for (int i = 0; i < cpiList.size(); i++) {
+                            String countryCode = cpiList.get(i).get("country_code");
+                            double value = NumberUtil.convertDouble(cpiList.get(i).get("cpi"), 0);
+                            cpiMap.put(countryCode, value);
+                        }
                         JsonArray jsonArray = new JsonArray();
                         String sql = "SELECT country_code, sum(cost) as total_cost, sum(purchased_user) as total_purchased_user," +
                                 " sum(total_installed) as installed, sum(today_uninstalled) as total_today_uninstalled," +
@@ -398,11 +405,9 @@ public class CountryAnalysisReport extends HttpServlet {
                                 d.addProperty("uninstalled_rate", NumberUtil.trimDouble(uninstalledRate,3));
                                 d.addProperty("active_users", activeUsers);
                                 d.addProperty("revenues", NumberUtil.trimDouble(revenues,0));
-                                HashMap<String, CPAHistory.CPAItem> history = CPAHistory.historyMaps.get(appId);
                                 double rpi = 0;
-                                if (history != null) {
-                                    CPAHistory.CPAItem item = history.get(countryCode);
-                                    if (item != null) rpi = item.rpi;
+                                if (cpiMap.get(countryCode) != null) {
+                                    rpi = cpiMap.get(countryCode);
                                 }
                                 d.addProperty("revenue_per_install", NumberUtil.trimDouble(rpi, 2));
                                 d.addProperty("pi", NumberUtil.trimDouble(pi,3));
