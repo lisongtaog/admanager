@@ -34,8 +34,10 @@ public class Rules extends HttpServlet {
             if (path.startsWith("/create")) {
                 String ruleType = request.getParameter("ruleType");
                 String ruleContent = request.getParameter("ruleContent");
+                String tag_id = request.getParameter("tag_id");
+                String tag_name = request.getParameter("tag_name");
 
-                OperationResult result = createNewRule(ruleType, ruleContent);
+                OperationResult result = createNewRule(ruleType, ruleContent,tag_id,tag_name);
                 json.addProperty("ret", result.result ? 1 : 0);
                 json.addProperty("message", result.message);
             } else if (path.startsWith("/delete")) {
@@ -57,13 +59,32 @@ public class Rules extends HttpServlet {
                 JsonArray array = new JsonArray();
                 for (int i = 0; i < data.size(); i++) {
                     JsonObject one = new JsonObject();
-                    one.addProperty("rule_type", (Integer)data.get(i).get("rule_type"));
+                    one.addProperty("rule_type", (Integer) data.get(i).get("rule_type"));
+
                     one.addProperty("rule_content", (String) data.get(i).get("rule_content"));
+
+                    one.addProperty("tag_name3", (String) data.get(i).get("tag_name"));
+
                     one.addProperty("id", (long) data.get(i).get("id"));
+
+                    one.addProperty("tag_id3", (Integer) data.get(i).get("tag_id"));
                     array.add(one);
                 }
                 json.add("data", array);
 
+            } else if (path.startsWith("/selectTagId")) {
+                String tag_name = request.getParameter("tag_name");
+                JSObject oneBySql = null;
+                JsonObject jsonObject = new JsonObject();
+
+                try {
+                    oneBySql = DB.findOneBySql("SELECT id FROM web_tag WHERE tag_name = '" + tag_name + "'");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                jsonObject.addProperty("id", (long) oneBySql.get("id"));
+                json.add("data", jsonObject);
             }
         } else {
 
@@ -79,7 +100,7 @@ public class Rules extends HttpServlet {
     public static List<JSObject> fetchData(int index, int size) {
         List<JSObject> list = new ArrayList<>();
         try {
-            return DB.scan("web_ad_rules").select("id", "rule_type", "rule_content").limit(size).start(index * size).orderByAsc("id").execute();
+            return DB.scan("web_ad_rules").select("id", "rule_type", "rule_content", "tag_id", "tag_name").limit(size).start(index * size).orderByAsc("id").execute();
         } catch (Exception ex) {
             Logger logger = Logger.getRootLogger();
             logger.error(ex.getMessage(), ex);
@@ -90,7 +111,7 @@ public class Rules extends HttpServlet {
     public static List<JSObject> fetchData(String query) {
         List<JSObject> list = new ArrayList<>();
         try {
-            return DB.scan("web_ad_rules").select("id", "rule_type", "rule_content").where(DB.filter().whereLikeTo("rule_content", "%" + query + "%")).orderByAsc("id").execute();
+            return DB.scan("web_ad_rules").select("id", "rule_type", "rule_content", "tag_id", "tag_name").where(DB.filter().whereLikeTo("rule_content", "%" + query + "%")).orderByAsc("id").execute();
         } catch (Exception ex) {
             Logger logger = Logger.getRootLogger();
             logger.error(ex.getMessage(), ex);
@@ -127,12 +148,16 @@ public class Rules extends HttpServlet {
         return ret;
     }
 
-    private OperationResult createNewRule(String ruleType, String ruleContent) {
+    private OperationResult createNewRule(String ruleType, String ruleContent,String tag_id,String tag_name) {
         OperationResult ret = new OperationResult();
 
         try {
-            DB.insert("web_ad_rules").put("rule_type", ruleType)
-                    .put("rule_content", ruleContent).execute();
+            DB.insert("web_ad_rules")
+                    .put("rule_type", ruleType)
+                    .put("rule_content", ruleContent)
+                    .put("tag_id", Integer.parseInt(tag_id))
+                    .put("tag_name", tag_name)
+                    .execute();
 
             ret.result = true;
             ret.message = "添加成功";
