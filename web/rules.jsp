@@ -51,8 +51,8 @@
                 <th>序号</th>
                 <th>规则类型</th>
                 <th>内容</th>
-                <th>tag_id</th>
-                <th>tag_name</th>
+                <th>标签序号</th>
+                <th>标签名称</th>
                 <th>操作</th>
             </tr>
             </thead>
