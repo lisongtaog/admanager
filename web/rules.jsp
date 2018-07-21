@@ -202,7 +202,9 @@
         var ruleType = $("#inputRuleType").val();
         var ruleContent = $("#inputRuleContent").val();
         // ruleContent = ruleContent.toLowerCase().replace(/\s/g, "").replace(/xxx/g, "");
+
         ruleContent = ruleContent.replace(/\s/g, "").replace(/xxx/g, "");
+
         var ruleParam = ruleContent.split(",");
         var rule = {};
         for (var i = 0; i < ruleParam.length; i++) {
@@ -239,8 +241,8 @@
     }
 
 
-    function checkNum(theObj) {//校验位正数
-        var reg = /^[0-9]+.?[0-9]+$/;
+    function checkNum(theObj) {//校验为正数
+        var reg = /^[0-9]+.?[0-9]*$/;
         return reg.test(theObj);
     }
 
