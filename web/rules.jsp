@@ -201,8 +201,8 @@
     function validData() {
         var ruleType = $("#inputRuleType").val();
         var ruleContent = $("#inputRuleContent").val();
-        ruleContent = ruleContent.toLowerCase().replace(/\s/g, "").replace(/xxx/g, "");
-
+        // ruleContent = ruleContent.toLowerCase().replace(/\s/g, "").replace(/xxx/g, "");
+        ruleContent = ruleContent.replace(/\s/g, "").replace(/xxx/g, "");
         var ruleParam = ruleContent.split(",");
         var rule = {};
         for (var i = 0; i < ruleParam.length; i++) {
