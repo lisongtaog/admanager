@@ -114,15 +114,15 @@ public class CountryAnalysisReport extends HttpServlet {
                         String sql = "";
 
                         if (sameDate) {
-                            sql =   "SELECT country_code, cost as total_cost, purchased_user as total_purchased_user, ad_new_revenue as ad_new_revenues," +
-                                    " total_installed as installed, today_uninstalled as total_today_uninstalled," +
-                                    " active_user as active_users, impression as impressions, revenue as revenues," +
-                                    " (revenue - cost) as incoming," +
-                                    " (case when impression > 0 then revenue * 1000 / impression else 0 end) as ecpm," +
-                                    " (case when purchased_user > 0 then cost / purchased_user else 0 end) as cpa " +
-                                    " from web_ad_country_analysis_report_history " +
-                                    " where date = '" + startTime + "'" +
-                                    " and app_id = '" + appId + "' GROUP BY country_code";
+                            sql =   "SELECT h.country_code, sum(cost) as total_cost, sum(purchased_user) as total_purchased_user, sum(ad_new_revenue) as ad_new_revenues,\n" +
+                                    "sum(total_installed) as installed, sum(today_uninstalled) as total_today_uninstalled,\n" +
+                                    "sum(active_user) as active_users, sum(impression) as impressions, sum(revenue) as revenues,\n" +
+                                    " (sum(revenue) - sum(cost)) as incoming,r.first_day_revenue,r.second_day_revenue,r.third_day_revenue,r.fourth_day_revenue,\n" +
+                                    " (case when sum(impression) > 0 then sum(revenue) * 1000 / sum(impression) else 0 end) as ecpm,\n" +
+                                    "(case when sum(purchased_user) > 0 then sum(cost) / sum(purchased_user) else 0 end) as cpa\n" +
+                                    " from web_ad_country_analysis_report_history h,web_ad_country_daily_add_revenue r\n" +
+                                    " where h.date = r.date and h.app_id = r.app_id AND h.country_code = r.country_code \n" +
+                                    " AND h.date = '" + endTime + "' and h.app_id = '" + appId + "' GROUP BY h.country_code";
                         } else {
                             sql = "SELECT country_code, sum(cost) as total_cost, sum(purchased_user) as total_purchased_user, sum(ad_new_revenue) as ad_new_revenues," +
                                     " sum(total_installed) as installed, sum(today_uninstalled) as total_today_uninstalled," +
@@ -192,6 +192,7 @@ public class CountryAnalysisReport extends HttpServlet {
                                 sql += " order by total_cost desc";
 
                         }
+                        java.lang.System.out.println(sql);
                         List<JSObject> countryDetailJSObjectList = DB.findListBySql(sql);
 
                         double totalCost = 0;
@@ -442,7 +443,19 @@ public class CountryAnalysisReport extends HttpServlet {
                                 d.addProperty("cpa", NumberUtil.trimDouble(cpa, 3));
                                 d.addProperty("rt", NumberUtil.trimDouble(rt, 3));
                                 d.addProperty("cost_upper_limit", costUpperLimit);
-
+                                if (sameDate) {
+                                    double firstDayRevenue = j.get("first_day_revenue");
+                                    double secondDayRevenue = j.get("second_day_revenue");
+                                    secondDayRevenue += firstDayRevenue;
+                                    double thirdDayRevenue = j.get("third_day_revenue");
+                                    thirdDayRevenue += secondDayRevenue;
+                                    double fourthDayRevenue = j.get("fourth_day_revenue");
+                                    fourthDayRevenue += thirdDayRevenue;
+                                    d.addProperty("first_day_revenue",firstDayRevenue);
+                                    d.addProperty("second_day_revenue",secondDayRevenue);
+                                    d.addProperty("third_day_revenue",thirdDayRevenue);
+                                    d.addProperty("fourth_day_revenue",fourthDayRevenue);
+                                }
                                 jsonArray.add(d);
                             }
 
@@ -452,6 +465,9 @@ public class CountryAnalysisReport extends HttpServlet {
                             jsonObject.addProperty("ret", 0);
                             jsonObject.addProperty("message", "此应用下当前日期中没有数据!");
                         } else {
+                            if (sameDate) {
+                                jsonObject.addProperty("same_date",1);
+                            }
                             jsonObject.add("array", jsonArray);
                             jsonObject.addProperty("total_cost", NumberUtil.trimDouble(totalCost, 0));
                             jsonObject.addProperty("total_puserchaed_user", NumberUtil.trimDouble(totalPuserchaedUser, 0));

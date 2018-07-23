@@ -69,22 +69,17 @@
             <th>Installed</th>
             <th>UninstalledRate</th>
             <th>ActiveUser</th>
-            <th>ad_new_revenue</th>
+            <th>AdNewRevenue</th>
             <th>Revenue</th>
             <th>Incoming</th>
             <th>PI</th>
             <th>ARPU</th>
             <th>ECPM</th>
-            <th>CECPM</th>
             <th>成本价/2</th>
             <th>CPA</th>
             <th>ACpa</th>
             <th>CPA/ECPM</th>
-            <th>7DaysCost</th>
-            <th>7DaysRevenue</th>
-            <th>7DaysIncoming</th>
             <th>RT</th>
-            <th>30DaysActiveUser</th>
             <th>竞价</th>
         </tr>
         </thead>
@@ -129,27 +124,57 @@
             endTime: endTime
         },function(data){
             if(data && data.ret == 1){
-                $('#result_header').html("<tr><th>国家</th>" +
-                    "<th>Cost<span sorterId=\"1031\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
-                    "<th>花费上限</th>" +
-                    "<th>PurchasedUser<span sorterId=\"1033\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
-                    "<th>Installed<span sorterId=\"1034\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
-                    "<th>UninstalledRate</th>" +
-                    "<th>ActiveUser<span sorterId=\"1038\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
-                    "<th>ad_new_revenue<span sorterId=\"1038\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
-                    "<th>Revenue<span sorterId=\"1039\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
-                    "<th>Incoming<span sorterId=\"1042\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
-                    "<th>PI</th>" +
-                    "<th>ARPU</th>" +
-                    "<th>ECPM<span sorterId=\"1040\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
-                    "<th>成本价/2</th>" +
-                    "<th>CPA<span sorterId=\"1041\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
-                    "<th>ACpa</th>" +
-                    "<th>CPA/ECPM</th>" +
-                    "<th>RT</th>" +
-                    "<th>竞价</th>" +
-                    "</tr>");
-                setData(data);
+                if (data.same_date == 1) {
+                    $('#result_header').html("<tr><th>国家</th>" +
+                        "<th>Cost<span sorterId=\"1031\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
+                        "<th>花费上限</th>" +
+                        "<th>PurchasedUser<span sorterId=\"1033\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
+                        "<th>Installed<span sorterId=\"1034\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
+                        "<th>UninstalledRate</th>" +
+                        "<th>ActiveUser<span sorterId=\"1038\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
+                        "<th>ad_new_revenue<span sorterId=\"1038\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
+                        "<th>Revenue<span sorterId=\"1039\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
+                        "<th>FirstDayRevenue</th>" +
+                        "<th>SecondDayRevenue</th>" +
+                        "<th>ThirdDayRevenue</th>" +
+                        "<th>FourthDayRevenue</th>" +
+                        "<th>Incoming<span sorterId=\"1042\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
+                        "<th>PI</th>" +
+                        "<th>ARPU</th>" +
+                        "<th>ECPM<span sorterId=\"1040\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
+                        "<th>成本价/2</th>" +
+                        "<th>CPA<span sorterId=\"1041\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
+                        "<th>ACpa</th>" +
+                        "<th>CPA/ECPM</th>" +
+                        "<th>RT</th>" +
+                        "<th>竞价</th>" +
+                        "</tr>");
+                    setData(data,1);
+                }else{
+                    $('#result_header').html("<tr><th>国家</th>" +
+                        "<th>Cost<span sorterId=\"1031\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
+                        "<th>花费上限</th>" +
+                        "<th>PurchasedUser<span sorterId=\"1033\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
+                        "<th>Installed<span sorterId=\"1034\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
+                        "<th>UninstalledRate</th>" +
+                        "<th>ActiveUser<span sorterId=\"1038\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
+                        "<th>ad_new_revenue<span sorterId=\"1038\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
+                        "<th>Revenue<span sorterId=\"1039\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
+                        "<th>Incoming<span sorterId=\"1042\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
+                        "<th>PI</th>" +
+                        "<th>ARPU</th>" +
+                        "<th>ECPM<span sorterId=\"1040\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
+                        "<th>成本价/2</th>" +
+                        "<th>CPA<span sorterId=\"1041\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
+                        "<th>ACpa</th>" +
+                        "<th>CPA/ECPM</th>" +
+                        "<th>RT</th>" +
+                        "<th>竞价</th>" +
+                        "</tr>");
+                    setData(data,0);
+                }
+
+
                 bindSortOp();
                 var str = "Cost: " + data.total_cost + "&nbsp;&nbsp;&nbsp;&nbsp;PuserchaedUser: " + data.total_puserchaed_user +
                     "&nbsp;&nbsp;&nbsp;&nbsp;CPA: " + data.total_cpa + "&nbsp;&nbsp;&nbsp;&nbsp;Revenue: " + data.total_revenue;
@@ -184,7 +209,7 @@
                 sorterId: sorterId
             },function(data){
                 if (data && data.ret == 1) {
-                    setData(data);
+                    setData(data,data.same_date);
                     var str = "Cost: " + data.total_cost + "&nbsp;&nbsp;&nbsp;&nbsp;PuserchaedUser: " + data.total_puserchaed_user +
                         "&nbsp;&nbsp;&nbsp;&nbsp;CPA: " + data.total_cpa + "&nbsp;&nbsp;&nbsp;&nbsp;Revenue: " + data.total_revenue;
 
@@ -198,7 +223,7 @@
         });
     }
 
-    function setData(data) {
+    function setData(data,same_date) {
         $('#results_body > tr').remove();
         var arr = data.array;
         var len = arr.length;
@@ -206,6 +231,12 @@
         var keyset = ["costs","cost_upper_limit","purchased_users", "installed", "uninstalled_rate",
             "active_users", "ad_new_revenues","revenues","incoming","pi", "arpu", "ecpm", "revenue_per_install","cpa",
             "a_cpa","cpa_div_ecpm", "rt","bidding_summary"];
+        if (same_date == 1) {
+            keyset = ["costs","cost_upper_limit","purchased_users", "installed", "uninstalled_rate",
+                "active_users", "ad_new_revenues","revenues","first_day_revenue","second_day_revenue",
+                "third_day_revenue","fourth_day_revenue","incoming","pi", "arpu", "ecpm", "revenue_per_install","cpa",
+                "a_cpa","cpa_div_ecpm", "rt","bidding_summary"];
+        }
         for (var i = 0; i < len; i++) {
             one = arr[i];
             var tr = $('<tr></tr>');
