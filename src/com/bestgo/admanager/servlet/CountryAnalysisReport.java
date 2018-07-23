@@ -120,9 +120,9 @@ public class CountryAnalysisReport extends HttpServlet {
                                     " (sum(revenue) - sum(cost)) as incoming,r.first_day_revenue,r.second_day_revenue,r.third_day_revenue,r.fourth_day_revenue,\n" +
                                     " (case when sum(impression) > 0 then sum(revenue) * 1000 / sum(impression) else 0 end) as ecpm,\n" +
                                     "(case when sum(purchased_user) > 0 then sum(cost) / sum(purchased_user) else 0 end) as cpa\n" +
-                                    " from web_ad_country_analysis_report_history h,web_ad_country_daily_add_revenue r\n" +
-                                    " where h.date = r.date and h.app_id = r.app_id AND h.country_code = r.country_code \n" +
-                                    " AND h.date = '" + endTime + "' and h.app_id = '" + appId + "' GROUP BY h.country_code";
+                                    " from web_ad_country_analysis_report_history h left join web_ad_country_daily_add_revenue r\n" +
+                                    " on h.date = r.date and h.app_id = r.app_id AND h.country_code = r.country_code \n" +
+                                    " where h.date = '" + endTime + "' and h.app_id = '" + appId + "' GROUP BY h.country_code";
                         } else {
                             sql = "SELECT country_code, sum(cost) as total_cost, sum(purchased_user) as total_purchased_user, sum(ad_new_revenue) as ad_new_revenues," +
                                     " sum(total_installed) as installed, sum(today_uninstalled) as total_today_uninstalled," +
@@ -444,12 +444,13 @@ public class CountryAnalysisReport extends HttpServlet {
                                 d.addProperty("rt", NumberUtil.trimDouble(rt, 3));
                                 d.addProperty("cost_upper_limit", costUpperLimit);
                                 if (sameDate) {
-                                    double firstDayRevenue = j.get("first_day_revenue");
-                                    double secondDayRevenue = j.get("second_day_revenue");
+
+                                    double firstDayRevenue = NumberUtil.convertDouble(j.get("first_day_revenue"),0);
+                                    double secondDayRevenue = NumberUtil.convertDouble(j.get("second_day_revenue"),0);
                                     secondDayRevenue += firstDayRevenue;
-                                    double thirdDayRevenue = j.get("third_day_revenue");
+                                    double thirdDayRevenue = NumberUtil.convertDouble(j.get("third_day_revenue"),0);
                                     thirdDayRevenue += secondDayRevenue;
-                                    double fourthDayRevenue = j.get("fourth_day_revenue");
+                                    double fourthDayRevenue = NumberUtil.convertDouble(j.get("fourth_day_revenue"),0);
                                     fourthDayRevenue += thirdDayRevenue;
                                     d.addProperty("first_day_revenue",firstDayRevenue);
                                     d.addProperty("second_day_revenue",secondDayRevenue);
