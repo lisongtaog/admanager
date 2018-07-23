@@ -142,16 +142,11 @@
                     "<th>PI</th>" +
                     "<th>ARPU</th>" +
                     "<th>ECPM<span sorterId=\"1040\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
-                    "<th>CECPM</th>" +
                     "<th>成本价/2</th>" +
                     "<th>CPA<span sorterId=\"1041\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
                     "<th>ACpa</th>" +
                     "<th>CPA/ECPM</th>" +
-                    "<th>7daysCost</th>" +
-                    "<th>7daysRevenue</th>" +
-                    "<th>7daysIncoming</th>" +
                     "<th>RT</th>" +
-                    "<th>30DaysActiveUser</th>" +
                     "<th>竞价</th>" +
                     "</tr>");
                 setData(data);
@@ -209,9 +204,8 @@
         var len = arr.length;
         var one;
         var keyset = ["costs","cost_upper_limit","purchased_users", "installed", "uninstalled_rate",
-            "active_users", "ad_new_revenues","revenues","incoming","pi", "arpu", "ecpm","c_ecpm", "revenue_per_install","cpa",
-            "a_cpa","cpa_div_ecpm", "seven_days_costs", "seven_days_revenues", "seven_days_incoming",
-            "rt","thirty_days_active_user","bidding_summary"];
+            "active_users", "ad_new_revenues","revenues","incoming","pi", "arpu", "ecpm", "revenue_per_install","cpa",
+            "a_cpa","cpa_div_ecpm", "rt","bidding_summary"];
         for (var i = 0; i < len; i++) {
             one = arr[i];
             var tr = $('<tr></tr>');
