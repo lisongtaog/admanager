@@ -35,6 +35,7 @@
         <table class="table">
             <thead>
             <tr><td colspan="10">是否计入统计---针对投放数据统计中的应用是否纳入到统计中。&nbsp;&nbsp;是否显示---显示的是正在投放的产品；不显示的是被暂停投放的产品，只是为了便于查看数据</td></tr>
+            <tr><td colspan="10">标签名称---与标签ID唯一并存，命名必须是前后两端中间位置都不能有空格，并且是驼峰命名AaaBbbCcc</td></tr>
             <tr><th>标签ID</th><th>标签名称</th><th>最大出价</th><th>应用品类名称</th><th>期望收入</th><th>期望盈利</th><th>投放人员</th><th>是否计入统计</th><th>是否显示</th><th>操作</th></tr>
             </thead>
             <tbody>
