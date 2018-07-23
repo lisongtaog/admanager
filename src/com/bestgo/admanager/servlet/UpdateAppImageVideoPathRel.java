@@ -4,6 +4,7 @@ import com.bestgo.admanager.utils.Utils;
 import com.bestgo.common.database.services.DB;
 import com.bestgo.common.database.utils.JSObject;
 import com.google.gson.JsonObject;
+import sun.security.tools.PathList;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -34,25 +35,26 @@ public class UpdateAppImageVideoPathRel extends HttpServlet {
             if (configList.size() > 0) {
                 for (JSObject config : configList) {
                     String configKey = config.get("config_key");
-                    if ("fb_image_path".equals(configKey)) {
-                        String ParentPath = config.get("config_value"); // ParentPath 里是表格里存的根路径
-                        ParentPath = ParentPath.replace("/", File.separator);
-//                        ParentPath = ParentPath.replace("\\",File.separator);
-                        String appParentPath = ParentPath + File.separatorChar + appName;
-                        File file = new File(appParentPath);
-                        List<String> PathList = Utils.ergodicImageDirectory(file, new ArrayList<>(), false);
+                    String rootPath = config.get("config_value"); // rootPath 里是表格里存的根路径
+//                        rootPath = rootPath.replace("/", File.separator);
+//                        rootPath = rootPath.replace("\\",File.separator);
+                    String appParentPath = rootPath + File.separatorChar + appName;
+                    File file = new File(appParentPath);
+                    List<String> PathList = Utils.ergodicImageDirectory(file, new ArrayList<>(), false);
 
+                    //更新这个应用的图片路径
+                    if ("fb_image_path".equals(configKey)) {
                         if (PathList.size() > 0) {
                             Set<String> set = new HashSet<>();
                             DB.delete("ad_app_image_path_rel").where(DB.filter().whereEqualTo("app_name", appName)).execute();
                             for (String imagePath : PathList) {
-                                String imageRelativePath = imagePath.replace(ParentPath + File.separatorChar, "");
+                                String imageRelativePath = imagePath.replace(rootPath + File.separatorChar, "");
 
                                 try {
 
-                                  int index = imageRelativePath.lastIndexOf("\\");
+//                                  int index = imageRelativePath.lastIndexOf("\\");
 
-//                                    int index = imageRelativePath.lastIndexOf("/");
+                                    int index = imageRelativePath.lastIndexOf("/");
                                     imageRelativePath = imageRelativePath.substring(0, index);
 
                                     int oldSize = set.size();
@@ -72,21 +74,15 @@ public class UpdateAppImageVideoPathRel extends HttpServlet {
                             }
                         }
                     } else {
-                        // "fb_video_path"的情况
-                        String ParentPath = config.get("config_value");
-                        ParentPath = ParentPath.replace("/", File.separator);
-//                        ParentPath = ParentPath.replace("\\",File.separator);
-                        String appParentPath = ParentPath + File.separatorChar + appName;
-                        File file = new File(appParentPath);
-                        List<String> PathList = Utils.ergodicVideoDirectory(file, new ArrayList<>(), false);
+                        //更新这个应用的视频路径
                         if (PathList.size() > 0) {
                             Set<String> set = new HashSet<>();
                             DB.delete("ad_app_video_path_rel").where(DB.filter().whereEqualTo("app_name", appName)).execute();
                             for (String videoPath : PathList) {
-                                String videoRelativePath = videoPath.replace(ParentPath + File.separatorChar, "");
+                                String videoRelativePath = videoPath.replace(rootPath + File.separatorChar, "");
                                 try {
-                                    int index = videoRelativePath.lastIndexOf("\\");
-//                                    int index = videoRelativePath.lastIndexOf("/");
+//                                    int index = videoRelativePath.lastIndexOf("\\");
+                                    int index = videoRelativePath.lastIndexOf("/");
 
                                     videoRelativePath = videoRelativePath.substring(0, index);
 
