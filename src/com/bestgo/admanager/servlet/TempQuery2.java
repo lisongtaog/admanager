@@ -210,7 +210,7 @@ public class TempQuery2 extends HttpServlet {
             }
         }
 
-        HashMap<String ,String> countryMap = Utils.getCountryMap();
+        HashMap<String ,String> countryMap = Utils.getCountryCodeNameMap();
 
         List<JSObject> list = DB.scan(relationTable).select("campaign_id")
                 .where(DB.filter().whereEqualTo("tag_id", tagId)).execute();

@@ -34,7 +34,7 @@ public class DailyCpaEcpmReport {
     public static List<Item> report(String date) {
         ArrayList<Item> list = new ArrayList<>();
         HashMap<String, Item> countryReportMap = new HashMap<>();
-        HashMap<String ,String> countryMap = Utils.getCountryMap();
+        HashMap<String ,String> countryMap = Utils.getCountryCodeNameMap();
 
         try {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");

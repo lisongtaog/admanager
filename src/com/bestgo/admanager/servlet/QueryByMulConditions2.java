@@ -59,7 +59,7 @@ public class QueryByMulConditions2 extends HttpServlet {
         String biddingComparisonValue = request.getParameter("biddingComparisonValue");
 
         String likeCampaignName = request.getParameter("likeCampaignName");
-        HashMap<String ,String> countryMap = Utils.getCountryMap();
+        HashMap<String ,String> countryMap = Utils.getCountryCodeNameMap();
 
         String beforeThreeDays = DateUtil.addDay(endTime,-3,"yyyy-MM-dd");//不包括endTime
         try {

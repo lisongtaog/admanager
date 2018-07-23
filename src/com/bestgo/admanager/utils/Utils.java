@@ -14,8 +14,13 @@ import java.net.*;
 import java.util.*;
 
 public class Utils {
-    public static HashMap<String, String> countryCodeMap;
+    //key=countryCode,value=countryName
+    private static HashMap<String, String> countryCodeNameMap;
+
+    //key=countryName,value=countryCode
+    private static HashMap<String, String> countryNameCodeMap;
     private static Object lock = new Object();
+    private static Object lock2 = new Object();
 
     public static boolean isAdmin(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setCharacterEncoding("utf-8");
@@ -55,22 +60,49 @@ public class Utils {
         return "";
     }
 
-    public static HashMap getCountryMap() {
-        if (countryCodeMap == null) {
+    /**
+     * 获取key=countryCode,value=countryName的Map
+     * @return
+     */
+    public static HashMap getCountryCodeNameMap() {
+        if (countryCodeNameMap == null) {
             try {
                 synchronized (lock) {
-                    countryCodeMap = new HashMap<>();
+                    countryCodeNameMap = new HashMap<>();
                     List<JSObject> list = DB.scan("app_country_code_dict").select("country_code", "country_name").execute();
                     for (JSObject one : list) {
                         String countryCode = one.get("country_code");
                         String countryName = one.get("country_name");
-                        countryCodeMap.put(countryCode, countryName);
+                        countryCodeNameMap.put(countryCode, countryName);
                     }
                 }
             } catch (Exception ex) {
             }
         }
-        return countryCodeMap;
+        return countryCodeNameMap;
+    }
+
+
+    /**
+     * 获取key=countryName,value=countryCode的Map
+     * @return
+     */
+    public static HashMap getCountryNameCodeMap() {
+        if (countryNameCodeMap == null) {
+            try {
+                synchronized (lock2) {
+                    countryNameCodeMap = new HashMap<>();
+                    List<JSObject> list = DB.scan("app_country_code_dict").select("country_code", "country_name").execute();
+                    for (JSObject one : list) {
+                        String countryCode = one.get("country_code");
+                        String countryName = one.get("country_name");
+                        countryNameCodeMap.put(countryName, countryCode);
+                    }
+                }
+            } catch (Exception ex) {
+            }
+        }
+        return countryNameCodeMap;
     }
 
 

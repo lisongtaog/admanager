@@ -63,7 +63,7 @@ public class QueryByMulConditions extends HttpServlet {
         String biddingOperator = request.getParameter("biddingOperator");
 
         String likeCampaignName = request.getParameter("likeCampaignName");
-        HashMap<String, String> countryMap = Utils.getCountryMap();
+        HashMap<String, String> countryMap = Utils.getCountryCodeNameMap();
 
         try {
             JSObject tagObject = DB.simpleScan("web_tag")

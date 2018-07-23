@@ -309,12 +309,12 @@
             }
             var tr = $(this).parents("tr");
             var costGroup = {};
-            var countryName = tr.children("td:eq(0)").text(); //这里得到的是完整的国家名
-            regionList.forEach(function(region){
-                if(region.name == countryName){
-                    costGroup.country_code = region.country_code;
-                }
-            });
+            costGroup.countryName = tr.children("td:eq(0)").text(); //这里得到的是完整的国家名
+//            regionList.forEach(function(region){
+//                if(region.name == countryName){
+//                    costGroup.country_code = region.country_code;
+//                }
+//            });
             costGroup.cost_upper_limit = value;
             cost_array.push(costGroup);
         });

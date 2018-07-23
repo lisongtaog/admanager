@@ -44,7 +44,7 @@ public class CountryAnalysisReport extends HttpServlet {
         String beforeFourDay = DateUtil.addDay(endTime,-4,"yyyy-MM-dd");//不包括endTime
         String beforeTwentyTwoDay = DateUtil.addDay(endTime,-22,"yyyy-MM-dd");//不包括endTime
 
-
+        HashMap<String,String> countryNameCodeMap = Utils.getCountryNameCodeMap();
         if(path.matches("/modify_web_ad_rules")){
             String cost_array = request.getParameter("cost_array");
             String app_name = request.getParameter("app_name");
@@ -53,7 +53,8 @@ public class CountryAnalysisReport extends HttpServlet {
             boolean flag = false;
             for(int i=0;i<cost_JsonArray.size();i++){
                 JsonObject json = cost_JsonArray.get(i).getAsJsonObject();
-                String countryCode = json.get("country_code").getAsString();
+                String countryName = json.get("countryName").getAsString();
+                String countryCode = countryNameCodeMap.get(countryName);
                 String cost = json.get("cost_upper_limit").getAsString();
                 try{
                     String sql = "SELECT id,rule_content FROM web_ad_rules WHERE rule_type = 3 AND rule_content LIKE '%app_name=" + app_name + "%country_code=" + countryCode + "%'";
