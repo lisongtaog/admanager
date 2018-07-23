@@ -69,6 +69,7 @@
             <th>Installed</th>
             <th>UninstalledRate</th>
             <th>ActiveUser</th>
+            <th>ad_new_revenue</th>
             <th>Revenue</th>
             <th>Incoming</th>
             <th>PI</th>
@@ -135,6 +136,7 @@
                     "<th>Installed<span sorterId=\"1034\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
                     "<th>UninstalledRate</th>" +
                     "<th>ActiveUser<span sorterId=\"1038\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
+                    "<th>ad_new_revenue<span sorterId=\"1038\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
                     "<th>Revenue<span sorterId=\"1039\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
                     "<th>Incoming<span sorterId=\"1042\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
                     "<th>PI</th>" +
@@ -207,7 +209,7 @@
         var len = arr.length;
         var one;
         var keyset = ["costs","cost_upper_limit","purchased_users", "installed", "uninstalled_rate",
-            "active_users", "revenues","incoming","pi", "arpu", "ecpm","c_ecpm", "revenue_per_install","cpa",
+            "active_users", "ad_new_revenues","revenues","incoming","pi", "arpu", "ecpm","c_ecpm", "revenue_per_install","cpa",
             "a_cpa","cpa_div_ecpm", "seven_days_costs", "seven_days_revenues", "seven_days_incoming",
             "rt","thirty_days_active_user","bidding_summary"];
         for (var i = 0; i < len; i++) {
@@ -230,6 +232,8 @@
                     td = $('<td title="'+ one['every_day_uninstalled_rate_for_fourteen_days'] + '"></td>');
                 }else if('active_users' == key){
                     td = $('<td title="'+ one['every_day_active_user_for_fourteen_days'] + '"></td>');
+                }else if('ad_new_revenues' == key){
+                    td = $('<td title="'+ one['every_day_ad_new_revenue_for_fourteen_days'] + '"></td>');
                 }else if('revenues' == key){
                     td = $('<td title="'+ one['every_day_revenue_for_fourteen_days'] + '"></td>');
                 }else if('pi' == key){

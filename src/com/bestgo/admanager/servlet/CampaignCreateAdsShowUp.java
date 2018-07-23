@@ -4,7 +4,6 @@ import com.bestgo.admanager.Config;
 import com.bestgo.common.database.services.DB;
 import com.bestgo.common.database.utils.JSObject;
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import javax.servlet.ServletException;
@@ -13,7 +12,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @WebServlet(name = "CampaignCreateAdsShowUp", urlPatterns = "/campaign_create_ads_show_up/*")
 public class CampaignCreateAdsShowUp extends HttpServlet {
@@ -74,12 +76,7 @@ public class CampaignCreateAdsShowUp extends HttpServlet {
                 JsonObject temp = new JsonObject();
                 Integer group_id = j.get("group_id");
                 temp.addProperty("group_id", group_id);
-                //选择worldWide，默认显示英语
-                if ("null".equals(j.get("language").toString())) {
-                    temp.addProperty("language", "English");
-                } else {
-                    temp.addProperty("language", j.get("language").toString());
-                }
+                temp.addProperty("language", j.get("language").toString());
                 temp.addProperty("title", j.get("title").toString());
                 temp.addProperty("message", j.get("message").toString());
                 adsArray.add(temp);
@@ -110,13 +107,7 @@ public class CampaignCreateAdsShowUp extends HttpServlet {
                 JsonObject temp = new JsonObject();
                 Integer group_id = j.get("group_id");
                 temp.addProperty("group_id", group_id);  //当 group_id 是 Integer类的时候需不需要
-                //选择All，默认显示英语
-                if ("null".equals(j.get("language").toString())) {
-                    temp.addProperty("language", "English");
-                } else {
-                    temp.addProperty("language", j.get("language").toString());
-                }
-//                temp.addProperty("language", j.get("language").toString());
+                temp.addProperty("language", j.get("language").toString());
                 temp.addProperty("message1", j.get("message1").toString());
                 temp.addProperty("message2", j.get("message2").toString());
                 temp.addProperty("message3", j.get("message3").toString());
