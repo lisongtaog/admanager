@@ -38,9 +38,12 @@ public class CountryAnalysisReport extends HttpServlet {
         String startTime = request.getParameter("startTime");
         String endTime = request.getParameter("endTime");
         boolean sameDate = false;
-        if (startTime.equals(endTime)) {
-            sameDate = true;
+        if (null != startTime) {
+            if (startTime.equals(endTime)) {
+                sameDate = true;
+            }
         }
+
 
         String sevenDaysAgo = DateUtil.addDay(endTime, -6, "yyyy-MM-dd");//包括endTime
         String fourteenDaysAgo = DateUtil.addDay(endTime, -13, "yyyy-MM-dd");//包括endTime
