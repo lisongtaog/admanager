@@ -60,7 +60,7 @@
         </div>
     </div>
     <table class="table table-hover">
-        公式：回本率=AdNewRevenue/Cost;ARPU = Revenue/ActiveUser
+        <span style="color: #0044cc">公式：回本率=AdNewRevenue/Cost;ARPU = Revenue/ActiveUser</span>
         <thead id="result_header">
         <tr>
             <th>国家</th>
@@ -133,7 +133,7 @@
                         "<th>Installed<span sorterId=\"1034\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
                         "<th>UninstalledRate</th>" +
                         "<th>ActiveUser<span sorterId=\"1038\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
-                        "<thadNewRevenue<span sorterId=\"1038\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
+                        "<th>AdNewRevenue<span sorterId=\"1038\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
                         "<th>Revenue<span sorterId=\"1039\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
                         "<th>FirstDayRevenue</th>" +
                         "<th>SecondDayRevenue</th>" +
@@ -160,7 +160,7 @@
                         "<th>Installed<span sorterId=\"1034\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
                         "<th>UninstalledRate</th>" +
                         "<th>ActiveUser<span sorterId=\"1038\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
-                        "<th>adNewRevenue<span sorterId=\"1038\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
+                        "<th>AdNewRevenue<span sorterId=\"1038\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
                         "<th>Revenue<span sorterId=\"1039\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
                         "<th>Incoming<span sorterId=\"1042\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
                         "<th>PI</th>" +
