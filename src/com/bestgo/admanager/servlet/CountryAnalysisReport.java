@@ -192,7 +192,6 @@ public class CountryAnalysisReport extends HttpServlet {
                                 sql += " order by total_cost desc";
 
                         }
-                        java.lang.System.out.println(sql);
                         List<JSObject> countryDetailJSObjectList = DB.findListBySql(sql);
 
                         double totalCost = 0;
@@ -303,7 +302,7 @@ public class CountryAnalysisReport extends HttpServlet {
                                     aCpa = NumberUtil.convertDouble(oneC.get("a_cpa"), 0);
                                 }
 
-                                double ad_new_revenues = NumberUtil.convertDouble(j.get("ad_new_revenues"), 0);
+                                double adNewRevenues = NumberUtil.convertDouble(j.get("ad_new_revenues"), 0);
                                 double revenues = NumberUtil.convertDouble(j.get("revenues"), 0);
                                 double ecpm = NumberUtil.convertDouble(j.get("ecpm"), 0);
                                 sql = "select country_name from app_country_code_dict where country_code = '" + countryCode + "'";
@@ -405,6 +404,8 @@ public class CountryAnalysisReport extends HttpServlet {
                                     }
                                 }
 
+                                //回本率=新用户收入/总花费
+                                double recoveryCostRatio = costs == 0 ? 0 : adNewRevenues / costs;
                                 JsonObject d = new JsonObject();
                                 d.addProperty("country_name", countryName);
                                 d.addProperty("bidding_summary", biddingSummaryStr);
@@ -413,7 +414,8 @@ public class CountryAnalysisReport extends HttpServlet {
                                 d.addProperty("installed", installed);
                                 d.addProperty("uninstalled_rate", NumberUtil.trimDouble(uninstalledRate, 3));
                                 d.addProperty("active_users", activeUsers);
-                                d.addProperty("ad_new_revenues", NumberUtil.trimDouble(ad_new_revenues, 0));
+                                d.addProperty("ad_new_revenues", NumberUtil.trimDouble(adNewRevenues, 0));
+                                d.addProperty("recovery_cost_ratio", NumberUtil.trimDouble(recoveryCostRatio, 3));
                                 d.addProperty("revenues", NumberUtil.trimDouble(revenues, 0));
                                 double rpi = 0;
                                 if (cpiMap.get(countryCode) != null) {
