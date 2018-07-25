@@ -7,7 +7,7 @@
 
 <html>
 <head>
-    <title>广告存储</title>
+    <title>广告语替换</title>
     <style>
         .red {
             color: red;
