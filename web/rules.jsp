@@ -141,7 +141,7 @@
                     </div>
 
                     <div class="form-group" id="inputSearchDiv">
-                        <label for="inputSearch" class="col-sm-2 control-label">tag_name</label>
+                        <label for="inputSearch" class="col-sm-2 control-label">标签名称</label>
                         <div class="col-sm-10">
                             <input id="inputSearch" class="form-control" style="display: inline; width: auto;"
                                    type="text"/>
