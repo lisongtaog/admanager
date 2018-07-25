@@ -52,14 +52,14 @@
 
     <div class="form-horizontal" action="#" id="formFacebook">
         <div class="form-group">
-            <label for="selectApp" class="col-sm-2 control-label">应用1</label>
+            <label for="selectApp" class="col-sm-2 control-label">即将生成的应用：</label>
             <div class="col-sm-3">
                 <select class="form-control" id="selectApp">
                 </select>
             </div>
         </div><br>
         <div class="form-group">
-            <label for="selectApp" class="col-sm-2 control-label">应用2</label>
+            <label for="selectApp" class="col-sm-2 control-label">已经存在的应用：</label>
             <div class="col-sm-3">
                 <select class="form-control" id="selectApp1">
                 </select>
