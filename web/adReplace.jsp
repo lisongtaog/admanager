@@ -84,8 +84,8 @@
     function init() {
         $("li[role='presentation']:eq(11)").addClass("active");
 
-        //连着三个post用于往【应用】下拉列表里动态添加选项
-        $.post('try/tagName/query', {
+        //post用于往【应用】下拉列表里动态添加选项
+        $.post('adReplace/tagName/query', {
             word: '',
         }, function(data) {
             if (data && data.ret == 1) {
@@ -107,7 +107,7 @@
         var app1 = $('#selectApp1').val();
         var option = $('input[name="optionsRadios"]:checked').val();
 
-        $.post("try/adReplace", {
+        $.post("adReplace/adReplace", {
             app0: app0,
             app1: app1,
             option:option
