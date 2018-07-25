@@ -60,7 +60,7 @@
         </div>
     </div>
     <table class="table table-hover">
-        <span style="color: #0044cc">公式：回本率=AdNewRevenue/Cost;ARPU = Revenue/ActiveUser</span>
+        <span style="color: #0044cc">公式：当天回本率=AdNewRevenue/Cost;ARPU = Revenue/ActiveUser</span>
         <thead id="result_header">
         <tr>
             <th>国家</th>
@@ -133,12 +133,9 @@
                         "<th>Installed<span sorterId=\"1034\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
                         "<th>UninstalledRate</th>" +
                         "<th>ActiveUser<span sorterId=\"1038\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
-                        "<th>AdNewRevenue<span sorterId=\"1038\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
                         "<th>Revenue<span sorterId=\"1039\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
-                        "<th>FirstDayRevenue</th>" +
-                        "<th>SecondDayRevenue</th>" +
-                        "<th>ThirdDayRevenue</th>" +
-                        "<th>FourthDayRevenue</th>" +
+                        "<th>AdNewRevenue<span sorterId=\"1038\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
+                        "<th>当天回本率</th>" +
                         "<th>Incoming<span sorterId=\"1042\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
                         "<th>PI</th>" +
                         "<th>ARPU</th>" +
@@ -148,7 +145,10 @@
                         "<th>ACpa</th>" +
                         "<th>CPA/ECPM</th>" +
                         "<th>RT</th>" +
-                        "<th>回本率</th>" +
+                        "<th>FirstDayRevenue</th>" +
+                        "<th>SecondDayRevenue</th>" +
+                        "<th>ThirdDayRevenue</th>" +
+                        "<th>FourthDayRevenue</th>" +
                         "<th>竞价</th>" +
                         "</tr>");
                     setData(data,1);
@@ -160,8 +160,9 @@
                         "<th>Installed<span sorterId=\"1034\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
                         "<th>UninstalledRate</th>" +
                         "<th>ActiveUser<span sorterId=\"1038\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
-                        "<th>AdNewRevenue<span sorterId=\"1038\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
                         "<th>Revenue<span sorterId=\"1039\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
+                        "<th>AdNewRevenue<span sorterId=\"1038\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
+                        "<th>当天回本率</th>" +
                         "<th>Incoming<span sorterId=\"1042\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
                         "<th>PI</th>" +
                         "<th>ARPU</th>" +
@@ -171,7 +172,6 @@
                         "<th>ACpa</th>" +
                         "<th>CPA/ECPM</th>" +
                         "<th>RT</th>" +
-                        "<th>回本率</th>" +
                         "<th>竞价</th>" +
                         "</tr>");
                     setData(data,0);
@@ -232,13 +232,13 @@
         var len = arr.length;
         var one;
         var keyset = ["costs","cost_upper_limit","purchased_users", "installed", "uninstalled_rate",
-            "active_users", "ad_new_revenues","revenues","incoming","pi", "arpu", "ecpm", "revenue_per_install","cpa",
-            "a_cpa","cpa_div_ecpm", "rt","recovery_cost_ratio","bidding_summary"];
+            "active_users","revenues", "ad_new_revenues","recovery_cost_ratio","incoming","pi", "arpu", "ecpm", "revenue_per_install","cpa",
+            "a_cpa","cpa_div_ecpm", "rt","bidding_summary"];
         if (same_date == 1) {
             keyset = ["costs","cost_upper_limit","purchased_users", "installed", "uninstalled_rate",
-                "active_users", "ad_new_revenues","revenues","first_day_revenue","second_day_revenue",
-                "third_day_revenue","fourth_day_revenue","incoming","pi", "arpu", "ecpm", "revenue_per_install","cpa",
-                "a_cpa","cpa_div_ecpm", "rt","recovery_cost_ratio","bidding_summary"];
+                "active_users","revenues", "ad_new_revenues","recovery_cost_ratio","incoming","pi", "arpu", "ecpm", "revenue_per_install","cpa",
+                "a_cpa","cpa_div_ecpm", "rt","first_day_revenue","second_day_revenue",
+                "third_day_revenue","fourth_day_revenue","bidding_summary"];
         }
         for (var i = 0; i < len; i++) {
             one = arr[i];
