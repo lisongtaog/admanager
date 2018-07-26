@@ -43,6 +43,9 @@ public class AutoCreateCampaign extends HttpServlet {
                 case "/create":
                     result = facebookCampaignCreate(request);
                     break;
+                case "/create2":
+                    result = facebookCampaignCreate2(request);
+                    break;
                 case "/delete":
                     result = facebookCampaignDelete(request);
                     break;
@@ -57,8 +60,8 @@ public class AutoCreateCampaign extends HttpServlet {
                     String tagName = request.getParameter("tagName"); //<input type="text">框内没有值时，默认有null值
                     String countryName = request.getParameter("country");  //而jQuery.ui 的 autocomplete()方法，当框内没有值时，默认""
                     JsonArray array = new JsonArray();
-                    List<JSObject> data = facebookFetchData(word,tagName,countryName);
-                    if(data.size()>0){
+                    List<JSObject> data = facebookFetchData(word, tagName, countryName);
+                    if (data.size() > 0) {
                         json.addProperty("ret", 1);
                         for (int i = 0; i < data.size(); i++) {
                             JsonObject one = new JsonObject();
@@ -72,7 +75,7 @@ public class AutoCreateCampaign extends HttpServlet {
                                 } else if (value instanceof Long) {
                                     one.addProperty(key, (Long) value);
                                 } else if (value instanceof Double) {
-                                    one.addProperty(key, NumberUtil.trimDouble((Double) value,4));
+                                    one.addProperty(key, NumberUtil.trimDouble((Double) value, 4));
                                 } else {
                                     one.addProperty(key, value.toString());
                                 }
@@ -100,7 +103,7 @@ public class AutoCreateCampaign extends HttpServlet {
                             } else if (value instanceof Long) {
                                 jsonObject.addProperty(key, (Long) value);
                             } else if (value instanceof Double) {
-                                jsonObject.addProperty(key, NumberUtil.trimDouble((Double) value,4));
+                                jsonObject.addProperty(key, NumberUtil.trimDouble((Double) value, 4));
                             } else {
                                 jsonObject.addProperty(key, value.toString());
                             }
@@ -121,6 +124,9 @@ public class AutoCreateCampaign extends HttpServlet {
                 case "/create":
                     result = adwordsCampaignCreate(request);
                     break;
+                case "/create2":
+                    result = adwordsCampaignCreate2(request);
+                    break;
                 case "/delete":
                     result = adwordsCampaignDelete(request);
                     break;
@@ -135,7 +141,7 @@ public class AutoCreateCampaign extends HttpServlet {
                     String tagName = request.getParameter("tagName");
                     String countryName = request.getParameter("country");
                     JsonArray array = new JsonArray();
-                    List<JSObject> data = adwordsFetchData(word,tagName,countryName);
+                    List<JSObject> data = adwordsFetchData(word, tagName, countryName);
                     json.addProperty("ret", 1);
                     for (int i = 0; i < data.size(); i++) {
                         JsonObject one = new JsonObject();
@@ -149,7 +155,7 @@ public class AutoCreateCampaign extends HttpServlet {
                             } else if (value instanceof Long) {
                                 one.addProperty(key, (Long) value);
                             } else if (value instanceof Double) {
-                                one.addProperty(key, NumberUtil.trimDouble((Double) value,4));
+                                one.addProperty(key, NumberUtil.trimDouble((Double) value, 4));
                             } else {
                                 one.addProperty(key, value.toString());
                             }
@@ -176,7 +182,7 @@ public class AutoCreateCampaign extends HttpServlet {
                             } else if (value instanceof Long) {
                                 jsonObject.addProperty(key, (Long) value);
                             } else if (value instanceof Double) {
-                                jsonObject.addProperty(key, NumberUtil.trimDouble((Double) value,4));
+                                jsonObject.addProperty(key, NumberUtil.trimDouble((Double) value, 4));
                             } else {
                                 jsonObject.addProperty(key, value.toString());
                             }
@@ -207,10 +213,10 @@ public class AutoCreateCampaign extends HttpServlet {
 
 
     static String[] FB_CAMPAIGN_FIELDS = {"id", "app_name", "create_count", "account_id", "country_region", "explode_country",
-                                           "excluded_region", "language", "age", "explode_age", "gender", "explode_gender",
-                                           "detail_target", "user_os", "user_devices","campaign_name", "bugdet", "bidding",
-                                           "explode_bidding", "max_cpa", "title", "message", "image_path", "create_time",
-                                           "update_time", "enabled","video_path","group_id","bid_strategy"};
+            "excluded_region", "language", "age", "explode_age", "gender", "explode_gender",
+            "detail_target", "user_os", "user_devices", "campaign_name", "bugdet", "bidding",
+            "explode_bidding", "max_cpa", "title", "message", "image_path", "create_time",
+            "update_time", "enabled", "video_path", "group_id", "bid_strategy"};
 
     public static JSObject facebookFetchById(String id) {
         try {
@@ -223,27 +229,27 @@ public class AutoCreateCampaign extends HttpServlet {
         return null;
     }
 
-    public static List<JSObject> facebookFetchData(String word,String tagName,String countryName) {
+    public static List<JSObject> facebookFetchData(String word, String tagName, String countryName) {
         List<JSObject> list = new ArrayList<>();
         try {
             if (StringUtil.isNotEmpty(tagName) && countryName.isEmpty() && (StringUtil.isEmpty(word))) {
                 return DB.scan("ad_campaigns_auto_create").select(FB_CAMPAIGN_FIELDS)
-                        .where(DB.filter().whereEqualTo("app_name",tagName)).orderByAsc("id").execute();
-            }else if(StringUtil.isNotEmpty(tagName) && StringUtil.isNotEmpty(countryName) && (StringUtil.isEmpty(word))){
+                        .where(DB.filter().whereEqualTo("app_name", tagName)).orderByAsc("id").execute();
+            } else if (StringUtil.isNotEmpty(tagName) && StringUtil.isNotEmpty(countryName) && (StringUtil.isEmpty(word))) {
                 return DB.scan("ad_campaigns_auto_create").select(FB_CAMPAIGN_FIELDS)
-                        .where(DB.filter().whereEqualTo("app_name",tagName))
-                        .and(DB.filter().whereEqualTo("country_region",countryName))
+                        .where(DB.filter().whereEqualTo("app_name", tagName))
+                        .and(DB.filter().whereEqualTo("country_region", countryName))
                         .orderByAsc("id").execute();
-            }else if(StringUtil.isNotEmpty(tagName) && StringUtil.isNotEmpty(word)  && countryName.isEmpty()){
+            } else if (StringUtil.isNotEmpty(tagName) && StringUtil.isNotEmpty(word) && countryName.isEmpty()) {
                 return DB.scan("ad_campaigns_auto_create").select(FB_CAMPAIGN_FIELDS)
-                        .where(DB.filter().whereEqualTo("app_name",tagName))
+                        .where(DB.filter().whereEqualTo("app_name", tagName))
                         .and(DB.filter().whereLikeTo("campaign_name", "%" + word + "%"))
                         .orderByAsc("id").execute();
-            }else if(StringUtil.isNotEmpty(tagName) && StringUtil.isNotEmpty(word)  &&  StringUtil.isNotEmpty(countryName)){
+            } else if (StringUtil.isNotEmpty(tagName) && StringUtil.isNotEmpty(word) && StringUtil.isNotEmpty(countryName)) {
                 return DB.scan("ad_campaigns_auto_create").select(FB_CAMPAIGN_FIELDS)
-                        .where(DB.filter().whereEqualTo("app_name",tagName))
+                        .where(DB.filter().whereEqualTo("app_name", tagName))
                         .and(DB.filter().whereLikeTo("campaign_name", "%" + word + "%"))
-                        .and(DB.filter().whereEqualTo("country_region",countryName))
+                        .and(DB.filter().whereEqualTo("country_region", countryName))
                         .orderByAsc("id").execute();
             }
 
@@ -277,29 +283,30 @@ public class AutoCreateCampaign extends HttpServlet {
         return 0;
     }
 
-    private OperationResult facebookCampaignBiddingBatchUpdate(HttpServletRequest request){
+    private OperationResult facebookCampaignBiddingBatchUpdate(HttpServletRequest request) {
         OperationResult result = new OperationResult();
         JsonParser parser = new JsonParser();
         String bidding_array = request.getParameter("bidding_array");
         JsonArray bidding_JsonArray = parser.parse(bidding_array).getAsJsonArray();
-        try{
-            for(int i=0;i<bidding_JsonArray.size();i++){
+        try {
+            for (int i = 0; i < bidding_JsonArray.size(); i++) {
                 JsonObject j = bidding_JsonArray.get(i).getAsJsonObject();
                 String id = j.get("id").getAsString();
                 String bidding = j.get("bidding").getAsString();
                 DB.update("ad_campaigns_auto_create")
-                        .put("bidding",bidding)
+                        .put("bidding", bidding)
                         .where(DB.filter().whereEqualTo("id", id))  //这里 id 可是一个String 类型啊！
                         .execute();
             }
             result.result = true;
             result.message = "批量更新成功";
-        }catch (Exception e){
+        } catch (Exception e) {
             result.result = false;
             result.message = e.getMessage();
         }
         return result;
     }
+
     private OperationResult facebookCampaignCreate(HttpServletRequest request) {
         OperationResult result = new OperationResult();
         try {
@@ -333,11 +340,11 @@ public class AutoCreateCampaign extends HttpServlet {
             String pageId = request.getParameter("FBpage[pageId]");
             String imagePath = new String();
             String videoPath = new String();
-            if(identification.equals("image")){
+            if (identification.equals("image")) {
                 imagePath = materialPath;
                 videoPath = "";
-            }else if(identification.equals("video")){
-                videoPath =  materialPath;
+            } else if (identification.equals("video")) {
+                videoPath = materialPath;
                 imagePath = "";
             }
 
@@ -358,20 +365,20 @@ public class AutoCreateCampaign extends HttpServlet {
                 result.message = "预算不能为空";
             } else if (bidding.isEmpty()) {
                 result.message = "出价不能为空";
-            }else if(gender == null){
+            } else if (gender == null) {
                 result.message = "性别不能为空";
-            }else if(region.isEmpty()){
+            } else if (region.isEmpty()) {
                 result.message = "国家不能为空";
-            }else if(publisherPlatforms.isEmpty()){
+            } else if (publisherPlatforms.isEmpty()) {
                 result.message = "版位不能为空";
-            }else {
+            } else {
                 double dBidding = NumberUtil.parseDouble(bidding, 0);
                 Double maxBiddingDouble = Campaign.tagMaxBiddingRelationMap.get(appName);
                 if (maxBiddingDouble != null && maxBiddingDouble != 0 && dBidding > maxBiddingDouble) {
                     result.message = "bidding超过了本应用的最大出价,   " + bidding + " > " + maxBiddingDouble;
-                } else{
+                } else {
                     //路径检查
-                    if(!imagePath.isEmpty()){
+                    if (!imagePath.isEmpty()) {
                         JSObject record = DB.simpleScan("web_system_config").select("config_value").where(DB.filter().whereEqualTo("config_key", "fb_image_path")).execute();
                         String imageRoot = null;
                         if (record.hasObjectData()) {
@@ -380,15 +387,15 @@ public class AutoCreateCampaign extends HttpServlet {
                         imagesPath = new File(imageRoot + File.separatorChar + imagePath);
                         if (imagesPath.exists()) {
                             uploadImages = FileUtils.listFiles(imagesPath, null, false);
-                            if(uploadImages != null && uploadImages.size() == 1){
+                            if (uploadImages != null && uploadImages.size() == 1) {
                                 result.result = true;
-                            }else{
+                            } else {
                                 result.message = "创建失败，每个系列必须而且只能上传一张图片";
                             }
-                        }else{
+                        } else {
                             result.message = "图片路径不存在";
                         }
-                    }else if(!videoPath.isEmpty()){
+                    } else if (!videoPath.isEmpty()) {
                         JSObject record = DB.simpleScan("web_system_config").select("config_value").where(DB.filter().whereEqualTo("config_key", "fb_video_path")).execute();
                         String videoRoot = null;
                         if (record.hasObjectData()) {
@@ -397,15 +404,15 @@ public class AutoCreateCampaign extends HttpServlet {
                         videosPath = new File(videoRoot + File.separatorChar + videoPath);
                         if (videosPath.exists()) {
                             uploadVideos = FileUtils.listFiles(videosPath, null, false);
-                            if(uploadVideos != null && uploadVideos.size() == 2){
+                            if (uploadVideos != null && uploadVideos.size() == 2) {
                                 result.result = true;
-                            }else{
+                            } else {
                                 result.message = "创建失败，每个系列必须而且只能上传一个视频和一个缩略图";
                             }
-                        }else{
+                        } else {
                             result.message = "视频路径不存在";
                         }
-                    }else {
+                    } else {
                         result.message = "图片或视频路径二选一，不能为空！";
                     }
                 }
@@ -445,14 +452,180 @@ public class AutoCreateCampaign extends HttpServlet {
                         .put("image_path", imagePath)
                         .put("video_path", videoPath)
                         .put("create_time", DateUtil.getNowTime())
-                        .put("publisher_platforms",publisherPlatforms)
-                        .put("bid_strategy",bidStrategy)
-                        .put("page_id",pageId)
+                        .put("publisher_platforms", publisherPlatforms)
+                        .put("bid_strategy", bidStrategy)
+                        .put("page_id", pageId)
                         .execute();
                 if (record) {
                     result.result = true;
                     result.message = "创建成功";
-                }else {
+                } else {
+                    result.result = false;
+                    result.message = "创建失败";
+                }
+            }
+        } catch (Exception ex) {
+            result.result = false;
+            result.message = ex.getMessage();
+        }
+        return result;
+    }
+
+    private OperationResult facebookCampaignCreate2(HttpServletRequest request) {
+        OperationResult result = new OperationResult();
+        try {
+            String flag = request.getParameter("flag");
+            String appName = request.getParameter("appName");
+            String accountName = request.getParameter("accountName");
+            String accountId = request.getParameter("accountId");
+            String createCount = request.getParameter("createCount");
+            String excludedRegion = request.getParameter("excludedRegion");
+            String language = request.getParameter("language");
+            String interest = request.getParameter("interest");
+            String userOs = request.getParameter("userOs");
+            String userDevice = request.getParameter("userDevice");
+            String campaignName = request.getParameter("campaignName");
+            String bugdet = request.getParameter("bugdet");
+            String maxCPA = request.getParameter("maxCPA");
+            String groupId = request.getParameter("groupId");
+            String title = request.getParameter("title");
+            String message = request.getParameter("message");
+            String region = request.getParameter("region");
+            String age = request.getParameter("age");
+            String gender = request.getParameter("gender");
+            String bidding = request.getParameter("bidding");
+            String explodeCountry = request.getParameter("explodeCountry");
+            String explodeAge = request.getParameter("explodeAge");
+            String explodeGender = request.getParameter("explodeGender");
+            String explodeBidding = request.getParameter("explodeBidding");
+            String identification = request.getParameter("identification");
+            String materialPath = request.getParameter("materialPath");
+            String publisherPlatforms = request.getParameter("publisherPlatforms");
+            String bidStrategy = request.getParameter("bidStrategy");
+            String pageId = request.getParameter("FBpage[pageId]");
+            String imagePath = new String();
+            String videoPath = new String();
+            if (identification.equals("image")) {
+                imagePath = materialPath;
+                videoPath = "";
+            } else if (identification.equals("video")) {
+                videoPath = materialPath;
+                imagePath = "";
+            }
+
+            result.result = false;
+            File imagesPath = null;
+            File videosPath = null;
+            Collection<File> uploadImages = null;
+            Collection<File> uploadVideos = null;
+            if (createCount.isEmpty()) {
+                result.message = "创建数量不能为空";
+            } else if (title.isEmpty()) {
+                result.message = "标题不能为空";
+            } else if (message.isEmpty()) {
+                result.message = "广告语不能为空";
+            } else if (campaignName.isEmpty()) {
+                result.message = "广告系列名称不能为空";
+            } else if (bugdet.isEmpty()) {
+                result.message = "预算不能为空";
+            } else if (bidding.isEmpty()) {
+                result.message = "出价不能为空";
+            } else if (gender == null) {
+                result.message = "性别不能为空";
+            } else if (region.isEmpty()) {
+                result.message = "国家不能为空";
+            } else if (publisherPlatforms.isEmpty()) {
+                result.message = "版位不能为空";
+            } else {
+                double dBidding = NumberUtil.parseDouble(bidding, 0);
+                Double maxBiddingDouble = Campaign.tagMaxBiddingRelationMap.get(appName);
+                if (maxBiddingDouble != null && maxBiddingDouble != 0 && dBidding > maxBiddingDouble) {
+                    result.message = "bidding超过了本应用的最大出价,   " + bidding + " > " + maxBiddingDouble;
+                } else {
+                    //路径检查
+                    if (!imagePath.isEmpty()) {
+                        JSObject record = DB.simpleScan("web_system_config").select("config_value").where(DB.filter().whereEqualTo("config_key", "fb_image_path")).execute();
+                        String imageRoot = null;
+                        if (record.hasObjectData()) {
+                            imageRoot = record.get("config_value");
+                        }
+                        imagesPath = new File(imageRoot + File.separatorChar + imagePath);
+                        if (imagesPath.exists()) {
+                            uploadImages = FileUtils.listFiles(imagesPath, null, false);
+                            if (uploadImages != null && uploadImages.size() == 1) {
+                                result.result = true;
+                            } else {
+                                result.message = "创建失败，每个系列必须而且只能上传一张图片";
+                            }
+                        } else {
+                            result.message = "图片路径不存在";
+                        }
+                    } else if (!videoPath.isEmpty()) {
+                        JSObject record = DB.simpleScan("web_system_config").select("config_value").where(DB.filter().whereEqualTo("config_key", "fb_video_path")).execute();
+                        String videoRoot = null;
+                        if (record.hasObjectData()) {
+                            videoRoot = record.get("config_value");
+                        }
+                        videosPath = new File(videoRoot + File.separatorChar + videoPath);
+                        if (videosPath.exists()) {
+                            uploadVideos = FileUtils.listFiles(videosPath, null, false);
+                            if (uploadVideos != null && uploadVideos.size() == 2) {
+                                result.result = true;
+                            } else {
+                                result.message = "创建失败，每个系列必须而且只能上传一个视频和一个缩略图";
+                            }
+                        } else {
+                            result.message = "视频路径不存在";
+                        }
+                    } else {
+                        result.message = "图片或视频路径二选一，不能为空！";
+                    }
+                }
+            }
+
+            if (result.result) {
+                campaignName = campaignName + "_Strategy" + bidStrategy;
+                if (campaignName.length() > 150) {
+                    campaignName = campaignName.substring(0, 150);
+                }
+                interest = (interest == null) ? "" : interest;
+                userOs = (userOs == null) ? "" : userOs;
+                userDevice = (userDevice == null) ? "" : userDevice;
+                boolean record = DB.insert("ad_campaigns_auto_create")
+                        .put("app_name", appName)
+                        .put("create_count", NumberUtil.parseInt(createCount, 0))
+                        .put("account_id", accountId)
+                        .put("country_region", region)
+                        .put("explode_country", Boolean.parseBoolean(explodeCountry) ? 1 : 0)
+                        .put("excluded_region", excludedRegion)
+                        .put("language", language)
+                        .put("age", age)
+                        .put("explode_age", Boolean.parseBoolean(explodeAge) ? 1 : 0)
+                        .put("gender", gender)
+                        .put("explode_gender", Boolean.parseBoolean(explodeGender) ? 1 : 0)
+                        .put("detail_target", interest)
+                        .put("user_os", userOs)
+                        .put("user_devices", userDevice)
+                        .put("campaign_name", campaignName)
+                        .put("bugdet", bugdet)
+                        .put("bidding", bidding)
+                        .put("explode_bidding", Boolean.parseBoolean(explodeBidding) ? 1 : 0)
+                        .put("max_cpa", maxCPA)
+                        .put("group_id", groupId)
+                        .put("title", title)
+                        .put("message", message)
+                        .put("image_path", imagePath)
+                        .put("video_path", videoPath)
+                        .put("create_time", DateUtil.getNowTime())
+                        .put("publisher_platforms", publisherPlatforms)
+                        .put("bid_strategy", bidStrategy)
+                        .put("page_id", pageId)
+                        .put("mode_type", Integer.parseInt(flag))
+                        .execute();
+                if (record) {
+                    result.result = true;
+                    result.message = "创建成功";
+                } else {
                     result.result = false;
                     result.message = "创建失败";
                 }
@@ -495,12 +668,12 @@ public class AutoCreateCampaign extends HttpServlet {
             String explodeBidding = request.getParameter("explodeBidding");
             String imagePath = new String();
             String videoPath = new String();
-            if(identification.equals("image")){
-               imagePath = materialPath;
-               videoPath = "";
-            }else{
-               videoPath = materialPath;
-               imagePath = "";
+            if (identification.equals("image")) {
+                imagePath = materialPath;
+                videoPath = "";
+            } else {
+                videoPath = materialPath;
+                imagePath = "";
             }
             result.result = true;
             JSObject record = DB.simpleScan("web_system_config").select("config_value").where(DB.filter().whereEqualTo("config_key", "fb_image_path")).execute();
@@ -532,11 +705,11 @@ public class AutoCreateCampaign extends HttpServlet {
                 result.result = false;
                 result.message = "出价不能为空";
             }
-            if(gender == null){
+            if (gender == null) {
                 result.result = false;
                 result.message = "性别不能为空";
             }
-            if(region.isEmpty()){
+            if (region.isEmpty()) {
                 result.result = false;
                 result.message = "国家不能为空";
             }
@@ -546,14 +719,14 @@ public class AutoCreateCampaign extends HttpServlet {
                 result.message = "bidding超过了0.5,   " + bidding;
             }
 
-            if(identification.equals("image")){
+            if (identification.equals("image")) {
                 File imagesPath = new File(imageRoot + File.separatorChar + materialPath);
                 if (!imagesPath.exists()) {
                     result.result = false;
                     result.message = "图片路径不存在";
                 }
-            }else if(identification.equals("video")){
-                File videosPath = new File(videoRoot+File.separatorChar + materialPath);
+            } else if (identification.equals("video")) {
+                File videosPath = new File(videoRoot + File.separatorChar + materialPath);
                 if (!videosPath.exists()) {
                     result.result = false;
                     result.message = "视频路径不存在";
@@ -606,7 +779,7 @@ public class AutoCreateCampaign extends HttpServlet {
         try {
             String id_batch = request.getParameter("id_batch");
             String[] id_array = id_batch.split(",");
-            for (String id:id_array){   //这里会有删不掉的隐患吗？
+            for (String id : id_array) {   //这里会有删不掉的隐患吗？
                 DB.delete("ad_campaigns_auto_create")
                         .where(DB.filter().whereEqualTo("id", id))
                         .execute();
@@ -626,16 +799,16 @@ public class AutoCreateCampaign extends HttpServlet {
             String id = request.getParameter("id");
             String id_batch = request.getParameter("id_batch");
             String enable = request.getParameter("enable");
-            if(id!=null){
+            if (id != null) {
                 DB.update("ad_campaigns_auto_create")
                         .put("enabled", "true".equals(enable) ? 1 : 0)
                         .where(DB.filter().whereEqualTo("id", id))
                         .execute();
                 result.result = true;
                 result.message = "操作成功";
-            }else if(id_batch!=null){
-                String sql = "update ad_campaigns_auto_create set enabled = "+("true".equals(enable) ? 1 : 0)+
-                             " where id in("+id_batch+")";
+            } else if (id_batch != null) {
+                String sql = "update ad_campaigns_auto_create set enabled = " + ("true".equals(enable) ? 1 : 0) +
+                        " where id in(" + id_batch + ")";
                 DB.updateBySql(sql); //待测试是否真的存入
                 result.result = true;
                 result.message = "操作成功";
@@ -650,7 +823,7 @@ public class AutoCreateCampaign extends HttpServlet {
 
     static String[] ADWORDS_CAMPAIGN_FIELDS = {"id", "app_name", "create_count", "account_id", "country_region", "explode_country",
             "excluded_region", "language", "message1", "message2", "message3", "message4",
-            "campaign_name", "bugdet", "bidding", "explode_bidding", "max_cpa", "image_path", "create_time", "update_time", "enabled","conversion_id"};
+            "campaign_name", "bugdet", "bidding", "explode_bidding", "max_cpa", "image_path", "create_time", "update_time", "enabled", "conversion_id"};
 
     public static JSObject adwordsFetchById(String id) {
         try {
@@ -663,27 +836,27 @@ public class AutoCreateCampaign extends HttpServlet {
         return null;
     }
 
-    public static List<JSObject> adwordsFetchData(String word,String tagName,String countryName) {
+    public static List<JSObject> adwordsFetchData(String word, String tagName, String countryName) {
         List<JSObject> list = new ArrayList<>();
         try {
             if (StringUtil.isNotEmpty(tagName) && countryName.isEmpty() && (StringUtil.isEmpty(word))) {
                 return DB.scan("ad_campaigns_admob_auto_create").select(ADWORDS_CAMPAIGN_FIELDS)
-                        .where(DB.filter().whereEqualTo("app_name",tagName)).orderByAsc("id").execute();
-            }else if(StringUtil.isNotEmpty(tagName) && StringUtil.isNotEmpty(countryName) && (StringUtil.isEmpty(word))){
+                        .where(DB.filter().whereEqualTo("app_name", tagName)).orderByAsc("id").execute();
+            } else if (StringUtil.isNotEmpty(tagName) && StringUtil.isNotEmpty(countryName) && (StringUtil.isEmpty(word))) {
                 return DB.scan("ad_campaigns_admob_auto_create").select(ADWORDS_CAMPAIGN_FIELDS)
-                        .where(DB.filter().whereEqualTo("app_name",tagName))
-                        .and(DB.filter().whereEqualTo("country_region",countryName))
+                        .where(DB.filter().whereEqualTo("app_name", tagName))
+                        .and(DB.filter().whereEqualTo("country_region", countryName))
                         .orderByAsc("id").execute();
-            }else if(StringUtil.isNotEmpty(tagName) && StringUtil.isNotEmpty(word)  && countryName.isEmpty()){
+            } else if (StringUtil.isNotEmpty(tagName) && StringUtil.isNotEmpty(word) && countryName.isEmpty()) {
                 return DB.scan("ad_campaigns_admob_auto_create").select(ADWORDS_CAMPAIGN_FIELDS)
-                        .where(DB.filter().whereEqualTo("app_name",tagName))
+                        .where(DB.filter().whereEqualTo("app_name", tagName))
                         .and(DB.filter().whereLikeTo("campaign_name", "%" + word + "%"))
                         .orderByAsc("id").execute();
-            }else if(StringUtil.isNotEmpty(tagName) && StringUtil.isNotEmpty(word)  &&  StringUtil.isNotEmpty(countryName)){
+            } else if (StringUtil.isNotEmpty(tagName) && StringUtil.isNotEmpty(word) && StringUtil.isNotEmpty(countryName)) {
                 return DB.scan("ad_campaigns_admob_auto_create").select(ADWORDS_CAMPAIGN_FIELDS)
-                        .where(DB.filter().whereEqualTo("app_name",tagName))
+                        .where(DB.filter().whereEqualTo("app_name", tagName))
                         .and(DB.filter().whereLikeTo("campaign_name", "%" + word + "%"))
-                        .and(DB.filter().whereEqualTo("country_region",countryName))
+                        .and(DB.filter().whereEqualTo("country_region", countryName))
                         .orderByAsc("id").execute();
             }
         } catch (Exception ex) {
@@ -716,31 +889,31 @@ public class AutoCreateCampaign extends HttpServlet {
         return 0;
     }
 
-    private OperationResult adwordsCampaignBiddingBatchUpdate(HttpServletRequest request){
+    private OperationResult adwordsCampaignBiddingBatchUpdate(HttpServletRequest request) {
         OperationResult result = new OperationResult();
         JsonParser parser = new JsonParser();
         String bidding_array = request.getParameter("bidding_array");
         JsonArray bidding_JsonArray = parser.parse(bidding_array).getAsJsonArray();
-        try{
-            for(int i=0;i<bidding_JsonArray.size();i++){
+        try {
+            for (int i = 0; i < bidding_JsonArray.size(); i++) {
                 JsonObject j = bidding_JsonArray.get(i).getAsJsonObject();
                 String id = j.get("id").getAsString();
                 String bidding = j.get("bidding").getAsString();
                 DB.update("ad_campaigns_admob_auto_create")
-                        .put("bidding",bidding)
+                        .put("bidding", bidding)
                         .where(DB.filter().whereEqualTo("id", id))  //这里 id 可是一个String 类型啊！
                         .execute();
             }
             result.result = true;
             result.message = "批量更新成功";
-        }catch (Exception e){
+        } catch (Exception e) {
             result.result = false;
             result.message = e.getMessage();
         }
         return result;
     }
 
-    private OperationResult  adwordsCampaignCreate(HttpServletRequest request) {
+    private OperationResult adwordsCampaignCreate(HttpServletRequest request) {
         OperationResult result = new OperationResult();
         try {
             String appName = request.getParameter("appName");
@@ -786,7 +959,7 @@ public class AutoCreateCampaign extends HttpServlet {
                 Double maxBiddingDouble = CampaignAdmob.tagMaxBiddingRelationMap.get(appName);
                 if (maxBiddingDouble != null && maxBiddingDouble != 0 && dBidding > maxBiddingDouble) {
                     result.message = "bidding超过了本应用的最大出价,   " + bidding + " > " + maxBiddingDouble;
-                }else{
+                } else {
                     JSObject record = DB.simpleScan("web_system_config").select("config_value").where(DB.filter().whereEqualTo("config_key", "admob_image_path")).execute();
                     String imageRoot = "";
                     if (record.hasObjectData()) {
@@ -795,14 +968,14 @@ public class AutoCreateCampaign extends HttpServlet {
                     File imagesPath = new File(imageRoot + File.separatorChar + imagePath);
                     if (imagesPath.exists()) {
                         result.result = true;
-                    }else{
+                    } else {
                         result.message = "图片路径不存在";
                     }
                 }
             }
             if (result.result) {
                 String s = String.valueOf(System.currentTimeMillis());
-                campaignName = campaignName+"_"+s.substring(s.length() - 6, s.length());
+                campaignName = campaignName + "_" + s.substring(s.length() - 6, s.length());
                 if (campaignName.length() > 110) {
                     campaignName = campaignName.substring(0, 110);
                 }
@@ -828,6 +1001,112 @@ public class AutoCreateCampaign extends HttpServlet {
                         .put("max_cpa", maxCPA)
                         .put("image_path", imagePath)
                         .put("create_time", DateUtil.getNowTime())
+                        .executeReturnId();
+                if (recordId > 0) {
+                    result.result = true;
+                    result.message = "创建成功";
+                } else {
+                    result.result = false;
+                    result.message = "创建失败";
+                }
+            }
+        } catch (Exception ex) {
+            result.result = false;
+            result.message = ex.getMessage();
+        }
+        return result;
+    }
+
+    private OperationResult adwordsCampaignCreate2(HttpServletRequest request) {
+        OperationResult result = new OperationResult();
+        try {
+            String flag = request.getParameter("flag");
+            String appName = request.getParameter("appName");
+            String accountName = request.getParameter("accountName");
+            String accountId = request.getParameter("accountId");
+            String createCount = request.getParameter("createCount");
+            String excludedRegion = request.getParameter("excludedRegion");
+            String language = request.getParameter("language");
+            String conversionId = request.getParameter("conversion_id");
+            String campaignName = request.getParameter("campaignName");
+            String bugdet = request.getParameter("bugdet");
+            String maxCPA = request.getParameter("maxCPA");
+            String groupId = request.getParameter("groupId");
+            String message1 = request.getParameter("message1");
+            String message2 = request.getParameter("message2");
+            String message3 = request.getParameter("message3");
+            String message4 = request.getParameter("message4");
+            String imagePath = request.getParameter("imagePath");
+            String region = request.getParameter("region");
+            String bidding = request.getParameter("bidding");
+            String explodeCountry = request.getParameter("explodeCountry");
+            String explodeBidding = request.getParameter("explodeBidding");
+
+            result.result = false;
+            if (createCount.isEmpty()) {
+                result.message = "创建数量不能为空";
+            } else if (message1.isEmpty()) {
+                result.message = "广告语1不能为空";
+            } else if (message2.isEmpty()) {
+                result.message = "广告语2不能为空";
+            } else if (message3.isEmpty()) {
+                result.message = "广告语3不能为空";
+            } else if (message4.isEmpty()) {
+                result.message = "广告语4不能为空";
+            } else if (campaignName.isEmpty()) {
+                result.message = "广告系列名称不能为空";
+            } else if (bugdet.isEmpty()) {
+                result.message = "预算不能为空";
+            } else if (bidding.isEmpty()) {
+                result.message = "出价不能为空";
+            } else {
+                double dBidding = NumberUtil.parseDouble(bidding, 0);
+                Double maxBiddingDouble = CampaignAdmob.tagMaxBiddingRelationMap.get(appName);
+                if (maxBiddingDouble != null && maxBiddingDouble != 0 && dBidding > maxBiddingDouble) {
+                    result.message = "bidding超过了本应用的最大出价,   " + bidding + " > " + maxBiddingDouble;
+                } else {
+                    JSObject record = DB.simpleScan("web_system_config").select("config_value").where(DB.filter().whereEqualTo("config_key", "admob_image_path")).execute();
+                    String imageRoot = "";
+                    if (record.hasObjectData()) {
+                        imageRoot = record.get("config_value");
+                    }
+                    File imagesPath = new File(imageRoot + File.separatorChar + imagePath);
+                    if (imagesPath.exists()) {
+                        result.result = true;
+                    } else {
+                        result.message = "图片路径不存在";
+                    }
+                }
+            }
+            if (result.result) {
+                String s = String.valueOf(System.currentTimeMillis());
+                campaignName = campaignName + "_" + s.substring(s.length() - 6, s.length());
+                if (campaignName.length() > 110) {
+                    campaignName = campaignName.substring(0, 110);
+                }
+                if (maxCPA == null) maxCPA = "";
+                long recordId = DB.insert("ad_campaigns_admob_auto_create")
+                        .put("app_name", appName)
+                        .put("create_count", NumberUtil.parseInt(createCount, 0))
+                        .put("account_id", accountId)
+                        .put("country_region", region)
+                        .put("explode_country", Boolean.parseBoolean(explodeCountry) ? 1 : 0)
+                        .put("excluded_region", excludedRegion)
+                        .put("language", language)
+                        .put("conversion_id", conversionId)
+                        .put("campaign_name", campaignName)
+                        .put("bugdet", bugdet)
+                        .put("bidding", bidding)
+                        .put("group_id", groupId)
+                        .put("message1", message1)
+                        .put("message2", message2)
+                        .put("message3", message3)
+                        .put("message4", message4)
+                        .put("explode_bidding", Boolean.parseBoolean(explodeBidding) ? 1 : 0)
+                        .put("max_cpa", maxCPA)
+                        .put("image_path", imagePath)
+                        .put("create_time", DateUtil.getNowTime())
+                        .put("mode_type", Integer.parseInt(flag))
                         .executeReturnId();
                 if (recordId > 0) {
                     result.result = true;
@@ -961,7 +1240,7 @@ public class AutoCreateCampaign extends HttpServlet {
         try {
             String id_batch = request.getParameter("id_batch");
             String[] id_array = id_batch.split(",");
-            for(String id:id_array){
+            for (String id : id_array) {
                 DB.delete("ad_campaigns_admob_auto_create")
                         .where(DB.filter().whereEqualTo("id", id))
                         .execute();
@@ -981,16 +1260,16 @@ public class AutoCreateCampaign extends HttpServlet {
             String id = request.getParameter("id");
             String id_batch = request.getParameter("id_batch");
             String enable = request.getParameter("enable");
-            if(id!=null){
+            if (id != null) {
                 DB.update("ad_campaigns_admob_auto_create")
                         .put("enabled", "true".equals(enable) ? 1 : 0)
                         .where(DB.filter().whereEqualTo("id", id))
                         .execute();
                 result.result = true;
                 result.message = "操作成功";
-            }else if(id_batch!=null){
-                String sql = "update ad_campaigns_admob_auto_create set enabled = "+("true".equals(enable) ? 1 : 0)+
-                             " where id in("+id_batch+")";
+            } else if (id_batch != null) {
+                String sql = "update ad_campaigns_admob_auto_create set enabled = " + ("true".equals(enable) ? 1 : 0) +
+                        " where id in(" + id_batch + ")";
                 DB.updateBySql(sql);
                 result.result = true;
                 result.message = "操作成功";

@@ -279,6 +279,7 @@
                 <input type="submit" class="btn btn-primary" style="width: 100px;" id="btnCreate" value="创建"/>
                 <label><input type="checkbox" id="checkAutoCreate"/>设置为自动创建</label>
                 <label><input type="checkbox" id="onlyCheckAutoCreate"/>仅设置为自动创建</label>
+                <label><input type="checkbox" id="flag"/>次日留用</label>
             </div>
         </div>
         <br>
@@ -400,6 +401,7 @@
                 <input type="submit" class="btn btn-primary" style="width: 100px;" id="btnCreateAdmob" value="创建"/>
                 <label><input type="checkbox" id="checkAdmobAutoCreate"/>设置为自动创建</label>
                 <label><input type="checkbox" id="onlyCheckAdmobAutoCreate"/>仅设置为自动创建</label>
+                <label><input type="checkbox" id="flag1"/>次日留用</label>
             </div>
         </div>
         <br>
