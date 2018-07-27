@@ -407,8 +407,12 @@ public class CountryAnalysisReport extends HttpServlet {
                                     }
                                 }
 
-                                //回本率=新用户收入/总花费
-                                double recoveryCostRatio = costs == 0 ? 0 : adNewRevenues / costs;
+                                //当天回本率=新用户收入/总花费
+                                double recoveryCostRatio = 0;
+                                if (sameDate) {
+                                    recoveryCostRatio = costs == 0 ? 0 : adNewRevenues / costs;
+                                }
+
                                 JsonObject d = new JsonObject();
                                 d.addProperty("country_name", countryName);
                                 d.addProperty("bidding_summary", biddingSummaryStr);
@@ -417,8 +421,11 @@ public class CountryAnalysisReport extends HttpServlet {
                                 d.addProperty("installed", installed);
                                 d.addProperty("uninstalled_rate", NumberUtil.trimDouble(uninstalledRate, 3));
                                 d.addProperty("active_users", activeUsers);
-                                d.addProperty("ad_new_revenues", NumberUtil.trimDouble(adNewRevenues, 0));
-                                d.addProperty("recovery_cost_ratio", NumberUtil.trimDouble(recoveryCostRatio, 3));
+                                if (sameDate) {
+                                    d.addProperty("ad_new_revenues", NumberUtil.trimDouble(adNewRevenues, 0));
+                                    d.addProperty("recovery_cost_ratio", NumberUtil.trimDouble(recoveryCostRatio, 3));
+                                }
+
                                 d.addProperty("revenues", NumberUtil.trimDouble(revenues, 0));
                                 double rpi = 0;
                                 if (cpiMap.get(countryCode) != null) {
@@ -464,7 +471,6 @@ public class CountryAnalysisReport extends HttpServlet {
                                 }
                                 jsonArray.add(d);
                             }
-
                         }
                         double total_cpa = totalPuserchaedUser != 0 ? totalCost / totalPuserchaedUser : 0;
                         if (jsonArray.size() == 0) {
@@ -490,6 +496,9 @@ public class CountryAnalysisReport extends HttpServlet {
                 jsonObject.addProperty("ret", 0);
                 jsonObject.addProperty("message", e.getMessage());
             }
+
+
+
         } else if (path.matches("/query_id_of_auto_create_campaigns")) {
             try {
                 String currCountryName = request.getParameter("curr_country_name");
