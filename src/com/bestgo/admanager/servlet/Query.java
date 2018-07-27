@@ -343,13 +343,13 @@ public class Query extends HttpServlet {
         String sql = "select sum(ch.total_spend) as spend, " +
                 " sum(ch.total_installed) as installed, sum(ch.total_impressions) as impressions, " +
                 " sum(ch.total_click) as click from " + webAdCampaignsHistoryTable + " ch, " + webAdCampaignsTable + " c " +
-                " where c.campaign_id = ch.campaign_id and tag_id = " + tagId +
+                " where c.campaign_id = ch.campaign_id and c.tag_id = " + tagId +
                 " and date between '" + startTime + "' and '" + endTime + "'";
         if(sameTime){
             sql = "select sum(ch.total_spend) as spend, " +
                     " sum(ch.total_installed) as installed, sum(ch.total_impressions) as impressions, " +
                     " sum(ch.total_click) as click from " + webAdCampaignsHistoryTable + " ch, " + webAdCampaignsTable + " c " +
-                    " where c.campaign_id = ch.campaign_id and tag_id = " + tagId +
+                    " where c.campaign_id = ch.campaign_id and c.tag_id = " + tagId +
                     " and date = '" + endTime + "'";
         }
         JSObject one = DB.findOneBySql(sql);
