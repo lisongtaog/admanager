@@ -943,7 +943,7 @@ public class QueryByMulConditions extends HttpServlet {
                     "sum(ch.total_installed) as installed, sum(ch.total_impressions) as impressions,sum(ch.total_click) as click, " +
                     "(case when sum(ch.total_installed) > 0 then sum(ch.total_spend) / sum(ch.total_installed) else 0 end) as cpa " +
                     " from " + webAdCampaignsTable + " c, " + webAdCampaignsCountryHistoryTable + " ch " +
-                    "where c.campaign_id=ch.campaign_id  and c.tag_id = " + tagId + " and country_code= '" + countryCode + "' " +
+                    "where c.campaign_id=ch.campaign_id  and c.tag_id = " + tagId + " and ch.country_code= '" + countryCode + "' " +
                     (StringUtil.isNotEmpty(campaignCreateTime) ? " AND create_time >= '" + campaignCreateTime + "' AND create_time < '" + afterCampaignCreateTime + "' " : "") +
                     (likeCampaignName.isEmpty() ? " " : " and campaign_name like '%" + likeCampaignName + "%' ") +
                     " and date between '" + startTime + "' and '" + endTime + "' " +
@@ -979,14 +979,14 @@ public class QueryByMulConditions extends HttpServlet {
         } else if (countryCheck) {//细分到国家
             sql = "select campaign_id, country_code, a.account_id,short_name, campaign_name, a.status, create_time, budget, bidding, spend, installed, impressions, click,cpa" +
                     " from (" +
-                    "select ch.campaign_id, country_code, account_id, campaign_name,c.status, create_time, c.budget, c.bidding, sum(ch.total_spend) as spend, " +
+                    "select ch.campaign_id, ch.country_code, account_id, campaign_name,c.status, create_time, c.budget, c.bidding, sum(ch.total_spend) as spend, " +
                     "sum(ch.total_installed) as installed, sum(ch.total_impressions) as impressions, " +
                     "(case when sum(ch.total_installed) > 0 then sum(ch.total_spend) / sum(ch.total_installed) else 0 end) as cpa, " +
                     " sum(ch.total_click) as click from " + webAdCampaignsTable + " c, " + webAdCampaignsCountryHistoryTable + " ch " +
                     "where c.campaign_id = ch.campaign_id and c.tag_id = " + tagId +
                     " and date between '" + startTime + "' and '" + endTime + "' " +
                     (likeCampaignName.isEmpty() ? " " : " and campaign_name like '%" + likeCampaignName + "%' ") +
-                    " group by ch.campaign_id, country_code " + havingField +
+                    " group by ch.campaign_id, ch.country_code " + havingField +
                     ") a left join " + webAccountIdTable + " b on a.account_id = b.account_id";
             list = DB.findListBySql(sql);
         } else {
@@ -1013,12 +1013,12 @@ public class QueryByMulConditions extends HttpServlet {
                     sql = "select c.campaign_id, c.account_id, short_name, c.campaign_name, create_time, c.status, budget, bidding, c.total_spend " +
                             "  from " + webAdCampaignsTable + " c, " + webAccountIdTable + " b " +
                             "where c.account_id = b.account_id and c.tag_id = " + tagId + " and c.status = '" + openStatus + "' AND b.status = 1 " +
-                            (likeCampaignName.isEmpty() ? " " : " and campaign_name like '%" + likeCampaignName + "%' ");
+                            (likeCampaignName.isEmpty() ? " " : " and c.campaign_name like '%" + likeCampaignName + "%' ");
                 }
 
                 listAll = DB.findListBySql(sql);
                 sql = "select ch.campaign_id from " + webAdCampaignsHistoryTable + " ch," + webAdCampaignsTable + " c " +
-                        " where c.campaign_id = ch.campaign_id and c.tag_id = " + tagId + " and date between '" + startTime + "' and '" + endTime + "'";
+                        " where c.campaign_id = ch.campaign_id and c.tag_id = " + tagId + " and ch.date between '" + startTime + "' and '" + endTime + "'";
                 List<JSObject> dataList = DB.findListBySql(sql);
                 if (dataList != null && dataList.size() > 0) {
                     listNoData = Utils.getDiffJSObjectList(listAll, dataList, "campaign_id");

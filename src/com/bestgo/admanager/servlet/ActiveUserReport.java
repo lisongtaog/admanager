@@ -121,7 +121,7 @@ public class ActiveUserReport extends HttpServlet {
                         }
                         double sevenDaysAvgARPU = 0;
                         sql = "SELECT avg(arpu) AS seven_days_avg_arpu FROM web_ad_country_analysis_report_history h,web_facebook_app_ids_rel r " +
-                                "WHERE h.app_id = r.google_package_id AND tag_name = '" + tagName + "' AND country_code = '" +
+                                "WHERE h.app_id = r.google_package_id AND tag_name = '" + tagName + "' AND h.country_code = '" +
                                 countryCode + "' AND date BETWEEN '" + sevenDayAgo + "' and '" + yesterday + "'";
                         one = DB.findOneBySql(sql);
                         if(one.hasObjectData()){

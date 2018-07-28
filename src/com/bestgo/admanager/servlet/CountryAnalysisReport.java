@@ -364,7 +364,7 @@ public class CountryAnalysisReport extends HttpServlet {
                                         " WHERE c.campaign_id = ch.campaign_id " +
                                         " AND date = '" + endTime + "'" +
                                         " AND c.tag_id = '" + tagId + "' " +
-                                        " AND country_code = '" + countryCode + "'";
+                                        " AND ch.country_code = '" + countryCode + "'";
 
                                 List<JSObject> biddingList = DB.findListBySql(sql);
                                 if (biddingList.size() > 0) {
@@ -382,7 +382,7 @@ public class CountryAnalysisReport extends HttpServlet {
                                         " WHERE c.campaign_id = ch.campaign_id " +
                                         " AND date = '" + endTime + "'" +
                                         " AND c.tag_id = '" + tagId + "' " +
-                                        " AND country_code = '" + countryCode + "'";
+                                        " AND ch.country_code = '" + countryCode + "'";
                                 biddingList = DB.findListBySql(sql);
                                 if (biddingList.size() > 0) {
                                     for (JSObject js : biddingList) {
