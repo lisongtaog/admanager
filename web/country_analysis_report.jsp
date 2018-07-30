@@ -116,6 +116,7 @@
 
 
     $("#btnSearch").click(function(){
+        $("#btnSearch").prop("disabled", true);
         var query = $("#inputSearch").val();
         var startTime = $('#inputStartTime').val();
         var endTime = $('#inputEndTime').val();
@@ -124,6 +125,7 @@
             startTime: startTime,
             endTime: endTime
         },function(data){
+
             if(data && data.ret == 1){
                 if (data.same_date == 1) {
                     $('#result_header').html("<tr><th>国家</th>" +
@@ -177,7 +179,7 @@
 
 
                 bindSortOp();
-                var str = "Cost: " + data.total_cost + "&nbsp;&nbsp;&nbsp;&nbsp;PuserchaedUser: " + data.total_puserchaed_user +
+                var str = "标签："+query+"&nbsp;&nbsp;&nbsp;&nbsp;Cost: " + data.total_cost + "&nbsp;&nbsp;&nbsp;&nbsp;PuserchaedUser: " + data.total_puserchaed_user +
                     "&nbsp;&nbsp;&nbsp;&nbsp;CPA: " + data.total_cpa + "&nbsp;&nbsp;&nbsp;&nbsp;Revenue: " + data.total_revenue;
                 str += "<br/><span class='estimateResult'></span>"
                 $('#total_result').html(str);
@@ -185,6 +187,7 @@
             } else {
                 admanager.showCommonDlg("错误", data.message);
             }
+            $("#btnSearch").prop("disabled", false);
         },'json');
     });
     function bindSortOp() {
