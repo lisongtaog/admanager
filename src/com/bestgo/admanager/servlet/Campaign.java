@@ -375,7 +375,10 @@ public class Campaign extends HttpServlet {
                 //@param array 用于存放facebook和adwords的具体错误信息的数组
                 String page = request.getParameter("pageNow");
                 int pageSizeAlone = pageSize/2;
-                int pageInt = Integer.parseInt(page);
+                Integer pageInt = Integer.parseInt(page);
+                if (pageInt == null) {
+                    pageInt = 1;
+                }
                 int pageIdx = (pageInt-1)*pageSizeAlone;
                 JsonArray array = new JsonArray();
 
