@@ -1,6 +1,6 @@
 var countryMapFunction = function () {
     var map = {};
-    for(var i = 0;i<regionList.length;i++){
+    for (var i = 0; i < regionList.length; i++) {
         var item = regionList[i];
         var key = item["country_code"];
         map[key] = item["name"];
@@ -15,7 +15,7 @@ for (var i = 0; i < regionList.length; i++) {
 
 var campaignId;
 var countryRevenueSpendReturn = "false";
-$("#new_campaign_dlg .btn-primary").click(function() {
+$("#new_campaign_dlg .btn-primary").click(function () {
     $("#new_campaign_dlg").modal("hide");
     var campaignName = $('#inputCampaignName').val();
     var status = $('#inputStatus').prop('checked') ? 'ACTIVE' : 'PAUSED';
@@ -71,7 +71,7 @@ function init() {
         source: countryNames
     });
 
-    $("input:checkbox").on('click', function() {
+    $("input:checkbox").on('click', function () {
         var $box = $(this);
         if ($box.is(":checked")) {
             var group = "input:checkbox[name='" + $box.attr("name") + "']";
@@ -82,7 +82,7 @@ function init() {
         }
     });
 
-    $("#btnQueryNoData").click(function(){
+    $("#btnQueryNoData").click(function () {
         var startTime = $('#inputStartTime').val();
         var endTime = $('#inputEndTime').val();
         var query = $("#inputSearch").val();
@@ -98,16 +98,16 @@ function init() {
         var reg = /^\d+$/;
         var totalInstallComparisonValue = $('#inputTotalInstallComparisonValue').val();
         var totalInstallOperator = $('#totalInstallOperator option:selected').val();
-        if(reg.test(totalInstallComparisonValue)){
-            if(totalInstallOperator == "1"){
+        if (reg.test(totalInstallComparisonValue)) {
+            if (totalInstallOperator == "1") {
                 totalInstallOperator = " > ";
-            }else if(totalInstallOperator == "2"){
+            } else if (totalInstallOperator == "2") {
                 totalInstallOperator = " < ";
-            }else {
+            } else {
                 totalInstallOperator = " = ";
             }
             totalInstallComparisonValue = totalInstallOperator + totalInstallComparisonValue;
-        }else{
+        } else {
             totalInstallComparisonValue = "";
         }
 
@@ -115,21 +115,21 @@ function init() {
         reg = /^\d+(\.{0,1}\d+){0,1}$/;
         var cpaComparisonValue = $('#inputCpaComparisonValue').val();
         var cpaOperator = $('#cpaOperator option:selected').val();
-        if(reg.test(cpaComparisonValue)){
-            if(cpaOperator == "4"){
+        if (reg.test(cpaComparisonValue)) {
+            if (cpaOperator == "4") {
                 cpaOperator = " > ";
-            }else if(cpaOperator == "5"){
+            } else if (cpaOperator == "5") {
                 cpaOperator = " < ";
-            }else {
+            } else {
                 cpaOperator = " = ";
             }
             cpaComparisonValue = cpaOperator + cpaComparisonValue;
-        }else{
+        } else {
             cpaComparisonValue = "";
         }
 
         var countryName = $('#inputCountry').val();
-        if(countryName != ""){
+        if (countryName != "") {
             for (var i = 0; i < regionList.length; i++) {
                 if (countryName == regionList[i].name) {
                     countryCode = regionList[i].country_code;
@@ -151,8 +151,8 @@ function init() {
             containsNoDataCampaignCheck: containsNoDataCampaignCheck,
             cpaComparisonValue: cpaComparisonValue
             // onlyQueryNoDataCampaignCheck: onlyQueryNoDataCampaignCheck
-        },function(data){
-            if(data && data.ret == 1){
+        }, function (data) {
+            if (data && data.ret == 1) {
                 appQueryData = data.data.array;
                 $('#result_header').html("<tr><th>系列ID</th><th>账户ID</th><th>账户简称</th><th>系列名称</th><th>创建时间</th><th>状态</th><th>预算</th><th>竞价</th><th>总花费</th><th>总安装</th><th>总点击</th><th>CPA</th><th>CTR</span></th><th>CVR</th><th>ROI</th></tr>");
                 data = data.data;
@@ -167,10 +167,10 @@ function init() {
             } else {
                 admanager.showCommonDlg("错误", data.message);
             }
-        },'json');
+        }, 'json');
     });
     $('#btnSearch').click(function () {
-        $("#btnSearch").prop("disabled",true);
+        $("#btnSearch").prop("disabled", true);
         var startTime = $('#inputStartTime').val();
         var endTime = $('#inputEndTime').val();
         var query = $("#inputSearch").val();
@@ -187,22 +187,22 @@ function init() {
         var reg = /^\d+$/;
         var totalInstallComparisonValue = $('#inputTotalInstallComparisonValue').val();
         var totalInstallOperator = $('#totalInstallOperator option:selected').val();
-        if(reg.test(totalInstallComparisonValue)){
-            if(totalInstallComparisonValue == "0" && totalInstallOperator == "2"){
+        if (reg.test(totalInstallComparisonValue)) {
+            if (totalInstallComparisonValue == "0" && totalInstallOperator == "2") {
                 totalInstallComparisonValue = "";
                 totalInstallOperator = "";
-            }else if(totalInstallOperator == "1"){
+            } else if (totalInstallOperator == "1") {
                 totalInstallOperator = " > ";
                 containsNoDataCampaignCheck = false;
-            }else if(totalInstallOperator == "2"){
+            } else if (totalInstallOperator == "2") {
                 totalInstallOperator = " < ";
-            }else {
+            } else {
                 totalInstallOperator = " = ";
-                if(totalInstallComparisonValue > 0){
+                if (totalInstallComparisonValue > 0) {
                     containsNoDataCampaignCheck = false;
                 }
             }
-        }else{
+        } else {
             totalInstallComparisonValue = "";
             totalInstallOperator = "";
         }
@@ -211,43 +211,43 @@ function init() {
         reg = /^\d+(\.{0,1}\d+){0,1}$/;
         var cpaComparisonValue = $('#inputCpaComparisonValue').val();
         var cpaOperator = $('#cpaOperator option:selected').val();
-        if(reg.test(cpaComparisonValue)){
-            if(cpaComparisonValue == "0" && cpaOperator == "5"){
+        if (reg.test(cpaComparisonValue)) {
+            if (cpaComparisonValue == "0" && cpaOperator == "5") {
                 cpaComparisonValue = "";
                 cpaOperator = "";
-            }else if(cpaOperator == "4"){
+            } else if (cpaOperator == "4") {
                 cpaOperator = " > ";
                 containsNoDataCampaignCheck = false;
-            }else if(cpaOperator == "5"){
+            } else if (cpaOperator == "5") {
                 cpaOperator = " < ";
-            }else {
+            } else {
                 cpaOperator = " = ";
-                if(cpaComparisonValue > 0){
+                if (cpaComparisonValue > 0) {
                     containsNoDataCampaignCheck = false;
                 }
             }
-        }else{
+        } else {
             cpaComparisonValue = "";
             cpaOperator = "";
         }
         //竞价筛选
         var biddingComparisonValue = $('#inputBiddingComparisonValue').val().trim();//这里我做一个提示？竞价必须小于0.8
         var biddingOperator = $("#biddingOperator option:selected").val();
-        if(biddingComparisonValue != "" && parseFloat(biddingComparisonValue)>0){
-            biddingComparisonValue = parseFloat(biddingComparisonValue)*100;
-            if(biddingOperator === "7"){
+        if (biddingComparisonValue != "" && parseFloat(biddingComparisonValue) > 0) {
+            biddingComparisonValue = parseFloat(biddingComparisonValue) * 100;
+            if (biddingOperator === "7") {
                 biddingOperator = " > ";
-            }else if(biddingOperator === "8"){
+            } else if (biddingOperator === "8") {
                 biddingOperator = " < ";
-            }else{
+            } else {
                 biddingOperator = " = ";
             }
-        }else{
+        } else {
             biddingOperator = "";
         }
 
         var countryName = $('#inputCountry').val();
-        if(countryName != ""){
+        if (countryName != "") {
             for (var i = 0; i < regionList.length; i++) {
                 if (countryName == regionList[i].name) {
                     countryCode = regionList[i].country_code;
@@ -272,57 +272,60 @@ function init() {
             totalInstallOperator: totalInstallOperator,
             containsNoDataCampaignCheck: containsNoDataCampaignCheck,
             biddingComparisonValue: biddingComparisonValue,
-            biddingOperator:biddingOperator
-            },function(data){
-                $("#btnSearch").prop("disabled",false);
-                if(data && data.ret == 1){
-                    appQueryData = data.data.array;
-                    if (countryCheck) {
-                        $('#result_header').html("<tr><th>国家</th>" +
-                            "<th>总展示<span sorterId=\"21\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
-                            "<th>总花费<span sorterId=\"22\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
-                            "<th>总安装<span sorterId=\"23\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
-                            "<th>总点击<span sorterId=\"24\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
-                            "<th>CPA<span sorterId=\"25\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
-                            "<th>CTR<span sorterId=\"26\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
-                            "<th>CVR<span sorterId=\"27\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
-                            "</tr>");
-                    } else {
-                        $('#result_header').html("<tr><th>系列ID</th><th>账户ID</th><th>账户简称</th><th>系列名称</th>" +
-                            "<th>创建时间<span sorterId=\"1\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
-                            "<th>状态<span sorterId=\"2\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
-                            "<th>预算<span sorterId=\"3\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
-                            "<th>竞价<span sorterId=\"4\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
-                            "<th>总花费<span sorterId=\"5\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
-                            "<th>总安装<span sorterId=\"6\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
-                            "<th>总点击<span sorterId=\"7\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
-                            "<th>CPA<span sorterId=\"8\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
-                            "<th>CECPM</th>" +
-                            "<th>CTR<span sorterId=\"9\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
-                            "<th>CVR<span sorterId=\"10\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
-                            "<th>CTR*CVR</th>" +
-                            "<th>UnRate<span sorterId=\"11\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
-                            "</tr>");
-                    }
-                    data = data.data;
-                    setData(data);
-                    bindSortOp();
-                    var str = "总花费: " + data.total_spend + " 总安装: " + data.total_installed +
-                        " 总展示: " + data.total_impressions + " 总点击: " + data.total_click +
-                        " CTR: " + data.total_ctr + " CPA: " + data.total_cpa + " CVR: " + data.total_cvr;
-                    str += "<br/><span class='estimateResult'></span>"
-                    $('#total_result').html(str);
-                    $('#total_result').removeClass("editable");
+            biddingOperator: biddingOperator
+        }, function (data) {
+            $("#btnSearch").prop("disabled", false);
+            if (data && data.ret == 1) {
+                appQueryData = data.data.array;
+                if (countryCheck) {
+                    $('#result_header').html("<tr><th>国家</th>" +
+                        "<th>总展示<span sorterId=\"21\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
+                        "<th>总花费<span sorterId=\"22\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
+                        "<th>总安装<span sorterId=\"23\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
+                        "<th>总点击<span sorterId=\"24\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
+                        "<th>CPA<span sorterId=\"25\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
+                        "<th>CTR<span sorterId=\"26\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
+                        "<th>CVR<span sorterId=\"27\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
+                        "</tr>");
                 } else {
-                    admanager.showCommonDlg("错误", data.message);
+                    $('#result_header').html("<tr><th>系列ID</th><th>账户ID</th><th>账户简称</th><th>系列名称</th>" +
+                        "<th>创建时间<span sorterId=\"1\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
+                        "<th>状态<span sorterId=\"2\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
+                        "<th>预算<span sorterId=\"3\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
+                        "<th>竞价<span sorterId=\"4\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
+                        "<th>总花费<span sorterId=\"5\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
+                        "<th>总安装<span sorterId=\"6\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
+                        "<th>总点击<span sorterId=\"7\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
+                        "<th>CPA<span sorterId=\"8\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
+                        "<th>CECPM</th>" +
+                        "<th>CTR<span sorterId=\"9\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
+                        "<th>CVR<span sorterId=\"10\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
+                        "<th>CTR*CVR</th>" +
+                        "<th>UnRate<span sorterId=\"11\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
+                        "</tr>");
                 }
-            },'json');
+                data = data.data;
+                setData(data);
+                bindSortOp();
+                var str = "总花费: " + data.total_spend + " 总安装: " + data.total_installed +
+                    " 总展示: " + data.total_impressions + " 总点击: " + data.total_click +
+                    " CTR: " + data.total_ctr + " CPA: " + data.total_cpa + " CVR: " + data.total_cvr;
+                str += "<br/><span class='estimateResult'></span>";
+                str += "<br/>";
+                str += "facebook_ARCHIVED:&nbsp" + data.total_ARCHIVED +"&nbsp&nbsp&nbsp&nbsp&nbsp&nbspfacebook_ACTIVE:&nbsp"+data.total_ACTIVE+"&nbsp&nbsp&nbsp&nbsp&nbsp&nbspfacebook_PAUSED:&nbsp"+data.total_PAUSED+"&nbsp&nbsp&nbsp&nbsp&nbsp&nbspadWords_paused:&nbsp"+data.total_paused+"&nbsp&nbsp&nbsp&nbsp&nbsp&nbspadWords_removed:&nbsp"+data.total_removed+"&nbsp&nbsp&nbsp&nbsp&nbsp&nbspadWords_enabled:&nbsp"+data.total_enabled;
+
+                    $('#total_result').html(str);
+                $('#total_result').removeClass("editable");
+            } else {
+                admanager.showCommonDlg("错误", data.message);
+            }
+        }, 'json');
         countryRevenueSpendReturn = "true";
     });
 
     strFullPath = window.document.location.href;
-    if(strFullPath.indexOf("?") != -1){
-        strFullPath = strFullPath.substr(strFullPath.indexOf("?")+1,strFullPath.length);
+    if (strFullPath.indexOf("?") != -1) {
+        strFullPath = strFullPath.substr(strFullPath.indexOf("?") + 1, strFullPath.length);
         var thisArr = strFullPath.split("&");
         countryRevenueSpendReturn = "true";
         //顺序：tag_name startTime endTime country_code
@@ -335,7 +338,7 @@ function init() {
     }
 
     $('#btnSummary').click(function () {
-        $("#btnSummary").prop("disabled",true);
+        $("#btnSummary").prop("disabled", true);
         var startTime = $('#inputStartTime').val();
         var endTime = $('#inputEndTime').val();
         var adwordsCheck = $('#adwordsCheck').is(':checked');  //is是一个方法的标签名
@@ -347,13 +350,13 @@ function init() {
             adwordsCheck: adwordsCheck,
             facebookCheck: facebookCheck,
         }, function (data) {
-            $("#btnSummary").prop("disabled",false);
+            $("#btnSummary").prop("disabled", false);
             if (data && data.ret == 1) {
                 $('#result_header').html("<tr><th>应用名称</th><th>总花费<span sorterId=\"70\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>预计总花费<span sorterId=\"71\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
                     "<th>总营收<span sorterId=\"72\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>预计总营收<span sorterId=\"73\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
                     "<th>总安装<span sorterId=\"74\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>总展示<span sorterId=\"75\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
                     "<th>总点击<span sorterId=\"76\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>CTR<span sorterId=\"77\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
-                    "<th>CPA<span sorterId=\"78\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>CVR<span sorterId=\"79\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>"+
+                    "<th>CPA<span sorterId=\"78\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>CVR<span sorterId=\"79\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
                     "<th>ECPM<span sorterId=\"80\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>Incoming<span sorterId=\"81\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th></tr>");
 
                 data = data.data; //这里把返回数据里的 data属性 的值给了变量data，即变量data 是Query.java里的 arr[{},{},...,{}]
@@ -377,22 +380,22 @@ function setDataSummary(data) {
     var total_cpa = 0;
     var total_cvr = 0;
     var total_incoming = 0;
-    var keyset = ["name", "total_spend","endTime_total_spend", "total_revenue", "endTime_total_revenue","total_installed", "total_impressions", "total_click",
-        "total_ctr", "total_cpa", "total_cvr","ecpm","incoming"];
+    var keyset = ["name", "total_spend", "endTime_total_spend", "total_revenue", "endTime_total_revenue", "total_installed", "total_impressions", "total_click",
+        "total_ctr", "total_cpa", "total_cvr", "ecpm", "incoming"];
 
     //total_spend是每20分钟抓一次，total_revenue是每小时抓一次
 
     var d = new Date(); //创建一个Date对象:这个对象返回创建时的本机系统时间
     var localTime = d.getTime();
-    var localOffset = d.getTimezoneOffset()*60000; //获得当地时间与UTC（1970）偏移的毫秒数
+    var localOffset = d.getTimezoneOffset() * 60000; //获得当地时间与UTC（1970）偏移的毫秒数
     var utc = localTime + localOffset; //utc即GMT时间
     var offset = 8; //美西时间，西八区差值
-    var Los = utc - (3600000*offset);    //得到相应美西时间 Date类型
+    var Los = utc - (3600000 * offset);    //得到相应美西时间 Date类型
     var nd = new Date(Los);
     var westTime = nd.getHours();  //返回美西时间的小时数
     westTime = westTime - 1;
     var minutes = nd.getMinutes();
-    var d_minutes = westTime*60 + minutes;   //得到北京时间与美西时间相差小时数
+    var d_minutes = westTime * 60 + minutes;   //得到北京时间与美西时间相差小时数
 
 
     $('#results_body > tr').remove();
@@ -401,37 +404,37 @@ function setDataSummary(data) {
         var tr = $("<tr></tr>");
         var con;
         for (var j = 0; j < keyset.length; j++) {
-            if(keyset[j] == "total_spend"){
-                var td = $('<td title ="'+ data[i]["spend_14"]+'"></td>');
+            if (keyset[j] == "total_spend") {
+                var td = $('<td title ="' + data[i]["spend_14"] + '"></td>');
             }
-            else if(keyset[j] == "total_revenue"){
-                var td = $('<td title ="'+ data[i]["revenue_14"]+'"></td>');
+            else if (keyset[j] == "total_revenue") {
+                var td = $('<td title ="' + data[i]["revenue_14"] + '"></td>');
             }
-            else if(keyset[j] == "total_installed"){
-                var td = $('<td title ="'+ data[i]["installed_14"]+'"></td>');
+            else if (keyset[j] == "total_installed") {
+                var td = $('<td title ="' + data[i]["installed_14"] + '"></td>');
             }
-            else if(keyset[j] == "total_cpa"){
-                var td = $('<td title ="'+ data[i]["cpa_14"]+'"></td>');
+            else if (keyset[j] == "total_cpa") {
+                var td = $('<td title ="' + data[i]["cpa_14"] + '"></td>');
             }
-            else if(keyset[j] == "total_cvr"){
-                var td = $('<td title ="'+ data[i]["cvr_14"]+'"></td>');
-            }else{
+            else if (keyset[j] == "total_cvr") {
+                var td = $('<td title ="' + data[i]["cvr_14"] + '"></td>');
+            } else {
                 var td = $("<td></td>");
             }
             var key = keyset[j];
-            if(key == "endTime_total_spend"){
+            if (key == "endTime_total_spend") {
                 var endTime_total_spend = data[i][key]; //取当前数组成员 属性名为key 的属性值
-                var expected_total_spend = parseInt(endTime_total_spend/d_minutes*24*60);
+                var expected_total_spend = parseInt(endTime_total_spend / d_minutes * 24 * 60);
                 con = expected_total_spend;
-            }else if(key == "endTime_total_revenue"){
+            } else if (key == "endTime_total_revenue") {
                 var endTime_total_revenue = data[i][key];
-                var expected_total_revenue = parseInt(endTime_total_revenue/d_minutes*24*60);
+                var expected_total_revenue = parseInt(endTime_total_revenue / d_minutes * 24 * 60);
                 con = expected_total_revenue;
-            }else{
-                if(key == 'total_spend'){     //对total_spend 条目进行颜色处理
-                    if(one['warning_level'] == 1){
+            } else {
+                if (key == 'total_spend') {     //对total_spend 条目进行颜色处理
+                    if (one['warning_level'] == 1) {
                         td.addClass("yellow");
-                    }else if(one['warning_level'] == 2){
+                    } else if (one['warning_level'] == 2) {
                         td.addClass("red");
                     }
                 }
@@ -452,17 +455,17 @@ function setDataSummary(data) {
         total_cvr = total_click > 0 ? total_installed / total_click : 0;
         $('#results_body').append(tr);
     }
-    if(adwordsCheck || facebookCheck){
+    if (adwordsCheck || facebookCheck) {
         var str = "总花费: " + total_spend + " 总安装: " + total_installed +
             " 总展示: " + total_impressions + " 总点击: " + total_click +
             " CTR: " + total_ctr + " CPA: " + total_cpa + " CVR: " + total_cvr +
-            " 总营收: "+ total_revenue + " Incoming: " + total_incoming;
+            " 总营收: " + total_revenue + " Incoming: " + total_incoming;
         $('#total_result').text(str);
-    }else{
+    } else {
         var str = "总花费: " + total_spend + "  总营收: " + total_revenue + " 总安装: " + total_installed +
             " 总展示: " + total_impressions + " 总点击: " + total_click +
             " CTR: " + total_ctr + " CPA: " + total_cpa + " CVR: " + total_cvr +
-            " 总营收: "+ total_revenue + " Incoming: " + total_incoming;
+            " 总营收: " + total_revenue + " Incoming: " + total_incoming;
         $('#total_result').text(str);
     }
 
@@ -476,10 +479,10 @@ function setData(data) {
         var tr = $('<tr></tr>');
         var countryCheck = $('#countryCheck').is(':checked');
         var keyset = ["campaign_id", "account_id", "short_name", "campaign_name", "create_time",
-            "status", "budget", "bidding", "spend", "installed", "click", "cpa", "ecpm", "ctr", "cvr","ctr_mul_cvr","un_rate"];
+            "status", "budget", "bidding", "spend", "installed", "click", "cpa", "ecpm", "ctr", "cvr", "ctr_mul_cvr", "un_rate"];
         var modifyColumns = ["campaign_name", "budget", "bidding"];
         if (countryCheck) {
-            keyset = ["country_name", "impressions","spend", "installed", "click", "cpa", "ctr", "cvr"];
+            keyset = ["country_name", "impressions", "spend", "installed", "click", "cpa", "ctr", "cvr"];
         }
         for (var j = 0; j < keyset.length; j++) {
             var campaignId = one['campaign_id'];
@@ -487,9 +490,9 @@ function setData(data) {
             for (var jj = 0; jj < appQueryData.length; jj++) {
                 if (appQueryData[jj]['campaign_id'] == campaignId) {
                     var countryName = $('#inputCountry').val();
-                    if(countryName != ""){
+                    if (countryName != "") {
                         totalSpend = appQueryData[jj]['campaign_spends'];
-                    }else{
+                    } else {
                         totalSpend = appQueryData[jj]['spend'];
                     }
                     break;
@@ -503,19 +506,19 @@ function setData(data) {
                 td.text(field_value / 100);
             } else if (field == 'spend') {
                 var currSpend = one['spend'];
-                if(currSpend > (one['budget'] * 9 / 1000)){
+                if (currSpend > (one['budget'] * 9 / 1000)) {
                     td.addClass("danhuangse");
                 }
                 td.text(field_value + " / " + totalSpend);
-            } else if(field == 'un_rate'){
-                if(field_value == -100000){
+            } else if (field == 'un_rate') {
+                if (field_value == -100000) {
                     td.text("--");
-                } else if(field_value == 0){
+                } else if (field_value == 0) {
                     td.text("");
-                } else{
+                } else {
                     td.text(field_value);
                 }
-            }else{
+            } else {
                 td.text(field_value);
             }
 
@@ -528,24 +531,24 @@ function setData(data) {
         }
 
         //这里增加【新建】按钮
-        if(!countryCheck){
+        if (!countryCheck) {
             var btn = $('<input type="button" value="新建">');
             btn.data("campaign_id", one['campaign_id']);
-            btn.data("budget",one['budget']);
-            btn.data("bidding",one['bidding']);
-            btn.click(function(){
+            btn.data("budget", one['budget']);
+            btn.data("bidding", one['bidding']);
+            btn.click(function () {
                 var campaign_id = $(this).data("campaign_id");  //选中当前元素中键campaign_id的值
                 var budget = $(this).data("budget");
-                budget = budget/100;
+                budget = budget / 100;
                 var bidding = $(this).data("bidding");
-                bidding = bidding/100;
-                window.open("campaigns_create.jsp?type=auto_create&campaignId="+ campaign_id+ "&budget="+budget+"&bidding="+bidding,"_blank");
-                    //window.open(url,name,features,replace)，四个参数分别针对url，新窗口target属性或窗口名称，窗口特征和浏览器历史
+                bidding = bidding / 100;
+                window.open("campaigns_create.jsp?type=auto_create&campaignId=" + campaign_id + "&budget=" + budget + "&bidding=" + bidding, "_blank");
+                //window.open(url,name,features,replace)，四个参数分别针对url，新窗口target属性或窗口名称，窗口特征和浏览器历史
             });
         }
         tr.append(btn);
 
-        if(one["impressions"] == 0){
+        if (one["impressions"] == 0) {
             tr.addClass("lilac");
         }
         //为当前的 DOM元素 tr[0] 添加属性 origCampaignData
@@ -563,7 +566,7 @@ function setData(data) {
 }
 
 function bindOp() {
-    $(".link_modify").click(function() {
+    $(".link_modify").click(function () {
         $('#modify_form').show();
 
         $("#dlg_title").text("修改系列");
@@ -587,7 +590,7 @@ function bindOp() {
         $("#new_campaign_dlg").modal("show");
     });
 
-    $(".link_copy").click(function() {
+    $(".link_copy").click(function () {
         var tds = $(this).parents("tr").find('td');
         $.post('campaign/find_create_data', {
             campaignId: $(tds.get(0)).text(),
@@ -595,7 +598,7 @@ function bindOp() {
             if (data && data.ret == 1) {
                 var list = [];
                 var keys = ["tag_name", "app_name", "facebook_app_id", "account_id", "country_region",
-                    "language","age", "gender", "detail_target", "campaign_name", "page_id", "bugdet", "bidding", "max_cpa", "title", "message"];
+                    "language", "age", "gender", "detail_target", "campaign_name", "page_id", "bugdet", "bidding", "max_cpa", "title", "message"];
                 var data = data.data;
                 for (var i = 0; i < keys.length; i++) {
                     list.push(data[keys[i]]);
@@ -609,7 +612,7 @@ function bindOp() {
 }
 
 function bindSortOpSummary() {
-    $('.sorter').click(function() {
+    $('.sorter').click(function () {
         var sorterId = $(this).attr('sorterId');
         sorterId = parseInt(sorterId);
         if ($(this).hasClass("glyphicon-arrow-up")) {
@@ -644,7 +647,7 @@ function bindSortOpSummary() {
 }
 
 function bindSortOp() {
-    $('.sorter').click(function() {
+    $('.sorter').click(function () {
         var sorterId = $(this).attr('sorterId');
         sorterId = parseInt(sorterId);
         if ($(this).hasClass("glyphicon-arrow-up")) {
@@ -672,22 +675,22 @@ function bindSortOp() {
         var reg = /^\d+$/;
         var totalInstallComparisonValue = $('#inputTotalInstallComparisonValue').val();
         var totalInstallOperator = $('#totalInstallOperator option:selected').val();
-        if(reg.test(totalInstallComparisonValue)){
-            if(totalInstallComparisonValue == "0" && totalInstallOperator == "2"){
+        if (reg.test(totalInstallComparisonValue)) {
+            if (totalInstallComparisonValue == "0" && totalInstallOperator == "2") {
                 totalInstallComparisonValue = "";
                 totalInstallOperator = "";
-            }else if(totalInstallOperator == "1"){
+            } else if (totalInstallOperator == "1") {
                 totalInstallOperator = " > ";
                 containsNoDataCampaignCheck = false;
-            }else if(totalInstallOperator == "2"){
+            } else if (totalInstallOperator == "2") {
                 totalInstallOperator = " < ";
-            }else {
+            } else {
                 totalInstallOperator = " = ";
-                if(totalInstallComparisonValue > 0){
+                if (totalInstallComparisonValue > 0) {
                     containsNoDataCampaignCheck = false;
                 }
             }
-        }else{
+        } else {
             totalInstallComparisonValue = "";
             totalInstallOperator = "";
         }
@@ -696,33 +699,33 @@ function bindSortOp() {
         reg = /^\d+(\.{0,1}\d+){0,1}$/;
         var cpaComparisonValue = $('#inputCpaComparisonValue').val();
         var cpaOperator = $('#cpaOperator option:selected').val();
-        if(reg.test(cpaComparisonValue)){
-            if(cpaComparisonValue == "0" && cpaOperator == "5"){
+        if (reg.test(cpaComparisonValue)) {
+            if (cpaComparisonValue == "0" && cpaOperator == "5") {
                 cpaComparisonValue = "";
                 cpaOperator = "";
-            }else if(cpaOperator == "4"){
+            } else if (cpaOperator == "4") {
                 cpaOperator = " > ";
                 containsNoDataCampaignCheck = false;
-            }else if(cpaOperator == "5"){
+            } else if (cpaOperator == "5") {
                 cpaOperator = " < ";
-            }else {
+            } else {
                 cpaOperator = " = ";
-                if(cpaComparisonValue > 0){
+                if (cpaComparisonValue > 0) {
                     containsNoDataCampaignCheck = false;
                 }
             }
-        }else{
+        } else {
             cpaComparisonValue = "";
             cpaOperator = "";
         }
 
         var biddingComparisonValue = $('#inputBiddingComparisonValue').val();
-        if(!reg.test(biddingComparisonValue)){
+        if (!reg.test(biddingComparisonValue)) {
             biddingComparisonValue = "";
         }
 
         var countryName = $('#inputCountry').val();
-        if(countryName != ""){
+        if (countryName != "") {
             for (var i = 0; i < regionList.length; i++) {
                 if (countryName == regionList[i].name) {
                     countryCode = regionList[i].country_code;
@@ -753,8 +756,8 @@ function bindSortOp() {
                 data = data.data;
                 setData(data);
                 var str = "总花费: " + data.total_spend + " 总安装: " + data.total_installed +
-                            " 总展示: " + data.total_impressions + " 总点击: " + data.total_click +
-                            " CTR: " + data.total_ctr + " CPA: " + data.total_cpa + " CVR: " + data.total_cvr;
+                    " 总展示: " + data.total_impressions + " 总点击: " + data.total_click +
+                    " CTR: " + data.total_ctr + " CPA: " + data.total_cpa + " CVR: " + data.total_cvr;
 
                 str += "<br/><span class='estimateResult'></span>"
                 $('#total_result').removeClass("editable");
@@ -775,7 +778,7 @@ function estimateCost() {
     var total_cpa = 0;
     var total_cvr = 0;
 
-    $('#results_body tr').each(function() {
+    $('#results_body tr').each(function () {
         if (!this.origCampaignData) return;
         total_spend += this.origCampaignData.spend;
         if (this.changedCampainData.enabled === false) {
@@ -788,11 +791,11 @@ function estimateCost() {
         total_impressions += this.origCampaignData.impressions;
         total_click += this.origCampaignData.click;
     });
-    $('#results_body tr').each(function() {
+    $('#results_body tr').each(function () {
         if (!this.changedCampainData) return;
         if (this.changedCampainData.budget > 0 && this.changedCampainData.budget != this.origCampaignData.budget) {
             total_spend += (this.changedCampainData.budget * 100 - this.origCampaignData.budget) / this.origCampaignData.budget * this.origCampaignData.spend;
-            var count = (this.changedCampainData.budget * 100 - this.origCampaignData.budget) / this.origCampaignData.budget  * this.origCampaignData.installed;
+            var count = (this.changedCampainData.budget * 100 - this.origCampaignData.budget) / this.origCampaignData.budget * this.origCampaignData.installed;
             total_installed += parseInt(count);
         }
     });
@@ -809,10 +812,10 @@ function estimateCost() {
 }
 
 function bindBatchModifyOperation() {
-    $(document).click(function() {
+    $(document).click(function () {
         $('#results_body td.editable').removeClass('editing');
         // .inputTemp 以下这个函数究竟要干什么？
-        $(".inputTemp").replaceWith(function() {
+        $(".inputTemp").replaceWith(function () {
             var td = $(".inputTemp").parent('td')[0];
             var tr = $(td).parents('tr')[0];
             if (td.origValue != this.value) {
@@ -824,10 +827,10 @@ function bindBatchModifyOperation() {
                         tr.changedCampainData.budget = this.value;
                         break;
                     case 'bidding':
-                        if(this.value > 0.8){
-                            admanager.showCommonDlg("警告","竞价不能超过 0.8");
+                        if (this.value > 0.8) {
+                            admanager.showCommonDlg("警告", "竞价不能超过 0.8");
                             break;
-                        }else{
+                        } else {
                             tr.changedCampainData.bidding = this.value;
                             break;
                         }
@@ -853,12 +856,12 @@ function bindBatchModifyOperation() {
     });
 
     // 【批量修改】
-    $('#btnModifyBatch').click(function() {
+    $('#btnModifyBatch').click(function () {
         var checkbox = $('#result_header input[type=checkbox]');
         if (checkbox.length > 0) return;
 
         $('#result_header tr th:first').before($("<th><input id='ckSelectAll' type='checkbox' /></th>"));
-        $('#results_body tr').each(function() {
+        $('#results_body tr').each(function () {
             $(this).find('td:first').before($("<td><input class='ckEnableCampaign' type='checkbox' /></td>"));
             if (this.origCampaignData.network == 'admob') {
                 if (this.origCampaignData.status == 'enabled') {
@@ -878,7 +881,7 @@ function bindBatchModifyOperation() {
                 }
             }
         });
-        $('.ckEnableCampaign').change(function() {
+        $('.ckEnableCampaign').change(function () {
             var tr = $(this).parents('tr')[0];
             var data = tr.origCampaignData;
             if ($(this).is(':checked') != data.campainEnabled) {
@@ -890,7 +893,7 @@ function bindBatchModifyOperation() {
             }
             estimateCost();
         });
-        $('#ckSelectAll').change(function() {
+        $('#ckSelectAll').change(function () {
             if ($(this).is(":checked")) {
                 $('#results_body input[type=checkbox]').prop('checked', true);
             } else {
@@ -917,24 +920,24 @@ function bindBatchModifyOperation() {
             }
             $(currentEle).html('<input class="inputTemp" type="text" style="width:100%" value="' + value + '" />');
             $(".inputTemp", currentEle).focus()
-                // .keyup(function (event) {
-                //     if (event.keyCode == 13) {
-                //         $(currentEle).removeClass('editing');
-                //         $(currentEle).text($(".inputTemp").val().trim());
-                //         if ($(currentEle).text() != currentEle.origValue) {
-                //             $(currentEle).addClass("changed");
-                //         } else {
-                //             $(currentEle).removeClass("changed");
-                //         }
-                //     }
-                // })
-                .click(function(e) {
-                e.stopPropagation();
-            });
+            // .keyup(function (event) {
+            //     if (event.keyCode == 13) {
+            //         $(currentEle).removeClass('editing');
+            //         $(currentEle).text($(".inputTemp").val().trim());
+            //         if ($(currentEle).text() != currentEle.origValue) {
+            //             $(currentEle).addClass("changed");
+            //         } else {
+            //             $(currentEle).removeClass("changed");
+            //         }
+            //     }
+            // })
+                .click(function (e) {
+                    e.stopPropagation();
+                });
         }
     });
 
-    $('#btnModifySubmit').click(function() {
+    $('#btnModifySubmit').click(function () {
         var list = [];
         var countryName = $('#inputCountry').val();
         var countryCode = '';
@@ -948,7 +951,7 @@ function bindBatchModifyOperation() {
             return;
         }
         //读取被修改行
-        $('#results_body td.changed').each(function() {
+        $('#results_body td.changed').each(function () {
             var tr = $(this).parents('tr')[0];
             var one = tr.changedCampainData;
             if (countryCode != '') {
@@ -984,14 +987,14 @@ function bindBatchModifyOperation() {
     });
 
     //【批量修改出价】（对“竞价”列进行修改）
-    $('#btnBatchModifyBidding').click(function() {
+    $('#btnBatchModifyBidding').click(function () {
         var checkbox = $('#result_header input[type=checkbox]');
         if (checkbox.length <= 0) return;
 
         var bidding = $('#inputBatchBidding').val();
         bidding = parseFloat(bidding);
         if (bidding > 0) {
-            $('#results_body tr').each(function() {
+            $('#results_body tr').each(function () {
                 var tr = this;
                 var one = tr.changedCampainData;
                 one.bidding = bidding;
@@ -1017,7 +1020,7 @@ function bindBatchModifyOperation() {
 }
 
 function bindQueryZero() {
-    $('#btnCloseZero').click(function() {
+    $('#btnCloseZero').click(function () {
         var yes = confirm("小心啊，确认关闭吗？");
         if (yes) {
             var startTime = $('#inputStartTime').val();
@@ -1035,7 +1038,7 @@ function bindQueryZero() {
                 conversionOp: conversionOp,
                 cost: cost,
                 conversion: conversion
-            }, function(data) {
+            }, function (data) {
                 if (data && data.ret == 1) {
                     admanager.showCommonDlg("提示", "提交任务成功");
                 } else {
@@ -1044,7 +1047,7 @@ function bindQueryZero() {
             }, 'json');
         }
     });
-    $('#btnQueryZero').click(function() {
+    $('#btnQueryZero').click(function () {
         var startTime = $('#inputStartTime').val();
         var endTime = $('#inputEndTime').val();
 
@@ -1060,7 +1063,7 @@ function bindQueryZero() {
             conversionOp: conversionOp,
             cost: cost,
             conversion: conversion,
-        }, function(data) {
+        }, function (data) {
             if (data && data.ret == 1) {
                 $('#result_header').html("<tr><th>系列ID</th><th>广告账号ID</th><th>系列名称</th><th>创建时间<span sorterId=\"1\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>状态<span sorterId=\"2\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>预算<span sorterId=\"3\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>竞价<span sorterId=\"4\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>总花费<span sorterId=\"5\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>总安装<span sorterId=\"6\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>总点击<span sorterId=\"7\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>CPA<span sorterId=\"8\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>CTR<span sorterId=\"9\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>CVR<span sorterId=\"10\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th></tr>");
                 data = data.data;
@@ -1084,26 +1087,26 @@ function bindQueryZero() {
 }
 
 //由“标签”刷新路径
-$("#updateAppMaterialPath").click(function(){
+$("#updateAppMaterialPath").click(function () {
     var app_name_for_path = $("#inputSearch").val();
-    if(!app_name_for_path || ""===app_name_for_path){
-        admanager.showCommonDlg("提示","标签为必录信息!");
+    if (!app_name_for_path || "" === app_name_for_path) {
+        admanager.showCommonDlg("提示", "标签为必录信息!");
         return;
     }
-    $("#updateAppMaterialPath").prop("disabled",true);
-    $.post("update_app_material_path_rel",{
-        app_name:app_name_for_path
-    },function(data){
-        if(data.err==0){
-            admanager.showCommonDlg("提示",data.message);
-            setTimeout(function(){
+    $("#updateAppMaterialPath").prop("disabled", true);
+    $.post("update_app_material_path_rel", {
+        app_name: app_name_for_path
+    }, function (data) {
+        if (data.err == 0) {
+            admanager.showCommonDlg("提示", data.message);
+            setTimeout(function () {
                 $("#common_message_dialog").modal("hide");
-            },1500);
-        }else{
-            admanager.showCommonDlg("提示",data.message);
+            }, 1500);
+        } else {
+            admanager.showCommonDlg("提示", data.message);
         }
-        $("#updateAppMaterialPath").prop("disabled",false);
-    },"json");
+        $("#updateAppMaterialPath").prop("disabled", false);
+    }, "json");
 });
 
 init();

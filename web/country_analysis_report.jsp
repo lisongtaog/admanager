@@ -73,11 +73,14 @@
             <th>AdNewRevenue</th>
             <th>Revenue</th>
             <th>Incoming</th>
+            <th>PI</th>
             <th>ARPU</th>
             <th>ECPM</th>
             <th>成本价/2</th>
             <th>CPA</th>
+            <th>ACpa</th>
             <th>CPA/ECPM</th>
+            <th>RT</th>
             <th>竞价</th>
         </tr>
         </thead>
@@ -113,6 +116,7 @@
 
 
     $("#btnSearch").click(function(){
+        $("#btnSearch").prop("disabled", true);
         var query = $("#inputSearch").val();
         var startTime = $('#inputStartTime').val();
         var endTime = $('#inputEndTime').val();
@@ -121,6 +125,7 @@
             startTime: startTime,
             endTime: endTime
         },function(data){
+
             if(data && data.ret == 1){
                 if (data.same_date == 1) {
                     $('#result_header').html("<tr><th>国家</th>" +
@@ -155,8 +160,6 @@
                         "<th>UninstalledRate</th>" +
                         "<th>ActiveUser<span sorterId=\"1038\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
                         "<th>Revenue<span sorterId=\"1039\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
-                        "<th>AdNewRevenue<span sorterId=\"1038\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
-                        "<th>当天回本率</th>" +
                         "<th>Incoming<span sorterId=\"1042\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
                         "<th>ARPU</th>" +
                         "<th>ECPM<span sorterId=\"1040\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
@@ -170,7 +173,7 @@
 
 
                 bindSortOp();
-                var str = "Cost: " + data.total_cost + "&nbsp;&nbsp;&nbsp;&nbsp;PuserchaedUser: " + data.total_puserchaed_user +
+                var str = "标签："+query+"&nbsp;&nbsp;&nbsp;&nbsp;Cost: " + data.total_cost + "&nbsp;&nbsp;&nbsp;&nbsp;PuserchaedUser: " + data.total_puserchaed_user +
                     "&nbsp;&nbsp;&nbsp;&nbsp;CPA: " + data.total_cpa + "&nbsp;&nbsp;&nbsp;&nbsp;Revenue: " + data.total_revenue;
                 str += "<br/><span class='estimateResult'></span>"
                 $('#total_result').html(str);
@@ -178,6 +181,7 @@
             } else {
                 admanager.showCommonDlg("错误", data.message);
             }
+            $("#btnSearch").prop("disabled", false);
         },'json');
     });
     function bindSortOp() {
@@ -223,11 +227,11 @@
         var len = arr.length;
         var one;
         var keyset = ["costs","cost_upper_limit","purchased_users", "installed", "uninstalled_rate",
-            "active_users","revenues", "ad_new_revenues","recovery_cost_ratio","incoming", "arpu", "ecpm", "revenue_per_install","cpa",
+            "active_users","revenues", "incoming","arpu", "ecpm", "revenue_per_install","cpa",
             "cpa_div_ecpm", "bidding_summary"];
         if (same_date == 1) {
             keyset = ["costs","cost_upper_limit","purchased_users", "installed", "uninstalled_rate",
-                "active_users","revenues", "ad_new_revenues","recovery_cost_ratio","incoming","arpu", "ecpm", "revenue_per_install","cpa",
+                "active_users","revenues", "ad_new_revenues","recovery_cost_ratio","incoming", "arpu", "ecpm", "revenue_per_install","cpa",
                 "cpa_div_ecpm", "first_day_revenue","second_day_revenue",
                 "third_day_revenue","fourth_day_revenue","bidding_summary"];
         }
