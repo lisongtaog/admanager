@@ -91,6 +91,17 @@
             <select id="biddingOperator"><option value="7" selected="true">大于</option><option value="8">小于</option><option value="9"  selected="true">等于</option></select>
             <input id="inputBiddingComparisonValue" class="form-control" style="display: inline; width: auto;" type="text"/>
 
+            <span>状态</span>
+            <select id="statusOperator">
+                <option value="all" selected="true">all</option>
+                <option value="ARCHIVED">facebook_ARCHIVED</option>
+                <option value="ACTIVE"  >facebook_ACTIVE</option>
+                <option value="PAUSED" >facebook_PAUSED</option>
+                <option value="paused" >adWords_paused</option>
+                <option value="removed" >adWords_removed</option>
+                <option value="enabled" >adWords_enabled</option>
+            </select>
+
             <button id="btnSearch" class="btn btn-default glyphicon glyphicon-search"></button><br>
 
             <input type="checkbox" name="adnetwork" id="facebookCheck"/><label for="facebookCheck">只显示Facebook</label>
