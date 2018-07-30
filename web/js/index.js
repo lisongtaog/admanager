@@ -245,6 +245,9 @@ function init() {
         } else {
             biddingOperator = "";
         }
+        //状态判断
+        var statusOperator = $("#statusOperator option:selected").val();
+
 
         var countryName = $('#inputCountry').val();
         if (countryName != "") {
@@ -272,7 +275,8 @@ function init() {
             totalInstallOperator: totalInstallOperator,
             containsNoDataCampaignCheck: containsNoDataCampaignCheck,
             biddingComparisonValue: biddingComparisonValue,
-            biddingOperator: biddingOperator
+            biddingOperator: biddingOperator,
+            statusOperator:statusOperator
         }, function (data) {
             $("#btnSearch").prop("disabled", false);
             if (data && data.ret == 1) {
@@ -314,7 +318,7 @@ function init() {
                 str += "<br/>";
                 str += "facebook_ARCHIVED:&nbsp" + data.total_ARCHIVED +"&nbsp&nbsp&nbsp&nbsp&nbsp&nbspfacebook_ACTIVE:&nbsp"+data.total_ACTIVE+"&nbsp&nbsp&nbsp&nbsp&nbsp&nbspfacebook_PAUSED:&nbsp"+data.total_PAUSED+"&nbsp&nbsp&nbsp&nbsp&nbsp&nbspadWords_paused:&nbsp"+data.total_paused+"&nbsp&nbsp&nbsp&nbsp&nbsp&nbspadWords_removed:&nbsp"+data.total_removed+"&nbsp&nbsp&nbsp&nbsp&nbsp&nbspadWords_enabled:&nbsp"+data.total_enabled;
 
-                    $('#total_result').html(str);
+                $('#total_result').html(str);
                 $('#total_result').removeClass("editable");
             } else {
                 admanager.showCommonDlg("错误", data.message);

@@ -36,6 +36,9 @@ public class QueryByMulConditions extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         if (!Utils.isAdmin(request, response)) return;
 
+        //状态条件查询
+        String statusOperator = request.getParameter("statusOperator");
+
         JsonObject json = new JsonObject();
         String startTime = request.getParameter("startTime");
         String endTime = request.getParameter("endTime");
@@ -87,7 +90,7 @@ public class QueryByMulConditions extends HttpServlet {
                  */
                 int total_ARCHIVED = 0;
                 int total_ACTIVE = 0;
-                int total_PAUSED   = 0;
+                int total_PAUSED = 0;
 
                 int total_paused = 0;
                 int total_removed = 0;
@@ -97,11 +100,11 @@ public class QueryByMulConditions extends HttpServlet {
                 if ("false".equals(adwordsCheck) && "false".equals(facebookCheck)) {
                     JsonObject admob = fetchOneAppData(id, tag, startTime, endTime, true, "true".equals(countryCheck), countryCode,
                             likeCampaignName, campaignCreateTime, countryMap, totalInstallComparisonValue, "true".equals(containsNoDataCampaignCheck), countryCode,
-                            cpaComparisonValue, biddingComparisonValue, biddingOperator, totalInstallOperator, cpaOperator);
+                            cpaComparisonValue, biddingComparisonValue, biddingOperator, totalInstallOperator, cpaOperator, statusOperator);
 
                     JsonObject facebook = fetchOneAppData(id, tag, startTime, endTime, false, "true".equals(countryCheck), countryCode, likeCampaignName,
                             campaignCreateTime, countryMap, totalInstallComparisonValue, "true".equals(containsNoDataCampaignCheck), countryName,
-                            cpaComparisonValue, biddingComparisonValue, biddingOperator, totalInstallOperator, cpaOperator);
+                            cpaComparisonValue, biddingComparisonValue, biddingOperator, totalInstallOperator, cpaOperator, statusOperator);
 
                     /**
                      * 各种状态计数
@@ -126,7 +129,7 @@ public class QueryByMulConditions extends HttpServlet {
                 } else if ("true".equals(adwordsCheck)) { //如果只选中【Adwords】
                     JsonObject admob = fetchOneAppData(id, tag, startTime, endTime, true, "true".equals(countryCheck), countryCode, likeCampaignName,
                             campaignCreateTime, countryMap, totalInstallComparisonValue, "true".equals(containsNoDataCampaignCheck), countryCode, cpaComparisonValue,
-                            biddingComparisonValue, biddingOperator, totalInstallOperator, cpaOperator);
+                            biddingComparisonValue, biddingOperator, totalInstallOperator, cpaOperator, statusOperator);
 
                     /**
                      * 各种状态计数
@@ -147,7 +150,7 @@ public class QueryByMulConditions extends HttpServlet {
                 } else { //如果只选中【Facebook】
                     JsonObject facebook = fetchOneAppData(id, tag, startTime, endTime, false, "true".equals(countryCheck), countryCode, likeCampaignName,
                             campaignCreateTime, countryMap, totalInstallComparisonValue, "true".equals(containsNoDataCampaignCheck), countryName, cpaComparisonValue,
-                            biddingComparisonValue, biddingOperator, totalInstallOperator, cpaOperator);
+                            biddingComparisonValue, biddingOperator, totalInstallOperator, cpaOperator, statusOperator);
 
                     /**
                      * 各种状态计数
@@ -822,7 +825,6 @@ public class QueryByMulConditions extends HttpServlet {
                 jsonObject.addProperty("total_impressions", total_impressions);
 
 
-
                 jsonObject.addProperty("total_click", total_click);
                 jsonObject.addProperty("total_ctr", NumberUtil.trimDouble(total_ctr, 3));
                 jsonObject.addProperty("total_cpa", NumberUtil.trimDouble(total_cpa, 3));
@@ -872,7 +874,7 @@ public class QueryByMulConditions extends HttpServlet {
     private JsonObject fetchOneAppData(long tagId, String tagName, String startTime, String endTime, boolean admobCheck, boolean countryCheck,
                                        String countryCode, String likeCampaignName, String campaignCreateTime, HashMap<String, String> countryMap,
                                        String totalInstallComparisonValue, boolean containsNoDataCampaignCheck, String country, String cpaComparisonValue,
-                                       String biddingComparisonValue, String biddingOperator, String totalInstallOperator, String cpaOperator)
+                                       String biddingComparisonValue, String biddingOperator, String totalInstallOperator, String cpaOperator, String statusOperator)
             throws Exception {
         String afterCampaignCreateTime = "";
         if (StringUtil.isNotEmpty(campaignCreateTime)) {
@@ -948,7 +950,8 @@ public class QueryByMulConditions extends HttpServlet {
                     (likeCampaignName.isEmpty() ? " " : " and campaign_name like '%" + likeCampaignName + "%' ") +
                     " and date between '" + startTime + "' and '" + endTime + "' " +
                     " group by ch.campaign_id " + havingField +
-                    ") a left join " + webAccountIdTable + " b on a.account_id = b.account_id";
+                    ") a left join " + webAccountIdTable + " b on a.account_id = b.account_id" +
+                    ("all".equalsIgnoreCase(statusOperator) ? " " : " where a.status = '" + statusOperator + "' ");
             list = DB.findListBySql(sql);
             if (containsNoDataCampaignCheck) {
                 if (admobCheck) {
@@ -987,7 +990,8 @@ public class QueryByMulConditions extends HttpServlet {
                     " and date between '" + startTime + "' and '" + endTime + "' " +
                     (likeCampaignName.isEmpty() ? " " : " and campaign_name like '%" + likeCampaignName + "%' ") +
                     " group by ch.campaign_id, country_code " + havingField +
-                    ") a left join " + webAccountIdTable + " b on a.account_id = b.account_id";
+                    ") a left join " + webAccountIdTable + " b on a.account_id = b.account_id" +
+                    ("all".equalsIgnoreCase(statusOperator) ? " " : " where a.status = '" + statusOperator + "' ");
             list = DB.findListBySql(sql);
         } else {
             sql = "select campaign_id, a.account_id,short_name, campaign_name, a.status, create_time, budget, bidding, spend, installed, impressions, click,cpa" +
@@ -1001,7 +1005,8 @@ public class QueryByMulConditions extends HttpServlet {
                     (StringUtil.isNotEmpty(campaignCreateTime) ? " AND c.create_time >= '" + campaignCreateTime + "' AND c.create_time < '" + afterCampaignCreateTime + "' " : "") +
                     (likeCampaignName.isEmpty() ? " " : " and campaign_name like '%" + likeCampaignName + "%' ") +
                     " group by ch.campaign_id " + havingField +
-                    ") a left join " + webAccountIdTable + " b on a.account_id = b.account_id";
+                    ") a left join " + webAccountIdTable + " b on a.account_id = b.account_id" +
+                    ("all".equalsIgnoreCase(statusOperator) ? " " : " where a.status = '" + statusOperator + "' ");
             list = DB.findListBySql(sql);
             if (containsNoDataCampaignCheck) {
                 if (admobCheck) {
@@ -1042,7 +1047,7 @@ public class QueryByMulConditions extends HttpServlet {
          */
         int total_ARCHIVED = 0;
         int total_ACTIVE = 0;
-        int total_PAUSED   = 0;
+        int total_PAUSED = 0;
 
         int total_paused = 0;
         int total_removed = 0;
@@ -1110,9 +1115,9 @@ public class QueryByMulConditions extends HttpServlet {
                     total_ACTIVE++;
                 } else if ("paused".equals(status)) {
                     total_paused++;
-                }else if ("removed".equals(status)) {
+                } else if ("removed".equals(status)) {
                     total_removed++;
-                }else if ("enabled".equals(status)) {
+                } else if ("enabled".equals(status)) {
                     total_enabled++;
                 }
 
@@ -1228,7 +1233,6 @@ public class QueryByMulConditions extends HttpServlet {
         jsonObject.addProperty("total_paused", total_paused);
         jsonObject.addProperty("total_removed", total_removed);
         jsonObject.addProperty("total_enabled", total_enabled);
-
 
 
         jsonObject.addProperty("total_ctr", NumberUtil.trimDouble(total_ctr, 3));
