@@ -45,8 +45,8 @@ public class CountryAnalysisReport extends HttpServlet {
         }
 
 
-        String sevenDaysAgo = DateUtil.addDay(endTime, -6, "yyyy-MM-dd");//包括endTime
-        String fourteenDaysAgo = DateUtil.addDay(endTime, -13, "yyyy-MM-dd");//包括endTime
+//        String sevenDaysAgo = DateUtil.addDay(endTime, -6, "yyyy-MM-dd");//包括endTime
+//        String fourteenDaysAgo = DateUtil.addDay(endTime, -13, "yyyy-MM-dd");//包括endTime
 
         String beforeTenDay = DateUtil.addDay(endTime, -10, "yyyy-MM-dd");//不包括endTime
         String beforeFourDay = DateUtil.addDay(endTime, -4, "yyyy-MM-dd");//不包括endTime
@@ -207,38 +207,38 @@ public class CountryAnalysisReport extends HttpServlet {
                                 String countryCode = j.get("country_code");
 
                                 //计算七天的总花费、总营收、总盈利等
-                                sql = "select cost, revenue,purchased_user,impression " +
-                                        "from web_ad_country_analysis_report_history where " +
-                                        " date BETWEEN '" + sevenDaysAgo + "' AND '" + endTime + "'" +
-                                        " and app_id = '" + appId + "' " +
-                                        " and country_code = '" + countryCode + "' ";
+//                                sql = "select cost, revenue,purchased_user,impression " +
+//                                        "from web_ad_country_analysis_report_history where " +
+//                                        " date BETWEEN '" + sevenDaysAgo + "' AND '" + endTime + "'" +
+//                                        " and app_id = '" + appId + "' " +
+//                                        " and country_code = '" + countryCode + "' ";
+//
+//                                List<JSObject> listCR = DB.findListBySql(sql);
 
-                                List<JSObject> listCR = DB.findListBySql(sql);
-
-                                double sevenDaysRevenues = 0;
-                                double sevenDaysImpressions = 0;
-                                for (JSObject one : listCR) {
-                                    if (one.hasObjectData()) {
-                                        double revenue = NumberUtil.convertDouble(one.get("revenue"), 0);
-                                        double impression = NumberUtil.convertDouble(one.get("impression"), 0);
-                                        sevenDaysRevenues += revenue;
-                                        sevenDaysImpressions += impression;
-                                    }
-                                }
-                                double sevenDaysAvgEcpm = sevenDaysImpressions == 0 ? 0 : sevenDaysRevenues * 1000 / sevenDaysImpressions;
+//                                double sevenDaysRevenues = 0;
+//                                double sevenDaysImpressions = 0;
+//                                for (JSObject one : listCR) {
+//                                    if (one.hasObjectData()) {
+//                                        double revenue = NumberUtil.convertDouble(one.get("revenue"), 0);
+//                                        double impression = NumberUtil.convertDouble(one.get("impression"), 0);
+//                                        sevenDaysRevenues += revenue;
+//                                        sevenDaysImpressions += impression;
+//                                    }
+//                                }
+//                                double sevenDaysAvgEcpm = sevenDaysImpressions == 0 ? 0 : sevenDaysRevenues * 1000 / sevenDaysImpressions;
 
 
                                 //悬浮显示十四天的总花费、总营收、总盈利等
-                                sql = "select date,cost, purchased_user,total_installed,revenue,active_user, " +
-                                        "(case when total_installed > 0 then today_uninstalled / total_installed else 0 end) as uninstall_rate," +
-                                        "(case when impression > 0 then revenue * 1000 / impression else 0 end) as ecpm," +
-                                        "(case when purchased_user > 0 then cost / purchased_user else 0 end) as cpa " +
-                                        "from web_ad_country_analysis_report_history where " +
-                                        " date BETWEEN '" + fourteenDaysAgo + "' AND '" + endTime + "'" +
-                                        " and app_id = '" + appId + "' " +
-                                        " and country_code = '" + countryCode + "' ";
+//                                sql = "select date,cost, purchased_user,total_installed,revenue,active_user, " +
+//                                        "(case when total_installed > 0 then today_uninstalled / total_installed else 0 end) as uninstall_rate," +
+//                                        "(case when impression > 0 then revenue * 1000 / impression else 0 end) as ecpm," +
+//                                        "(case when purchased_user > 0 then cost / purchased_user else 0 end) as cpa " +
+//                                        "from web_ad_country_analysis_report_history where " +
+//                                        " date BETWEEN '" + fourteenDaysAgo + "' AND '" + endTime + "'" +
+//                                        " and app_id = '" + appId + "' " +
+//                                        " and country_code = '" + countryCode + "' ";
 
-                                listCR = DB.findListBySql(sql);
+//                                listCR = DB.findListBySql(sql);
                                 String everyDayCostForFourteenDays = "";
                                 String everyDayPurchasedUserForFourteenDays = "";
                                 String everyDayInstalledForFourteenDays = "";
@@ -249,7 +249,7 @@ public class CountryAnalysisReport extends HttpServlet {
                                 String everyDayCpaForFourteenDays = "";
                                 String everyDayCpaDivEcpmForFourteenDays = "";
                                 String everyDayIncomingForFourteenDays = "";
-                                for (JSObject one : listCR) {
+/*                                for (JSObject one : listCR) {
                                     if (one.hasObjectData()) {
                                         Date date = one.get("date");
                                         double cost = NumberUtil.convertDouble(one.get("cost"), 0);
@@ -273,7 +273,7 @@ public class CountryAnalysisReport extends HttpServlet {
                                         everyDayCpaDivEcpmForFourteenDays += date + "(" + NumberUtil.trimDouble(cpaDivEcpm, 3) + ")" + "\n";
                                         everyDayIncomingForFourteenDays += date + "(" + (int) incoming + ")" + "\n";
                                     }
-                                }
+                                }*/
 
                                 sql = "select date, pi from web_ad_country_analysis_report_history_by_date " +
                                         "where " +
@@ -281,35 +281,35 @@ public class CountryAnalysisReport extends HttpServlet {
                                         " and app_id = '" + appId + "' " +
                                         " and country_code = '" + countryCode + "' ";
 
-                                listCR = DB.findListBySql(sql);
-                                String everyDayPiForFourteenDays = "";
-                                if (listCR != null && listCR.size() > 0) {
-                                    for (JSObject one : listCR) {
-                                        double pi = NumberUtil.convertDouble(one.get("pi"), 0);
-                                        Date date = one.get("date");
-                                        everyDayPiForFourteenDays += date + "(" + NumberUtil.trimDouble(pi, 3) + ")" + "\n";
-                                    }
-                                }
+//                                List<JSObject> listCR = DB.findListBySql(sql);
+//                                String everyDayPiForFourteenDays = "";
+//                                if (listCR != null && listCR.size() > 0) {
+//                                    for (JSObject one : listCR) {
+//                                        double pi = NumberUtil.convertDouble(one.get("pi"), 0);
+//                                        Date date = one.get("date");
+//                                        everyDayPiForFourteenDays += date + "(" + NumberUtil.trimDouble(pi, 3) + ")" + "\n";
+//                                    }
+//                                }
 
-                                sql = "select pi,a_cpa " +
-                                        " from web_ad_country_analysis_report_history where " +
-                                        " date = '" + endTime + "'" +
-                                        " and app_id = '" + appId + "' " +
-                                        " and country_code = '" + countryCode + "' ";
-
-                                JSObject oneC = DB.findOneBySql(sql);
-                                double pi = 0;
-                                double aCpa = 0;
-                                if (oneC.hasObjectData()) {
+//                                sql = "select pi,a_cpa " +
+//                                        " from web_ad_country_analysis_report_history where " +
+//                                        " date = '" + endTime + "'" +
+//                                        " and app_id = '" + appId + "' " +
+//                                        " and country_code = '" + countryCode + "' ";
+//
+//                                JSObject oneC = DB.findOneBySql(sql);
+//                                double pi = 0;
+//                                double aCpa = 0;
+                                /*if (oneC.hasObjectData()) {
                                     pi = NumberUtil.convertDouble(oneC.get("pi"), 0);
                                     aCpa = NumberUtil.convertDouble(oneC.get("a_cpa"), 0);
-                                }
+                                }*/
 
                                 double adNewRevenues = NumberUtil.convertDouble(j.get("ad_new_revenues"), 0);
                                 double revenues = NumberUtil.convertDouble(j.get("revenues"), 0);
                                 double ecpm = NumberUtil.convertDouble(j.get("ecpm"), 0);
                                 sql = "select country_name from app_country_code_dict where country_code = '" + countryCode + "'";
-                                oneC = DB.findOneBySql(sql);
+                                JSObject oneC = DB.findOneBySql(sql);
                                 String countryName = "";
                                 if (oneC.hasObjectData()) {
                                     countryName = oneC.get("country_name");
@@ -332,20 +332,20 @@ public class CountryAnalysisReport extends HttpServlet {
 
                                 double arpu = activeUsers > 0 ? revenues / activeUsers : 0;
 
-                                sql = "SELECT avg(pi) as avg_pi FROM web_ad_country_analysis_report_history_by_date " +
-                                        "WHERE " +
-                                        " date BETWEEN '" + beforeTenDay + "' AND '" + beforeFourDay + "'" +
-                                        " and app_id = '" + appId + "' " +
-                                        " AND country_code = '" + countryCode + "'";
-
-                                oneC = DB.findOneBySql(sql);
-                                double sevenDaysAvgPi = 0;
-                                if (oneC.hasObjectData()) {
-                                    sevenDaysAvgPi = NumberUtil.convertDouble(oneC.get("avg_pi"), 0);
-                                }
+//                                sql = "SELECT avg(pi) as avg_pi FROM web_ad_country_analysis_report_history_by_date " +
+//                                        "WHERE " +
+//                                        " date BETWEEN '" + beforeTenDay + "' AND '" + beforeFourDay + "'" +
+//                                        " and app_id = '" + appId + "' " +
+//                                        " AND country_code = '" + countryCode + "'";
+//
+//                                oneC = DB.findOneBySql(sql);
+//                                double sevenDaysAvgPi = 0;
+//                                if (oneC.hasObjectData()) {
+//                                    sevenDaysAvgPi = NumberUtil.convertDouble(oneC.get("avg_pi"), 0);
+//                                }
 
                                 //RT回报时长=CPA * 1000 / sevenDaysAvgPi / sevenDaysAvgEcpm
-                                double rt = (sevenDaysAvgPi == 0 || sevenDaysAvgEcpm == 0) ? 0 : (cpa * 1000 / sevenDaysAvgPi / sevenDaysAvgEcpm);
+//                                double rt = (sevenDaysAvgPi == 0 || sevenDaysAvgEcpm == 0) ? 0 : (cpa * 1000 / sevenDaysAvgPi / sevenDaysAvgEcpm);
 
                                 totalCost += costs;
                                 totalPuserchaedUser += purchasedUsers;
@@ -425,7 +425,7 @@ public class CountryAnalysisReport extends HttpServlet {
                                     rpi = cpiMap.get(countryCode);
                                 }
                                 d.addProperty("revenue_per_install", NumberUtil.trimDouble(rpi, 2));
-                                d.addProperty("pi", NumberUtil.trimDouble(pi, 3));
+//                                d.addProperty("pi", NumberUtil.trimDouble(pi, 3));
                                 d.addProperty("arpu", NumberUtil.trimDouble(arpu, 3));
                                 d.addProperty("ecpm", NumberUtil.trimDouble(ecpm, 3));
                                 d.addProperty("cpa_div_ecpm", NumberUtil.trimDouble(cpaDivEcpm, 3));
@@ -437,16 +437,16 @@ public class CountryAnalysisReport extends HttpServlet {
                                 d.addProperty("every_day_uninstalled_rate_for_fourteen_days", everyDayUninstalledRateForFourteenDays);
                                 d.addProperty("every_day_active_user_for_fourteen_days", everyDayActiveUserForFourteenDays);
                                 d.addProperty("every_day_revenue_for_fourteen_days", everyDayRevenueForFourteenDays);
-                                d.addProperty("every_day_pi_for_fourteen_days", everyDayPiForFourteenDays);
+//                                d.addProperty("every_day_pi_for_fourteen_days", everyDayPiForFourteenDays);
                                 d.addProperty("every_day_ecpm_for_fourteen_days", everyDayEcpmForFourteenDays);
                                 d.addProperty("every_day_cpa_for_fourteen_days", everyDayCpaForFourteenDays);
                                 d.addProperty("every_day_cpa_div_ecpm_for_fourteen_days", everyDayCpaDivEcpmForFourteenDays);
                                 d.addProperty("every_day_incoming_for_fourteen_days", everyDayIncomingForFourteenDays);
 
-                                d.addProperty("a_cpa", NumberUtil.trimDouble(aCpa, 3));
+//                                d.addProperty("a_cpa", NumberUtil.trimDouble(aCpa, 3));
                                 d.addProperty("incoming", NumberUtil.trimDouble(incoming, 0));
                                 d.addProperty("cpa", NumberUtil.trimDouble(cpa, 3));
-                                d.addProperty("rt", NumberUtil.trimDouble(rt, 3));
+//                                d.addProperty("rt", NumberUtil.trimDouble(rt, 3));
                                 d.addProperty("cost_upper_limit", costUpperLimit);
                                 if (sameDate) {
 
