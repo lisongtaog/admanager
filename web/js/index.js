@@ -738,6 +738,9 @@ function bindSortOp() {
             }
         }
 
+        //状态判断
+        var statusOperator = $("#statusOperator option:selected").val();
+
         $.post('query_by_mul_conditions', {
             tag: query,
             startTime: startTime,
@@ -763,7 +766,9 @@ function bindSortOp() {
                     " 总展示: " + data.total_impressions + " 总点击: " + data.total_click +
                     " CTR: " + data.total_ctr + " CPA: " + data.total_cpa + " CVR: " + data.total_cvr;
 
-                str += "<br/><span class='estimateResult'></span>"
+                str += "<br/><span class='estimateResult'></span>";
+                str += "<br/>";
+                str += "facebook_ARCHIVED:&nbsp" + data.total_ARCHIVED +"&nbsp&nbsp&nbsp&nbsp&nbsp&nbspfacebook_ACTIVE:&nbsp"+data.total_ACTIVE+"&nbsp&nbsp&nbsp&nbsp&nbsp&nbspfacebook_PAUSED:&nbsp"+data.total_PAUSED+"&nbsp&nbsp&nbsp&nbsp&nbsp&nbspadWords_paused:&nbsp"+data.total_paused+"&nbsp&nbsp&nbsp&nbsp&nbsp&nbspadWords_removed:&nbsp"+data.total_removed+"&nbsp&nbsp&nbsp&nbsp&nbsp&nbspadWords_enabled:&nbsp"+data.total_enabled;
                 $('#total_result').removeClass("editable");
                 $('#total_result').html(str);
             } else {

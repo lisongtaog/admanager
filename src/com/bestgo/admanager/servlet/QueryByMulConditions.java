@@ -38,6 +38,9 @@ public class QueryByMulConditions extends HttpServlet {
 
         //状态条件查询
         String statusOperator = request.getParameter("statusOperator");
+        if (statusOperator == null) {       //容错处理。 没有请求参数就是all
+            statusOperator = "all";
+        }
 
         JsonObject json = new JsonObject();
         String startTime = request.getParameter("startTime");
