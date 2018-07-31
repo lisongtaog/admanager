@@ -67,19 +67,27 @@ public class CountryAnalysisReport extends HttpServlet {
                 try {
                     String sql = "SELECT id,rule_content FROM web_ad_rules WHERE rule_type = 3 AND rule_content LIKE '%app_name=" + app_name + "%country_code=" + countryCode + "%'";
                     JSObject one = DB.findOneBySql(sql);
+
                     if (one.hasObjectData()) {
-                        String rule_content = one.get("rule_content");
                         long id = one.get("id");
+                        String rule_content = one.get("rule_content");
+
                         String newLine = rule_content.replaceAll("cost>\\d*", "cost>" + cost);
                         flag = DB.update("web_ad_rules")
                                 .put("rule_content", newLine)
                                 .where(DB.filter().whereEqualTo("id", id))
                                 .execute();
                     } else {
+                        JSObject oneBySql = DB.findOneBySql("select id from web_tag where tag_name = '" + app_name + "'");
+
+                        long tag_id = oneBySql.get("id");
+
                         String ruleContent = "app_name=" + app_name + ",country_code=" + countryCode + ",cpa_div_ecpm>0.2,cost>" + cost;
                         flag = DB.insert("web_ad_rules")
                                 .put("rule_type", 3)
                                 .put("rule_content", ruleContent)
+                                .put("tag_id", tag_id)
+                                .put("tag_name", app_name)
                                 .execute();
                     }
                 } catch (Exception e) {

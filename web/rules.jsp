@@ -132,6 +132,7 @@
                             </select>
                         </div>
                     </div>
+
                     <div class="form-group">
                         <label for="inputRuleContent" class="col-sm-2 control-label">缩写</label>
                         <div class="col-sm-10">
@@ -176,6 +177,7 @@
         $('#inputRuleContent').val("campaign_id=xxx,conversions>xxx,cpa>xxx")
         modifyType = 'new';
         $('#delete_message').hide();
+        $('#inputSearchDiv').show();
         $('#modify_form').show();
         $("#dlg_title").text("添加规则");
         $("#new_rule_dlg").modal("show");
