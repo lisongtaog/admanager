@@ -757,7 +757,8 @@ function bindSortOp() {
             containsNoDataCampaignCheck: containsNoDataCampaignCheck,
             biddingComparisonValue: biddingComparisonValue,
             totalInstallOperator: totalInstallOperator,
-            cpaOperator: cpaOperator
+            cpaOperator: cpaOperator,
+            statusOperator:statusOperator
         }, function (data) {
             if (data && data.ret == 1) {
                 data = data.data;
