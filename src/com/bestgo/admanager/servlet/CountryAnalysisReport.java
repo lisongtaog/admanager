@@ -30,7 +30,7 @@ public class CountryAnalysisReport extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         if (!Utils.isAdmin(request, response)) return;
-
+        Map<String, Long> tagNameIdMap = getTagNameIdMap();
         String path = request.getPathInfo();
         JsonObject jsonObject = new JsonObject();
         String sorterId = request.getParameter("sorterId");
@@ -45,10 +45,7 @@ public class CountryAnalysisReport extends HttpServlet {
         }
 
 
-//        String sevenDaysAgo = DateUtil.addDay(endTime, -6, "yyyy-MM-dd");//包括endTime
-//        String fourteenDaysAgo = DateUtil.addDay(endTime, -13, "yyyy-MM-dd");//包括endTime
 
-        String beforeTenDay = DateUtil.addDay(endTime, -10, "yyyy-MM-dd");//不包括endTime
         String beforeFourDay = DateUtil.addDay(endTime, -4, "yyyy-MM-dd");//不包括endTime
         String beforeTwentyTwoDay = DateUtil.addDay(endTime, -22, "yyyy-MM-dd");//不包括endTime
 
@@ -78,17 +75,19 @@ public class CountryAnalysisReport extends HttpServlet {
                                 .where(DB.filter().whereEqualTo("id", id))
                                 .execute();
                     } else {
-                        JSObject oneBySql = DB.findOneBySql("select id from web_tag where tag_name = '" + app_name + "'");
-
-                        long tag_id = oneBySql.get("id");
-
+                        Long tagId = tagNameIdMap.get(app_name);
                         String ruleContent = "app_name=" + app_name + ",country_code=" + countryCode + ",cpa_div_ecpm>0.2,cost>" + cost;
-                        flag = DB.insert("web_ad_rules")
-                                .put("rule_type", 3)
-                                .put("rule_content", ruleContent)
-                                .put("tag_id", tag_id)
-                                .put("tag_name", app_name)
-                                .execute();
+                        if (tagId == null || tagId == 0L) {
+                            jsonObject.addProperty("ret", 0);
+                            jsonObject.addProperty("message", "标签ID为空，请联系管理员");
+                        } else {
+                            flag = DB.insert("web_ad_rules")
+                                    .put("rule_type", 3)
+                                    .put("rule_content", ruleContent)
+                                    .put("tag_id", tagId)
+                                    .put("tag_name", app_name)
+                                    .execute();
+                        }
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -538,5 +537,29 @@ public class CountryAnalysisReport extends HttpServlet {
             }
         }
         response.getWriter().write(jsonObject.toString());
+    }
+
+
+
+    /**
+     * 获取标签名称与ID的Map
+     * @return
+     * @throws Exception
+     */
+    private static Map<String,Long> getTagNameIdMap() {
+        Map<String,Long> map = new HashMap<>();
+        List<JSObject> list = null;
+        try {
+            list = DB.findListBySql("SELECT id,tag_name FROM web_tag");
+            for (int i = 0,len = list.size();i<len;i++) {
+                JSObject js = list.get(i);
+                long id = js.get("id");
+                String tagName = js.get("tag_name");
+                map.put(tagName,id);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return map;
     }
 }
