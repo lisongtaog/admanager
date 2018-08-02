@@ -28,6 +28,7 @@
         response.sendRedirect("login.jsp");
     }
 
+    //添加按钮数据的加载
     List<JSObject> allTags = Tags.fetchAllTags();
     JsonArray array1 = new JsonArray();
     for (int i = 0; i < allTags.size(); i++) {
@@ -59,6 +60,7 @@
             <tbody>
 
             <%
+                //页面刷新，加载全部的数据。
                 List<JSObject> data = new ArrayList<>();
                 long totalPage = 0;
                 long count = TagsBidAdmanager.count();
@@ -1902,6 +1904,7 @@
     for (var i = 0; i < regionList.length; i++) {
         countryNames.push(regionList[i].name);
     }
+
     $("#inputCountry").autocomplete({
         source: countryNames
     });
@@ -1951,7 +1954,6 @@
                 }
             }, 'json');
         } else if (modifyType == 'update') {
-
             $.post('tagsBidAdmanager/update', {
                 id: id,
                 name: tagName,

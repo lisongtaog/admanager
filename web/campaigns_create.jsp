@@ -47,7 +47,7 @@
 %>
 
 <div class="container-fluid">
-    <%@include file="common/navigationbar.jsp"%>
+    <%@include file="common/navigationbar.jsp" %>
 
     <div class="panel panel-default" style="margin-top: 10px">
         <div class="panel-heading" id="panel_title">
@@ -68,7 +68,8 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
                     <h4 class="modal-title" id="dlg_title">输入国家，每行一个</h4>
                 </div>
                 <div class="modal-body">
@@ -76,7 +77,7 @@
                         <div class="form-group">
                             <label for="inputCustomCountryPart" class="col-sm-2 control-label">自定义字段</label>
                             <div class="col-sm-10">
-                                <input id="inputCustomCountryPart" style="width:100%;" />
+                                <input id="inputCustomCountryPart" style="width:100%;"/>
                             </div>
                         </div>
                         <div class="form-group">
@@ -128,7 +129,8 @@
                 </select>
             </div>
             <div class="col-sm-2">
-                <label title="选中后每个选项创建一个或多个广告系列"><input type="checkbox" checked="checked" class="form-check-input" id="selectFBPageExplode">分离到系列</label>
+                <label title="选中后每个选项创建一个或多个广告系列"><input type="checkbox" checked="checked" class="form-check-input"
+                                                         id="selectFBPageExplode">分离到系列</label>
             </div>
         </div>
 
@@ -143,7 +145,8 @@
                 <input type="button" class="btn-more btn btn-default" id="btnSelectRegionMore" value="批量输入"/>
             </div>
             <div class="col-sm-2">
-                <label title="选中后每个选项创建一个或多个广告系列"><input type="checkbox" class="form-check-input" id="selectRegionExplode">分离到系列</label>
+                <label title="选中后每个选项创建一个或多个广告系列"><input type="checkbox" class="form-check-input"
+                                                         id="selectRegionExplode">分离到系列</label>
             </div>
         </div>
         <div class="form-group alert-warning" id="customCountryPartDiv">
@@ -187,13 +190,14 @@
             </div>
 
             <div class="col-sm-2">
-                <label title="选中后每个选项创建一个或多个广告系列"><input type="checkbox" class="form-check-input" id="selectGenderExplode">分离到系列</label>
+                <label title="选中后每个选项创建一个或多个广告系列"><input type="checkbox" class="form-check-input"
+                                                         id="selectGenderExplode">分离到系列</label>
             </div>
         </div>
         <div class="form-group">
             <label for="inputInterest" class="col-sm-2 control-label">兴趣</label>
             <div class="col-sm-10">
-                <input class="form-control" id="inputInterest" />
+                <input class="form-control" id="inputInterest"/>
             </div>
         </div>
         <div class="form-group">
@@ -203,16 +207,18 @@
                 </select>
             </div>
             <div class="col-sm-2">
-                <label title="选中后每个选项创建一个或多个广告系列"><input type="checkbox" class="form-check-input" id="selectUserOsExplode">分离到系列</label>
+                <label title="选中后每个选项创建一个或多个广告系列"><input type="checkbox" class="form-check-input"
+                                                         id="selectUserOsExplode">分离到系列</label>
             </div>
         </div>
         <div class="form-group">
             <label for="inputUserDevices" class="col-sm-2 control-label">用户设备</label>
             <div class="col-sm-8">
-                <input class="form-control" id="inputUserDevices" />
+                <input class="form-control" id="inputUserDevices"/>
             </div>
             <div class="col-sm-2">
-                <label title="选中后每个选项创建一个或多个广告系列"><input type="checkbox" class="form-check-input" id="selectUserDevicesExplode">分离到系列</label>
+                <label title="选中后每个选项创建一个或多个广告系列"><input type="checkbox" class="form-check-input"
+                                                         id="selectUserDevicesExplode">分离到系列</label>
             </div>
         </div>
         <div class="form-group">
@@ -222,38 +228,53 @@
                 </select>
             </div>
             <div class="col-sm-2">
-                <label title="选中后每个选项创建一个或多个广告系列"><input type="checkbox" class="form-check-input" id="selectPublisherPlatformsExplode">分离到系列</label>
+                <label title="选中后每个选项创建一个或多个广告系列"><input type="checkbox" class="form-check-input"
+                                                         id="selectPublisherPlatformsExplode">分离到系列</label>
             </div>
         </div>
         <div class="form-group">
             <label for="inputBudget" class="col-sm-2 control-label">预算</label>
             <div class="col-sm-10">
-                <input class="form-control" id="inputBudget" />
+                <input class="form-control" id="inputBudget"/>
             </div>
         </div>
         <div class="form-group">
-            <label for="selectBidStrategy" class="col-sm-2 control-label" >竞价策略</label>
+            <label for="selectBidStrategy" class="col-sm-2 control-label">竞价策略</label>
             <div class="col-sm-10">
                 <select class="form-control" id="selectBidStrategy">
-                    <option value="1">TARGET_COST</option> <%--设置 出价 平均费用--%>
-                    <option value="2">LOWEST_COST_WITH_BID_CAP</option><%--需要 设置竞价上限--%>
+                    <option value="1">TARGET_COST</option>
+                    <%--设置 出价 平均费用--%>
+                    <option value="2">LOWEST_COST_WITH_BID_CAP</option>
+                    <%--需要 设置竞价上限--%>
                 </select>
             </div>
         </div>
+
+
         <div class="form-group">
-            <label for="inputBidding" class="col-sm-2 control-label">出价/竞价上限</label>
+            <label for="inputBidding" class="col-sm-2 control-label">应用出价/竞价上限</label>
             <div class="col-sm-8">
-                <input class="form-control" id="inputBidding" type="text" />
+                <input class="form-control" id="inputBidding" type="text"/>
             </div>
 
             <div class="col-sm-2">
-                <label title="选中后每个选项创建一个或多个广告系列"><input type="checkbox" class="form-check-input" id="inputBiddingExplode">分离到系列</label>
+                <label title="选中后每个选项创建一个或多个广告系列"><input type="checkbox" class="form-check-input"
+                                                         id="inputBiddingExplode">分离到系列</label>
             </div>
         </div>
+
+        <%--国家出价/竞价上限--%>
+        <div class="form-group">
+            <label class="col-sm-2 control-label"></label>
+            <div class="col-sm-8">
+                <span id="appCountryBidding"></span>
+            </div>
+        </div>
+
         <div class="form-group">
             <label for="inputMaxCpa" class="col-sm-2 control-label">关闭价格</label>
             <div class="col-sm-10">
-                <input class="form-control" id="inputMaxCpa" />
+                <input class="form-control" id="inputMaxCpa"/>
             </div>
         </div>
         <div class="form-group">
@@ -262,16 +283,18 @@
                 <input class="form-control" id="inputImagePath"/>
             </div>
             <div class="col-sm-2">
-                <label title="选中后每个选项创建一个或多个广告系列"><input type="checkbox" class="form-check-input" id="inputImageExplode">分离到系列</label>
+                <label title="选中后每个选项创建一个或多个广告系列"><input type="checkbox" class="form-check-input"
+                                                         id="inputImageExplode">分离到系列</label>
             </div>
         </div>
         <div class="form-group">
             <label for="inputVideoPath" class="col-sm-2 control-label">视频路径</label>
             <div class="col-sm-8">
-                <input class="form-control" id="inputVideoPath" />
+                <input class="form-control" id="inputVideoPath"/>
             </div>
             <div class="col-sm-2">
-                <label title="选中后每个选项创建一个或多个广告系列"><input type="checkbox" class="form-check-input" id="inputVideoExplode">分离到系列</label>
+                <label title="选中后每个选项创建一个或多个广告系列"><input type="checkbox" class="form-check-input"
+                                                         id="inputVideoExplode">分离到系列</label>
             </div>
         </div>
         <div class="form-group">
@@ -285,8 +308,13 @@
         <br>
         <table class="table table-hover" id="advertisement">
             <thead>
-            <tr><th><input type="checkbox" id="checkbox_facebook"></th>
-                <th>广告语组合</th><th>语言</th><th>广告语标题</th><th>广告语</th></tr>
+            <tr>
+                <th><input type="checkbox" id="checkbox_facebook"></th>
+                <th>广告语组合</th>
+                <th>语言</th>
+                <th>广告语标题</th>
+                <th>广告语</th>
+            </tr>
             </thead>
             <tbody id="tbody_facebook"></tbody>
         </table>
@@ -328,7 +356,8 @@
                 <input type="button" class="btn-more btn btn-default" id="btnSelectRegionAdmobMore" value="批量输入"/>
             </div>
             <div class="col-sm-2">
-                <label title="选中后每个选项创建一个或多个广告系列"><input type="checkbox" class="form-check-input" id="selectRegionAdmobExplode">分离到系列</label>
+                <label title="选中后每个选项创建一个或多个广告系列"><input type="checkbox" class="form-check-input"
+                                                         id="selectRegionAdmobExplode">分离到系列</label>
             </div>
         </div>
         <div class="form-group alert-warning" id="customCountryPartAdmobDiv">
@@ -345,7 +374,8 @@
                 </select>
             </div>
             <div class="col-sm-1">
-                <input type="button" class="btn-more btn btn-default" id="btnSelectRegionUnselectedAdmobMore" value="批量输入"/>
+                <input type="button" class="btn-more btn btn-default" id="btnSelectRegionUnselectedAdmobMore"
+                       value="批量输入"/>
             </div>
         </div>
 
@@ -369,31 +399,44 @@
         <div class="form-group">
             <label for="inputBudget" class="col-sm-2 control-label">预算</label>
             <div class="col-sm-10">
-                <input class="form-control" id="inputBudgetAdmob" />
+                <input class="form-control" id="inputBudgetAdmob"/>
             </div>
         </div>
+
+
         <div class="form-group">
             <label for="inputBiddingAdmob" class="col-sm-2 control-label">出价</label>
             <div class="col-sm-8">
-                <input class="form-control" id="inputBiddingAdmob" />
+                <input class="form-control" id="inputBiddingAdmob"/>
             </div>
             <div class="col-sm-2">
-                <label title="选中后每个选项创建一个或多个广告系列"><input type="checkbox" class="form-check-input" id="inputBiddingAdmobExplode">分离到系列</label>
+                <label title="选中后每个选项创建一个或多个广告系列"><input type="checkbox" class="form-check-input"
+                                                         id="inputBiddingAdmobExplode">分离到系列</label>
             </div>
         </div>
+
+        <%--国家出价/竞价上限--%>
+        <div class="form-group">
+            <label class="col-sm-2 control-label"></label>
+            <div class="col-sm-8">
+                <span id="appCountryBiddingAdWords"></span>
+            </div>
+        </div>
+
         <div class="form-group">
             <label for="inputMaxCpa" class="col-sm-2 control-label">关闭价格</label>
             <div class="col-sm-10">
-                <input class="form-control" id="inputMaxCpaAdmob" />
+                <input class="form-control" id="inputMaxCpaAdmob"/>
             </div>
         </div>
         <div class="form-group">
             <label for="inputImagePath" class="col-sm-2 control-label">图片路径</label>
             <div class="col-sm-8">
-                <input class="form-control" id="inputImagePathAdmob" />
+                <input class="form-control" id="inputImagePathAdmob"/>
             </div>
             <div class="col-sm-2">
-                <label title="选中后每个选项创建一个或多个广告系列"><input type="checkbox" class="form-check-input" id="inputImageAdmobExplode">分离到系列</label>
+                <label title="选中后每个选项创建一个或多个广告系列"><input type="checkbox" class="form-check-input"
+                                                         id="inputImageAdmobExplode">分离到系列</label>
             </div>
         </div>
         <div class="form-group">
@@ -407,8 +450,15 @@
         <br>
         <table class="table table-hover" id="advertisement_admob">
             <thead>
-            <tr><th><input type="checkbox" id="checkbox_admob"></th>
-                <th>广告语组合</th><th>语言</th><th>广告语1</th><th>广告语2</th><th>广告语3</th><th>广告语4</th></tr>
+            <tr>
+                <th><input type="checkbox" id="checkbox_admob"></th>
+                <th>广告语组合</th>
+                <th>语言</th>
+                <th>广告语1</th>
+                <th>广告语2</th>
+                <th>广告语3</th>
+                <th>广告语4</th>
+            </tr>
             </thead>
             <tbody id="tbody_admob"></tbody>
         </table>
@@ -436,15 +486,15 @@
     var IndexBidding = <%=bidding%>;
 
     //国家后面的“分离到系列”一旦选中的互动
-    $("#selectRegionExplode , #selectRegionAdmobExplode").click(function(){
+    $("#selectRegionExplode , #selectRegionAdmobExplode").click(function () {
         var checkId = $(this).attr("id")
         var checked = $(this).prop("checked");
-        if(checked){
-            if(checkId === "selectRegionExplode"){
-                $("#customCountryPart").val("").prop("disabled",true);
+        if (checked) {
+            if (checkId === "selectRegionExplode") {
+                $("#customCountryPart").val("").prop("disabled", true);
                 $("#customCountryPartDiv").hide();
-            }else{
-                $("#customCountryPartAdmob").val("").prop("disabled",true);
+            } else {
+                $("#customCountryPartAdmob").val("").prop("disabled", true);
                 $("#customCountryPartAdmobDiv").hide();
             }
         }

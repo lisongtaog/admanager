@@ -2132,19 +2132,23 @@ function init() {
         $('#selectLanguage').append($("<option>" + one + "</option>"));
     });
     $("#selectLanguage option:first-child").prop("selected", true);
+
     genderList.forEach(function (one) {
         $('#selectGender').append($("<option>" + one + "</option>"));
     });
     $("#selectGender option:first-child").prop("selected", true);
+
     osList.forEach(function (one) {
         $('#selectUserOs').append($("<option>" + one + "</option>"));
     });
     $('#selectUserOs option:first-child').prop("selected", true);
+
     regionList.forEach(function (one) {
         $('#selectRegion').append($("<option>" + one.name + "</option>"));
         $('#selectRegionUnselected').append($("<option>" + one.name + "</option>"));
     });
     $("#selectRegionUnselected").append("<option selected></option>");
+
     admobLanguageCodes.forEach(function (one) {
         $('#selectLanguageAdmob').append($("<option value='" + one.code + "'>" + one.name + "</option>"));
     });
@@ -2157,6 +2161,7 @@ function init() {
         $('#selectRegionUnselectedAdmob').append($("<option value='" + value + "'>" + key + "</option>"));
     }
     $('#selectRegionUnselectedAdmob').append("<option selected></option>");
+
     var pendingList = [1, 2, 3];
     /*
      * 三个 $.post 是异步执行的，哪个先返回response就先执行哪一个的 function
@@ -2786,8 +2791,10 @@ $("#selectAppAdmob").change(function () {
     return false;
 });
 
+var countryBidding;
 //根据[国家地区][应用名称]回显已创建好的广告语
 $("#selectRegion").change(function () {
+    $("#appCountryBidding").text("");
     // if (isAutoCreate && !firstInitForm) {
     //     firstInitForm = true;
     //     return;
@@ -2797,6 +2804,26 @@ $("#selectRegion").change(function () {
     if (region != null && region.length > 0) {
         var appName = $('#selectApp').val();
         if (appName != "") {
+            //查询出国家出价上限
+            $.post("tagsBidAdmanager/selectByTagNameRegion", {
+                appName: appName,
+                region: region.join(",")
+            }, function (data) {
+                if (data) {
+                    var list = data.data;
+                    countryBidding = list;
+                    list.forEach(function (one) {
+                        // alert(one.country);
+                        // alert(one.bidding);
+                        $("#appCountryBidding").append("<span>" + one.country + "  :  " + one.bidding + "</span>&nbsp;&nbsp;&nbsp;&nbsp;");
+
+                    });
+                } else if (data) {
+                    admanager.showCommonDlg("Warning", data.message);
+                }
+            }, "json");
+
+
             $.post("campaign_create_ads_show_up/facebook", {
                 appName: appName,
                 region: region.join(",")
@@ -2826,7 +2853,10 @@ $("#selectRegion").change(function () {
     }
     return false;
 });
+
+var countryBiddingAdmob;
 $("#selectRegionAdmob").change(function () {
+    $("#appCountryBiddingAdWords").text("");
     // if (isAutoCreate && !firstInitForm) {
     //     firstInitForm = true;
     //     return;
@@ -2839,6 +2869,25 @@ $("#selectRegionAdmob").change(function () {
     });
     if (regionAdmob != null && regionAdmob.length > 0) {
         var appNameAdmob = $('#selectAppAdmob').val();
+        //查询出国家出价上限
+        $.post("tagsBidAdmanager/selectByTagNameRegion", {
+            appName: appNameAdmob,
+            region: regionAdmob.join(",")
+        }, function (data) {
+            if (data) {
+                var list = data.data;
+                countryBiddingAdmob = list;
+                list.forEach(function (one) {
+                    // alert(one.country);
+                    // alert(one.bidding);
+                    $("#appCountryBiddingAdWords").append("<span>" + one.country + "  :  " + one.bidding + "</span>&nbsp;&nbsp;&nbsp;&nbsp;");
+
+                });
+            } else if (data) {
+                admanager.showCommonDlg("Warning", data.message);
+            }
+        }, "json");
+
         $.post("campaign_create_ads_show_up/adwords", {
             appName: appNameAdmob,
             region: regionAdmob.join(","),
@@ -3353,6 +3402,29 @@ function FacebookFormReading() {
 
 //创建facebook系列
 $('#btnCreate').click(function () {
+
+    var bidding = $('#inputBidding').val();//出价/竞价
+
+    var biddingMap = bidding.split(",").map(function (x) {
+        return x.trim();
+    })
+
+    var flag = 0;
+    biddingMap.forEach(function (one) {
+        countryBidding.forEach(function (two) {
+            if (one > two.bidding) {
+                alert("你的出价大于 "+two.country+" 出价上限！请修改正确！");
+                flag = 1;
+                return;
+            }
+        });
+    })
+
+    if (flag == 1) {
+        return;
+    }
+
+
     var explodeParams = FacebookFormReading();
     //用 explodeParams 构造新的请求
 
@@ -3912,8 +3984,7 @@ $('#btnCreate').click(function () {
 //     });
 // }
     return false;
-})
-;
+});
 
 //读取并分离adwords表单数据
 function AdwordFormReading() {
@@ -4060,6 +4131,25 @@ function AdwordFormReading() {
 
 //创建admob系列
 $("#btnCreateAdmob").click(function () {
+    //对创建的出价进行校验
+    var bidding = $('#inputBiddingAdmob').val();//出价/竞价
+    var biddingMap2 = bidding.split(",").map(function (x) {
+        return x.trim();
+    })
+    var flag = 0;
+    biddingMap2.forEach(function (one) {
+        countryBiddingAdmob.forEach(function (two) {
+            if (one > two.bidding) {
+                alert("你的出价大于 "+two.country+" 出价上限！请修改正确！");
+                flag = 1;
+                return;
+            }
+        });
+    })
+    if (flag == 1) {
+        return;
+    }
+
     var explodeParams = AdwordFormReading();
 
     var checkAutoCreate = $('#checkAdmobAutoCreate').prop('checked');
@@ -4216,40 +4306,40 @@ $("#btnCreateAdmob").click(function () {
             }, "json");
         }, function (errorLog) {
             //队列全部处理完成
-                var AutoRequestPool = [];
-                var explodeCountry = $("#selectRegionAdmobExplode").prop("checked");
-                var explodeBidding = $("#inputBiddingAdmobExplode").prop("checked");
-                requestPool.forEach(function (p) {
-                    var AutoCloned = {};
-                    $.extend(AutoCloned, p);
-                    AutoCloned.explodeCountry = explodeCountry;
-                    AutoCloned.explodeBidding = explodeBidding;
-                    AutoCloned.groupId = p.adsGroup.groupId;
-                    AutoCloned.message1 = p.adsGroup.message1;
-                    AutoCloned.message2 = p.adsGroup.message2;
-                    AutoCloned.message3 = p.adsGroup.message3;
-                    AutoCloned.message4 = p.adsGroup.message4;
-                    AutoRequestPool.push(AutoCloned);
+            var AutoRequestPool = [];
+            var explodeCountry = $("#selectRegionAdmobExplode").prop("checked");
+            var explodeBidding = $("#inputBiddingAdmobExplode").prop("checked");
+            requestPool.forEach(function (p) {
+                var AutoCloned = {};
+                $.extend(AutoCloned, p);
+                AutoCloned.explodeCountry = explodeCountry;
+                AutoCloned.explodeBidding = explodeBidding;
+                AutoCloned.groupId = p.adsGroup.groupId;
+                AutoCloned.message1 = p.adsGroup.message1;
+                AutoCloned.message2 = p.adsGroup.message2;
+                AutoCloned.message3 = p.adsGroup.message3;
+                AutoCloned.message4 = p.adsGroup.message4;
+                AutoRequestPool.push(AutoCloned);
+            });
+            var url = "auto_create_campaign/adwords/create2";
+            if (isAutoCreate && modifyRecordId > 0) {
+                AutoRequestPool.forEach(function (p) {
+                    p.id = modifyRecordId;
                 });
-                var url = "auto_create_campaign/adwords/create2";
-                if (isAutoCreate && modifyRecordId > 0) {
-                    AutoRequestPool.forEach(function (p) {
-                        p.id = modifyRecordId;
-                    });
-                    url = "auto_create_campaign/adwords/modify";
-                }
-                batchRequest(AutoRequestPool, function (param, onSuccess, onFail) {
-                    $.post(url, param, function (data) {
-                        if (data && data.ret == 1) {
-                            onSuccess();
-                        } else {
-                            onFail(data.message)
-                        }
-                    }, "json");
-                }, function (errorLog) {
-                    //[设置为自动创建]队列全部处理完成
-                    layer.tips("自动创建队列处理完毕", "#btnCreateAdmob", {tips: 1, time: 3000});
-                });
+                url = "auto_create_campaign/adwords/modify";
+            }
+            batchRequest(AutoRequestPool, function (param, onSuccess, onFail) {
+                $.post(url, param, function (data) {
+                    if (data && data.ret == 1) {
+                        onSuccess();
+                    } else {
+                        onFail(data.message)
+                    }
+                }, "json");
+            }, function (errorLog) {
+                //[设置为自动创建]队列全部处理完成
+                layer.tips("自动创建队列处理完毕", "#btnCreateAdmob", {tips: 1, time: 3000});
+            });
         });
 
 
@@ -4560,3 +4650,7 @@ $("#inputVideoPath,#inputImagePath,#inputImagePathAdmob").change(function () {
         }
     }
 });
+
+
+
+

@@ -1,5 +1,6 @@
 package com.bestgo.admanager.servlet;
 
+import com.bestgo.admanager.Config;
 import com.bestgo.admanager.OperationResult;
 import com.bestgo.admanager.utils.DateUtil;
 import com.bestgo.admanager.utils.NumberUtil;
@@ -17,8 +18,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by lisongtao on 7/31/18.
@@ -31,6 +31,7 @@ public class TagsBidAdmanager extends HttpServlet {
         String path = request.getPathInfo();
         JsonObject json = new JsonObject();
         OperationResult result = new OperationResult();
+
 //        String tag = request.getParameter("tag");
 //        String startTime = request.getParameter("startTime");
 //        String endTime = request.getParameter("endTime");
@@ -107,78 +108,16 @@ public class TagsBidAdmanager extends HttpServlet {
                     }
                     json.add("data", array);
                 }
-            } else if (path.startsWith("/selectByTagName")) {
-//                result.result = true;
-//                if (tag.isEmpty()) {
-//                    result.result = false;
-//                    result.message = "标签不能为空";
-//                }
-//                if (result.result) {
-//                    endTime = DateUtil.addDay(endTime, 1, "yyyy-MM-dd");//加一天
-//                    String sqlFacebook = "select app_name,campaign_id,account_id,campaign_name,create_time,bugdet,bidding,country_region" +
-//                            " from ad_campaigns where tag_name = '" + tag + "' and create_time >= '" + startTime + "' and create_time < '" + endTime + "'";
-//                    String sqlAdmob = "select app_name,campaign_id,account_id,campaign_name,create_time,bugdet,bidding,ccd.country_name" +
-//                            " from ad_campaigns_admob ca,app_country_code_dict ccd " +
-//                            "where ca.country_region = ccd.country_code and " +
-//                            "tag_name = '" + tag + "' and create_time >= '" + startTime + "' and create_time < '" + endTime + "'";
-//                    try {
-//                        List<JSObject> listF = DB.findListBySql(sqlFacebook);
-//                        List<JSObject> listA = DB.findListBySql(sqlAdmob);
-//                        JsonArray array = new JsonArray();
-//                        double total_budget = 0;
-//                        for (JSObject j : listA) {
-//                            JsonObject one = new JsonObject();
-//                            String app_name = j.get("app_name");
-//                            String campaign_id = j.get("campaign_id");
-//                            String account_id = j.get("account_id");
-//                            String campaign_name = j.get("campaign_name");
-//                            String create_time = DateUtil.timeStamp2Date(j.get("create_time"), "yyyy-MM-dd HH:mm:ss");
-//                            double budget = NumberUtil.parseDouble(j.get("bugdet"), 0);
-//                            total_budget += budget;
-//                            double bidding = NumberUtil.parseDouble(j.get("bidding"), 0);
-//                            String country_region = j.get("country_name");
-//                            one.addProperty("app_name", app_name);
-//                            one.addProperty("campaign_id", campaign_id);
-//                            one.addProperty("account_id", account_id);
-//                            one.addProperty("campaign_name", campaign_name);
-//                            one.addProperty("create_time", create_time);
-//                            one.addProperty("budget", budget);
-//                            one.addProperty("bidding", bidding);
-//                            one.addProperty("country_region", country_region);
-//                            array.add(one);
-//                        }
-//                        for (JSObject j : listF) {
-//                            JsonObject one = new JsonObject();
-//                            String app_name = j.get("app_name");
-//                            String campaign_id = j.get("campaign_id");
-//                            String account_id = j.get("account_id");
-//                            String campaign_name = j.get("campaign_name");
-//                            String create_time = DateUtil.timeStamp2Date(j.get("create_time"), "yyyy-MM-dd HH:mm:ss");
-//
-//                            double budget = NumberUtil.parseDouble(j.get("bugdet"), 0);
-//                            total_budget += budget;
-//                            double bidding = NumberUtil.parseDouble(j.get("bidding"), 0);
-//                            String country_region = j.get("country_region");
-//                            one.addProperty("app_name", app_name);
-//                            one.addProperty("campaign_id", campaign_id);
-//                            one.addProperty("account_id", account_id);
-//                            one.addProperty("campaign_name", campaign_name);
-//                            one.addProperty("create_time", create_time);
-//                            one.addProperty("budget", budget);
-//                            one.addProperty("bidding", bidding);
-//                            one.addProperty("country_region", country_region);
-//                            array.add(one);
-//                        }
-//                        json.add("arr", array);
-//                        json.addProperty("total_budget", total_budget);
-//                        json.addProperty("total_count", array.size());
-//                    } catch (Exception ex) {
-//                        result.message = ex.getMessage();
-//                        result.result = false;
-//                    }
-//                }
-//                json.addProperty("ret", result.result ? 1 : 0);
-//                json.addProperty("message", result.message);
+            } else if (path.startsWith("/selectByTagNameRegion")) {
+                String app_name = request.getParameter("appName");
+                String region = request.getParameter("region");
+                JsonArray array = new JsonArray();
+                try {
+                    array = fetchBidding(app_name, region);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                json.add("data", array);
             }
         }
 
@@ -189,6 +128,12 @@ public class TagsBidAdmanager extends HttpServlet {
         doPost(request, response);
     }
 
+    /**
+     * 条件查询方法
+     *
+     * @param word
+     * @return
+     */
     public static List<JSObject> fetchData(String word) {
         List<JSObject> list = new ArrayList<>();
         try {
@@ -201,6 +146,11 @@ public class TagsBidAdmanager extends HttpServlet {
         return list;
     }
 
+    /**
+     * 对话框出现，自动加载标签
+     *
+     * @return
+     */
     public static List<JSObject> fetchAllTags() {
         List<JSObject> list = new ArrayList<>();
         try {
@@ -213,6 +163,13 @@ public class TagsBidAdmanager extends HttpServlet {
     }
 
 
+    /**
+     * 页面刷新自动加载<table>数据
+     *
+     * @param index
+     * @param size
+     * @return
+     */
     public static List<JSObject> fetchAllData(int index, int size) {
         List<JSObject> list = new ArrayList<>();
         try {
@@ -225,6 +182,11 @@ public class TagsBidAdmanager extends HttpServlet {
         return list;
     }
 
+    /**
+     * 页面数据总量
+     *
+     * @return
+     */
     public static long count() {
         try {
             JSObject object = DB.simpleScan("web_tag_bid_admanager").select(DB.func(DB.COUNT, "id")).execute();
@@ -236,6 +198,12 @@ public class TagsBidAdmanager extends HttpServlet {
         return 0;
     }
 
+    /**
+     * 删除一条数据方法
+     *
+     * @param id
+     * @return
+     */
     private OperationResult deleteTag(String id) {
         int tagId = Integer.parseInt(id);
         OperationResult ret = new OperationResult();
@@ -255,6 +223,14 @@ public class TagsBidAdmanager extends HttpServlet {
         return ret;
     }
 
+    /**
+     * 创建一条数据方法
+     *
+     * @param tagName
+     * @param bidding
+     * @param country
+     * @return
+     */
     private OperationResult createNewTag(String tagName, String bidding, String country) {
         OperationResult ret = new OperationResult();
 
@@ -279,6 +255,15 @@ public class TagsBidAdmanager extends HttpServlet {
     }
 
 
+    /**
+     * 更新一条数据的方法
+     *
+     * @param id
+     * @param tagName
+     * @param country
+     * @param bidding
+     * @return
+     */
     private OperationResult updateTag(String id, String tagName, String country, String bidding) {
         int tagId = Integer.parseInt(id);
 
@@ -300,4 +285,30 @@ public class TagsBidAdmanager extends HttpServlet {
         }
         return ret;
     }
+
+    /**
+     * 通过appName和国家地区查询出竞价
+     * @param appName
+     * @param region
+     * @return
+     * @throws Exception
+     */
+    private JsonArray fetchBidding(String appName, String region) throws Exception {
+        JsonArray biddingArray = new JsonArray();
+            String[] regionArray = region.split(",");
+            for (int i = 0, len = regionArray.length; i < len; i++) {
+                String sql = "SELECT country,bidding FROM web_tag_bid_admanager WHERE tag_name = '" + appName + "' AND country = '" + regionArray[i] + "'";
+                JSObject oneBidding = DB.findOneBySql(sql);
+                if (oneBidding.hasObjectData()){
+                    JsonObject jsonObject = new JsonObject();
+
+                    jsonObject.addProperty("country",oneBidding.get("country").toString());
+                    jsonObject.addProperty("bidding",oneBidding.get("bidding").toString());
+
+                    biddingArray.add(jsonObject);
+                }
+            }
+        return biddingArray;
+    }
+
 }
