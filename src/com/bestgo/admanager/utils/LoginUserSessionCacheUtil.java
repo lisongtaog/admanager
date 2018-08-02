@@ -13,7 +13,7 @@ public class LoginUserSessionCacheUtil {
         if (context == null || session == null) return;
         Jedis jedis = (Jedis)context.getAttribute("cache");
         if (jedis == null) {
-            jedis = new Jedis("52.14.153.90", 6379);
+            jedis = new Jedis("10.23.3.192", 6379);
             context.setAttribute("cache", jedis);
         }
         User loginUser = (User) session.getAttribute("loginUser");
