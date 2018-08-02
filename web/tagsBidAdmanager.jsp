@@ -13,7 +13,7 @@
 
 <html>
 <head>
-    <title>标签出价管理</title>
+    <title>标签下国家出价管理</title>
     <style>
         .ui-autocomplete {
             display: block;
@@ -83,7 +83,7 @@
             <tr>
                 <td><%=one.get("id")%></td>
                 <td><%=one.get("tag_name")%></td>
-                <td><%=one.get("country")%></td>
+                <td><%=one.get("country_name")%></td>
                 <td><%=one.get("bidding")%></td>
                 <td><a class="link_modify glyphicon glyphicon-pencil" href="#"></a><a
                         class="link_delete glyphicon glyphicon-remove" href="#"></a></td>

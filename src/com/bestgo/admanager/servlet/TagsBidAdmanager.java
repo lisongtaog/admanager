@@ -1,8 +1,6 @@
 package com.bestgo.admanager.servlet;
 
-import com.bestgo.admanager.Config;
 import com.bestgo.admanager.OperationResult;
-import com.bestgo.admanager.utils.DateUtil;
 import com.bestgo.admanager.utils.NumberUtil;
 import com.bestgo.admanager.utils.StringUtil;
 import com.bestgo.admanager.utils.Utils;
@@ -33,19 +31,16 @@ public class TagsBidAdmanager extends BaseHttpServlet {
         JsonObject json = new JsonObject();
         OperationResult result = new OperationResult();
 
-//        String tag = request.getParameter("tag");
-//        String startTime = request.getParameter("startTime");
-//        String endTime = request.getParameter("endTime");
-
+        String tagName = request.getParameter("name");
+        String bidding = request.getParameter("bidding");
+        String countryName = request.getParameter("country");
+        String id = request.getParameter("id");
         if (path != null) {
             if (path.startsWith("/create")) {
-                String tagName = request.getParameter("name");
-                String bidding = request.getParameter("bidding");
-                String country = request.getParameter("country");
 
-                if (!tagName.isEmpty() && (bidding.matches("^\\d+(\\.\\d+)?$") || StringUtil.isEmpty(bidding)) || "".equals(country)) {
+                if (!tagName.isEmpty() && (bidding.matches("^\\d+(\\.\\d+)?$") || StringUtil.isEmpty(bidding)) || "".equals(countryName)) {
 
-                    result = createNewTag(tagName, bidding, country);
+                    result = createNewTag(tagName, bidding, countryName);
                     json.addProperty("ret", result.result ? 1 : 0);
                     json.addProperty("message", result.message);
                 } else {
@@ -53,22 +48,14 @@ public class TagsBidAdmanager extends BaseHttpServlet {
                     json.addProperty("message", "创建失败，请注意输入格式");
                 }
             } else if (path.startsWith("/delete")) {
-
-                String id = request.getParameter("id");
                 result = deleteTag(id);
                 json.addProperty("ret", result.result ? 1 : 0);
                 json.addProperty("message", result.message);
 
             } else if (path.startsWith("/update")) {
 
-                String id = request.getParameter("id");
-                String tagName = request.getParameter("name");
-                String country = request.getParameter("country");
-                String bidding = request.getParameter("bidding");
-
-                if (!tagName.isEmpty() && (bidding.matches("^\\d+(\\.\\d+)?$") || StringUtil.isEmpty(bidding)) || "".equals(country)) {
-
-                    result = updateTag(id, tagName, country, bidding);
+                if (!tagName.isEmpty() && (bidding.matches("^\\d+(\\.\\d+)?$") || StringUtil.isEmpty(bidding)) || "".equals(countryName)) {
+                    result = updateTag(id, null, countryName, bidding);
                     json.addProperty("ret", result.result ? 1 : 0);
                     json.addProperty("message", result.message);
                 } else {
@@ -87,7 +74,7 @@ public class TagsBidAdmanager extends BaseHttpServlet {
                         one.addProperty("id", data.get(i).get("id").toString());
                         one.addProperty("tag_name", (String) data.get(i).get("tag_name"));
                         one.addProperty("bidding", (Double) data.get(i).get("bidding"));
-                        one.addProperty("country", (String) data.get(i).get("country"));
+                        one.addProperty("country", (String) data.get(i).get("country_name"));
                         array.add(one);
                     }
                     json.add("data", array);
@@ -95,7 +82,7 @@ public class TagsBidAdmanager extends BaseHttpServlet {
                     long count = count();
                     int index = NumberUtil.parseInt(request.getParameter("page_index"), 0);
                     int size = NumberUtil.parseInt(request.getParameter("page_size"), 20);
-                    long totalPage = count / size + (count % size == 0 ? 0 : 1);
+//                    long totalPage = count / size + (count % size == 0 ? 0 : 1);
                     List<JSObject> data = fetchAllData(index, size);
                     json.addProperty("ret", 1);
                     JsonArray array = new JsonArray();
@@ -104,7 +91,7 @@ public class TagsBidAdmanager extends BaseHttpServlet {
                         one.addProperty("id", data.get(i).get("id").toString());
                         one.addProperty("tag_name", (String) data.get(i).get("tag_name"));
                         one.addProperty("bidding", (Double) data.get(i).get("bidding"));
-                        one.addProperty("country", (String) data.get(i).get("country"));
+                        one.addProperty("country", (String) data.get(i).get("country_name"));
                         array.add(one);
                     }
                     json.add("data", array);
@@ -138,8 +125,9 @@ public class TagsBidAdmanager extends BaseHttpServlet {
     public static List<JSObject> fetchData(String word) {
         List<JSObject> list = new ArrayList<>();
         try {
-            String sql = "SELECT id,tag_name,bidding,country FROM web_tag_bid_admanager WHERE tag_name LIKE ? ";
+            String sql = "SELECT id,tag_name,bidding,country_name FROM web_tag_country_bidding WHERE tag_name LIKE ? ";
             list = DB.findListBySql(sql, "%" + word + "%");
+            java.lang.System.out.println(list);
         } catch (Exception ex) {
             Logger logger = Logger.getRootLogger();
             logger.error(ex.getMessage(), ex);
@@ -174,7 +162,7 @@ public class TagsBidAdmanager extends BaseHttpServlet {
     public static List<JSObject> fetchAllData(int index, int size) {
         List<JSObject> list = new ArrayList<>();
         try {
-            List<JSObject> jsObjectList = DB.scan("web_tag_bid_admanager").select("id", "tag_name", "country", "bidding").limit(size).start(index * size).orderByAsc("id").execute();
+            List<JSObject> jsObjectList = DB.scan("web_tag_country_bidding").select("id", "tag_name", "country_name", "bidding").limit(size).start(index * size).orderByAsc("id").execute();
             return jsObjectList;
         } catch (Exception ex) {
             Logger logger = Logger.getRootLogger();
@@ -190,7 +178,7 @@ public class TagsBidAdmanager extends BaseHttpServlet {
      */
     public static long count() {
         try {
-            JSObject object = DB.simpleScan("web_tag_bid_admanager").select(DB.func(DB.COUNT, "id")).execute();
+            JSObject object = DB.simpleScan("web_tag_country_bidding").select(DB.func(DB.COUNT, "id")).execute();
             return object.get("count(id)");
         } catch (Exception ex) {
             Logger logger = Logger.getRootLogger();
@@ -210,7 +198,7 @@ public class TagsBidAdmanager extends BaseHttpServlet {
         OperationResult ret = new OperationResult();
 
         try {
-            DB.delete("web_tag_bid_admanager").where(DB.filter().whereEqualTo("id", tagId)).execute();
+            DB.delete("web_tag_country_bidding").where(DB.filter().whereEqualTo("id", tagId)).execute();
 
             ret.result = true;
             ret.message = "执行成功";
@@ -229,18 +217,18 @@ public class TagsBidAdmanager extends BaseHttpServlet {
      *
      * @param tagName
      * @param bidding
-     * @param country
+     * @param countryName
      * @return
      */
-    private OperationResult createNewTag(String tagName, String bidding, String country) {
+    private OperationResult createNewTag(String tagName, String bidding, String countryName) {
         OperationResult ret = new OperationResult();
 
 
         try {
-            DB.insert("web_tag_bid_admanager")
+            DB.insert("web_tag_country_bidding")
                     .put("tag_name", tagName)
                     .put("bidding", Double.parseDouble(bidding))
-                    .put("country", country)
+                    .put("country_name", countryName)
                     .execute();
 
             ret.result = true;
@@ -261,19 +249,19 @@ public class TagsBidAdmanager extends BaseHttpServlet {
      *
      * @param id
      * @param tagName
-     * @param country
+     * @param countryName
      * @param bidding
      * @return
      */
-    private OperationResult updateTag(String id, String tagName, String country, String bidding) {
+    private OperationResult updateTag(String id, String tagName, String countryName, String bidding) {
         int tagId = Integer.parseInt(id);
 
         OperationResult ret = new OperationResult();
 
         try {
 
-            ret.result = DB.update("web_tag_bid_admanager")
-                    .put("country", country)
+            ret.result = DB.update("web_tag_country_bidding")
+                    .put("country_name", countryName)
                     .put("bidding", Double.parseDouble(bidding))
                     .where(DB.filter().whereEqualTo("id", tagId))
                     .execute();
@@ -298,12 +286,12 @@ public class TagsBidAdmanager extends BaseHttpServlet {
         JsonArray biddingArray = new JsonArray();
             String[] regionArray = region.split(",");
             for (int i = 0, len = regionArray.length; i < len; i++) {
-                String sql = "SELECT country,bidding FROM web_tag_bid_admanager WHERE tag_name = '" + appName + "' AND country = '" + regionArray[i] + "'";
+                String sql = "SELECT country_name,bidding FROM web_tag_country_bidding WHERE tag_name = '" + appName + "' AND country_name = '" + regionArray[i] + "'";
                 JSObject oneBidding = DB.findOneBySql(sql);
                 if (oneBidding.hasObjectData()){
                     JsonObject jsonObject = new JsonObject();
 
-                    jsonObject.addProperty("country",oneBidding.get("country").toString());
+                    jsonObject.addProperty("country",oneBidding.get("country_name").toString());
                     jsonObject.addProperty("bidding",oneBidding.get("bidding").toString());
 
                     biddingArray.add(jsonObject);
