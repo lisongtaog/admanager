@@ -23,8 +23,9 @@ import java.util.List;
  * 目前web_rules包含了Facebook和Adwords两个的所有规则
  */
 @WebServlet(name = "Rules", urlPatterns = {"/rules/*"})
-public class Rules extends HttpServlet {
+public class Rules extends BaseHttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        super.doPost(request, response);
         if (!Utils.isAdmin(request, response)) return;
 
         String path = request.getPathInfo();

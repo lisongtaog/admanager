@@ -30,9 +30,10 @@ import java.util.*;
  * Desc:广告系列 与 广告单元 管理功能
  */
 @WebServlet(name = "CampaignAdUnit", urlPatterns = "/campaignAdUnit/*")
-public class CampaignAdUnit extends HttpServlet {
+public class CampaignAdUnit extends BaseHttpServlet {
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        super.doPost(request, response);
         if (!Utils.isAdmin(request, response)) return;
         handleRequest(request, response);
     }

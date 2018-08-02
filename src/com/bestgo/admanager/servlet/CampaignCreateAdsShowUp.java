@@ -18,7 +18,7 @@ import java.util.Map;
 import java.util.Set;
 
 @WebServlet(name = "CampaignCreateAdsShowUp", urlPatterns = "/campaign_create_ads_show_up/*")
-public class CampaignCreateAdsShowUp extends HttpServlet {
+public class CampaignCreateAdsShowUp extends BaseHttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         doPost(request, response);
     }

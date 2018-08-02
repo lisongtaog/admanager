@@ -1,6 +1,7 @@
 package com.bestgo.admanager.servlet;
 
 import com.bestgo.admanager.bean.User;
+import com.bestgo.admanager.utils.LoginUserSessionCacheUtil;
 import com.bestgo.common.database.services.DB;
 import com.bestgo.common.database.utils.JSObject;
 import com.google.gson.JsonObject;
@@ -18,7 +19,7 @@ import com.bestgo.admanager.utils.MD5Util;
  * Created by jikai on 5/31/17.
  */
 @WebServlet(name = "login", urlPatterns = "/login/*")
-public class Login extends HttpServlet {
+public class Login extends BaseHttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String path = request.getPathInfo();
         JsonObject json = new JsonObject();
@@ -48,6 +49,7 @@ public class Login extends HttpServlet {
 
                     json.addProperty("ret", 1);
                     response.getWriter().write(json.toString());
+                    LoginUserSessionCacheUtil.saveSessionInCache(getServletContext(), session);
                 } else {
 
                     json.addProperty("ret", 0);

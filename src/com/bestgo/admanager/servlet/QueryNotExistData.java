@@ -21,13 +21,14 @@ import java.util.*;
  * 查询无数据的系列
  */
 @WebServlet(name = "QueryNotExistData", urlPatterns = {"/query_not_exist_data"}, asyncSupported = true)
-public class QueryNotExistData extends HttpServlet {
+public class QueryNotExistData extends BaseHttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         doPost(request, response);
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        super.doPost(request, response);
         if (!Utils.isAdmin(request, response)) return;
 
         JsonObject json = new JsonObject();

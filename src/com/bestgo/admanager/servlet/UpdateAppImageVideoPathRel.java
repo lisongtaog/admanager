@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Set;
 
 @WebServlet(name = "UpdateAppImageVideoPathRel", urlPatterns = "/update_app_material_path_rel")
-public class UpdateAppImageVideoPathRel extends HttpServlet {
+public class UpdateAppImageVideoPathRel extends BaseHttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         doPost(request, response);
     }

@@ -17,8 +17,9 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @WebServlet(name = "AdvertAdMob", urlPatterns = {"/advert_admob/*"})
-public class AdvertAdmob extends HttpServlet {
+public class AdvertAdmob extends BaseHttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        super.doPost(request, response);
         if (!Utils.isAdmin(request, response)) return;
 
         String path = request.getPathInfo();

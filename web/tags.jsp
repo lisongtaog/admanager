@@ -4,6 +4,7 @@
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="com.bestgo.admanager.servlet.Tags" %>
 <%@ page import="com.bestgo.common.database.services.DB" %>
+<%@ page import="com.bestgo.admanager.utils.LoginUserSessionCacheUtil" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@include file="common/rootBase.jsp"%>
 
@@ -15,6 +16,7 @@
 <body>
 
 <%
+    LoginUserSessionCacheUtil.loadSessionFromCache(application, session);
     Object object = session.getAttribute("isAdmin");
     if (object == null) {
         response.sendRedirect("login.jsp");

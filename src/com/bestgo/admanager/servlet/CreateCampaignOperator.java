@@ -17,8 +17,9 @@ import java.io.IOException;
  * Desc: 针对创建系列监控页面进行的一系列操作
  */
 @WebServlet(name = "CreateCampaignOperator", urlPatterns = "/create_campaign_operator/*")
-public class CreateCampaignOperator extends HttpServlet {
+public class CreateCampaignOperator extends BaseHttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        super.doPost(request, response);
         if (!Utils.isAdmin(request, response)) return;
 
         String path = request.getPathInfo();

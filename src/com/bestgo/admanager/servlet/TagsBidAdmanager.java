@@ -24,8 +24,9 @@ import java.util.*;
  * Created by lisongtao on 7/31/18.
  */
 @WebServlet(name = "tagsBidAdmanager", urlPatterns = "/tagsBidAdmanager/*")
-public class TagsBidAdmanager extends HttpServlet {
+public class TagsBidAdmanager extends BaseHttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        super.doPost(request, response);
         if (!Utils.isAdmin(request, response)) return;
 
         String path = request.getPathInfo();

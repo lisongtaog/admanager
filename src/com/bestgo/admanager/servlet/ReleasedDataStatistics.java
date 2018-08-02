@@ -23,7 +23,7 @@ import java.util.List;
  * Desc: 对每个项目组每个品类每个应用的投放数据的统计
  */
 @WebServlet(name = "ReleasedDataStatistics", urlPatterns = {"/released_data_statistics/*"}, asyncSupported = true)
-public class ReleasedDataStatistics extends HttpServlet {
+public class ReleasedDataStatistics extends BaseHttpServlet {
     private static final String[] filterApps = {"CleanV3", "WeatherV6", "PedometerV1", "PedometerV2", "BrowserV1", "AntivirusV3",
             "WeatherV3", "WeatherV8", "WeatherV9", "WeatherV11", "AntivirusV1", "CleanerV1", "CleanerV2", "BatteryV2", "SecurityV3",
             "BatteryV3", "SecurityV4", "BatteryV4", "Wifi", "Plusapplock", "ApplockV9", "ApplockV11", "VideoV9", "NewMusicV2",
@@ -41,6 +41,7 @@ public class ReleasedDataStatistics extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        super.doPost(request, response);
         if (!Utils.isAdmin(request, response)) return;
 
         String path = request.getPathInfo();

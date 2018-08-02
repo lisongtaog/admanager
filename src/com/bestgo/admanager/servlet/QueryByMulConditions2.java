@@ -23,7 +23,7 @@ import java.util.*;
  * 多条件查询
  */
 @WebServlet(name = "QueryByMulConditions2", urlPatterns = {"/query_by_mul_conditions2"}, asyncSupported = true)
-public class QueryByMulConditions2 extends HttpServlet {
+public class QueryByMulConditions2 extends BaseHttpServlet {
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         doPost(request, response);
@@ -31,6 +31,7 @@ public class QueryByMulConditions2 extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        super.doPost(request, response);
         if (!Utils.isAdmin(request, response)) return;
 
         JsonObject json = new JsonObject();

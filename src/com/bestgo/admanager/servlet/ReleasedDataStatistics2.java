@@ -22,7 +22,7 @@ import java.util.List;
  * Desc: 对每个项目组每个品类每个应用的投放数据的统计
  */
 @WebServlet(name = "ReleasedDataStatistics2", urlPatterns = {"/released_data_statistics2/*"}, asyncSupported = true)
-public class ReleasedDataStatistics2 extends HttpServlet {
+public class ReleasedDataStatistics2 extends BaseHttpServlet {
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         doPost(request, response);
@@ -30,6 +30,7 @@ public class ReleasedDataStatistics2 extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        super.doPost(request, response);
         if (!Utils.isAdmin(request, response)) return;
 
         String path = request.getPathInfo();

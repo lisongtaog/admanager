@@ -20,8 +20,9 @@ import java.util.List;
  * Desc: 有关Adwords转化的操作
  */
 @WebServlet(name = "AdvertConversionAdmob", urlPatterns = "/advert_conversion_admob/*")
-public class AdvertConversionAdmob extends HttpServlet {
+public class AdvertConversionAdmob extends BaseHttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        super.doPost(request, response);
         if (!Utils.isAdmin(request, response)) return;
 
         String path = request.getPathInfo();

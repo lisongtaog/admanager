@@ -21,8 +21,9 @@ import java.util.List;
  * Desc: 项目组的总收入与总支出
  */
 @WebServlet(name = "ProjectTeamTotalRevenueAndTotalCost", urlPatterns = "/project_team_total_revenue_and_total_cost/*")
-public class ProjectTeamTotalRevenueAndTotalCost extends HttpServlet {
+public class ProjectTeamTotalRevenueAndTotalCost extends BaseHttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        super.doPost(request, response);
         if (!Utils.isAdmin(request, response)) return;
 
         String path = request.getPathInfo();

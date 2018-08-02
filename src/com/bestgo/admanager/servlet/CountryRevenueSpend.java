@@ -22,7 +22,7 @@ import java.util.*;
  * 国家收支
  */
 @WebServlet(name = "CountryRevenueSpend", urlPatterns = {"/country_revenue_spend"})
-public class CountryRevenueSpend extends HttpServlet {
+public class CountryRevenueSpend extends BaseHttpServlet {
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         doPost(request, response);
@@ -30,6 +30,7 @@ public class CountryRevenueSpend extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        super.doPost(request, response);
         if (!Utils.isAdmin(request, response)) return;
 
         JsonObject json = new JsonObject();

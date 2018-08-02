@@ -17,8 +17,9 @@ import java.io.IOException;
  * Desc: 针对批量修改页面进行的一系列操作
  */
 @WebServlet(name = "BatchChangeCampaignOperator", urlPatterns = "/batch_change_campaign_operator/*")
-public class BatchChangeCampaignOperator extends HttpServlet {
+public class BatchChangeCampaignOperator extends BaseHttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        super.doPost(request, response);
         if (!Utils.isAdmin(request, response)) return;
 
         String path = request.getPathInfo();

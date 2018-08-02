@@ -22,7 +22,7 @@ import java.util.*;
  * Desc: 分析每个应用每个国家的活跃用户度的报告
  */
 @WebServlet(name = "ActiveUserReport", urlPatterns = {"/active_user_report/*"})
-public class ActiveUserReport extends HttpServlet {
+public class ActiveUserReport extends BaseHttpServlet {
     private static Map<String,String> countryCodeMap;
     static{
         if(countryCodeMap == null){
@@ -48,6 +48,7 @@ public class ActiveUserReport extends HttpServlet {
         }
     }
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        super.doPost(request, response);
         if (!Utils.isAdmin(request, response)) return;
 
         String path = request.getPathInfo();

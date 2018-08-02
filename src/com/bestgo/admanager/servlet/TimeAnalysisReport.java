@@ -19,7 +19,7 @@ import java.util.*;
 import java.lang.String;
 
 @WebServlet(name = "TimeAnalysisReport", urlPatterns = {"/time_analysis_report/*"}, asyncSupported = true)
-public class TimeAnalysisReport extends HttpServlet {
+public class TimeAnalysisReport extends BaseHttpServlet {
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         doPost(request, response);
@@ -27,6 +27,7 @@ public class TimeAnalysisReport extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        super.doPost(request, response);
         if (!Utils.isAdmin(request, response)) return;
         String path = request.getPathInfo(); //getPathInfo()截取传来路径除去servlet的urlPattern的部分
         JsonObject jsonObject = new JsonObject();

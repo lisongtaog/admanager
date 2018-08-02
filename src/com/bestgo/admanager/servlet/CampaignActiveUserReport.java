@@ -25,7 +25,7 @@ import java.util.Map;
  * Desc: 按标签和安装日期查询活跃用户数量
  */
 @WebServlet(name = "CampaignActiveUserReport", urlPatterns = {"/campaign_active_user_report/*"})
-public class CampaignActiveUserReport extends HttpServlet {
+public class CampaignActiveUserReport extends BaseHttpServlet {
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         doPost(request, response);

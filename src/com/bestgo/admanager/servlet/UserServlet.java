@@ -22,8 +22,9 @@ import java.util.List;
  * @Desc:
  */
 @WebServlet(name = "UserServlet", urlPatterns = {"/user_servlet/*"})
-public class UserServlet extends HttpServlet {
+public class UserServlet extends BaseHttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        super.doPost(request, response);
         if (!Utils.isAdmin(request, response)) return;
         String path = request.getPathInfo();
         JsonObject jsonObject = new JsonObject();

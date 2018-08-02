@@ -17,7 +17,7 @@ import java.io.IOException;
 import java.util.*;
 
 @WebServlet(name = "QueryTwo", urlPatterns = {"/query_two/*"}, asyncSupported = true)
-public class QueryTwo extends HttpServlet {
+public class QueryTwo extends BaseHttpServlet {
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         doPost(request, response);
@@ -25,6 +25,7 @@ public class QueryTwo extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        super.doPost(request, response);
         if (!Utils.isAdmin(request, response)) return;
 
         String path = request.getPathInfo();

@@ -22,8 +22,9 @@ import java.util.List;
  * Created by jikai on 5/31/17.
  */
 @WebServlet(name = "AdAccount", urlPatterns = {"/adaccount/*"})
-public class AdAccount extends HttpServlet {
+public class AdAccount extends BaseHttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        super.doPost(request, response);
         if (!Utils.isAdmin(request, response)) return;
 
         String path = request.getPathInfo();
