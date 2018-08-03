@@ -1,14 +1,12 @@
 package com.bestgo.admanager.servlet;
 
 import com.bestgo.admanager.bean.User;
-import com.bestgo.admanager.utils.LoginUserSessionCacheUtil;
 import com.bestgo.common.database.services.DB;
 import com.bestgo.common.database.utils.JSObject;
 import com.google.gson.JsonObject;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -46,10 +44,9 @@ public class Login extends BaseHttpServlet {
                     loginUser.setNickname(one.get("nickname"));
                     loginUser.setUsername(username);
                     session.setAttribute("loginUser", loginUser);
-
+//                    LoginUserSessionCacheUtil.saveSessionInCache(getServletContext(), session);
                     json.addProperty("ret", 1);
                     response.getWriter().write(json.toString());
-                    LoginUserSessionCacheUtil.saveSessionInCache(getServletContext(), session);
                 } else {
 
                     json.addProperty("ret", 0);
