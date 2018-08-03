@@ -29,7 +29,7 @@ import java.util.*;
  */
 @WebServlet(name = "Campaign", urlPatterns = "/campaign/*")
 public class Campaign extends HttpServlet {
-    public static Map<String,Double> tagMaxBiddingRelationMap;   //声明了一个静态类，无属性，无方法，则Java会给它一个默认无参构造器
+    public static Map<String,Double> tagMaxBiddingRelationMap;
     static {
         if(tagMaxBiddingRelationMap == null){
             tagMaxBiddingRelationMap = new HashMap<>();
@@ -56,7 +56,7 @@ public class Campaign extends HttpServlet {
 
         String path = request.getPathInfo();
         JsonObject json = new JsonObject();
-
+        Map<String, Integer> facebookAccountDetailsMap = getFacebookAccountDetails();
         if (path.startsWith("/create")) {
             String appName = request.getParameter("appName");
             String appId = request.getParameter("appId");
@@ -103,10 +103,15 @@ public class Campaign extends HttpServlet {
                 Collection<File> uploadImages = null;
                 Collection<File> uploadVideos = null;
                 int groupId = NumberUtil.parseInt(groupIdStr,0);
+
+                //账户状态，如果为1则为开启；为2则为禁用
+                Integer accountStatus = facebookAccountDetailsMap.get(accountId);
                 if (groupId == 0) {
                     result.message = "广告组ID不存在！请联系管理员";
                 }else if (createCount.isEmpty()) {
                     result.message = "创建数量不能为空";
+                } else if (accountStatus == null || accountStatus != 1) {
+                    result.message = "没有这个账户ID或此账户被禁，请联系管理员";
                 } else if (StringUtil.isEmpty(pageId)) {
                     result.message = "pageId不能为空，请关闭页面刷新重试";
                 } else if (title.isEmpty()) {
@@ -326,8 +331,6 @@ public class Campaign extends HttpServlet {
                 sql = "SELECT id,network,campaign_id,campaign_name,failed_count,last_error_message FROM web_ad_batch_change_campaigns "+
                              "WHERE success = 0 "+
                              "LIMIT "+pageSize+" OFFSET "+pageIdx;
-//                List<JSObject> list = DB.scan("web_ad_batch_change_campaigns").select(fields)
-//                        .where(DB.filter().whereEqualTo("success", 0)).execute();
                 List<JSObject> list = DB.findListBySql(sql);
                 for (int i = 0; i < list.size(); i++) {
                     JsonObject one = new JsonObject();
@@ -568,20 +571,25 @@ public class Campaign extends HttpServlet {
                         throw new Exception("超过最大出价, 系列ID=" + item.campaignId);
                     }
                     if (enabled == 1) item.excludedCountry = null;
+                    //账户状态，为1则为开启；为2则为禁用
+                    Integer accountStatus = facebookAccountDetailsMap.get(item.accountId);
+
                     if (record.hasObjectData() && (item.excludedCountry == null || item.excludedCountry.isEmpty())) {
                         long id = record.get("id");
-                        DB.update("web_ad_batch_change_campaigns")
-                                .put("enabled", enabled)
-                                .put("bugdet", item.budget)
-                                .put("bidding", item.bidding)
-                                .put("network", item.network)
-                                .put("account_id", item.accountId)
-                                .put("campaign_name", item.campaignName != null ? item.campaignName : "")
-                                .put("excluded_country", item.excludedCountry != null ? item.excludedCountry : "")
-                                .put("create_time", now)
-                                .put("success", 0)
-                                .where(DB.filter().whereEqualTo("id", id))
-                                .execute();
+                        if (("admob".equals(item.network)) || ("facebook".equals(item.network) && accountStatus != null && accountStatus == 1)) {
+                            DB.update("web_ad_batch_change_campaigns")
+                                    .put("enabled", enabled)
+                                    .put("bugdet", item.budget)
+                                    .put("bidding", item.bidding)
+                                    .put("network", item.network)
+                                    .put("account_id", item.accountId)
+                                    .put("campaign_name", item.campaignName != null ? item.campaignName : "")
+                                    .put("excluded_country", item.excludedCountry != null ? item.excludedCountry : "")
+                                    .put("create_time", now)
+                                    .put("success", 0)
+                                    .where(DB.filter().whereEqualTo("id", id))
+                                    .execute();
+                        }
                     } else {
                         int bidStrategy = 1;
                         if ("facebook".equals(item.network)) {
@@ -590,19 +598,21 @@ public class Campaign extends HttpServlet {
                                 bidStrategy = one.get("bid_strategy");
                             }
                         }
-                        DB.insert("web_ad_batch_change_campaigns")
-                                .put("enabled", enabled)
-                                .put("bugdet", item.budget)
-                                .put("bidding", item.bidding)
-                                .put("bid_strategy", bidStrategy)
-                                .put("network", item.network)
-                                .put("account_id", item.accountId)
-                                .put("campaign_id", item.campaignId)
-                                .put("campaign_name", item.campaignName != null ? item.campaignName : "")
-                                .put("excluded_country", item.excludedCountry != null ? item.excludedCountry : "")
-                                .put("create_time", now)
-                                .put("success", 0)
-                                .execute();
+                        if (("admob".equals(item.network)) || ("facebook".equals(item.network) && accountStatus != null && accountStatus == 1)) {
+                            DB.insert("web_ad_batch_change_campaigns")
+                                    .put("enabled", enabled)
+                                    .put("bugdet", item.budget)
+                                    .put("bidding", item.bidding)
+                                    .put("bid_strategy", bidStrategy)
+                                    .put("network", item.network)
+                                    .put("account_id", item.accountId)
+                                    .put("campaign_id", item.campaignId)
+                                    .put("campaign_name", item.campaignName != null ? item.campaignName : "")
+                                    .put("excluded_country", item.excludedCountry != null ? item.excludedCountry : "")
+                                    .put("create_time", now)
+                                    .put("success", 0)
+                                    .execute();
+                        }
                     }
                 }
                 json.addProperty("ret", 1);
@@ -870,6 +880,32 @@ public class Campaign extends HttpServlet {
             e.printStackTrace();
         }
         return retList;
+    }
+
+    /**
+     * 获取facebook的账户ID和状态，1为开启，2为关闭
+     * @return
+     * @throws Exception
+     */
+    private static Map<String,Integer> getFacebookAccountDetails() {
+        Map<String,Integer> map = new HashMap<>();
+        try {
+            List<JSObject> list = DB.findListBySql("SELECT account_id,status FROM web_account_id");
+            for (int i = 0,len = list.size();i < len;i++) {
+                JSObject js = list.get(i);
+                if (js.hasObjectData()) {
+                    String accountId = js.get("account_id");
+                    Integer status = js.get("status");
+                    if (status != null && accountId != null) {
+                        map.put(accountId,status);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return map;
     }
 }
 
