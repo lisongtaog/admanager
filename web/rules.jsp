@@ -5,6 +5,7 @@
 <%@ page import="com.bestgo.admanager.servlet.Rules" %>
 <%@ page import="com.bestgo.admanager.servlet.Tags" %>
 <%@ page import="com.google.gson.JsonArray" %>
+
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@include file="common/rootBase.jsp" %>
 
@@ -21,6 +22,7 @@
 <body>
 
 <%
+
     Object object = session.getAttribute("isAdmin");
     if (object == null) {
         response.sendRedirect("login.jsp");

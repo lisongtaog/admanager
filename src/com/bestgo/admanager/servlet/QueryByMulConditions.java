@@ -26,7 +26,7 @@ import java.util.*;
  * 多条件查询
  */
 @WebServlet(name = "QueryByMulConditions", urlPatterns = {"/query_by_mul_conditions"}, asyncSupported = true)
-public class QueryByMulConditions extends HttpServlet {
+public class QueryByMulConditions extends BaseHttpServlet {
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         doPost(request, response);
@@ -34,6 +34,7 @@ public class QueryByMulConditions extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        super.doPost(request, response);
         if (!Utils.isAdmin(request, response)) return;
 
         //状态条件查询

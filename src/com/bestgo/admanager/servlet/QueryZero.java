@@ -20,7 +20,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 @WebServlet(name = "QueryZero", urlPatterns = {"/query_zero/*"}, asyncSupported = true)
-public class QueryZero extends HttpServlet {
+public class QueryZero extends BaseHttpServlet {
     private static ExecutorService executors = Executors.newFixedThreadPool(1);
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -29,6 +29,7 @@ public class QueryZero extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        super.doPost(request, response);
         if (!Utils.isAdmin(request, response)) return;
 
         String path = request.getPathInfo();

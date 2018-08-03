@@ -24,8 +24,9 @@ import java.util.List;
  * Created by jikai on 5/31/17.
  */
 @WebServlet(name = "tags", urlPatterns = "/tags/*")
-public class Tags extends HttpServlet {
+public class Tags extends BaseHttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        super.doPost(request, response);
         if (!Utils.isAdmin(request, response)) return;
 
         String path = request.getPathInfo();

@@ -16,7 +16,6 @@ import org.apache.log4j.Logger;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
@@ -28,8 +27,8 @@ import java.util.*;
  *  Desc: 有关Facebook系列创建的操作
  */
 @WebServlet(name = "Campaign", urlPatterns = "/campaign/*")
-public class Campaign extends HttpServlet {
-    public static Map<String,Double> tagMaxBiddingRelationMap;
+public class Campaign extends BaseHttpServlet {
+    public static Map<String,Double> tagMaxBiddingRelationMap;   //声明了一个静态类，无属性，无方法，则Java会给它一个默认无参构造器
     static {
         if(tagMaxBiddingRelationMap == null){
             tagMaxBiddingRelationMap = new HashMap<>();
@@ -52,6 +51,7 @@ public class Campaign extends HttpServlet {
         }
     }
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        super.doPost(request, response);
         if (!Utils.isAdmin(request, response)) return;
 
         String path = request.getPathInfo();

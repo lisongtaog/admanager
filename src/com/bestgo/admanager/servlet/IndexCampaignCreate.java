@@ -20,7 +20,7 @@ import java.util.regex.Pattern;
  * 取完的数据返回js文件，用于往jsp页面上的表单填充
  */
 @WebServlet(name = "IndexCampaignCreate", urlPatterns = "/IndexCampaignCreate")
-public class IndexCampaignCreate extends HttpServlet{
+public class IndexCampaignCreate extends BaseHttpServlet{
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         doPost(request, response);
     }

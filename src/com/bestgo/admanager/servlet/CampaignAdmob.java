@@ -22,7 +22,7 @@ import java.util.*;
  * Desc: 有关Adwords系列创建的操作
  */
 @WebServlet(name = "CampaignAdMob", urlPatterns = "/campaign_admob/*")
-public class CampaignAdmob extends HttpServlet {
+public class CampaignAdmob extends BaseHttpServlet {
     public static Map<String,Double> tagMaxBiddingRelationMap;
     static {
         if(tagMaxBiddingRelationMap == null){
@@ -44,6 +44,7 @@ public class CampaignAdmob extends HttpServlet {
         }
     }
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        super.doPost(request, response);
         if (!Utils.isAdmin(request, response)) return;
 
         String path = request.getPathInfo();

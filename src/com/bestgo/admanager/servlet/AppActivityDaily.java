@@ -21,7 +21,7 @@ import java.util.List;
  * Desc:用于【应用日更记录】页面的操作
  */
 @WebServlet(name = "AppActivityDaily", urlPatterns = {"/app_activity_daily/*"})
-public class AppActivityDaily extends HttpServlet{
+public class AppActivityDaily extends BaseHttpServlet{
     protected void doGet(HttpServletRequest request, HttpServletResponse response)throws ServletException,IOException{
         doPost(request,response);
     }

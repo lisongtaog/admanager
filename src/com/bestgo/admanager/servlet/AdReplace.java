@@ -21,8 +21,9 @@ import java.util.List;
  * Created by LiSongTao on 7/24/17.
  */
 @WebServlet(name = "AdReplace", urlPatterns = "/adReplace/*")
-public class AdReplace extends HttpServlet {
+public class AdReplace extends BaseHttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        super.doPost(request, response);
         if (!Utils.isAdmin(request, response)) return;
 
         String path = request.getPathInfo();

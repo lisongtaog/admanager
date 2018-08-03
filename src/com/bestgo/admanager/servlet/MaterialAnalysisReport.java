@@ -22,7 +22,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * Desc: 素材分析报告
  */
 @WebServlet(name = "MaterialAnalysisReport",urlPatterns = "/material_analysis_report/*")
-public class MaterialAnalysisReport extends HttpServlet {
+public class MaterialAnalysisReport extends BaseHttpServlet {
     class CampaignResourceItem {
         public String campaignId;
         public String network;
@@ -58,6 +58,7 @@ public class MaterialAnalysisReport extends HttpServlet {
     static ConcurrentHashMap<String, CampaignResourceItem> cacheCampaigns = new ConcurrentHashMap<>();
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        super.doPost(request, response);
         if (!Utils.isAdmin(request, response)) return;
         JsonObject json = new JsonObject();
         String path = request.getPathInfo();

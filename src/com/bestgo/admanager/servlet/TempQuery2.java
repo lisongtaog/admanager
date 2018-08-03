@@ -18,7 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 
 @WebServlet(name = "temp_query2", urlPatterns = {"/temp_query2"}, asyncSupported = true)
-public class TempQuery2 extends HttpServlet {
+public class TempQuery2 extends BaseHttpServlet {
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         doPost(request, response);
@@ -26,6 +26,7 @@ public class TempQuery2 extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        super.doPost(request, response);
         if (!Utils.isAdmin(request, response)) return;
 
         JsonObject json = new JsonObject();

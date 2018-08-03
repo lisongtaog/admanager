@@ -21,7 +21,7 @@ import java.util.*;
  * 国家分析报告
  */
 @WebServlet(name = "CountryAnalysisReport", urlPatterns = {"/country_analysis_report/*"}, asyncSupported = true)
-public class CountryAnalysisReport extends HttpServlet {
+public class CountryAnalysisReport extends BaseHttpServlet {
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         doPost(request, response);
@@ -29,6 +29,7 @@ public class CountryAnalysisReport extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        super.doPost(request, response);
         if (!Utils.isAdmin(request, response)) return;
         Map<String, Long> tagNameIdMap = getTagNameIdMap();
         String path = request.getPathInfo();

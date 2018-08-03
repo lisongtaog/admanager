@@ -1,11 +1,13 @@
 package com.bestgo.admanager.bean;
 
+import java.io.Serializable;
+
 /**
  * @Author: mengjun
  * @Date: 2018/5/14 15:07
  * @Desc: 用户，对应web_ad_login_user表
  */
-public class User {
+public class User implements Serializable {
     private Integer id;
     private String username;
     private String password;

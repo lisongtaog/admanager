@@ -21,9 +21,10 @@ import java.util.List;
  * Desc: 有关app_image_path表和app_video_path表的操作
  */
 @WebServlet(name = "AppImageVideoRel",urlPatterns = "/app_image_video_rel/*")
-public class AppImageVideoRel extends HttpServlet {
+public class AppImageVideoRel extends BaseHttpServlet {
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        super.doPost(request, response);
         if (!Utils.isAdmin(request, response)) return;
         String path = request.getPathInfo();   //getPathInfo()用于截取urlPattern以后的部分
         JsonObject jsonObject = new JsonObject();

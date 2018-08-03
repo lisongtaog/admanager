@@ -25,9 +25,10 @@ import java.util.*;
  * 自动创建系列
  */
 @WebServlet(name = "AutoCreateCampaign", urlPatterns = "/auto_create_campaign/*")
-public class AutoCreateCampaign extends HttpServlet {
+public class AutoCreateCampaign extends BaseHttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        super.doPost(request, response);
         if (!Utils.isAdmin(request, response)) return;
 
         String path = request.getPathInfo();

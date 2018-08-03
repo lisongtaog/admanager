@@ -20,7 +20,7 @@ import java.util.*;
  * Desc: 对应前端 项目组/应用品类管理 页面；对表 web_ad_category_team 和 web_ad_tag_category 的增删改
  */
 @WebServlet(name = "TeamCategoryManagement", urlPatterns = {"/team_category_management/*"})
-public class TeamCategoryManagement extends HttpServlet{
+public class TeamCategoryManagement extends BaseHttpServlet{
     protected void doGet(HttpServletRequest request,HttpServletResponse response) throws ServletException,IOException{
         doPost(request, response);
     }

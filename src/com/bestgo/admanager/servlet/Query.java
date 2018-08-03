@@ -24,7 +24,7 @@ import java.util.List;
  * 首页的汇总
  */
 @WebServlet(name = "Query", urlPatterns = {"/query"}, asyncSupported = true)
-public class Query extends HttpServlet {
+public class Query extends BaseHttpServlet {
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         doPost(request, response);
@@ -32,6 +32,7 @@ public class Query extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        super.doPost(request, response);
         if (!Utils.isAdmin(request, response)) return;
 
         JsonObject json = new JsonObject();

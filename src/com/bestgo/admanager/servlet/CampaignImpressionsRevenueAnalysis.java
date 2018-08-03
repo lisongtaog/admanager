@@ -19,7 +19,7 @@ import java.util.List;
  * Desc: 按标签和安装日期查询广告收益
  */
 @WebServlet(name = "CampaignImpressionsRevenueAnalysis", urlPatterns = {"/campaign_impressions_revenue_report/*"})
-public class CampaignImpressionsRevenueAnalysis extends HttpServlet {
+public class CampaignImpressionsRevenueAnalysis extends BaseHttpServlet {
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         doPost(request, response);
