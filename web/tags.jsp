@@ -6,7 +6,7 @@
 <%@ page import="com.bestgo.common.database.services.DB" %>
 
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@include file="common/rootBase.jsp"%>
+<%@include file="common/rootBase.jsp" %>
 
 
 <html>
@@ -24,21 +24,37 @@
 %>
 
 <div class="container-fluid">
-    <%@include file="common/navigationbar.jsp"%>
+    <%@include file="common/navigationbar.jsp" %>
 
     <div class="panel panel-default">
         <!-- Default panel contents -->
         <div class="panel-heading">标签列表
             <button id="btn_add_new_tag" class="btn btn-default">添加</button>
-            <input id="inputSearch" class="form-control" style="display: inline; width: auto;" type="text" />
+            <input id="inputSearch" class="form-control" style="display: inline; width: auto;" type="text"/>
             <button id="btnSearch" class="btn btn-default glyphicon glyphicon-search"></button>
         </div>
 
         <table class="table">
             <thead>
-            <tr><td colspan="10">是否计入统计---针对投放数据统计中的应用是否纳入到统计中。&nbsp;&nbsp;是否显示---显示的是正在投放的产品；不显示的是被暂停投放的产品，只是为了便于查看数据</td></tr>
-            <tr><td colspan="10">标签名称---与标签ID唯一并存，命名必须是前后两端中间位置都不能有空格，并且是驼峰命名AaaBbbCcc</td></tr>
-            <tr><th>标签ID</th><th>标签名称</th><th>最大出价</th><th>应用品类名称</th><th>期望收入</th><th>期望盈利</th><th>投放人员</th><th>是否计入统计</th><th>是否显示</th><th>操作</th></tr>
+            <tr>
+                <td colspan="10">是否计入统计---针对投放数据统计中的应用是否纳入到统计中。&nbsp;&nbsp;是否显示---显示的是正在投放的产品；不显示的是被暂停投放的产品，只是为了便于查看数据
+                </td>
+            </tr>
+            <tr>
+                <td colspan="10">标签名称---与标签ID唯一并存，命名必须是前后两端中间位置都不能有空格，并且是驼峰命名AaaBbbCcc</td>
+            </tr>
+            <tr>
+                <th>标签ID</th>
+                <th>标签名称</th>
+                <th>最大出价</th>
+                <th>应用品类名称</th>
+                <th>期望收入</th>
+                <th>期望盈利</th>
+                <th>投放人员</th>
+                <th>是否计入统计</th>
+                <th>是否显示</th>
+                <th>操作</th>
+            </tr>
             </thead>
             <tbody>
 
@@ -50,8 +66,8 @@
                 int size = NumberUtil.parseInt(request.getParameter("page_size"), 20);
                 totalPage = count / size + (count % size == 0 ? 0 : 1);
 
-                int preIndex = index > 0 ? index-1 : 0;
-                int nextPage = index < totalPage - 1 ? index+1 : index;
+                int preIndex = index > 0 ? index - 1 : 0;
+                int nextPage = index < totalPage - 1 ? index + 1 : index;
 
                 data = Tags.fetchData(index, size);
             %>
@@ -68,8 +84,8 @@
                 <td><%=one.get("anticipated_revenue")%></td>
                 <td><%=one.get("anticipated_incoming")%></td>
                 <td><%=one.get("nickname")%></td>
-                <td><%=Integer.parseInt(one.get("is_statistics").toString())== 1 ? "是" : "否"%></td>
-                <td><%=Integer.parseInt(one.get("is_display").toString())== 1 ? "是" : "否"%></td>
+                <td><%=Integer.parseInt(one.get("is_statistics").toString()) == 1 ? "是" : "否"%></td>
+                <td><%=Integer.parseInt(one.get("is_display").toString()) == 1 ? "是" : "否"%></td>
                 <td><a class="link_modify glyphicon glyphicon-pencil" href="#"></a><a class="link_delete glyphicon glyphicon-remove" href="#"></a></td>
             </tr>
             <% } %>
@@ -85,9 +101,9 @@
                     </a>
                 </li>
                 <%
-                    for(int i=0;i<totalPage;i++){
+                    for (int i = 0; i < totalPage; i++) {
                 %>
-                <li><a href="tags.jsp?page_index=<%=i%>"><span><%=i+1%></span></a></li>
+                <li><a href="tags.jsp?page_index=<%=i%>"><span><%=i + 1%></span></a></li>
                 <% } %>
                 <li>
                     <a href="tags.jsp?page_index=<%=nextPage%>" aria-label="Next">
@@ -103,7 +119,8 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+                </button>
                 <h4 class="modal-title" id="dlg_title">添加标签</h4>
             </div>
             <div class="modal-body">
@@ -126,10 +143,11 @@
                             <select id="category" class="form-control">
                                 <%
                                     List<JSObject> cag = DB.scan("web_ad_tag_category").select("id").select("category_name").execute();
-                                    for(JSObject j:cag){
+                                    for (JSObject j : cag) {
                                 %>
-                                <option value="<%=j.get("id")%>"><%=j.get("category_name")%></option>
-                                <%  } %>
+                                <option value="<%=j.get("id")%>"><%=j.get("category_name")%>
+                                </option>
+                                <% } %>
 
                             </select>
                         </div>
@@ -152,10 +170,11 @@
                             <select id="user" class="form-control">
                                 <%
                                     List<JSObject> user = DB.scan("web_ad_login_user").select("id").select("nickname").execute();
-                                    for(JSObject j:user){
+                                    for (JSObject j : user) {
                                 %>
-                                <option value="<%=j.get("id")%>"><%=j.get("nickname")%></option>
-                                <%  } %>
+                                <option value="<%=j.get("id")%>"><%=j.get("nickname")%>
+                                </option>
+                                <% } %>
 
                             </select>
                         </div>
@@ -198,7 +217,7 @@
     var modifyType = 'new';
     var id;
     $("li[role='presentation']:eq(3)").addClass("active");
-    $("#btn_add_new_tag").click(function() {
+    $("#btn_add_new_tag").click(function () {
         modifyType = 'new';
         $('#delete_message').hide();
         $('#modify_form').show();
@@ -206,7 +225,7 @@
         $("#new_tag_dlg").modal("show");
     });
 
-    $("#new_tag_dlg .btn-primary").click(function() {
+    $("#new_tag_dlg .btn-primary").click(function () {
         var tagName = $("#inputTagName").val();
         var maxBidding = $("#inputMaxBidding").val();
         var tagCategoryId = $("#category").val();
@@ -220,12 +239,12 @@
                 name: tagName,
                 maxBidding: maxBidding,
                 tagCategoryId: tagCategoryId,
-                anticipated_revenue:anticipated_revenue,
-                anticipated_incoming:anticipated_incoming,
-                user_id:user_id,
-                is_statistics:is_statistics,
-                is_display:is_display
-            }, function(data) {
+                anticipated_revenue: anticipated_revenue,
+                anticipated_incoming: anticipated_incoming,
+                user_id: user_id,
+                is_statistics: is_statistics,
+                is_display: is_display
+            }, function (data) {
                 if (data && data.ret == 1) {
                     $("#new_tag_dlg").modal("hide");
                     location.reload();
@@ -235,18 +254,27 @@
             }, 'json');
         } else if (modifyType == 'update') {
 
+            //《是否显示》为否，清空该标签的规则。
+            if (is_display == 0) {
+                $.post('rules/delByTagName', {
+                    tagName: tagName,
+                }, function (data) {
+
+                }, 'json');
+            }
+
             $.post('tags/update', {
                 id: id,
-                name:tagName,
+                name: tagName,
                 maxBidding: maxBidding,
                 tagCategoryId: tagCategoryId,
-                anticipated_revenue:anticipated_revenue,
-                anticipated_incoming:anticipated_incoming,
-                user_id:user_id,
-                is_statistics:is_statistics,
-                is_display:is_display
-            }, function(data) {
-                $("#inputTagName").prop("disabled",false);
+                anticipated_revenue: anticipated_revenue,
+                anticipated_incoming: anticipated_incoming,
+                user_id: user_id,
+                is_statistics: is_statistics,
+                is_display: is_display
+            }, function (data) {
+                $("#inputTagName").prop("disabled", false);
                 if (data && data.ret == 1) {
                     $("#new_tag_dlg").modal("hide");
                     location.reload();
@@ -258,7 +286,7 @@
             $.post('tags/delete', {
                 id: id,
                 name: tagName
-            }, function(data) {
+            }, function (data) {
                 if (data && data.ret == 1) {
                     $("#new_tag_dlg").modal("hide");
                     location.reload();
@@ -269,11 +297,11 @@
         }
     });
 
-    $('#btnSearch').click(function() {
+    $('#btnSearch').click(function () {
         var query = $("#inputSearch").val();
         $.post("tags/query", {
             word: query
-        }, function(data) {
+        }, function (data) {
             if (data && data.ret == 1) {
                 $('.table tbody > tr').remove();
                 setData(data.data);
@@ -317,11 +345,11 @@
             tr.append(td);
 
             td = $('<td></td>');
-            td.text(one.is_statistics == "1"? "是":"否");
+            td.text(one.is_statistics == "1" ? "是" : "否");
             tr.append(td);
 
             td = $('<td></td>');
-            td.text(one.is_display == "1"? "是":"否");
+            td.text(one.is_display == "1" ? "是" : "否");
             tr.append(td);
 
             td = $('<td><a class="link_modify glyphicon glyphicon-pencil" href="#"></a><a class="link_delete glyphicon glyphicon-remove" href="#"></a></td>');
@@ -331,7 +359,7 @@
     }
 
     function bindOp() {
-        $(".link_modify").click(function() {
+        $(".link_modify").click(function () {
             modifyType = "update";
             $('#delete_message').hide();
             $('#modify_form').show();
@@ -348,35 +376,35 @@
             var user = $(tds.get(6)).text();
             var isStatistics = $(tds.get(7)).text();
             var isDisplay = $(tds.get(8)).text();
-            $("#inputTagName").val(tagName).prop("disabled",true);
+            $("#inputTagName").val(tagName).prop("disabled", true);
             $("#inputMaxBidding").val(maxBidding);
-            $("#category option").each(function(idx){
+            $("#category option").each(function (idx) {
                 var name = $(this).text();
-                if(name == tagCategoryId){
+                if (name == tagCategoryId) {
                     $("#category").val($(this).val());
                     return;
                 }
             });
             $("#inputRevenue").val(revenue);
             $("#inputIncoming").val(incoming);
-            $("#user option").each(function(idx){
+            $("#user option").each(function (idx) {
                 var name = $(this).text();
-                if(name == user){
+                if (name == user) {
                     $("#user").val($(this).val());
                     return;
                 }
             });
-            $("#isStatistics option").each(function(idx){
+            $("#isStatistics option").each(function (idx) {
                 var name = $(this).text();
-                if(name == isStatistics){
+                if (name == isStatistics) {
                     $("#isStatistics").val($(this).val());
                     return;
                 }
             });
 
-            $("#isDisplay option").each(function(idx){
+            $("#isDisplay option").each(function (idx) {
                 var name = $(this).text();
-                if(name == isDisplay){
+                if (name == isDisplay) {
                     $("#isDisplay").val($(this).val());
                     return;
                 }
@@ -385,7 +413,8 @@
             $("#new_tag_dlg").modal("show");
         });
 
-        $(".link_delete").click(function() {
+        $(".link_delete").click(function () {
+            return;
             modifyType = "delete";
             $('#delete_message').show();
             $('#modify_form').hide();
