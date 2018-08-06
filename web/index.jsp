@@ -68,16 +68,16 @@
     <div class="panel panel-default" style="margin-top: 10px">
         <div class="panel-heading" id="panel_title">
             <label for="inputStartTime">开始日期</label>
-            <input type="text" id="inputStartTime" readonly style="width: 70px;">
+            <input type="text" id="inputStartTime" readonly size="10">
             <label for="inputEndTime">结束日期</label>
-            <input type="text" id="inputEndTime" readonly style="width: 70px;">
+            <input type="text" id="inputEndTime" readonly size="10">
             <label for="inputSearch">标签</label>
             <input id="inputSearch" class="form-control" style="display: inline; width: auto;" type="text"/>
             <button id="updateAppMaterialPath" class="btn btn-default glyphicon glyphicon-refresh" >路径</button>
             <label for="inputCountry">国家</label>
             <input id="inputCountry" class="form-control" style="display: inline; width: auto;" type="text"/>
             <label for="inputCampaignCreateTime">系列创建时间</label>
-            <input type="text" id="inputCampaignCreateTime"  placeholder="ChinaTime" readonly style="width: 75px;">
+            <input type="text" id="inputCampaignCreateTime"  placeholder="ChinaTime" readonly size="10">
             <label for="inputLikeCampaignName">系列名称</label>
             <input type="text" id="inputLikeCampaignName" class="form-control" style="display: inline; width: auto;" />
 
