@@ -472,10 +472,10 @@ public class CountryAnalysisReport extends BaseHttpServlet {
                                     thirdDayRevenue += secondDayRevenue;
                                     double fourthDayRevenue = NumberUtil.convertDouble(j.get("fourth_day_revenue"),0);
                                     fourthDayRevenue += thirdDayRevenue;
-                                    d.addProperty("first_day_revenue",firstDayRevenue);
-                                    d.addProperty("second_day_revenue",secondDayRevenue);
-                                    d.addProperty("third_day_revenue",thirdDayRevenue);
-                                    d.addProperty("fourth_day_revenue",fourthDayRevenue);
+                                    d.addProperty("first_day_revenue",NumberUtil.trimDouble(firstDayRevenue,2));
+                                    d.addProperty("second_day_revenue",NumberUtil.trimDouble(secondDayRevenue,2));
+                                    d.addProperty("third_day_revenue",NumberUtil.trimDouble(thirdDayRevenue,2));
+                                    d.addProperty("fourth_day_revenue",NumberUtil.trimDouble(fourthDayRevenue,2));
                                 }
                                 jsonArray.add(d);
                             }
