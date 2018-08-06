@@ -39,7 +39,6 @@ public class TagsBidAdmanager extends BaseHttpServlet {
             if (path.startsWith("/create")) {
 
                 if (!tagName.isEmpty() && (bidding.matches("^\\d+(\\.\\d+)?$") || StringUtil.isEmpty(bidding)) || "".equals(countryName)) {
-
                     result = createNewTag(tagName, bidding, countryName);
                     json.addProperty("ret", result.result ? 1 : 0);
                     json.addProperty("message", result.message);
@@ -223,16 +222,26 @@ public class TagsBidAdmanager extends BaseHttpServlet {
     private OperationResult createNewTag(String tagName, String bidding, String countryName) {
         OperationResult ret = new OperationResult();
 
-
         try {
-            DB.insert("web_tag_country_bidding")
-                    .put("tag_name", tagName)
-                    .put("bidding", Double.parseDouble(bidding))
-                    .put("country_name", countryName)
+            JSObject one = DB.simpleScan("web_tag_country_bidding")
+                    .select("id")
+                    .where(DB.filter().whereEqualTo("tag_name", tagName))
+                    .and(DB.filter().whereEqualTo("country_name", countryName))
                     .execute();
 
-            ret.result = true;
-            ret.message = "创建成功";
+            if (!one.hasObjectData()){
+                DB.insert("web_tag_country_bidding")
+                        .put("tag_name", tagName)
+                        .put("bidding", Double.parseDouble(bidding))
+                        .put("country_name", countryName)
+                        .execute();
+
+                ret.result = true;
+                ret.message = "创建成功";
+            }else {
+                ret.result = false;
+                ret.message = "该应用、国家的出价已经存在，请做必要的更改";
+            }
 
         } catch (Exception e) {
             e.printStackTrace();

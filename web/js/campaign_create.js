@@ -3415,13 +3415,13 @@ $('#btnCreate').click(function () {
             if (one > two.bidding) {
                 alert("你的出价大于 "+two.country+" 出价上限！请修改正确！");
                 flag = 1;
-                return;
+                // return;
             }
         });
     })
 
     if (flag == 1) {
-        return;
+        return false;
     }
 
 
