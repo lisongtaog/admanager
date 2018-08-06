@@ -13,7 +13,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Login</title>
-    <link href="bootstrap/css/signin.css" rel="stylesheet">
+    <link href="common/statics/bootstrap/css/signin.css" rel="stylesheet">
 </head>
 <body>
 
@@ -32,7 +32,7 @@
         <%--<button class="btn btn-lg btn-success btn-block" id="btnRegister">注册(开发中)</button>--%>
     </form>
 
-    <jsp:include page="loading_dialog.jsp" ></jsp:include>
+    <jsp:include page="common/loading_dialog.jsp" ></jsp:include>
 </div>
 
 <div class="modal fade" id="register" tabindex="-1" role="dialog">

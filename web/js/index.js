@@ -45,8 +45,12 @@ var strFullPath = "";
 
 function init() {
     var now = new Date(new Date().getTime() - 86400 * 1000);
-    $('#inputStartTime').val(now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + now.getDate());
-    $('#inputEndTime').val(now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + now.getDate());
+    var month = now.getMonth() + 1;
+    var date = now.getDate();
+    month = month < 10 ? "0"+month : month;
+    date = date < 10 ? "0" + date : date;
+    $('#inputStartTime').val(now.getFullYear() + "-" + month + "-" + date);
+    $('#inputEndTime').val(now.getFullYear() + "-" + month + "-" + date);
     $('#inputStartTime').datetimepicker({
         minView: "month",
         format: 'yyyy-mm-dd',

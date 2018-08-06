@@ -471,7 +471,7 @@
 </div>
 
 
-<jsp:include page="loading_dialog.jsp"></jsp:include>
+<jsp:include page="common/loading_dialog.jsp"></jsp:include>
 <%--<jsp:include page="campaign_confirm_dialog.jsp"></jsp:include>--%>
 <%--<script src="js/campaign_confirm_creation.js?20180524"></script>--%>
 

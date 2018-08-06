@@ -84,7 +84,7 @@
 
 </div>
 
-<jsp:include page="loading_dialog.jsp"></jsp:include>
+<jsp:include page="common/loading_dialog.jsp"></jsp:include>
 
 <!-- DataTables -->
 <script src="http://money.uugame.info/admin_lte/bower_components/datatables.net/js/jquery.dataTables.min.js"></script>

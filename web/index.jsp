@@ -67,38 +67,39 @@
 
     <div class="panel panel-default" style="margin-top: 10px">
         <div class="panel-heading" id="panel_title">
-            <span>开始日期</span>
-            <input type="text" value="2012-05-15" id="inputStartTime" readonly>
-            <span>结束日期</span>
-            <input type="text" value="2012-05-15" id="inputEndTime" readonly>
-            <span>标签</span>
+            <label for="inputStartTime">开始日期</label>
+            <input type="text" id="inputStartTime" readonly style="width: 70px;">
+            <label for="inputEndTime">结束日期</label>
+            <input type="text" id="inputEndTime" readonly style="width: 70px;">
+            <label for="inputSearch">标签</label>
             <input id="inputSearch" class="form-control" style="display: inline; width: auto;" type="text"/>
             <button id="updateAppMaterialPath" class="btn btn-default glyphicon glyphicon-refresh" >路径</button>
-            <span>国家</span>
+            <label for="inputCountry">国家</label>
             <input id="inputCountry" class="form-control" style="display: inline; width: auto;" type="text"/>
-            <span>系列创建时间</span>
-            <input type="text" id="inputCampaignCreateTime"  placeholder="ChinaTime">
-            <span>系列名称</span>
-            <input type="text" id="inputLikeCampaignName" />
+            <label for="inputCampaignCreateTime">系列创建时间</label>
+            <input type="text" id="inputCampaignCreateTime"  placeholder="ChinaTime" readonly style="width: 75px;">
+            <label for="inputLikeCampaignName">系列名称</label>
+            <input type="text" id="inputLikeCampaignName" class="form-control" style="display: inline; width: auto;" />
 
-            <span>总安装</span>
-            <select id="totalInstallOperator"><option value="1" selected="true">大于</option><option value="2">小于</option><option value="3">等于</option></select>
+            <br/>
+            <label for="inputTotalInstallComparisonValue">总安装</label>
+            <select id="totalInstallOperator" class="selectpicker"><option value="1" selected="true">大于</option><option value="2">小于</option><option value="3">等于</option></select>
             <input id="inputTotalInstallComparisonValue" class="form-control" style="display: inline; width: auto;" type="text"/>
 
-            <span>CPA</span>
-            <select id="cpaOperator"><option value="4" selected="true">大于</option><option value="5">小于</option><option value="6">等于</option></select>
+            <label for="inputCpaComparisonValue">CPA</label>
+            <select id="cpaOperator" class="selectpicker"><option value="4" selected="true">大于</option><option value="5">小于</option><option value="6">等于</option></select>
             <input id="inputCpaComparisonValue" class="form-control" style="display: inline; width: auto;" type="text" />
 
-            <span>竞价</span>
-            <select id="biddingOperator"><option value="7" selected="true">大于</option><option value="8">小于</option><option value="9"  selected="true">等于</option></select>
+            <label for="inputBiddingComparisonValue">竞价</label>
+            <select id="biddingOperator" class="selectpicker"><option value="7" selected="true">大于</option><option value="8">小于</option><option value="9"  selected="true">等于</option></select>
             <input id="inputBiddingComparisonValue" class="form-control" style="display: inline; width: auto;" type="text"/>
 
-            <span>状态</span>
-            <select id="statusOperator">
-                <option value="all" selected="true">all</option>
-                <option value="ARCHIVED">facebook_ARCHIVED</option>
-                <option value="ACTIVE"  >facebook_ACTIVE</option>
-                <option value="PAUSED" >facebook_PAUSED</option>
+            <label for="statusOperator">状态</label>
+            <select id="statusOperator" class="selectpicker">
+                <option value="all" selected="true">ALL</option>
+                <option value="ARCHIVED">FB_ARCHIVED</option>
+                <option value="ACTIVE"  >FB_ACTIVE</option>
+                <option value="PAUSED" >FB_PAUSED</option>
                 <option value="paused" >adWords_paused</option>
                 <option value="removed" >adWords_removed</option>
                 <option value="enabled" >adWords_enabled</option>
@@ -112,9 +113,9 @@
             <input type="checkbox" name="filtrateCampaign" id="containsNoDataCampaignCheck"/><label for="containsNoDataCampaignCheck">包含无数据的系列</label>
 
             <div>
-                <label>花费比例</label><select id="selectCostOp"><option value="1">大于等于</option><option value="2" selected="true">小于等于</option></select>
+                <label for="inputCostRate">花费比例</label><select id="selectCostOp" class="selectpicker"><option value="1">大于等于</option><option value="2" selected="true">小于等于</option></select>
                 <input id="inputCostRate" class="form-control" style="display: inline; width: auto;" type="text" value="0.5"/>
-                <label>转化</label><select id="selectConversionOp"><option value="1">大于等于</option><option value="2" selected="true">小于等于</option></select>
+                <label for="inputConversion">转化</label><select id="selectConversionOp" class="selectpicker"><option value="1">大于等于</option><option value="2" selected="true">小于等于</option></select>
                 <input id="inputConversion" class="form-control" style="display: inline; width: auto;" type="text" value="1"/>
                 <button id="btnQueryZero" class="btn btn-default">查询Zero</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 
@@ -209,7 +210,7 @@
 
 </div>
 
-<jsp:include page="loading_dialog.jsp"></jsp:include>
+<jsp:include page="common/loading_dialog.jsp"></jsp:include>
 
 <script src="js/index.js?t=20180531"></script>
 

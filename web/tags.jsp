@@ -211,7 +211,7 @@
     </div>
 </div>
 
-<jsp:include page="loading_dialog.jsp"></jsp:include>
+<jsp:include page="common/loading_dialog.jsp"></jsp:include>
 
 <script type="text/javascript">
     var modifyType = 'new';
@@ -412,8 +412,10 @@
 
             $("#new_tag_dlg").modal("show");
         });
-
-        $(".link_delete").click(function () {
+/**
+ * 删除标签的功能是危险操作。这个功能取消
+ */
+        /*$(".link_delete").click(function () {
             return;
             modifyType = "delete";
             $('#delete_message').show();
@@ -431,7 +433,7 @@
             $("#category").val(tagCategoryId);
 
             $("#new_tag_dlg").modal("show");
-        });
+        });*/
     }
 
     bindOp();

@@ -197,7 +197,7 @@
 
 </div>
 
-<jsp:include page="loading_dialog.jsp"></jsp:include>
+<jsp:include page="common/loading_dialog.jsp"></jsp:include>
 
 <script src="js/index2.js?t=20180126"></script>
 
