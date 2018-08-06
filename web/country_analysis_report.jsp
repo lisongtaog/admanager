@@ -99,8 +99,8 @@
     var now = new Date();
     var pre = new Date(new Date().getTime() - 86400 * 1000);//当前时间前一天
     var date = getDateStr(pre);
-    $('#inputStartTime').val(pre);
-    $('#inputEndTime').val(pre);
+    $('#inputStartTime').val(date);
+    $('#inputEndTime').val(date);
     $('#inputStartTime').datetimepicker({
         minView: "month",
         format: 'yyyy-mm-dd',
