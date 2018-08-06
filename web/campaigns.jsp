@@ -172,10 +172,10 @@
     </div>
 </div>
 
-<jsp:include page="loading_dialog.jsp"></jsp:include>
+<jsp:include page="common/loading_dialog.jsp"></jsp:include>
 
-<script src="js/typeahead.js"></script>
-<script src="js/bootstrap-tagsinput.js"></script>
+<script src="common/statics/js/typeahead.js"></script>
+<script src="common/statics/bootstrap/js/bootstrap-tagsinput.js"></script>
 
 <script type="text/javascript">
     $("li[role='presentation']:eq(3)").addClass("active");

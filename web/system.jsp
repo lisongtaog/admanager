@@ -225,7 +225,7 @@
       </div>
     </div>
 
-  <jsp:include page="loading_dialog.jsp"></jsp:include>
+  <jsp:include page="common/loading_dialog.jsp"></jsp:include>
 
   <script type="text/javascript">
     var modifyType;

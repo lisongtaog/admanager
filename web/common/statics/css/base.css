@@ -1,0 +1,51 @@
+/*jquery validate css --begin*/
+input.error { border: 1px solid red; }
+label.error {
+    background: url('../images/unchecked.gif') no-repeat;
+    padding-left: 16px;
+    margin-left: .3em;
+    color: red;
+    font-style: italic;
+}
+label.valid {
+    background: url('../images/checked.gif') no-repeat;
+    display: block;
+    width: 16px;
+    height: 16px;
+}
+/*jquery validate css --end*/
+
+body{
+    font-size:12px;
+}
+form input{
+    text-align: left;
+    vertical-align:middle;
+    margin: 2px 2px;
+}
+table.dataTable{
+    width: 100% !important;
+    table-layout:fixed;
+    empty-cells:show;
+    border-collapse: collapse;
+    margin:0 auto;
+}
+table.dataTable th{
+    border: 1px solid #c5c5c5;
+}
+
+/*table cell overflow - begin*/
+table.dataTable tr td{
+    min-width: 20px;
+    max-width:280px;
+    word-wrap:break-word;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+    overflow:hidden;
+}
+table.dataTable tr td:hover{
+    white-space:normal;
+    overflow:auto;
+}
+/*table cell overflow - end*/
+

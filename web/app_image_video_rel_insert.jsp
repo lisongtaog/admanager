@@ -94,7 +94,7 @@
     </div>
   </div>
 
-  <jsp:include page="loading_dialog.jsp"></jsp:include>
+  <jsp:include page="common/loading_dialog.jsp"></jsp:include>
 
   <script src="js/country-name-code-dict.js"></script>
 
