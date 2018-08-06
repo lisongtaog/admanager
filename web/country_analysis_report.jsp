@@ -62,7 +62,7 @@
         </div>
     </div>
     <table class="table table-hover">
-        <span style="color: #0044cc">公式：当天回本率=AdNewRevenue/Cost;ARPU = Revenue/ActiveUser</span>
+        <span style="color: #0044cc">公式：当天回本率=AdNewRevenue/Cost;ARPU = Revenue/ActiveUser;四天的每日收入是累计值</span>
         <thead id="result_header">
         <tr>
             <th>国家</th>
