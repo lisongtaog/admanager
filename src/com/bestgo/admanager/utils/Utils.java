@@ -277,4 +277,18 @@ public class Utils {
         }
         return false;
     }
+
+    /**
+     * 执行Shell命令
+     * @param cmd
+     * @return
+     * @throws InterruptedException
+     * @throws IOException
+     */
+    public static boolean executeShellCommand(String cmd) throws InterruptedException, IOException {
+        String[] cmdparts = {"/bin/sh", "-c", cmd};
+        Process process = Runtime.getRuntime().exec(cmdparts);
+        process.waitFor();
+        return true;
+    }
 }

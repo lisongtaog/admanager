@@ -38,7 +38,7 @@ public class AdAccount extends BaseHttpServlet {
                 OperationResult result = createNewAdAccount(account, shortName);
                 json.addProperty("ret", result.result ? 1 : 0);
                 json.addProperty("message", result.message);
-            } else if (path.startsWith("/delete")) {
+            } else if (path.matches("/delete")) {
                 String account = request.getParameter("account");
                 OperationResult result = deleteAccount(account);
                 json.addProperty("ret", result.result ? 1 : 0);
@@ -50,6 +50,16 @@ public class AdAccount extends BaseHttpServlet {
                 OperationResult result = updateAdAccount(id, account, shortName);
                 json.addProperty("ret", result.result ? 1 : 0);
                 json.addProperty("message", result.message);
+            }  else if (path.matches("/archive_fb_campaigns_by_account_id")) {
+//                String account = request.getParameter("account");
+                boolean b = false;
+                try {
+                    b = archiveFBCampaignsByAccountId("123123");
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                json.addProperty("ret", b ? 1 : 0);
+                json.addProperty("message", "");
             } else if (path.startsWith("/query")) {
                 String word = request.getParameter("word");
                 if (word != null) {
@@ -220,5 +230,15 @@ public class AdAccount extends BaseHttpServlet {
         }
 
         return ret;
+    }
+
+    /**
+     * 根据账号ID归档FB系列
+     * @param accountId
+     * @return
+     */
+    private boolean archiveFBCampaignsByAccountId(String accountId) throws IOException, InterruptedException {
+        String cmd = "sh /home/bestgo/shell_file/test.sh";
+        return Utils.executeShellCommand(cmd);
     }
 }

@@ -9,7 +9,6 @@ import org.apache.log4j.Logger;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -17,9 +16,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @Author: mengjun
- * @Date: 2018/5/14 15:12
- * @Desc:
+ * @author: mengjun
+ * @date: 2018/5/14 15:12
+ * @desc: 登录用户验证
  */
 @WebServlet(name = "UserServlet", urlPatterns = {"/user_servlet/*"})
 public class UserServlet extends BaseHttpServlet {

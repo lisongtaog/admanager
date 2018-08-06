@@ -17,9 +17,9 @@ import java.io.IOException;
 import java.util.*;
 
 /**
- * Author: mengjun
- * Date: 2018/2/2 21:15
- * Desc: 分析每个应用每个国家的活跃用户度的报告
+ * @author mengjun
+ * @date 2018/2/2 21:15
+ * @desc 分析每个应用每个国家的活跃用户度的报告
  */
 @WebServlet(name = "ActiveUserReport", urlPatterns = {"/active_user_report/*"})
 public class ActiveUserReport extends BaseHttpServlet {
