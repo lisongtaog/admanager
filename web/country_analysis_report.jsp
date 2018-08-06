@@ -96,18 +96,21 @@
 
 <script>
     $("li[role='presentation']:eq(2)").addClass("active");
-    var now = new Date(new Date().getTime() - 86400 * 1000);
-    $('#inputStartTime').val(now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + now.getDate());
-    $('#inputEndTime').val(now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + now.getDate());
+    var now = new Date(new Date().getTime() - 86400 * 1000);//当前时间前一天
+    var date = getDateStr(now);
+    $('#inputStartTime').val(date);
+    $('#inputEndTime').val(date);
     $('#inputStartTime').datetimepicker({
         minView: "month",
         format: 'yyyy-mm-dd',
+        endDate: now,
         autoclose: true,
         todayBtn: true
     });
     $('#inputEndTime').datetimepicker({
         minView: "month",
         format: 'yyyy-mm-dd',
+        endDate: now,
         autoclose: true,
         todayBtn: true
     });

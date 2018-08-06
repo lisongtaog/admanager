@@ -76,6 +76,23 @@
             console.log(textStatus);// 错误信息
         }
 
+        /**
+         * 获取指定日期字符串,YYYY-MM-DD格式
+         * @param dateTime 不传，则默认取系统当前时间
+         * @returns {string}
+         */
+        function getDateStr(dateTime) {
+            if(!dateTime || !(dateTime instanceof Date) ){
+                dateTime = new Date();
+            }
+            var month = dateTime.getMonth() + 1;
+            var date = dateTime.getDate();
+            month = month < 10 ? "0"+month : month;
+            date = date < 10 ? "0" + date : date;
+
+            return dateTime.getFullYear() + "-" + month + "-" + date;
+        }
+
         //jquery datatable 异常事件处理；取消弹窗警告
         //开发过程中 可以放开进行调试
         $.fn.dataTable.ext.errMode = 'none';
