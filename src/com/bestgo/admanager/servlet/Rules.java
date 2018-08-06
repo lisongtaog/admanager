@@ -11,7 +11,6 @@ import org.apache.log4j.Logger;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -38,7 +37,7 @@ public class Rules extends BaseHttpServlet {
                 String tag_id = request.getParameter("tag_id");
                 String tag_name = request.getParameter("tag_name");
 
-                OperationResult result = createNewRule(ruleType, ruleContent,tag_id,tag_name);
+                OperationResult result = createNewRule(ruleType, ruleContent, tag_id, tag_name);
                 json.addProperty("ret", result.result ? 1 : 0);
                 json.addProperty("message", result.message);
             } else if (path.startsWith("/delete")) {
@@ -86,6 +85,9 @@ public class Rules extends BaseHttpServlet {
 
                 jsonObject.addProperty("id", (long) oneBySql.get("id"));
                 json.add("data", jsonObject);
+            } else if (path.startsWith("/delByTagName")) {
+                String tagName = request.getParameter("tagName");
+                deleteByTagName(tagName);
             }
         } else {
 
@@ -149,7 +151,7 @@ public class Rules extends BaseHttpServlet {
         return ret;
     }
 
-    private OperationResult createNewRule(String ruleType, String ruleContent,String tag_id,String tag_name) {
+    private OperationResult createNewRule(String ruleType, String ruleContent, String tag_id, String tag_name) {
         OperationResult ret = new OperationResult();
 
         try {
@@ -190,5 +192,17 @@ public class Rules extends BaseHttpServlet {
         }
 
         return ret;
+    }
+
+    /**
+     * 根据标签名称删除标签规则的方法
+     * @param tagName
+     */
+    private void deleteByTagName(String tagName) {
+        try {
+            DB.delete("web_ad_rules").where(DB.filter().whereEqualTo("tag_name",tagName)).execute();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
