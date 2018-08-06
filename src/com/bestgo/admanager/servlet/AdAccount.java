@@ -238,7 +238,7 @@ public class AdAccount extends BaseHttpServlet {
      * @return
      */
     private boolean archiveFBCampaignsByAccountId(String accountId) throws IOException, InterruptedException {
-        String cmd = "sh /home/bestgo/shell_file/test.sh";
+        String cmd = "/home/bestgo/shell_file/test.sh";
         return Utils.executeShellCommand(cmd);
     }
 }
