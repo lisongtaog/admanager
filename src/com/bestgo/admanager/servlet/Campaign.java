@@ -16,7 +16,6 @@ import org.apache.log4j.Logger;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
@@ -28,7 +27,7 @@ import java.util.*;
  *  Desc: 有关Facebook系列创建的操作
  */
 @WebServlet(name = "Campaign", urlPatterns = "/campaign/*")
-public class Campaign extends HttpServlet {
+public class Campaign extends BaseHttpServlet {
     public static Map<String,Double> tagMaxBiddingRelationMap;   //声明了一个静态类，无属性，无方法，则Java会给它一个默认无参构造器
     static {
         if(tagMaxBiddingRelationMap == null){
@@ -57,13 +56,29 @@ public class Campaign extends HttpServlet {
 
         String path = request.getPathInfo();
         JsonObject json = new JsonObject();
-        //检查帐户的状态
+        //检查帐户状态
         Map<String, Integer> facebookAccountDetailsMap = getFacebookAccountDetails();
         if (path.startsWith("/create")) {
             String appName = request.getParameter("appName");
             String appId = request.getParameter("appId");
             String accountId = request.getParameter("accountId");
             String accountName = request.getParameter("accountName");
+
+            String[] accountNameArr = accountName.split(",");
+            String[] accountIdArr = accountId.split(",");
+
+            //判断帐户是否有效
+            boolean index = false;
+
+            for(int j=0,len=accountNameArr.length;j<len;j++){
+                //账户状态，如果为1则为开启；为2则为禁用
+                Integer accountStatus = facebookAccountDetailsMap.get(accountIdArr[j]);
+                //帐户不存在或status是关闭,直接返回
+                if (accountStatus == null || accountStatus != 1) {
+                    index = true;
+                    break;
+                }
+            }
 
             String createCount = request.getParameter("createCount");
             String pageId = request.getParameter("FBpage[pageId]");
@@ -105,10 +120,13 @@ public class Campaign extends HttpServlet {
                 Collection<File> uploadImages = null;
                 Collection<File> uploadVideos = null;
                 int groupId = NumberUtil.parseInt(groupIdStr,0);
+
                 if (groupId == 0) {
                     result.message = "广告组ID不存在！请联系管理员";
                 }else if (createCount.isEmpty()) {
                     result.message = "创建数量不能为空";
+                } else if (index) {
+                    result.message = "没有这个账户ID或此账户被禁，请联系管理员";
                 } else if (StringUtil.isEmpty(pageId)) {
                     result.message = "pageId不能为空，请关闭页面刷新重试";
                 } else if (title.isEmpty()) {
@@ -190,105 +208,88 @@ public class Campaign extends HttpServlet {
                 if (result.result) {
                     Calendar calendar = Calendar.getInstance();
                     String campaignNameOld = campaignName.replace("Group_","Group" + groupId) + "_";
-                    String[] accountNameArr = accountName.split(",");
+                    accountNameArr = accountName.split(",");
                     String accountNameArrStr = accountName.replace(",", "");
-                    String[] accountIdArr = accountId.split(",");
+                    accountIdArr = accountId.split(",");
                     int createCountInt = Integer.parseInt(createCount);
 
-                    //判断帐户是否有效
-                    boolean index = true;
                     for(int j=0,len=accountNameArr.length;j<len;j++){
-                        //账户状态，如果为1则为开启；为2则为禁用
-                        Integer accountStatus = facebookAccountDetailsMap.get(accountIdArr[j]);
-                        //帐户不存在或status是关闭,直接返回
-                        if (accountStatus == null || accountStatus != 1) {
-                            result.result = true;
-                            result.message = "没有这个账户ID或此账户被禁，请联系管理员";
-                            index = false;
-                            break;
-                        }
-                    }
-
-                    if (index){
-                        for(int j=0,len=accountNameArr.length;j<len;j++){
-                            for(int i=0;i<createCountInt;i++){
-                                String now  = String.format("%d-%02d-%02d %02d:%02d:%02d", calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH),
-                                        calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), calendar.get(Calendar.SECOND));
-                                String s = String.valueOf(System.currentTimeMillis());
-                                String part = new StringBuffer(i + s + "").reverse().toString();
-                                campaignName = campaignNameOld.replace(accountNameArrStr,accountNameArr[j]) + "_Strategy" + bidStrategy + "_" + part;
-                                if (campaignName.length() > 150) {
-                                    campaignName = campaignName.substring(0, 150);
-                                }
-
-                                long genId = DB.insert("ad_campaigns")
-                                        .put("facebook_app_id", appId)
-                                        .put("account_id", accountIdArr[j])
-                                        .put("country_region", region)
-                                        .put("excluded_region", excludedRegion)
-                                        .put("create_time", now)
-                                        .put("language", language)
-                                        .put("campaign_name", campaignName)
-                                        .put("page_id", pageId)
-                                        .put("bugdet", bugdet)
-                                        .put("bidding", bidding)
-                                        .put("group_id", groupId)
-                                        .put("title", title)
-                                        .put("message", message)
-                                        .put("app_name", appName)
-                                        .put("tag_name", appName)
-                                        .put("age", age)
-                                        .put("gender", gender)
-                                        .put("detail_target", interest)
-                                        .put("max_cpa", maxCPA)
-                                        .put("user_devices", userDevice)
-                                        .put("user_os", userOs)
-                                        .put("publisher_platforms", publisherPlatforms)
-                                        .put("bid_strategy", bidStrategy)
-                                        .executeReturnId();
-                                if(genId >0){
-                                    boolean flag = false;
-                                    if(uploadImages != null){
-                                        for (File file : uploadImages) {
-                                            String fileName = file.getAbsolutePath().toLowerCase();
-                                            if (fileName.endsWith("gif") || fileName.endsWith("jpg") || fileName.endsWith("jpeg") || fileName.endsWith("png")) {
-                                                String sql = "insert into ad_ads set parent_id=" + genId + ", image_file_path='" + file.getAbsolutePath() + "'";
-                                                flag = DB.updateBySql(sql);
-                                            }
-                                        }
-                                    }else if(uploadVideos != null){
-                                        String video_file_path = null;
-                                        String thumbnail_image_file_path = null;
-                                        for (File file : uploadVideos) {
-                                            String fileAbsolutePath = file.getAbsolutePath();
-                                            String fileName = fileAbsolutePath.toLowerCase();
-                                            if (fileName.endsWith("mp4") || fileName.endsWith("mov") || fileName.endsWith("gif")) {
-                                                video_file_path = fileAbsolutePath;
-                                            }else if (fileName.endsWith("jpg") || fileName.endsWith("jpeg") || fileName.endsWith("png")) {
-                                                thumbnail_image_file_path = fileAbsolutePath;
-                                            }
-                                        }
-                                        if(video_file_path != null && thumbnail_image_file_path != null){
-                                            String sql = "insert into ad_ads set parent_id = '"+genId+"', video_file_path = '"+video_file_path+"', thumbnail_image_file_path = '"+thumbnail_image_file_path+"'";
+                        for(int i=0;i<createCountInt;i++){
+                            String now  = String.format("%d-%02d-%02d %02d:%02d:%02d", calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH),
+                                    calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), calendar.get(Calendar.SECOND));
+                            String s = String.valueOf(System.currentTimeMillis());
+                            String part = new StringBuffer(i + s + "").reverse().toString();
+                            campaignName = campaignNameOld.replace(accountNameArrStr,accountNameArr[j]) + "_Strategy" + bidStrategy + "_" + part;
+                            if (campaignName.length() > 150) {
+                                campaignName = campaignName.substring(0, 150);
+                            }
+                            long genId = DB.insert("ad_campaigns")
+                                    .put("facebook_app_id", appId)
+                                    .put("account_id", accountIdArr[j])
+                                    .put("country_region", region)
+                                    .put("excluded_region", excludedRegion)
+                                    .put("create_time", now)
+                                    .put("language", language)
+                                    .put("campaign_name", campaignName)
+                                    .put("page_id", pageId)
+                                    .put("bugdet", bugdet)
+                                    .put("bidding", bidding)
+                                    .put("group_id", groupId)
+                                    .put("title", title)
+                                    .put("message", message)
+                                    .put("app_name", appName)
+                                    .put("tag_name", appName)
+                                    .put("age", age)
+                                    .put("gender", gender)
+                                    .put("detail_target", interest)
+                                    .put("max_cpa", maxCPA)
+                                    .put("user_devices", userDevice)
+                                    .put("user_os", userOs)
+                                    .put("publisher_platforms", publisherPlatforms)
+                                    .put("bid_strategy", bidStrategy)
+                                    .executeReturnId();
+                            if(genId >0){
+                                boolean flag = false;
+                                if(uploadImages != null){
+                                    for (File file : uploadImages) {
+                                        String fileName = file.getAbsolutePath().toLowerCase();
+                                        if (fileName.endsWith("gif") || fileName.endsWith("jpg") || fileName.endsWith("jpeg") || fileName.endsWith("png")) {
+                                            String sql = "insert into ad_ads set parent_id=" + genId + ", image_file_path='" + file.getAbsolutePath() + "'";
                                             flag = DB.updateBySql(sql);
                                         }
                                     }
-                                    if(!flag){
-                                        DB.delete("ad_campaigns").where(DB.filter().whereEqualTo("campaign_name", campaignName)).execute();
-                                        //返回前端提醒
-                                        System.out.println("由于Media导致第"+(i+1)+"个系列创建失败,名为["+campaignName + "]的系列已经被删除！");
-                                        result.warning = "由于Media导致第"+(i+1)+"个系列创建失败,名为["+campaignName + "]的系列已经被删除！";
+                                }else if(uploadVideos != null){
+                                    String video_file_path = null;
+                                    String thumbnail_image_file_path = null;
+                                    for (File file : uploadVideos) {
+                                        String fileAbsolutePath = file.getAbsolutePath();
+                                        String fileName = fileAbsolutePath.toLowerCase();
+                                        if (fileName.endsWith("mp4") || fileName.endsWith("mov") || fileName.endsWith("gif")) {
+                                            video_file_path = fileAbsolutePath;
+                                        }else if (fileName.endsWith("jpg") || fileName.endsWith("jpeg") || fileName.endsWith("png")) {
+                                            thumbnail_image_file_path = fileAbsolutePath;
+                                        }
                                     }
-                                } else {
-                                    Logger logger = Logger.getRootLogger();
-                                    logger.debug("facebook_app_id=" + appId + ", account_id=" +  accountIdArr[j] + ", country_region=" + region +
-                                            ", excluded_region="+  excludedRegion +    ", create_time=" +  now +   ", language=" + language +
-                                            ", campaign_name="+ campaignName + ", page_id="+ pageId + ", bugdet="+ bugdet +
-                                            ", bidding="+ bidding + ", bugdet="+ bugdet + ", bidding="+ bidding + ", title="+ title + ", message="+ message +
-                                            ", app_name="+ appName + ", age="+ age +", gender="+ gender + ", user_devices="+ userDevice + ", detail_target="+interest);
+                                    if(video_file_path != null && thumbnail_image_file_path != null){
+                                        String sql = "insert into ad_ads set parent_id = '"+genId+"', video_file_path = '"+video_file_path+"', thumbnail_image_file_path = '"+thumbnail_image_file_path+"'";
+                                        flag = DB.updateBySql(sql);
+                                    }
                                 }
-
+                                if(!flag){
+                                    DB.delete("ad_campaigns").where(DB.filter().whereEqualTo("campaign_name", campaignName)).execute();
+                                    //返回前端提醒
+                                    System.out.println("由于Media导致第"+(i+1)+"个系列创建失败,名为["+campaignName + "]的系列已经被删除！");
+                                    result.warning = "由于Media导致第"+(i+1)+"个系列创建失败,名为["+campaignName + "]的系列已经被删除！";
+                                }
+                            } else {
+                                Logger logger = Logger.getRootLogger();
+                                logger.debug("facebook_app_id=" + appId + ", account_id=" +  accountIdArr[j] + ", country_region=" + region +
+                                        ", excluded_region="+  excludedRegion +    ", create_time=" +  now +   ", language=" + language +
+                                        ", campaign_name="+ campaignName + ", page_id="+ pageId + ", bugdet="+ bugdet +
+                                        ", bidding="+ bidding + ", bugdet="+ bugdet + ", bidding="+ bidding + ", title="+ title + ", message="+ message +
+                                        ", app_name="+ appName + ", age="+ age +", gender="+ gender + ", user_devices="+ userDevice + ", detail_target="+interest);
                             }
+
                         }
                     }
                 }
@@ -345,8 +346,6 @@ public class Campaign extends HttpServlet {
                 sql = "SELECT id,network,campaign_id,campaign_name,failed_count,last_error_message FROM web_ad_batch_change_campaigns "+
                         "WHERE success = 0 "+
                         "LIMIT "+pageSize+" OFFSET "+pageIdx;
-//                List<JSObject> list = DB.scan("web_ad_batch_change_campaigns").select(fields)
-//                        .where(DB.filter().whereEqualTo("success", 0)).execute();
                 List<JSObject> list = DB.findListBySql(sql);
                 for (int i = 0; i < list.size(); i++) {
                     JsonObject one = new JsonObject();
@@ -587,7 +586,6 @@ public class Campaign extends HttpServlet {
                         throw new Exception("超过最大出价, 系列ID=" + item.campaignId);
                     }
                     if (enabled == 1) item.excludedCountry = null;
-
                     //账户状态，为1则为开启；为2则为禁用
                     Integer accountStatus = facebookAccountDetailsMap.get(item.accountId);
 
@@ -607,7 +605,6 @@ public class Campaign extends HttpServlet {
                                     .where(DB.filter().whereEqualTo("id", id))
                                     .execute();
                         }
-
                     } else {
                         int bidStrategy = 1;
                         if ("facebook".equals(item.network)) {
@@ -925,8 +922,4 @@ public class Campaign extends HttpServlet {
 
         return map;
     }
-
-
-
 }
-
