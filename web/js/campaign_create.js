@@ -2791,7 +2791,7 @@ $("#selectAppAdmob").change(function () {
     return false;
 });
 
-var countryBidding;
+var countryBidding = [];
 //根据[国家地区][应用名称]回显已创建好的广告语
 $("#selectRegion").change(function () {
     $("#appCountryBidding").text("");
@@ -2854,7 +2854,7 @@ $("#selectRegion").change(function () {
     return false;
 });
 
-var countryBiddingAdmob;
+var countryBiddingAdmob = [];
 $("#selectRegionAdmob").change(function () {
     $("#appCountryBiddingAdWords").text("");
     // if (isAutoCreate && !firstInitForm) {

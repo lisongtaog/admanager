@@ -110,10 +110,12 @@
 
         <div class="form-group">
             <label for="selectAccount" class="col-sm-2 control-label">账号</label>
-            <div class="col-sm-10">
+            <div class="col-sm-8">
                 <select class="form-control select2" id="selectAccount" multiple="multiple">
-
                 </select>
+            </div>
+            <div class="col-sm-2">
+                <label title="选中后每个选项创建一个或多个广告系列"><input type="checkbox" checked class="form-check-input" disabled = "true">分离到系列</label>
             </div>
         </div>
 
@@ -261,7 +263,7 @@
 
             <div class="col-sm-2">
                 <label title="选中后每个选项创建一个或多个广告系列"><input type="checkbox" class="form-check-input"
-                                                         id="inputBiddingExplode">分离到系列</label>
+                                                         id="inputBiddingExplode" checked disabled = "true">分离到系列</label>
             </div>
         </div>
 
@@ -286,7 +288,7 @@
             </div>
             <div class="col-sm-2">
                 <label title="选中后每个选项创建一个或多个广告系列"><input type="checkbox" class="form-check-input"
-                                                         id="inputImageExplode">分离到系列</label>
+                                                         id="inputImageExplode" checked disabled = "true">分离到系列</label>
             </div>
         </div>
         <div class="form-group">
@@ -296,7 +298,7 @@
             </div>
             <div class="col-sm-2">
                 <label title="选中后每个选项创建一个或多个广告系列"><input type="checkbox" class="form-check-input"
-                                                         id="inputVideoExplode">分离到系列</label>
+                                                         id="inputVideoExplode" checked disabled = "true">分离到系列</label>
             </div>
         </div>
         <div class="form-group">
@@ -335,10 +337,13 @@
 
         <div class="form-group">
             <label for="selectAccountAdmob" class="col-sm-2 control-label">广告账号</label>
-            <div class="col-sm-10">
+            <div class="col-sm-8">
                 <select class="form-control select2" id="selectAccountAdmob" multiple="multiple">
 
                 </select>
+            </div>
+            <div class="col-sm-2">
+                <label title="选中后每个选项创建一个或多个广告系列"><input type="checkbox" checked class="form-check-input" disabled = "true">分离到系列</label>
             </div>
         </div>
         <div class="form-group">
@@ -413,7 +418,7 @@
             </div>
             <div class="col-sm-2">
                 <label title="选中后每个选项创建一个或多个广告系列"><input type="checkbox" class="form-check-input"
-                                                         id="inputBiddingAdmobExplode">分离到系列</label>
+                                                         id="inputBiddingAdmobExplode" disabled = "true" checked>分离到系列</label>
             </div>
         </div>
 
@@ -438,7 +443,7 @@
             </div>
             <div class="col-sm-2">
                 <label title="选中后每个选项创建一个或多个广告系列"><input type="checkbox" class="form-check-input"
-                                                         id="inputImageAdmobExplode">分离到系列</label>
+                                                         id="inputImageAdmobExplode" disabled = "true" checked>分离到系列</label>
             </div>
         </div>
         <div class="form-group">
