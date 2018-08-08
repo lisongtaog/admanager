@@ -11,7 +11,6 @@ import com.google.gson.JsonParser;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -125,7 +124,7 @@ public class CountryAnalysisReport extends BaseHttpServlet {
                         String sql = "";
 
                         if (sameDate) {
-                            sql =   "SELECT h.country_code, sum(cost) as total_cost, sum(purchased_user) as total_purchased_user, sum(ad_new_revenue) as ad_new_revenues,\n" +
+                            sql =   "SELECT h.country_code, sum(cost) as total_cost, sum(purchased_user) as total_purchased_user, sum(ad_new_revenue) as new_revenues,\n" +
                                     "sum(total_installed) as installed, sum(today_uninstalled) as total_today_uninstalled,\n" +
                                     "sum(active_user) as active_users, sum(impression) as impressions, sum(revenue) as revenues,\n" +
                                     " (sum(revenue) - sum(cost)) as incoming,r.first_day_revenue,r.second_day_revenue,r.third_day_revenue,r.fourth_day_revenue,\n" +
@@ -135,7 +134,7 @@ public class CountryAnalysisReport extends BaseHttpServlet {
                                     " on h.date = r.date and h.app_id = r.app_id AND h.country_code = r.country_code \n" +
                                     " where h.date = '" + endTime + "' and h.app_id = '" + appId + "' GROUP BY h.country_code";
                         } else {
-                            sql = "SELECT country_code, sum(cost) as total_cost, sum(purchased_user) as total_purchased_user, sum(ad_new_revenue) as ad_new_revenues," +
+                            sql = "SELECT country_code, sum(cost) as total_cost, sum(purchased_user) as total_purchased_user, sum(ad_new_revenue) as new_revenues," +
                                     " sum(total_installed) as installed, sum(today_uninstalled) as total_today_uninstalled," +
                                     " sum(active_user) as active_users, sum(impression) as impressions, sum(revenue) as revenues," +
                                     " (sum(revenue) - sum(cost)) as incoming," +
@@ -283,11 +282,11 @@ public class CountryAnalysisReport extends BaseHttpServlet {
                                     }
                                 }*/
 
-                                sql = "select date, pi from web_ad_country_analysis_report_history_by_date " +
-                                        "where " +
-                                        " date BETWEEN '" + beforeTwentyTwoDay + "' AND '" + beforeFourDay + "'" +
-                                        " and app_id = '" + appId + "' " +
-                                        " and country_code = '" + countryCode + "' ";
+//                                sql = "select date, pi from web_ad_country_analysis_report_history_by_date " +
+//                                        "where " +
+//                                        " date BETWEEN '" + beforeTwentyTwoDay + "' AND '" + beforeFourDay + "'" +
+//                                        " and app_id = '" + appId + "' " +
+//                                        " and country_code = '" + countryCode + "' ";
 
 //                                List<JSObject> listCR = DB.findListBySql(sql);
 //                                String everyDayPiForFourteenDays = "";
@@ -313,7 +312,7 @@ public class CountryAnalysisReport extends BaseHttpServlet {
                                     aCpa = NumberUtil.convertDouble(oneC.get("a_cpa"), 0);
                                 }*/
 
-                                double adNewRevenues = NumberUtil.convertDouble(j.get("ad_new_revenues"), 0);
+                                double newRevenues = NumberUtil.convertDouble(j.get("new_revenues"), 0);
                                 double revenues = NumberUtil.convertDouble(j.get("revenues"), 0);
                                 double ecpm = NumberUtil.convertDouble(j.get("ecpm"), 0);
                                 sql = "select country_name from app_country_code_dict where country_code = '" + countryCode + "'";
@@ -337,23 +336,6 @@ public class CountryAnalysisReport extends BaseHttpServlet {
                                 double cpa = NumberUtil.convertDouble(j.get("cpa"), 0);
                                 double incoming = NumberUtil.convertDouble(j.get("incoming"), 0);
                                 double cpaDivEcpm = (ecpm == 0) ? 0 : (cpa / ecpm);
-
-                                double arpu = activeUsers > 0 ? revenues / activeUsers : 0;
-
-//                                sql = "SELECT avg(pi) as avg_pi FROM web_ad_country_analysis_report_history_by_date " +
-//                                        "WHERE " +
-//                                        " date BETWEEN '" + beforeTenDay + "' AND '" + beforeFourDay + "'" +
-//                                        " and app_id = '" + appId + "' " +
-//                                        " AND country_code = '" + countryCode + "'";
-//
-//                                oneC = DB.findOneBySql(sql);
-//                                double sevenDaysAvgPi = 0;
-//                                if (oneC.hasObjectData()) {
-//                                    sevenDaysAvgPi = NumberUtil.convertDouble(oneC.get("avg_pi"), 0);
-//                                }
-
-                                //RT回报时长=CPA * 1000 / sevenDaysAvgPi / sevenDaysAvgEcpm
-//                                double rt = (sevenDaysAvgPi == 0 || sevenDaysAvgEcpm == 0) ? 0 : (cpa * 1000 / sevenDaysAvgPi / sevenDaysAvgEcpm);
 
                                 totalCost += costs;
                                 totalPuserchaedUser += purchasedUsers;
@@ -418,7 +400,7 @@ public class CountryAnalysisReport extends BaseHttpServlet {
                                 //当天回本率=新用户收入/总花费
                                 double recoveryCostRatio = 0;
                                 if (sameDate) {
-                                    recoveryCostRatio = costs == 0 ? 0 : adNewRevenues / costs;
+                                    recoveryCostRatio = costs == 0 ? 0 : newRevenues / costs;
                                 }
 
                                 JsonObject d = new JsonObject();
@@ -430,18 +412,11 @@ public class CountryAnalysisReport extends BaseHttpServlet {
                                 d.addProperty("uninstalled_rate", NumberUtil.trimDouble(uninstalledRate, 3));
                                 d.addProperty("active_users", activeUsers);
                                 if (sameDate) {
-                                    d.addProperty("ad_new_revenues", NumberUtil.trimDouble(adNewRevenues, 0));
+                                    d.addProperty("new_revenues", NumberUtil.trimDouble(newRevenues, 0));
                                     d.addProperty("recovery_cost_ratio", NumberUtil.trimDouble(recoveryCostRatio, 3));
                                 }
 
                                 d.addProperty("revenues", NumberUtil.trimDouble(revenues, 0));
-                                double rpi = 0;
-                                if (cpiMap.get(countryCode) != null) {
-                                    rpi = cpiMap.get(countryCode);
-                                }
-                                d.addProperty("revenue_per_install", NumberUtil.trimDouble(rpi, 2));
-//                                d.addProperty("pi", NumberUtil.trimDouble(pi, 3));
-                                d.addProperty("arpu", NumberUtil.trimDouble(arpu, 3));
                                 d.addProperty("ecpm", NumberUtil.trimDouble(ecpm, 3));
                                 d.addProperty("cpa_div_ecpm", NumberUtil.trimDouble(cpaDivEcpm, 3));
 
@@ -452,16 +427,13 @@ public class CountryAnalysisReport extends BaseHttpServlet {
                                 d.addProperty("every_day_uninstalled_rate_for_fourteen_days", everyDayUninstalledRateForFourteenDays);
                                 d.addProperty("every_day_active_user_for_fourteen_days", everyDayActiveUserForFourteenDays);
                                 d.addProperty("every_day_revenue_for_fourteen_days", everyDayRevenueForFourteenDays);
-//                                d.addProperty("every_day_pi_for_fourteen_days", everyDayPiForFourteenDays);
                                 d.addProperty("every_day_ecpm_for_fourteen_days", everyDayEcpmForFourteenDays);
                                 d.addProperty("every_day_cpa_for_fourteen_days", everyDayCpaForFourteenDays);
                                 d.addProperty("every_day_cpa_div_ecpm_for_fourteen_days", everyDayCpaDivEcpmForFourteenDays);
                                 d.addProperty("every_day_incoming_for_fourteen_days", everyDayIncomingForFourteenDays);
 
-//                                d.addProperty("a_cpa", NumberUtil.trimDouble(aCpa, 3));
                                 d.addProperty("incoming", NumberUtil.trimDouble(incoming, 0));
                                 d.addProperty("cpa", NumberUtil.trimDouble(cpa, 3));
-//                                d.addProperty("rt", NumberUtil.trimDouble(rt, 3));
                                 d.addProperty("cost_upper_limit", costUpperLimit);
                                 if (sameDate) {
 

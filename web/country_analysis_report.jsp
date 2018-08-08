@@ -62,7 +62,7 @@
         </div>
     </div>
     <table class="table table-hover">
-        <span style="color: #0044cc">公式：当天回本率=AdNewRevenue/Cost;ARPU = Revenue/ActiveUser;四天的每日收入是累计值</span>
+        <span style="color: #0044cc">公式：当天回本率=NewRevenue/Cost;四天的每日收入是累计值</span>
         <thead id="result_header">
         <tr>
             <th>国家</th>
@@ -72,13 +72,11 @@
             <th>Installed</th>
             <th>UninstalledRate</th>
             <th>ActiveUser</th>
-            <th>AdNewRevenue</th>
+            <th>NewRevenue</th>
             <th>Revenue</th>
             <th>Incoming</th>
             <th>PI</th>
-            <th>ARPU</th>
             <th>ECPM</th>
-            <th>成本价/2</th>
             <th>CPA</th>
             <th>ACpa</th>
             <th>CPA/ECPM</th>
@@ -142,12 +140,10 @@
                         "<th>UninstalledRate</th>" +
                         "<th>ActiveUser<span sorterId=\"1038\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
                         "<th>Revenue<span sorterId=\"1039\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
-                        "<th>AdNewRevenue<span sorterId=\"1038\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
+                        "<th>NewRevenue<span sorterId=\"1038\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
                         "<th>当天回本率</th>" +
                         "<th>Incoming<span sorterId=\"1042\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
-                        "<th>ARPU</th>" +
                         "<th>ECPM<span sorterId=\"1040\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
-                        "<th>成本价/2</th>" +
                         "<th>CPA<span sorterId=\"1041\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
                         "<th>CPA/ECPM</th>" +
                         "<th>FirstDayRevenue</th>" +
@@ -167,9 +163,7 @@
                         "<th>ActiveUser<span sorterId=\"1038\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
                         "<th>Revenue<span sorterId=\"1039\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
                         "<th>Incoming<span sorterId=\"1042\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
-                        "<th>ARPU</th>" +
                         "<th>ECPM<span sorterId=\"1040\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
-                        "<th>成本价/2</th>" +
                         "<th>CPA<span sorterId=\"1041\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
                         "<th>CPA/ECPM</th>" +
                         "<th>竞价</th>" +
@@ -233,11 +227,11 @@
         var len = arr.length;
         var one;
         var keyset = ["costs","cost_upper_limit","purchased_users", "installed", "uninstalled_rate",
-            "active_users","revenues", "incoming","arpu", "ecpm", "revenue_per_install","cpa",
+            "active_users","revenues", "incoming", "ecpm", "cpa",
             "cpa_div_ecpm", "bidding_summary"];
         if (same_date == 1) {
             keyset = ["costs","cost_upper_limit","purchased_users", "installed", "uninstalled_rate",
-                "active_users","revenues", "ad_new_revenues","recovery_cost_ratio","incoming", "arpu", "ecpm", "revenue_per_install","cpa",
+                "active_users","revenues", "new_revenues","recovery_cost_ratio","incoming", "ecpm", "cpa",
                 "cpa_div_ecpm", "first_day_revenue","second_day_revenue",
                 "third_day_revenue","fourth_day_revenue","bidding_summary"];
         }
@@ -261,7 +255,7 @@
                     td = $('<td title="'+ one['every_day_uninstalled_rate_for_fourteen_days'] + '"></td>');
                 }else if('active_users' == key){
                     td = $('<td title="'+ one['every_day_active_user_for_fourteen_days'] + '"></td>');
-                }else if('ad_new_revenues' == key){
+                }else if('new_revenues' == key){
                     td = $('<td title="'+ one['every_day_ad_new_revenue_for_fourteen_days'] + '"></td>');
                 }else if('revenues' == key){
                     td = $('<td title="'+ one['every_day_revenue_for_fourteen_days'] + '"></td>');
@@ -280,8 +274,6 @@
                     if(r < 0){
                         td.addClass("red");
                     }
-                }else if('revenue_per_install' == key){
-                    r = r / 2;
                 }else if('cost_upper_limit' == key){
                     td = $("<td class='cost_upper_limit'></td>");
                     if(r ==""){
