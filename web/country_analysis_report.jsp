@@ -10,6 +10,14 @@
     <title>国家分析报告</title>
 
     <style>
+        table th {
+            min-width: 35px;
+            max-width: 120px;
+            overflow: auto;
+            word-wrap:break-word;
+            text-overflow:ellipsis;
+            white-space:normal;
+        }
         td.changed {
             background-color: #0f0;
         }
@@ -68,15 +76,19 @@
             <th>国家</th>
             <th>Cost</th>
             <th>花费上限</th>
-            <th>PurchasedUser</th>
+            <th>Purchased<br/>User</th>
             <th>Installed</th>
-            <th>UninstalledRate</th>
+            <th>卸载率</th>
             <th>ActiveUser</th>
             <th>NewRevenue</th>
             <th>Revenue</th>
             <th>Incoming</th>
             <th>PI</th>
             <th>ECPM</th>
+            <th>旧用户<br/>平均展示</th>
+            <th>新用户<br/>平均展示</th>
+            <th>OldUser<br/>Ecpm</th>
+            <th>NewUser<br/>Ecpm</th>
             <th>CPA</th>
             <th>ACpa</th>
             <th>CPA/ECPM</th>
@@ -134,32 +146,36 @@
                 if (data.same_date == 1) {
                     $('#result_header').html("<tr><th>国家</th>" +
                         "<th>Cost<span sorterId=\"1031\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
-                        "<th>花费上限</th>" +
-                        "<th>PurchasedUser<span sorterId=\"1033\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
+                        "<th>花费<br/>上限</th>" +
+                        "<th>Purchased<br/>User<span sorterId=\"1033\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
                         "<th>Installed<span sorterId=\"1034\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
-                        "<th>UninstalledRate</th>" +
+                        "<th>卸载率</th>" +
                         "<th>ActiveUser<span sorterId=\"1038\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
                         "<th>Revenue<span sorterId=\"1039\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
                         "<th>NewRevenue<span sorterId=\"1038\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
-                        "<th>当天回本率</th>" +
+                        "<th>当天<br/>回本率</th>" +
                         "<th>Incoming<span sorterId=\"1042\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
                         "<th>ECPM<span sorterId=\"1040\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
+                        "<th>旧用户<br/>平均展示</th>" +
+                        "<th>新用户<br/>平均展示</th>" +
+                        "<th>OldUser<br/>Ecpm</th>" +
+                        "<th>NewUser<br/>Ecpm</th>" +
                         "<th>CPA<span sorterId=\"1041\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
                         "<th>CPA/ECPM</th>" +
-                        "<th>FirstDayRevenue</th>" +
-                        "<th>SecondDayRevenue</th>" +
-                        "<th>ThirdDayRevenue</th>" +
-                        "<th>FourthDayRevenue</th>" +
+                        "<th>1Day<br/>Revenue</th>" +
+                        "<th>2Day<br/>Revenue</th>" +
+                        "<th>3Day<br/>Revenue</th>" +
+                        "<th>4Day<br/>Revenue</th>" +
                         "<th>竞价</th>" +
                         "</tr>");
                     setData(data,1);
                 }else{
                     $('#result_header').html("<tr><th>国家</th>" +
                         "<th>Cost<span sorterId=\"1031\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
-                        "<th>花费上限</th>" +
-                        "<th>PurchasedUser<span sorterId=\"1033\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
+                        "<th>花费<br/>上限</th>" +
+                        "<th>Purchased<br/>User<span sorterId=\"1033\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
                         "<th>Installed<span sorterId=\"1034\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
-                        "<th>UninstalledRate</th>" +
+                        "<th>卸载率</th>" +
                         "<th>ActiveUser<span sorterId=\"1038\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
                         "<th>Revenue<span sorterId=\"1039\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
                         "<th>Incoming<span sorterId=\"1042\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
@@ -231,7 +247,8 @@
             "cpa_div_ecpm", "bidding_summary"];
         if (same_date == 1) {
             keyset = ["costs","cost_upper_limit","purchased_users", "installed", "uninstalled_rate",
-                "active_users","revenues", "new_revenues","recovery_cost_ratio","incoming", "ecpm", "cpa",
+                "active_users","revenues", "new_revenues","recovery_cost_ratio","incoming", "ecpm",
+                "cpa","old_user_avg_impression","new_user_avg_impression","old_user_ecpm","new_user_ecpm",
                 "cpa_div_ecpm", "first_day_revenue","second_day_revenue",
                 "third_day_revenue","fourth_day_revenue","bidding_summary"];
         }

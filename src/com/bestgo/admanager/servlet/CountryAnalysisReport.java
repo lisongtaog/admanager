@@ -104,7 +104,7 @@ public class CountryAnalysisReport extends BaseHttpServlet {
                 jsonObject.addProperty("message", "后台未正确修改");
             }
         } else if (path.matches("/query_country_analysis_report")) {
-            try {
+                try {
                 String sqlG = "select t.id, google_package_id from web_facebook_app_ids_rel r,web_tag t WHERE t.tag_name = r.tag_name AND t.tag_name = '" + tagName + "'";
                 JSObject oneG = DB.findOneBySql(sqlG);
                 if (oneG.hasObjectData()) {
@@ -126,7 +126,9 @@ public class CountryAnalysisReport extends BaseHttpServlet {
                         if (sameDate) {
                             sql =   "SELECT h.country_code, sum(cost) as total_cost, sum(purchased_user) as total_purchased_user, sum(ad_new_revenue) as new_revenues,\n" +
                                     "sum(total_installed) as installed, sum(today_uninstalled) as total_today_uninstalled,\n" +
-                                    "sum(active_user) as active_users, sum(impression) as impressions, sum(revenue) as revenues,\n" +
+                                    "sum(h.total_user) as total_users, sum(active_user) as active_users, sum(impression) as impressions, sum(revenue) as revenues,\n" +
+                                    "sum(h.new_user_revenue) as new_user_revenues,sum(h.new_user_impression) as new_user_impressions, " +
+                                    "sum(h.old_user_revenue) as old_user_revenues,sum(h.old_user_impression) as old_user_impressions, " +
                                     " (sum(revenue) - sum(cost)) as incoming,r.first_day_revenue,r.second_day_revenue,r.third_day_revenue,r.fourth_day_revenue,\n" +
                                     " (case when sum(impression) > 0 then sum(revenue) * 1000 / sum(impression) else 0 end) as ecpm,\n" +
                                     "(case when sum(purchased_user) > 0 then sum(cost) / sum(purchased_user) else 0 end) as cpa\n" +
@@ -312,7 +314,7 @@ public class CountryAnalysisReport extends BaseHttpServlet {
                                     aCpa = NumberUtil.convertDouble(oneC.get("a_cpa"), 0);
                                 }*/
 
-                                double newRevenues = NumberUtil.convertDouble(j.get("new_revenues"), 0);
+
                                 double revenues = NumberUtil.convertDouble(j.get("revenues"), 0);
                                 double ecpm = NumberUtil.convertDouble(j.get("ecpm"), 0);
                                 sql = "select country_name from app_country_code_dict where country_code = '" + countryCode + "'";
@@ -397,12 +399,6 @@ public class CountryAnalysisReport extends BaseHttpServlet {
                                     }
                                 }
 
-                                //当天回本率=新用户收入/总花费
-                                double recoveryCostRatio = 0;
-                                if (sameDate) {
-                                    recoveryCostRatio = costs == 0 ? 0 : newRevenues / costs;
-                                }
-
                                 JsonObject d = new JsonObject();
                                 d.addProperty("country_name", countryName);
                                 d.addProperty("bidding_summary", biddingSummaryStr);
@@ -411,10 +407,6 @@ public class CountryAnalysisReport extends BaseHttpServlet {
                                 d.addProperty("installed", installed);
                                 d.addProperty("uninstalled_rate", NumberUtil.trimDouble(uninstalledRate, 3));
                                 d.addProperty("active_users", activeUsers);
-                                if (sameDate) {
-                                    d.addProperty("new_revenues", NumberUtil.trimDouble(newRevenues, 0));
-                                    d.addProperty("recovery_cost_ratio", NumberUtil.trimDouble(recoveryCostRatio, 3));
-                                }
 
                                 d.addProperty("revenues", NumberUtil.trimDouble(revenues, 0));
                                 d.addProperty("ecpm", NumberUtil.trimDouble(ecpm, 3));
@@ -436,7 +428,31 @@ public class CountryAnalysisReport extends BaseHttpServlet {
                                 d.addProperty("cpa", NumberUtil.trimDouble(cpa, 3));
                                 d.addProperty("cost_upper_limit", costUpperLimit);
                                 if (sameDate) {
+                                    double newRevenues = NumberUtil.convertDouble(j.get("new_revenues"), 0);
+                                    double newUserRevenue = NumberUtil.convertDouble(j.get("new_user_revenues"), 0);
+                                    double newUserImpression = NumberUtil.convertDouble(j.get("new_user_impressions"), 0);
+                                    double oldUserRevenue = NumberUtil.convertDouble(j.get("old_user_revenues"), 0);
+                                    double oldUserImpression = NumberUtil.convertDouble(j.get("old_user_impressions"), 0);
 
+                                    double newUserEcpm = newUserImpression == 0 ? 0 : newUserRevenue * 1000 / newUserImpression;
+                                    double oldUserEcpm = oldUserImpression == 0 ? 0 : oldUserRevenue * 1000 / oldUserImpression;
+                                    d.addProperty("new_user_ecpm",NumberUtil.trimDouble(newUserEcpm,4));
+                                    d.addProperty("old_user_ecpm",NumberUtil.trimDouble(oldUserEcpm,4));
+
+                                    double totalUsers = NumberUtil.convertDouble(j.get("total_users"), 0);
+                                    double oldUser = totalUsers - installed;
+                                    double oldUserAvgImpression = oldUser == 0 ? 0 : oldUserImpression / oldUser;
+                                    double newUserAvgImpression = installed == 0 ? 0 : newUserImpression / installed;
+                                    d.addProperty("old_user_avg_impression",NumberUtil.trimDouble(oldUserAvgImpression,4));
+                                    d.addProperty("new_user_avg_impression",NumberUtil.trimDouble(newUserAvgImpression,4));
+
+                                    //当天回本率=newRevenues/总花费
+                                    double recoveryCostRatio = 0;
+                                    if (sameDate) {
+                                        recoveryCostRatio = costs == 0 ? 0 : newRevenues / costs;
+                                    }
+                                    d.addProperty("new_revenues", NumberUtil.trimDouble(newRevenues, 0));
+                                    d.addProperty("recovery_cost_ratio", NumberUtil.trimDouble(recoveryCostRatio, 3));
                                     double firstDayRevenue = NumberUtil.convertDouble(j.get("first_day_revenue"),0);
                                     double secondDayRevenue = NumberUtil.convertDouble(j.get("second_day_revenue"),0);
                                     secondDayRevenue += firstDayRevenue;
