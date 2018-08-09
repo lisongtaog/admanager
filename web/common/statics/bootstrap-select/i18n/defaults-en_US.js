@@ -23,7 +23,7 @@
 
 (function ($) {
   $.fn.selectpicker.defaults = {
-    style: 'btn-info btn-sm',
+    style: 'btn-default btn-sm',
     noneSelectedText: 'Nothing selected',
     noneResultsText: 'No results match {0}',
     countSelectedText: function (numSelected, numTotal) {
