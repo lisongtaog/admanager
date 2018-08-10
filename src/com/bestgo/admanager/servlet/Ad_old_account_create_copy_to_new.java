@@ -134,7 +134,7 @@ public class Ad_old_account_create_copy_to_new extends BaseHttpServlet {
     public static List<JSObject> fetchAllData(int index, int size) {
         List<JSObject> list = new ArrayList<>();
         try {
-            List<JSObject> jsObjectList = DB.scan("Ad_old_account_create_copy_to_new").select("id", "tag_name", "old_account_id", "new_account_id", "bidding_mul", "network").limit(size).start(index * size).orderByAsc("id").execute();
+            List<JSObject> jsObjectList = DB.scan("ad_old_account_create_copy_to_new").select("id", "tag_name", "old_account_id", "new_account_id", "bidding_mul", "network").limit(size).start(index * size).orderByAsc("id").execute();
             return jsObjectList;
         } catch (Exception ex) {
             Logger logger = Logger.getRootLogger();
