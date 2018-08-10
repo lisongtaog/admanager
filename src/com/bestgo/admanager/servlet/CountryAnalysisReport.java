@@ -209,7 +209,7 @@ public class CountryAnalysisReport extends BaseHttpServlet {
                         double totalCost = 0;
                         double totalPuserchaedUser = 0;
                         double totalRevenue = 0;
-
+                        double totalNewRevenues = 0; //新用户收入汇总
 
                         for (JSObject j : countryDetailJSObjectList) {
                             if (j.hasObjectData()) {
@@ -427,8 +427,10 @@ public class CountryAnalysisReport extends BaseHttpServlet {
                                 d.addProperty("incoming", NumberUtil.trimDouble(incoming, 0));
                                 d.addProperty("cpa", NumberUtil.trimDouble(cpa, 3));
                                 d.addProperty("cost_upper_limit", costUpperLimit);
+
                                 if (sameDate) {
                                     double newRevenues = NumberUtil.convertDouble(j.get("new_revenues"), 0);
+                                    totalNewRevenues += newRevenues;
                                     double newUserRevenue = NumberUtil.convertDouble(j.get("new_user_revenues"), 0);
                                     double newUserImpression = NumberUtil.convertDouble(j.get("new_user_impressions"), 0);
                                     double oldUserRevenue = NumberUtil.convertDouble(j.get("old_user_revenues"), 0);
@@ -475,6 +477,7 @@ public class CountryAnalysisReport extends BaseHttpServlet {
                         } else {
                             if (sameDate) {
                                 jsonObject.addProperty("same_date",1);
+                                jsonObject.addProperty("total_new_revenue", NumberUtil.trimDouble(totalNewRevenues, 3));
                             }
                             jsonObject.add("array", jsonArray);
                             jsonObject.addProperty("total_cost", NumberUtil.trimDouble(totalCost, 0));

@@ -226,7 +226,11 @@
                     setData(data,data.same_date);
                     var str = "Cost: " + data.total_cost + "&nbsp;&nbsp;&nbsp;&nbsp;PuserchaedUser: " + data.total_puserchaed_user +
                         "&nbsp;&nbsp;&nbsp;&nbsp;CPA: " + data.total_cpa + "&nbsp;&nbsp;&nbsp;&nbsp;Revenue: " + data.total_revenue;
-
+                    if (data.same_date == 1) {
+                        str = "Cost: " + data.total_cost + "&nbsp;&nbsp;&nbsp;&nbsp;PuserchaedUser: " + data.total_puserchaed_user +
+                            "&nbsp;&nbsp;&nbsp;&nbsp;CPA: " + data.total_cpa + "&nbsp;&nbsp;&nbsp;&nbsp;Revenue: " + data.total_revenue
+                            + "&nbsp;&nbsp;&nbsp;&nbsp;TotalNewRevenue: " + data.total_new_revenue;
+                    }
                     str += "<br/><span class='estimateResult'></span>"
                     $('#total_result').removeClass("editable");
                     $('#total_result').html(str);
@@ -248,7 +252,7 @@
         if (same_date == 1) {
             keyset = ["costs","cost_upper_limit","purchased_users", "installed", "uninstalled_rate",
                 "active_users","revenues", "new_revenues","recovery_cost_ratio","incoming", "ecpm",
-                "cpa","old_user_avg_impression","new_user_avg_impression","old_user_ecpm","new_user_ecpm",
+                "old_user_avg_impression","new_user_avg_impression","old_user_ecpm","new_user_ecpm","cpa",
                 "cpa_div_ecpm", "first_day_revenue","second_day_revenue",
                 "third_day_revenue","fourth_day_revenue","bidding_summary"];
         }
