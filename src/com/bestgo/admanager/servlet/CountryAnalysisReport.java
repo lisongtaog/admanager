@@ -443,16 +443,14 @@ public class CountryAnalysisReport extends BaseHttpServlet {
 
                                     double totalUsers = NumberUtil.convertDouble(j.get("total_users"), 0);
                                     double oldUser = totalUsers - installed;
-                                    double oldUserAvgImpression = oldUser == 0 ? 0 : oldUserImpression / oldUser;
-                                    double newUserAvgImpression = installed == 0 ? 0 : newUserImpression / installed;
+                                    double oldUserAvgImpression = oldUser > 0 ? oldUserImpression / oldUser : 0;
+                                    double newUserAvgImpression = installed > 0 ? newUserImpression / installed : 0;
                                     d.addProperty("old_user_avg_impression",NumberUtil.trimDouble(oldUserAvgImpression,4));
                                     d.addProperty("new_user_avg_impression",NumberUtil.trimDouble(newUserAvgImpression,4));
 
                                     //当天回本率=newRevenues/总花费
-                                    double recoveryCostRatio = 0;
-                                    if (sameDate) {
-                                        recoveryCostRatio = costs == 0 ? 0 : newRevenues / costs;
-                                    }
+                                    double recoveryCostRatio = costs > 0 ? newRevenues / costs : 0;
+
                                     d.addProperty("new_revenues", NumberUtil.trimDouble(newRevenues, 2));
                                     d.addProperty("recovery_cost_ratio", NumberUtil.trimDouble(recoveryCostRatio, 3));
                                     double firstDayRevenue = NumberUtil.convertDouble(j.get("first_day_revenue"),0);
@@ -470,7 +468,7 @@ public class CountryAnalysisReport extends BaseHttpServlet {
                                 jsonArray.add(d);
                             }
                         }
-                        double total_cpa = totalPuserchaedUser != 0 ? totalCost / totalPuserchaedUser : 0;
+                        double total_cpa = totalPuserchaedUser > 0 ? totalCost / totalPuserchaedUser : 0;
                         if (jsonArray.size() == 0) {
                             jsonObject.addProperty("ret", 0);
                             jsonObject.addProperty("message", "此应用下当前日期中没有数据!");
@@ -478,12 +476,14 @@ public class CountryAnalysisReport extends BaseHttpServlet {
                             if (sameDate) {
                                 jsonObject.addProperty("same_date",1);
                                 jsonObject.addProperty("total_new_revenue", NumberUtil.trimDouble(totalNewRevenues, 3));
+                                double totalNewRevenueDivCost = totalCost > 0 ? totalNewRevenues / totalCost : 0;
+                                jsonObject.addProperty("total_new_revenue_div_cost", NumberUtil.trimDouble(totalNewRevenueDivCost, 3));
                             }
                             jsonObject.add("array", jsonArray);
-                            jsonObject.addProperty("total_cost", NumberUtil.trimDouble(totalCost, 0));
-                            jsonObject.addProperty("total_puserchaed_user", NumberUtil.trimDouble(totalPuserchaedUser, 0));
+                            jsonObject.addProperty("total_cost", NumberUtil.trimDouble(totalCost, 3));
+                            jsonObject.addProperty("total_puserchaed_user", NumberUtil.trimDouble(totalPuserchaedUser, 3));
                             jsonObject.addProperty("total_cpa", NumberUtil.trimDouble(total_cpa, 3));
-                            jsonObject.addProperty("total_revenue", NumberUtil.trimDouble(totalRevenue, 0));
+                            jsonObject.addProperty("total_revenue", NumberUtil.trimDouble(totalRevenue, 3));
                             jsonObject.addProperty("ret", 1);
                         }
                     }

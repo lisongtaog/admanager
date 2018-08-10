@@ -85,13 +85,12 @@
             <th>Incoming</th>
             <th>PI</th>
             <th>ECPM</th>
-            <th>旧用户<br/>平均展示</th>
-            <th>新用户<br/>平均展示</th>
-            <th>OldUser<br/>Ecpm</th>
-            <th>NewUser<br/>Ecpm</th>
             <th>CPA</th>
-            <th>ACpa</th>
             <th>CPA/ECPM</th>
+            <th>新用户<br/>平均展示</th>
+            <th>老用户<br/>平均展示</th>
+            <th>新用户<br/>Ecpm</th>
+            <th>老用户<br/>Ecpm</th>
             <th>RT</th>
             <th>竞价</th>
         </tr>
@@ -156,12 +155,12 @@
                         "<th>当天<br/>回本率</th>" +
                         "<th>Incoming<span sorterId=\"1042\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
                         "<th>ECPM<span sorterId=\"1040\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
-                        "<th>旧用户<br/>平均展示</th>" +
-                        "<th>新用户<br/>平均展示</th>" +
-                        "<th>OldUser<br/>Ecpm</th>" +
-                        "<th>NewUser<br/>Ecpm</th>" +
                         "<th>CPA<span sorterId=\"1041\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
                         "<th>CPA/ECPM</th>" +
+                        "<th>新用户<br/>平均展示</th>" +
+                        "<th>老用户<br/>平均展示</th>" +
+                        "<th>新用户<br/>Ecpm</th>" +
+                        "<th>老用户<br/>Ecpm</th>" +
                         "<th>1Day<br/>Revenue</th>" +
                         "<th>2Day<br/>Revenue</th>" +
                         "<th>3Day<br/>Revenue</th>" +
@@ -189,12 +188,13 @@
 
 
                 bindSortOp();
-                var str = "标签："+query+"&nbsp;&nbsp;&nbsp;&nbsp;Cost: " + data.total_cost + "&nbsp;&nbsp;&nbsp;&nbsp;PuserchaedUser: " + data.total_puserchaed_user +
+                var str = "TotalCost: " + data.total_cost + "&nbsp;&nbsp;&nbsp;&nbsp;PuserchaedUser: " + data.total_puserchaed_user +
                     "&nbsp;&nbsp;&nbsp;&nbsp;CPA: " + data.total_cpa + "&nbsp;&nbsp;&nbsp;&nbsp;Revenue: " + data.total_revenue;
                 if (data.same_date == 1) {
-                    str = "标签："+query+"&nbsp;&nbsp;&nbsp;&nbsp;Cost: " + data.total_cost + "&nbsp;&nbsp;&nbsp;&nbsp;PuserchaedUser: " + data.total_puserchaed_user
-                        + "&nbsp;&nbsp;&nbsp;&nbsp;CPA: " + data.total_cpa + "&nbsp;&nbsp;&nbsp;&nbsp;Revenue: " + data.total_revenue
-                        + "&nbsp;&nbsp;&nbsp;&nbsp;TotalNewRevenue: " + data.total_new_revenue;
+                    str = "PuserchaedUser: " + data.total_puserchaed_user +
+                        "&nbsp;&nbsp;&nbsp;&nbsp;CPA: " + data.total_cpa + "&nbsp;&nbsp;&nbsp;&nbsp;Revenue: " + data.total_revenue
+                        + "&nbsp;&nbsp;&nbsp;&nbsp;TotalNewRevenue/TotalCost = " + data.total_new_revenue
+                        + "/" + data.total_cost + " = " + data.total_new_revenue_div_cost;
                 }
                 str += "<br/><span class='estimateResult'></span>"
                 $('#total_result').html(str);
@@ -229,12 +229,13 @@
             },function(data){
                 if (data && data.ret == 1) {
                     setData(data,data.same_date);
-                    var str = "Cost: " + data.total_cost + "&nbsp;&nbsp;&nbsp;&nbsp;PuserchaedUser: " + data.total_puserchaed_user +
+                    var str = "TotalCost: " + data.total_cost + "&nbsp;&nbsp;&nbsp;&nbsp;PuserchaedUser: " + data.total_puserchaed_user +
                         "&nbsp;&nbsp;&nbsp;&nbsp;CPA: " + data.total_cpa + "&nbsp;&nbsp;&nbsp;&nbsp;Revenue: " + data.total_revenue;
                     if (data.same_date == 1) {
-                        str = "Cost: " + data.total_cost + "&nbsp;&nbsp;&nbsp;&nbsp;PuserchaedUser: " + data.total_puserchaed_user +
+                        str = "PuserchaedUser: " + data.total_puserchaed_user +
                             "&nbsp;&nbsp;&nbsp;&nbsp;CPA: " + data.total_cpa + "&nbsp;&nbsp;&nbsp;&nbsp;Revenue: " + data.total_revenue
-                            + "&nbsp;&nbsp;&nbsp;&nbsp;TotalNewRevenue: " + data.total_new_revenue;
+                            + "&nbsp;&nbsp;&nbsp;&nbsp;TotalNewRevenue/TotalCost = " + data.total_new_revenue
+                            + "/" + data.total_cost + " = " + data.total_new_revenue_div_cost;
                     }
                     str += "<br/><span class='estimateResult'></span>"
                     $('#total_result').removeClass("editable");
@@ -257,8 +258,8 @@
         if (same_date == 1) {
             keyset = ["costs","cost_upper_limit","purchased_users", "installed", "uninstalled_rate",
                 "active_users","revenues", "new_revenues","recovery_cost_ratio","incoming", "ecpm",
-                "old_user_avg_impression","new_user_avg_impression","old_user_ecpm","new_user_ecpm","cpa",
-                "cpa_div_ecpm", "first_day_revenue","second_day_revenue",
+                "cpa","cpa_div_ecpm", "new_user_avg_impression","old_user_avg_impression","new_user_ecpm",
+                "old_user_ecpm","first_day_revenue","second_day_revenue",
                 "third_day_revenue","fourth_day_revenue","bidding_summary"];
         }
         for (var i = 0; i < len; i++) {
