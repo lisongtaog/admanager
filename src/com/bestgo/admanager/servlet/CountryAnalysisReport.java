@@ -453,7 +453,7 @@ public class CountryAnalysisReport extends BaseHttpServlet {
                                     if (sameDate) {
                                         recoveryCostRatio = costs == 0 ? 0 : newRevenues / costs;
                                     }
-                                    d.addProperty("new_revenues", NumberUtil.trimDouble(newRevenues, 0));
+                                    d.addProperty("new_revenues", NumberUtil.trimDouble(newRevenues, 2));
                                     d.addProperty("recovery_cost_ratio", NumberUtil.trimDouble(recoveryCostRatio, 3));
                                     double firstDayRevenue = NumberUtil.convertDouble(j.get("first_day_revenue"),0);
                                     double secondDayRevenue = NumberUtil.convertDouble(j.get("second_day_revenue"),0);

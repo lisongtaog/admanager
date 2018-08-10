@@ -191,6 +191,11 @@
                 bindSortOp();
                 var str = "标签："+query+"&nbsp;&nbsp;&nbsp;&nbsp;Cost: " + data.total_cost + "&nbsp;&nbsp;&nbsp;&nbsp;PuserchaedUser: " + data.total_puserchaed_user +
                     "&nbsp;&nbsp;&nbsp;&nbsp;CPA: " + data.total_cpa + "&nbsp;&nbsp;&nbsp;&nbsp;Revenue: " + data.total_revenue;
+                if (data.same_date == 1) {
+                    str = "标签："+query+"&nbsp;&nbsp;&nbsp;&nbsp;Cost: " + data.total_cost + "&nbsp;&nbsp;&nbsp;&nbsp;PuserchaedUser: " + data.total_puserchaed_user
+                        + "&nbsp;&nbsp;&nbsp;&nbsp;CPA: " + data.total_cpa + "&nbsp;&nbsp;&nbsp;&nbsp;Revenue: " + data.total_revenue
+                        + "&nbsp;&nbsp;&nbsp;&nbsp;TotalNewRevenue: " + data.total_new_revenue;
+                }
                 str += "<br/><span class='estimateResult'></span>"
                 $('#total_result').html(str);
                 $('#total_result').removeClass("editable");
