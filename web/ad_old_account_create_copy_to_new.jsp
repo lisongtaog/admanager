@@ -162,7 +162,7 @@
                         <label for="network" class="col-sm-2 control-label">network</label>
                         <div class="col-sm-8">
                             <select id="network" class="form-control">
-                                <option value="fackbook">fackbook</option>
+                                <option value="facebook">facebook</option>
                                 <option value="admob">admob</option>
                             </select>
                         </div>
