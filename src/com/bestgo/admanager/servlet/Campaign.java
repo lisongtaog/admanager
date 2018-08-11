@@ -123,7 +123,7 @@ public class Campaign extends BaseHttpServlet {
 
                 if (groupId == 0) {
                     result.message = "广告组ID不存在！请联系管理员";
-                }else if (createCount.isEmpty()) {
+                }else if (StringUtil.isEmpty(createCount)) {
                     result.message = "创建数量不能为空";
                 } else if (index) {
                     result.message = "没有这个账户ID或此账户被禁，请联系管理员";
@@ -211,8 +211,7 @@ public class Campaign extends BaseHttpServlet {
                     accountNameArr = accountName.split(",");
                     String accountNameArrStr = accountName.replace(",", "");
                     accountIdArr = accountId.split(",");
-                    int createCountInt = Integer.parseInt(createCount);
-
+                    int createCountInt = NumberUtil.parseInt(createCount,0);
                     for(int j=0,len=accountNameArr.length;j<len;j++){
                         for(int i=0;i<createCountInt;i++){
                             String now  = String.format("%d-%02d-%02d %02d:%02d:%02d", calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH),
