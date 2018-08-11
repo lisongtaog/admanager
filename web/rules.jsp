@@ -132,6 +132,7 @@
                                 <option value="2">类型2（监控应用）</option>
                                 <option value="3">类型3（监控国家花费）</option>
                                 <option value="4">类型4（监控国家回本率）</option>
+                                <option value="5">类型5（监控所有国家回本率）</option>
                             </select>
                         </div>
                     </div>
@@ -198,6 +199,8 @@
             $('#inputRuleContent').val("app_name=xxx,country_code=xxx,cpa_div_ecpm>xxx,cost>xxx")
         } else if (ruleType == 4) {
             $('#inputRuleContent').val("app_name=xxx,country_code=xxx,purchased_user>10,recovery_cost_ratio<0.5")
+        } else if (ruleType == 5) {
+            $('#inputRuleContent').val("app_name=xxx,purchased_user>10,recovery_cost_ratio<0.5")
         }
     });
 
