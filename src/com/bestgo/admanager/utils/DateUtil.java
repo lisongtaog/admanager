@@ -206,4 +206,19 @@ public class DateUtil {
         return between;
     }
 
+    /**
+     * 获取当前时间几小时后的时间字符串
+     * @param hour
+     * @return
+     */
+    public static String getTimeByHour(int hour) {
+
+        Calendar calendar = Calendar.getInstance();
+
+        calendar.set(Calendar.HOUR_OF_DAY, calendar.get(Calendar.HOUR_OF_DAY) + hour);
+
+        return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(calendar.getTime());
+
+    }
+
 }
