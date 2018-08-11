@@ -218,6 +218,12 @@
     var id;
     $("li[role='presentation']:eq(3)").addClass("active");
     $("#btn_add_new_tag").click(function () {
+        $("#inputTagName").prop("disabled", false);
+        $("#inputTagName").val("");
+        $("#inputMaxBidding").val("");
+        $("#inputRevenue").val("");
+        $("#inputIncoming").val("");
+
         modifyType = 'new';
         $('#delete_message').hide();
         $('#modify_form').show();
