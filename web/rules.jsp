@@ -130,7 +130,8 @@
                             <select class="form-control" id="inputRuleType">
                                 <option value="1">类型1（监控广告系列）</option>
                                 <option value="2">类型2（监控应用）</option>
-                                <option value="3">类型3（监控国家）</option>
+                                <option value="3">类型3（监控国家花费）</option>
+                                <option value="4">类型4（监控国家回本率）</option>
                             </select>
                         </div>
                     </div>
@@ -195,6 +196,8 @@
             $('#inputRuleContent').val("app_name=xxx,cost>xxx,cpa>xxx")
         } else if (ruleType == 3) {//是应用+国家维度 app_name=应用名称,country_code=国家代号,cpa_div_ecpm>cpa除以ecpm,cost>花费
             $('#inputRuleContent').val("app_name=xxx,country_code=xxx,cpa_div_ecpm>xxx,cost>xxx")
+        } else if (ruleType == 4) {
+            $('#inputRuleContent').val("app_name=xxx,country_code=xxx,purchased_user>10,recovery_cost_ratio<0.5")
         }
     });
 
@@ -309,29 +312,6 @@
         }
     })
     ;
-
-    // function setData(data) {
-    //     for (var i = 0; i < data.length; i++) {
-    //         var one = data[i];
-    //         var tr = $('<tr></tr>');
-    //         var td = $('<td></td>');
-    //         td.text(one.id);
-    //         tr.append(td);
-    //         td = $('<td></td>');
-    //         td.text(one.rule_type);
-    //         tr.append(td);
-    //         td = $('<td></td>');
-    //         td.text(one.rule_content);
-    //         tr.append(td);
-    //         td.text(one.tag_id3);
-    //         tr.append(td);
-    //         td.text(one.tag_name3);
-    //         tr.append(td);
-    //         td = $('<td><a class="link_modify glyphicon glyphicon-pencil" href="#"></a><a class="link_delete glyphicon glyphicon-remove" href="#"></a></td>');
-    //         tr.append(td);
-    //         $('.table tbody').append(tr);
-    //     }
-    // }
 
     function bindOp() {
         $(".link_modify").click(function () {
