@@ -31,6 +31,8 @@ public class CountryAnalysisReport extends BaseHttpServlet {
         super.doPost(request, response);
         if (!Utils.isAdmin(request, response)) return;
         Map<String, Long> tagNameIdMap = getTagNameIdMap();
+        Map<String, String> tagNamePackageIdMap = getTagNamePackageIdMap();
+        HashMap<String,String> countryCodeNameMap = Utils.getCountryCodeNameMap();
         String path = request.getPathInfo();
         JsonObject jsonObject = new JsonObject();
         String sorterId = request.getParameter("sorterId");
@@ -44,10 +46,8 @@ public class CountryAnalysisReport extends BaseHttpServlet {
             }
         }
 
-
-
-        String beforeFourDay = DateUtil.addDay(endTime, -4, "yyyy-MM-dd");//不包括endTime
-        String beforeTwentyTwoDay = DateUtil.addDay(endTime, -22, "yyyy-MM-dd");//不包括endTime
+//        String beforeFourDay = DateUtil.addDay(endTime, -4, "yyyy-MM-dd");//不包括endTime
+//        String beforeTwentyTwoDay = DateUtil.addDay(endTime, -22, "yyyy-MM-dd");//不包括endTime
 
         HashMap<String, String> countryNameCodeMap = Utils.getCountryNameCodeMap();
         if (path.matches("/modify_web_ad_rules")) {
@@ -104,25 +104,13 @@ public class CountryAnalysisReport extends BaseHttpServlet {
                 jsonObject.addProperty("message", "后台未正确修改");
             }
         } else if (path.matches("/query_country_analysis_report")) {
-                try {
-                String sqlG = "select t.id, google_package_id from web_facebook_app_ids_rel r,web_tag t WHERE t.tag_name = r.tag_name AND t.tag_name = '" + tagName + "'";
-                JSObject oneG = DB.findOneBySql(sqlG);
-                if (oneG.hasObjectData()) {
-                    String appId = oneG.get("google_package_id");
-                    long tagId = oneG.get("id");
+            try {
+                long tagId = tagNameIdMap.get(tagName); //标签ID
+                String appId = tagNamePackageIdMap.get(tagName); //包ID
+                if (tagId > 0) {
                     if (appId != null) {
-                        HashMap<String, Double> cpiMap = new HashMap<>();
-                        String sqlCpi = "select country_code, cpi from web_ad_app_cpi where app_id=?";
-                        List<JSObject> cpiList = DB.findListBySql(sqlCpi, appId);
-                        for (int i = 0; i < cpiList.size(); i++) {
-                            String countryCode = cpiList.get(i).get("country_code");
-                            double value = NumberUtil.convertDouble(cpiList.get(i).get("cpi"), 0);
-                            cpiMap.put(countryCode, value);
-                        }
                         JsonArray jsonArray = new JsonArray();
-
                         String sql = "";
-
                         if (sameDate) {
                             sql =   "SELECT h.country_code, sum(cost) as total_cost, sum(purchased_user) as total_purchased_user, sum(ad_new_revenue) as new_revenues,\n" +
                                     "sum(total_installed) as installed, sum(today_uninstalled) as total_today_uninstalled,\n" +
@@ -206,14 +194,15 @@ public class CountryAnalysisReport extends BaseHttpServlet {
                         }
                         List<JSObject> countryDetailJSObjectList = DB.findListBySql(sql);
 
-                        double totalCost = 0;
-                        double totalPuserchaedUser = 0;
-                        double totalRevenue = 0;
+                        double totalCost = 0; //当前应用的总花费
+                        double totalPuserchaedUser = 0; //当前应用的总购买用户
+                        double totalRevenue = 0; //当前应用的总收入
                         double totalNewRevenues = 0; //新用户收入汇总
-
+                        JSObject oneC = null;
+                        String countryCode = null; //国家代号
                         for (JSObject j : countryDetailJSObjectList) {
                             if (j.hasObjectData()) {
-                                String countryCode = j.get("country_code");
+                                countryCode = j.get("country_code");
 
                                 //计算七天的总花费、总营收、总盈利等
 //                                sql = "select cost, revenue,purchased_user,impression " +
@@ -248,16 +237,16 @@ public class CountryAnalysisReport extends BaseHttpServlet {
 //                                        " and country_code = '" + countryCode + "' ";
 
 //                                listCR = DB.findListBySql(sql);
-                                String everyDayCostForFourteenDays = "";
-                                String everyDayPurchasedUserForFourteenDays = "";
-                                String everyDayInstalledForFourteenDays = "";
-                                String everyDayUninstalledRateForFourteenDays = "";
-                                String everyDayActiveUserForFourteenDays = "";
-                                String everyDayRevenueForFourteenDays = "";
-                                String everyDayEcpmForFourteenDays = "";
-                                String everyDayCpaForFourteenDays = "";
-                                String everyDayCpaDivEcpmForFourteenDays = "";
-                                String everyDayIncomingForFourteenDays = "";
+//                                String everyDayCostForFourteenDays = "";
+//                                String everyDayPurchasedUserForFourteenDays = "";
+//                                String everyDayInstalledForFourteenDays = "";
+//                                String everyDayUninstalledRateForFourteenDays = "";
+//                                String everyDayActiveUserForFourteenDays = "";
+//                                String everyDayRevenueForFourteenDays = "";
+//                                String everyDayEcpmForFourteenDays = "";
+//                                String everyDayCpaForFourteenDays = "";
+//                                String everyDayCpaDivEcpmForFourteenDays = "";
+//                                String everyDayIncomingForFourteenDays = "";
 /*                                for (JSObject one : listCR) {
                                     if (one.hasObjectData()) {
                                         Date date = one.get("date");
@@ -284,61 +273,16 @@ public class CountryAnalysisReport extends BaseHttpServlet {
                                     }
                                 }*/
 
-//                                sql = "select date, pi from web_ad_country_analysis_report_history_by_date " +
-//                                        "where " +
-//                                        " date BETWEEN '" + beforeTwentyTwoDay + "' AND '" + beforeFourDay + "'" +
-//                                        " and app_id = '" + appId + "' " +
-//                                        " and country_code = '" + countryCode + "' ";
-
-//                                List<JSObject> listCR = DB.findListBySql(sql);
-//                                String everyDayPiForFourteenDays = "";
-//                                if (listCR != null && listCR.size() > 0) {
-//                                    for (JSObject one : listCR) {
-//                                        double pi = NumberUtil.convertDouble(one.get("pi"), 0);
-//                                        Date date = one.get("date");
-//                                        everyDayPiForFourteenDays += date + "(" + NumberUtil.trimDouble(pi, 3) + ")" + "\n";
-//                                    }
-//                                }
-
-//                                sql = "select pi,a_cpa " +
-//                                        " from web_ad_country_analysis_report_history where " +
-//                                        " date = '" + endTime + "'" +
-//                                        " and app_id = '" + appId + "' " +
-//                                        " and country_code = '" + countryCode + "' ";
-//
-//                                JSObject oneC = DB.findOneBySql(sql);
-//                                double pi = 0;
-//                                double aCpa = 0;
-                                /*if (oneC.hasObjectData()) {
-                                    pi = NumberUtil.convertDouble(oneC.get("pi"), 0);
-                                    aCpa = NumberUtil.convertDouble(oneC.get("a_cpa"), 0);
-                                }*/
-
-
                                 double revenues = NumberUtil.convertDouble(j.get("revenues"), 0);
                                 double ecpm = NumberUtil.convertDouble(j.get("ecpm"), 0);
-                                sql = "select country_name from app_country_code_dict where country_code = '" + countryCode + "'";
-                                JSObject oneC = DB.findOneBySql(sql);
-                                String countryName = "";
-                                if (oneC.hasObjectData()) {
-                                    countryName = oneC.get("country_name");
-                                } else {
-                                    countryName = countryCode;
-                                }
                                 double costs = NumberUtil.convertDouble(j.get("total_cost"), 0);
                                 double purchasedUsers = NumberUtil.convertDouble(j.get("total_purchased_user"), 0);
                                 double installed = NumberUtil.convertDouble(j.get("installed"), 0);
                                 double totalTodayUninstalled = NumberUtil.convertDouble(j.get("total_today_uninstalled"), 0);
                                 double uninstalledRate = installed != 0 ? totalTodayUninstalled / installed : 0;
-
-
                                 double activeUsers = NumberUtil.convertDouble(j.get("active_users"), 0);
-
-
                                 double cpa = NumberUtil.convertDouble(j.get("cpa"), 0);
                                 double incoming = NumberUtil.convertDouble(j.get("incoming"), 0);
-                                double cpaDivEcpm = (ecpm == 0) ? 0 : (cpa / ecpm);
-
                                 totalCost += costs;
                                 totalPuserchaedUser += purchasedUsers;
                                 totalRevenue += revenues;
@@ -400,34 +344,6 @@ public class CountryAnalysisReport extends BaseHttpServlet {
                                 }
 
                                 JsonObject d = new JsonObject();
-                                d.addProperty("country_name", countryName);
-                                d.addProperty("bidding_summary", biddingSummaryStr);
-                                d.addProperty("costs", NumberUtil.trimDouble(costs, 0));
-                                d.addProperty("purchased_users", purchasedUsers);
-                                d.addProperty("installed", installed);
-                                d.addProperty("uninstalled_rate", NumberUtil.trimDouble(uninstalledRate, 3));
-                                d.addProperty("active_users", activeUsers);
-
-                                d.addProperty("revenues", NumberUtil.trimDouble(revenues, 0));
-                                d.addProperty("ecpm", NumberUtil.trimDouble(ecpm, 3));
-                                d.addProperty("cpa_div_ecpm", NumberUtil.trimDouble(cpaDivEcpm, 3));
-
-
-                                d.addProperty("every_day_cost_for_fourteen_days", everyDayCostForFourteenDays);
-                                d.addProperty("every_day_purchased_user_for_fourteen_days", everyDayPurchasedUserForFourteenDays);
-                                d.addProperty("every_day_installed_for_fourteen_days", everyDayInstalledForFourteenDays);
-                                d.addProperty("every_day_uninstalled_rate_for_fourteen_days", everyDayUninstalledRateForFourteenDays);
-                                d.addProperty("every_day_active_user_for_fourteen_days", everyDayActiveUserForFourteenDays);
-                                d.addProperty("every_day_revenue_for_fourteen_days", everyDayRevenueForFourteenDays);
-                                d.addProperty("every_day_ecpm_for_fourteen_days", everyDayEcpmForFourteenDays);
-                                d.addProperty("every_day_cpa_for_fourteen_days", everyDayCpaForFourteenDays);
-                                d.addProperty("every_day_cpa_div_ecpm_for_fourteen_days", everyDayCpaDivEcpmForFourteenDays);
-                                d.addProperty("every_day_incoming_for_fourteen_days", everyDayIncomingForFourteenDays);
-
-                                d.addProperty("incoming", NumberUtil.trimDouble(incoming, 0));
-                                d.addProperty("cpa", NumberUtil.trimDouble(cpa, 3));
-                                d.addProperty("cost_upper_limit", costUpperLimit);
-
                                 if (sameDate) {
                                     double newRevenues = NumberUtil.convertDouble(j.get("new_revenues"), 0);
                                     totalNewRevenues += newRevenues;
@@ -464,7 +380,34 @@ public class CountryAnalysisReport extends BaseHttpServlet {
                                     d.addProperty("second_day_revenue",NumberUtil.trimDouble(secondDayRevenue,2));
                                     d.addProperty("third_day_revenue",NumberUtil.trimDouble(thirdDayRevenue,2));
                                     d.addProperty("fourth_day_revenue",NumberUtil.trimDouble(fourthDayRevenue,2));
+                                    double cpaDivNewUserEcpm = newUserEcpm > 0 ? cpa / newUserEcpm : 0;
+                                    d.addProperty("cpa_div_new_user_ecpm", NumberUtil.trimDouble(cpaDivNewUserEcpm, 3));
+                                } else {
+                                    double cpaDivEcpm = ecpm > 0 ? cpa / ecpm : 0;
+                                    d.addProperty("cpa_div_ecpm", NumberUtil.trimDouble(cpaDivEcpm, 3));
                                 }
+                                d.addProperty("country_name", countryCodeNameMap.get(countryCode));
+                                d.addProperty("bidding_summary", biddingSummaryStr);
+                                d.addProperty("costs", NumberUtil.trimDouble(costs, 2));
+                                d.addProperty("purchased_users", purchasedUsers);
+                                d.addProperty("installed", installed);
+                                d.addProperty("uninstalled_rate", NumberUtil.trimDouble(uninstalledRate, 3));
+                                d.addProperty("active_users", activeUsers);
+                                d.addProperty("revenues", NumberUtil.trimDouble(revenues, 2));
+                                d.addProperty("ecpm", NumberUtil.trimDouble(ecpm, 3));
+//                                d.addProperty("every_day_cost_for_fourteen_days", everyDayCostForFourteenDays);
+//                                d.addProperty("every_day_purchased_user_for_fourteen_days", everyDayPurchasedUserForFourteenDays);
+//                                d.addProperty("every_day_installed_for_fourteen_days", everyDayInstalledForFourteenDays);
+//                                d.addProperty("every_day_uninstalled_rate_for_fourteen_days", everyDayUninstalledRateForFourteenDays);
+//                                d.addProperty("every_day_active_user_for_fourteen_days", everyDayActiveUserForFourteenDays);
+//                                d.addProperty("every_day_revenue_for_fourteen_days", everyDayRevenueForFourteenDays);
+//                                d.addProperty("every_day_ecpm_for_fourteen_days", everyDayEcpmForFourteenDays);
+//                                d.addProperty("every_day_cpa_for_fourteen_days", everyDayCpaForFourteenDays);
+//                                d.addProperty("every_day_cpa_div_ecpm_for_fourteen_days", everyDayCpaDivEcpmForFourteenDays);
+//                                d.addProperty("every_day_incoming_for_fourteen_days", everyDayIncomingForFourteenDays);
+                                d.addProperty("incoming", NumberUtil.trimDouble(incoming, 2));
+                                d.addProperty("cpa", NumberUtil.trimDouble(cpa, 3));
+                                d.addProperty("cost_upper_limit", costUpperLimit);
                                 jsonArray.add(d);
                             }
                         }
@@ -486,10 +429,13 @@ public class CountryAnalysisReport extends BaseHttpServlet {
                             jsonObject.addProperty("total_revenue", NumberUtil.trimDouble(totalRevenue, 3));
                             jsonObject.addProperty("ret", 1);
                         }
+                    } else {
+                        jsonObject.addProperty("ret", 0);
+                        jsonObject.addProperty("message", "此应用未在web_facebook_app_ids_rel表中关联");
                     }
                 } else {
                     jsonObject.addProperty("ret", 0);
-                    jsonObject.addProperty("message", "此应用未在web_facebook_app_ids_rel表中关联");
+                    jsonObject.addProperty("message", "此应用未在web_tag表中关联");
                 }
             } catch (Exception e) {
                 jsonObject.addProperty("ret", 0);
@@ -532,7 +478,6 @@ public class CountryAnalysisReport extends BaseHttpServlet {
     }
 
 
-
     /**
      * 获取标签名称与ID的Map
      * @return
@@ -548,6 +493,27 @@ public class CountryAnalysisReport extends BaseHttpServlet {
                 long id = js.get("id");
                 String tagName = js.get("tag_name");
                 map.put(tagName,id);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return map;
+    }
+
+    /**
+     * 获取标签名称与包ID（appID）的Map
+     * @return
+     */
+    private static Map<String,String> getTagNamePackageIdMap() {
+        Map<String,String> map = new HashMap<>();
+        List<JSObject> list = null;
+        try {
+            list = DB.findListBySql("SELECT tag_name,google_package_id FROM web_facebook_app_ids_rel");
+            for (int i = 0,len = list.size();i<len;i++) {
+                JSObject js = list.get(i);
+                String tagName = js.get("tag_name");
+                String googlePackageId = js.get("google_package_id");
+                map.put(tagName,googlePackageId);
             }
         } catch (Exception e) {
             e.printStackTrace();

@@ -7,9 +7,9 @@ import java.lang.reflect.Method;
 import java.lang.reflect.InvocationTargetException;
 
 /**
- * Author: mengjun
- * Date: 2018/4/3 20:12
- * Desc: 泛型集合排序，根据实体类对象的某个属性排序
+ * @uthor: mengjun
+ * @date: 2018/4/3 20:12
+ * @desc: 泛型集合排序，根据实体类对象的某个属性排序
  */
 public class SortList<E> {
 

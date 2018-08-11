@@ -6,7 +6,11 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
-
+/**
+ * @author mengjun
+ * @date 2018/7/9 17:13
+ * @desc 处理有关日期的操作
+ */
 public class DateUtil {
 
     /**

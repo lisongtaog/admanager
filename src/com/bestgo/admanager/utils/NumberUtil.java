@@ -5,7 +5,7 @@ import java.math.BigDecimal;
 /**
  * @author mengjun
  * @date 2018/7/9 17:13
- * @description 处理有关数字的操作
+ * @desc 处理有关数字的操作
  */
 public class NumberUtil {
     public static int parseInt(String value, int defaultValue) {

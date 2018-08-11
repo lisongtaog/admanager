@@ -156,7 +156,7 @@
                         "<th>Incoming<span sorterId=\"1042\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
                         "<th>ECPM<span sorterId=\"1040\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
                         "<th>CPA<span sorterId=\"1041\" class=\"sorter glyphicon glyphicon-arrow-down\"></span></th>" +
-                        "<th>CPA/ECPM</th>" +
+                        "<th>CPA/新用户ECPM</th>" +
                         "<th>新用户<br/>平均展示</th>" +
                         "<th>老用户<br/>平均展示</th>" +
                         "<th>新用户<br/>Ecpm</th>" +
@@ -258,7 +258,7 @@
         if (same_date == 1) {
             keyset = ["costs","cost_upper_limit","purchased_users", "installed", "uninstalled_rate",
                 "active_users","revenues", "new_revenues","recovery_cost_ratio","incoming", "ecpm",
-                "cpa","cpa_div_ecpm", "new_user_avg_impression","old_user_avg_impression","new_user_ecpm",
+                "cpa","cpa_div_new_user_ecpm", "new_user_avg_impression","old_user_avg_impression","new_user_ecpm",
                 "old_user_ecpm","first_day_revenue","second_day_revenue",
                 "third_day_revenue","fourth_day_revenue","bidding_summary"];
         }
