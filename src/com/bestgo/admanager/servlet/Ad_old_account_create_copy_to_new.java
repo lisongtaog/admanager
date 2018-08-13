@@ -155,21 +155,7 @@ public class Ad_old_account_create_copy_to_new extends BaseHttpServlet {
         return list;
     }
 
-    /**
-     * 对话框出现，自动加载标签
-     *
-     * @return
-     */
-    public static List<JSObject> fetchAllTags() {
-        List<JSObject> list = new ArrayList<>();
-        try {
-            return DB.scan("web_tag").select("id", "tag_name").orderByAsc("id").execute();
-        } catch (Exception ex) {
-            Logger logger = Logger.getRootLogger();
-            logger.error(ex.getMessage(), ex);
-        }
-        return list;
-    }
+
 
     /**
      * 页面数据总量
@@ -278,5 +264,41 @@ public class Ad_old_account_create_copy_to_new extends BaseHttpServlet {
             ret.message = e.getMessage();
         }
         return ret;
+    }
+
+    /**
+     * 对话框出现，自动加载标签
+     *
+     * @return
+     */
+    public static List<JSObject> fetchAllTags() {
+        List<JSObject> list = new ArrayList<>();
+        try {
+            return DB.scan("web_tag").select("id", "tag_name").orderByAsc("id").execute();
+        } catch (Exception ex) {
+            Logger logger = Logger.getRootLogger();
+            logger.error(ex.getMessage(), ex);
+        }
+        return list;
+    }
+
+    /**
+     * 对话框出现，自动加载帐户
+     *
+     * @return
+     */
+    public static List<JSObject> fetchAllAccount() {
+        List<JSObject> list = new ArrayList<>();
+        try {
+            List<JSObject> FBAccount = DB.scan("web_account_id").select("id", "account_id").orderByAsc("id").execute();
+            List<JSObject> AdmobAccount = DB.scan("web_account_id_admob").select("id", "account_id").orderByAsc("id").execute();
+            FBAccount.addAll(AdmobAccount);
+
+            return FBAccount;
+        } catch (Exception ex) {
+            Logger logger = Logger.getRootLogger();
+            logger.error(ex.getMessage(), ex);
+        }
+        return list;
     }
 }

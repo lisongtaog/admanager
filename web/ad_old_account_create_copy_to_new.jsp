@@ -30,12 +30,19 @@
         response.sendRedirect("login.jsp");
     }
 
-    //添加按钮数据的加载
-    List<JSObject> allTags = Tags.fetchAllTags();
+    //添加按钮数据的加载fetchAllAccount
+    List<JSObject> allTags = Ad_old_account_create_copy_to_new.fetchAllTags();
     JsonArray array1 = new JsonArray();
     for (int i = 0; i < allTags.size(); i++) {
         array1.add((String) allTags.get(i).get("tag_name"));
     }
+
+    List<JSObject> allAccounts = Ad_old_account_create_copy_to_new.fetchAllAccount();
+    JsonArray array2 = new JsonArray();
+    for (int i = 0; i < allAccounts.size(); i++) {
+        array2.add((String) allAccounts.get(i).get("account_id"));
+    }
+
 %>
 
 <div class="container-fluid">
@@ -140,14 +147,14 @@
                     <div class="form-group">
                         <label for="old" class="col-sm-2 control-label">模板帐号</label>
                         <div class="col-sm-8">
-                            <input class="form-control" id="old" autocomplete="off">
+                            <input class="form-control" id="old">
                         </div>
                     </div>
 
                     <div class="form-group">
                         <label for="new" class="col-sm-2 control-label">创建帐号</label>
                         <div class="col-sm-8">
-                            <input class="form-control" id="new" autocomplete="off">
+                            <input class="form-control" id="new">
                         </div>
                     </div>
 
@@ -188,6 +195,16 @@
     var data1 = <%=array1.toString()%>;
     $("#inputTagName").autocomplete({
         source: data1
+    });
+
+    //页面刷新，帐户名称自动加载
+    var data2 = <%=array2.toString()%>;
+    $("#old").autocomplete({
+        source: data2
+    });
+
+    $("#new").autocomplete({
+        source: data2
     });
 
     var modifyType = 'new';
