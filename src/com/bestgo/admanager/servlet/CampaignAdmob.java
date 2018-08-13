@@ -1,13 +1,17 @@
 package com.bestgo.admanager.servlet;
 
+import com.bestgo.admanager.AdWordsFetcher;
 import com.bestgo.admanager.Config;
+import com.bestgo.admanager.FacebookAccountBalanceFetcher;
 import com.bestgo.admanager.OperationResult;
 import com.bestgo.admanager.utils.*;
 import com.bestgo.common.database.services.DB;
 import com.bestgo.common.database.utils.JSObject;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+
 import java.lang.System;
+
 import org.apache.log4j.Logger;
 
 import javax.servlet.ServletException;
@@ -23,9 +27,10 @@ import java.util.*;
  */
 @WebServlet(name = "CampaignAdMob", urlPatterns = "/campaign_admob/*")
 public class CampaignAdmob extends BaseHttpServlet {
-    public static Map<String,Double> tagMaxBiddingRelationMap;
+    public static Map<String, Double> tagMaxBiddingRelationMap;
+
     static {
-        if(tagMaxBiddingRelationMap == null){
+        if (tagMaxBiddingRelationMap == null) {
             tagMaxBiddingRelationMap = new HashMap<>();
         }
         String sql = "select tag_name,max_bidding from web_tag";
@@ -35,14 +40,15 @@ public class CampaignAdmob extends BaseHttpServlet {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        if(list != null && list.size() > 0){
-            for(JSObject j : list){
+        if (list != null && list.size() > 0) {
+            for (JSObject j : list) {
                 String currTagName = j.get("tag_name");
-                double currMaxBidding = NumberUtil.convertDouble(j.get("max_bidding"),0);
-                tagMaxBiddingRelationMap.put(currTagName,currMaxBidding);
+                double currMaxBidding = NumberUtil.convertDouble(j.get("max_bidding"), 0);
+                tagMaxBiddingRelationMap.put(currTagName, currMaxBidding);
             }
         }
     }
+
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         super.doPost(request, response);
         if (!Utils.isAdmin(request, response)) return;
@@ -50,7 +56,53 @@ public class CampaignAdmob extends BaseHttpServlet {
         String path = request.getPathInfo();
         JsonObject json = new JsonObject();
 
-        if (path.startsWith("/create")) {
+        if (path.startsWith("/archivedCampaign")) {
+            try {
+                String accountId = request.getParameter("accountId");
+                String accountName = request.getParameter("accountName");
+                String containsDisabledAccountId = request.getParameter("containsDisabledAccountId");
+
+                String campaignStatus = request.getParameter("campaignStatus");
+                String region = request.getParameter("region");
+                String appName = request.getParameter("appName");
+
+                String[] accountIds = accountId.split(",");
+                String[] accountNames = accountName.split(",");
+                String[] campaignStatuss = campaignStatus.split(",");
+                String[] regions = region.split(",");
+
+
+
+                //更新系列
+                if (accountIds.length > 1) {
+                    for (int j = 0; j < accountIds.length; j++) {
+//                        FacebookAccountBalanceFetcher.updateFBCampaignStatusMultipleConditions(accountIds[j], Boolean.parseBoolean(containsDisabledAccountId), campaignStatus);
+                        AdWordsFetcher.syncStatus(accountIds[j]);
+                    }
+                } else if (accountIds.length == 1) {
+//                    FacebookAccountBalanceFetcher.updateFBCampaignStatusMultipleConditions(accountId, Boolean.parseBoolean(containsDisabledAccountId), campaignStatus);
+                    AdWordsFetcher.syncStatus(accountId);
+                    System.out.println("完成了!");
+                }else {
+                    return;
+                }
+
+
+                //删除系列
+                if (accountIds.length > 1) {
+                    for (int i = 0; i < accountIds.length; i++) {
+//                        FacebookAccountBalanceFetcher.deleteFBCampaignMultipleConditions(accountIds[i], campaignStatus, appName, region);
+                        AdWordsFetcher.deleteAdwordsCampaignMultipleConditions(accountIds[i], campaignStatus, appName, region);
+                    }
+                } else {
+//                    FacebookAccountBalanceFetcher.deleteFBCampaignMultipleConditions(accountId, campaignStatus, appName, region);
+                    AdWordsFetcher.deleteAdwordsCampaignMultipleConditions(accountId, campaignStatus, appName, region);
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else if (path.startsWith("/create")) {
             String appName = request.getParameter("appName");
             String gpPackageId = request.getParameter("gpPackageId");
             String accountId = request.getParameter("accountId");
@@ -78,10 +130,10 @@ public class CampaignAdmob extends BaseHttpServlet {
             try {
 
                 result.result = false;
-                int groupId = NumberUtil.parseInt(groupIdStr,0);
+                int groupId = NumberUtil.parseInt(groupIdStr, 0);
                 if (groupId == 0) {
                     result.message = "广告组ID不存在！请联系管理员";
-                }else if (createCount.isEmpty()) {
+                } else if (createCount.isEmpty()) {
                     result.message = "创建数量不能为空";
                 } else if (message1.isEmpty()) {
                     result.message = "广告语1不能为空";
@@ -99,16 +151,16 @@ public class CampaignAdmob extends BaseHttpServlet {
                     result.message = "出价不能为空";
                 } else if (bidding.indexOf(" ") != -1) {
                     result.message = "出价不能出现空格！";
-                } else if(region.isEmpty()){
+                } else if (region.isEmpty()) {
                     result.message = "国家不能为空";
-                }else {
+                } else {
                     double dBidding = NumberUtil.parseDouble(bidding, 0);
                     Double maxBiddingDouble = tagMaxBiddingRelationMap.get(appName);
-                    if(maxBiddingDouble == null){
+                    if (maxBiddingDouble == null) {
                         JSObject one = DB.findOneBySql("select max_bidding from web_tag where tag_name = '" + appName + "'");
-                        if(one != null && one.hasObjectData()){
-                            maxBiddingDouble = NumberUtil.convertDouble(one.get("max_bidding"),0);
-                            tagMaxBiddingRelationMap.put(appName,maxBiddingDouble);
+                        if (one != null && one.hasObjectData()) {
+                            maxBiddingDouble = NumberUtil.convertDouble(one.get("max_bidding"), 0);
+                            tagMaxBiddingRelationMap.put(appName, maxBiddingDouble);
                         }
                         if (maxBiddingDouble == null || maxBiddingDouble == 0) {
                             maxBiddingDouble = 0.01;
@@ -116,7 +168,7 @@ public class CampaignAdmob extends BaseHttpServlet {
                     }
                     if (maxBiddingDouble != null && maxBiddingDouble != 0 && dBidding > maxBiddingDouble) {
                         result.message = "bidding超过了本应用的最大出价,   " + bidding + " > " + maxBiddingDouble;
-                    }else{
+                    } else {
                         JSObject record = DB.simpleScan("web_system_config").select("config_value").where(DB.filter().whereEqualTo("config_key", "admob_image_path")).execute();
                         String imageRoot = "";
                         if (record.hasObjectData()) {
@@ -126,7 +178,7 @@ public class CampaignAdmob extends BaseHttpServlet {
                         File imagesPath = new File(imageRoot + File.separatorChar + imagePath);
                         if (imagesPath.exists()) {
                             result.result = true;
-                        } else{
+                        } else {
                             result.result = false;
                             result.message = "图片路径不存在";
                         }
@@ -137,40 +189,40 @@ public class CampaignAdmob extends BaseHttpServlet {
 
                             String[] countrys = region.split(",");
                             String countrysStr = "";
-                            for(int i=0,len=countrys.length;i<len;i++){
+                            for (int i = 0, len = countrys.length; i < len; i++) {
                                 countrysStr += "'" + countrys[i] + "',";
                             }
                             String countryListStr = "";
-                            if(countrysStr.length() >0){
-                                countrysStr = countrysStr.substring(0,countrysStr.length()-1);
-                                String sqlCountry = "select country_name from app_country_code_dict where country_code in ("+countrysStr+")";
+                            if (countrysStr.length() > 0) {
+                                countrysStr = countrysStr.substring(0, countrysStr.length() - 1);
+                                String sqlCountry = "select country_name from app_country_code_dict where country_code in (" + countrysStr + ")";
                                 List<JSObject> countryList = DB.findListBySql(sqlCountry);
 
-                                for(JSObject j : countryList){
+                                for (JSObject j : countryList) {
                                     countryListStr += j.get("country_name") + ",";
                                 }
                             }
                             if (countryListStr.length() > 30) {
                                 countryListStr = countryListStr.substring(0, 30);
                             }
-                            if(countryListStr != null && countryListStr.length()>0){
-                                campaignNameOld = campaignName.replace(region,countryListStr)+"_";
-                            }else{
+                            if (countryListStr != null && countryListStr.length() > 0) {
+                                campaignNameOld = campaignName.replace(region, countryListStr) + "_";
+                            } else {
                                 campaignNameOld = campaignName + "_";
                             }
-                            campaignNameOld = campaignNameOld.replace("Group_","Group" + groupId);
+                            campaignNameOld = campaignNameOld.replace("Group_", "Group" + groupId);
                             String[] accountNameArr = accountName.split(",");
                             String[] accountIdArr = accountId.split(",");
                             int createCountInt = Integer.parseInt(createCount);
                             Random random = new Random();
-                            for(int j=0,len = accountNameArr.length;j<len;j++){
-                                for(int i=0;i<createCountInt;i++){
-                                    String now  = String.format("%d-%02d-%02d %02d:%02d:%02d", calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH),
+                            for (int j = 0, len = accountNameArr.length; j < len; j++) {
+                                for (int i = 0; i < createCountInt; i++) {
+                                    String now = String.format("%d-%02d-%02d %02d:%02d:%02d", calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH),
                                             calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), calendar.get(Calendar.SECOND));
                                     int r = random.nextInt();
                                     long s = System.currentTimeMillis();
                                     String part = new StringBuffer(i + r + s + "").reverse().toString();
-                                    campaignName = campaignNameOld + accountNameArr[j] + "_"+ (i + j) + part;
+                                    campaignName = campaignNameOld + accountNameArr[j] + "_" + (i + j) + part;
 
                                     if (campaignName.length() > 150) {
                                         campaignName = campaignName.substring(0, 150);
@@ -196,13 +248,13 @@ public class CampaignAdmob extends BaseHttpServlet {
                                             .put("tag_name", appName)
                                             .put("image_path", imageAbsolutePath)
                                             .executeReturnId();
-                                    if(genId <= 0){
+                                    if (genId <= 0) {
                                         Logger logger = Logger.getRootLogger();
-                                        logger.debug("app_id=" + gpPackageId + ", account_id=" +  accountIdArr[j] + ", country_region=" + region +
-                                                ", excluded_region="+  excludedRegion +    ", create_time=" +  now +   ", language=" + language +
-                                                ", campaign_name="+ campaignName + ", conversion_id="+ conversionId + ", bugdet="+ bugdet +
-                                                ", bidding="+ bidding + ", bugdet="+ bugdet + ", bidding="+ bidding + ", message1="+ message1 + ", message2="+ message2
-                                                + ", message3="+ message3 + ", message4="+ message4 +", app_name="+ appName + ", image_path="+imageAbsolutePath);
+                                        logger.debug("app_id=" + gpPackageId + ", account_id=" + accountIdArr[j] + ", country_region=" + region +
+                                                ", excluded_region=" + excludedRegion + ", create_time=" + now + ", language=" + language +
+                                                ", campaign_name=" + campaignName + ", conversion_id=" + conversionId + ", bugdet=" + bugdet +
+                                                ", bidding=" + bidding + ", bugdet=" + bugdet + ", bidding=" + bidding + ", message1=" + message1 + ", message2=" + message2
+                                                + ", message3=" + message3 + ", message4=" + message4 + ", app_name=" + appName + ", image_path=" + imageAbsolutePath);
                                     }
                                 }
                             }
@@ -226,7 +278,7 @@ public class CampaignAdmob extends BaseHttpServlet {
             OperationResult result = new OperationResult();
             if (id != null) {
                 try {
-                    String sql = "SELECT id FROM web_tag WHERE tag_name = '"+tags+"'";
+                    String sql = "SELECT id FROM web_tag WHERE tag_name = '" + tags + "'";
                     JSObject one = DB.findOneBySql(sql);
                     if (one.hasObjectData()) {
                         long tagId = one.get("id");
@@ -245,7 +297,7 @@ public class CampaignAdmob extends BaseHttpServlet {
                     e.printStackTrace();
                 }
 
-            }else {
+            } else {
                 result.result = false;
                 result.message = "ID为空！传参异常，联系管理员！";
             }
@@ -260,16 +312,16 @@ public class CampaignAdmob extends BaseHttpServlet {
                 String languageAdmob = "";
                 String[] regionAdmobArray = region.split(",");
                 Set<String> languageAdmobSet = new HashSet<>();
-                for (int i=0,len = regionAdmobArray.length;i<len;i++){
+                for (int i = 0, len = regionAdmobArray.length; i < len; i++) {
                     languageAdmobSet.add(regionLanguageAdmobRelMap.get(regionAdmobArray[i]));
                 }
 
-                if(languageAdmobSet.size() == 1){
+                if (languageAdmobSet.size() == 1) {
                     languageAdmob = regionLanguageAdmobRelMap.get(regionAdmobArray[0]);
-                }else{
+                } else {
                     languageAdmob = "English";
                 }
-                String  sql = "select message1,message2,message3,message4 from web_ad_descript_dict_admob where app_name = '" + appName + "' and language = '" + languageAdmob +"' and group_id = "+advertGroupId;
+                String sql = "select message1,message2,message3,message4 from web_ad_descript_dict_admob where app_name = '" + appName + "' and language = '" + languageAdmob + "' and group_id = " + advertGroupId;
 
                 JSObject messages = null;
                 try {
@@ -277,15 +329,15 @@ public class CampaignAdmob extends BaseHttpServlet {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                if(messages != null && messages.hasObjectData()){
-                    json.addProperty("message1",(String)(messages.get("message1")));
-                    json.addProperty("message2",(String)(messages.get("message2")));
-                    json.addProperty("message3",(String)(messages.get("message3")));
-                    json.addProperty("message4",(String)(messages.get("message4")));
+                if (messages != null && messages.hasObjectData()) {
+                    json.addProperty("message1", (String) (messages.get("message1")));
+                    json.addProperty("message2", (String) (messages.get("message2")));
+                    json.addProperty("message3", (String) (messages.get("message3")));
+                    json.addProperty("message4", (String) (messages.get("message4")));
                     json.addProperty("ret", 1);
                 }
             }
-        }else if (path.startsWith("/query")) {
+        } else if (path.startsWith("/query")) {
             String word = request.getParameter("word");
             if (word != null) {
                 JsonArray array = new JsonArray();
@@ -297,13 +349,13 @@ public class CampaignAdmob extends BaseHttpServlet {
                     for (String key : keySet) {
                         Object value = data.get(i).get(key);
                         if (value instanceof String) {
-                            one.addProperty(key, (String)value);
+                            one.addProperty(key, (String) value);
                         } else if (value instanceof Integer) {
-                            one.addProperty(key, (Integer)value);
+                            one.addProperty(key, (Integer) value);
                         } else if (value instanceof Long) {
-                            one.addProperty(key, (Long)value);
+                            one.addProperty(key, (Long) value);
                         } else if (value instanceof Double) {
-                            one.addProperty(key, NumberUtil.trimDouble((Double)value,3));
+                            one.addProperty(key, NumberUtil.trimDouble((Double) value, 3));
                         } else {
                             one.addProperty(key, value.toString());
                         }
@@ -319,13 +371,13 @@ public class CampaignAdmob extends BaseHttpServlet {
                     double installed = NumberUtil.convertDouble(one.get("total_installed").getAsDouble(), 0);
                     double click = NumberUtil.convertDouble(one.get("total_click").getAsDouble(), 0);
                     double cvr = click > 0 ? installed / click : 0;
-                    one.addProperty("cvr", NumberUtil.trimDouble(cvr,3));
+                    one.addProperty("cvr", NumberUtil.trimDouble(cvr, 3));
                     one.addProperty("tagStr", tagStr);
                     array.add(one);
                 }
                 json.add("data", array);
             }
-        }else if (path.startsWith("/fetch_campaigns_not_exist_tag")) {
+        } else if (path.startsWith("/fetch_campaigns_not_exist_tag")) {
             JsonArray array = new JsonArray();
 //            String sqlCampaignIds = "select campaign_id from web_ad_campaign_tag_admob_rel";
 //
@@ -352,20 +404,20 @@ public class CampaignAdmob extends BaseHttpServlet {
                         "total_spend,total_click,total_installed,total_impressions,cpa,ctr from web_ad_campaigns_admob " +
                         "where tag_id = 0";
                 List<JSObject> data = DB.findListBySql(sqlFilterAll);
-                if(data != null){
-                    for (int i = 0,len = data.size(); i < len; i++) {
+                if (data != null) {
+                    for (int i = 0, len = data.size(); i < len; i++) {
                         JsonObject one = new JsonObject();
                         Set<String> keySet = data.get(i).getKeys();
                         for (String key : keySet) {
                             Object value = data.get(i).get(key);
                             if (value instanceof String) {
-                                one.addProperty(key, (String)value);
+                                one.addProperty(key, (String) value);
                             } else if (value instanceof Integer) {
-                                one.addProperty(key, (Integer)value);
+                                one.addProperty(key, (Integer) value);
                             } else if (value instanceof Long) {
-                                one.addProperty(key, (Long)value);
+                                one.addProperty(key, (Long) value);
                             } else if (value instanceof Double) {
-                                one.addProperty(key, NumberUtil.trimDouble((Double)value,3));
+                                one.addProperty(key, NumberUtil.trimDouble((Double) value, 3));
                             } else {
                                 one.addProperty(key, value.toString());
                             }
@@ -373,7 +425,7 @@ public class CampaignAdmob extends BaseHttpServlet {
                         double installed = NumberUtil.convertDouble(one.get("total_installed").getAsDouble(), 0);
                         double click = NumberUtil.convertDouble(one.get("total_click").getAsDouble(), 0);
                         double cvr = click > 0 ? installed / click : 0;
-                        one.addProperty("cvr", NumberUtil.trimDouble(cvr,3));
+                        one.addProperty("cvr", NumberUtil.trimDouble(cvr, 3));
                         //one.addProperty("tagStr", "");
                         array.add(one);
 
@@ -386,11 +438,11 @@ public class CampaignAdmob extends BaseHttpServlet {
 
             json.addProperty("ret", 1);
             json.add("data", array);
-        }else if (path.startsWith("/selectAdmobMessage")) {
+        } else if (path.startsWith("/selectAdmobMessage")) {
             String appNameAdmob = request.getParameter("appNameAdmob");
             String languageAdmob = request.getParameter("languageAdmob");
             try {
-                String sql = "select message1,message2,message3,message4 from web_ad_descript_dict_admob where app_name = '" + appNameAdmob + "' and language = '" + languageAdmob +"' limit 1";
+                String sql = "select message1,message2,message3,message4 from web_ad_descript_dict_admob where app_name = '" + appNameAdmob + "' and language = '" + languageAdmob + "' limit 1";
                 JSObject messages = new JSObject();
                 try {
                     messages = DB.findOneBySql(sql);
@@ -398,17 +450,17 @@ public class CampaignAdmob extends BaseHttpServlet {
                     e.printStackTrace();
                 }
 
-                json.addProperty("message1",(String)(messages.get("message1")));
-                json.addProperty("message2",(String)(messages.get("message2")));
-                json.addProperty("message3",(String)(messages.get("message3")));
-                json.addProperty("message4",(String)(messages.get("message4")));
+                json.addProperty("message1", (String) (messages.get("message1")));
+                json.addProperty("message2", (String) (messages.get("message2")));
+                json.addProperty("message3", (String) (messages.get("message3")));
+                json.addProperty("message4", (String) (messages.get("message4")));
                 json.addProperty("languageAdmob", languageAdmob);
                 json.addProperty("ret", 1);
 
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }else if (path.startsWith("/selectMaxBiddingByAppName")) {
+        } else if (path.startsWith("/selectMaxBiddingByAppName")) {
             String appName = request.getParameter("appName");
             try {
                 String sql = "select max_bidding from web_tag where tag_name = '" + appName + "'";
@@ -418,10 +470,10 @@ public class CampaignAdmob extends BaseHttpServlet {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                if(j != null && j.hasObjectData()){
-                    double maxBidding = NumberUtil.convertDouble(j.get("max_bidding"),0);
-                    if(maxBidding != 0){
-                        json.addProperty("max_bidding",maxBidding);
+                if (j != null && j.hasObjectData()) {
+                    double maxBidding = NumberUtil.convertDouble(j.get("max_bidding"), 0);
+                    if (maxBidding != 0) {
+                        json.addProperty("max_bidding", maxBidding);
                         json.addProperty("ret", 1);
                     }
                 }

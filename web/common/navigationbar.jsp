@@ -65,6 +65,7 @@
                 <li><a href="tags.jsp" target="_blank">标签管理</a></li>
                 <li><a href="tagsBidAdmanager.jsp" target="_blank">标签下国家出价管理</a></li>
                 <li><a href="team_category_management.jsp" target="_blank">项目组/应用品类管理</a></li>
+                <li><a href="archived_campaign.jsp" target="_blank">删除广告系列(测试中)</a></li>
             </ul>
         </li>
 
@@ -81,7 +82,6 @@
         <li role="presentation"><a href="project_team_total_ revenue_and_total_cost.jsp">项目组总收支</a></li>
         <li role="presentation"><a href="app_image_video_rel_insert.jsp">应用图片视频关联录入</a></li>
         <li role="presentation"><a href="adReplace.jsp">广告语替换</a></li>
-        <li role="presentation"><a href="archived_campaign.jsp">删除广告系列</a></li>
         <li role="presentation"><a href="ad_old_account_create_copy_to_new.jsp">模板账号to创建系列账号</a></li>
 
 </ul>

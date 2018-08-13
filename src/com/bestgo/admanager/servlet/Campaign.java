@@ -1,6 +1,7 @@
 package com.bestgo.admanager.servlet;
 
 import com.bestgo.admanager.Config;
+import com.bestgo.admanager.FacebookAccountBalanceFetcher;
 import com.bestgo.admanager.utils.*;
 import com.bestgo.admanager.OperationResult;
 import com.bestgo.admanager.utils.StringUtil;
@@ -28,9 +29,10 @@ import java.util.*;
  */
 @WebServlet(name = "Campaign", urlPatterns = "/campaign/*")
 public class Campaign extends BaseHttpServlet {
-    public static Map<String,Double> tagMaxBiddingRelationMap;   //声明了一个静态类，无属性，无方法，则Java会给它一个默认无参构造器
+    public static Map<String, Double> tagMaxBiddingRelationMap;   //声明了一个静态类，无属性，无方法，则Java会给它一个默认无参构造器
+
     static {
-        if(tagMaxBiddingRelationMap == null){
+        if (tagMaxBiddingRelationMap == null) {
             tagMaxBiddingRelationMap = new HashMap<>();
         }
         String sql = "select tag_name,max_bidding from web_tag";
@@ -40,16 +42,19 @@ public class Campaign extends BaseHttpServlet {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        if(list != null && list.size() > 0){
-            for(JSObject j : list){
+        if (list != null && list.size() > 0) {
+            for (JSObject j : list) {
                 String currTagName = j.get("tag_name");
-                double currMaxBidding = NumberUtil.convertDouble(j.get("max_bidding"),0);
+                double currMaxBidding = NumberUtil.convertDouble(j.get("max_bidding"), 0);
                 if (currMaxBidding > 0) {
                     tagMaxBiddingRelationMap.put(currTagName, currMaxBidding);
                 }
             }
         }
     }
+
+    private static final Logger LOGGER = Logger.getLogger(Campaign.class);
+
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         super.doPost(request, response);
         if (!Utils.isAdmin(request, response)) return;
@@ -58,7 +63,46 @@ public class Campaign extends BaseHttpServlet {
         JsonObject json = new JsonObject();
         //检查帐户状态
         Map<String, Integer> facebookAccountDetailsMap = getFacebookAccountDetails();
-        if (path.startsWith("/create")) {
+
+        if (path.startsWith("/archivedCampaign")) {
+            try {
+                String accountId = request.getParameter("accountId");
+                String accountName = request.getParameter("accountName");
+                String containsDisabledAccountId = request.getParameter("containsDisabledAccountId");
+
+                String campaignStatus = request.getParameter("campaignStatus");
+                String region = request.getParameter("region");
+                String appName = request.getParameter("appName");
+
+                String[] accountIds = accountId.split(",");
+                String[] accountNames = accountName.split(",");
+                String[] campaignStatuss = campaignStatus.split(",");
+                String[] regions = region.split(",");
+
+                //更新系列
+                if (accountIds.length > 1) {
+                    for (int j = 0; j < accountIds.length; j++) {
+                        FacebookAccountBalanceFetcher.updateFBCampaignStatusMultipleConditions(accountIds[j], Boolean.parseBoolean(containsDisabledAccountId), campaignStatus);
+                    }
+                } else {
+                    FacebookAccountBalanceFetcher.updateFBCampaignStatusMultipleConditions(accountId, Boolean.parseBoolean(containsDisabledAccountId), campaignStatus);
+                }
+                LOGGER.info("更新完成！");
+
+                //删除系列
+                if (accountIds.length > 1) {
+                    for (int i = 0; i < accountIds.length; i++) {
+                        FacebookAccountBalanceFetcher.deleteFBCampaignMultipleConditions(accountIds[i], campaignStatus, appName, region);
+                    }
+                } else {
+                    FacebookAccountBalanceFetcher.deleteFBCampaignMultipleConditions(accountId, campaignStatus, appName, region);
+                }
+                LOGGER.info("删除完成！");
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else if (path.startsWith("/create")) {
             String appName = request.getParameter("appName");
             String appId = request.getParameter("appId");
             String accountId = request.getParameter("accountId");
