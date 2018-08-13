@@ -198,9 +198,9 @@
         } else if (ruleType == 3) {//是应用+国家维度 app_name=应用名称,country_code=国家代号,cpa_div_ecpm>cpa除以ecpm,cost>花费
             $('#inputRuleContent').val("app_name=xxx,country_code=xxx,cpa_div_ecpm>xxx,cost>xxx")
         } else if (ruleType == 4) {
-            $('#inputRuleContent').val("app_name=xxx,country_code=xxx,purchased_user>10,recovery_cost_ratio<0.5")
+            $('#inputRuleContent').val("app_name=xxx,country_code=xxx,purchased_user>10,roi<0.5")
         } else if (ruleType == 5) {
-            $('#inputRuleContent').val("app_name=xxx,purchased_user>10,recovery_cost_ratio<0.5")
+            $('#inputRuleContent').val("app_name=xxx,purchased_user>10,roi<0.5")
         }
     });
 
