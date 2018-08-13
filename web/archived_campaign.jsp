@@ -170,7 +170,6 @@
 </div>
 
 <script>
-    $("li[role='presentation']:eq(12)").addClass("active");
 
     var campaignStatus = ["", "ARCHIVED", "ACTIVE", "PAUSED"];
 
