@@ -10,8 +10,8 @@ import java.util.*;
 import java.util.concurrent.*;
 
 public class FacebookAccountBalanceFetcher {
-    public static final String ACCESS_TOKEN = com.bestgo.admanager.DefaultConfig.ACCESS_TOKEN;
-    public static final String APP_SECRET = com.bestgo.admanager.DefaultConfig.APP_SECRET;
+    public static final String ACCESS_TOKEN = DefaultConfig.ACCESS_TOKEN;
+    public static final String APP_SECRET = DefaultConfig.APP_SECRET;
 
 
     private static final int ONE_PAGE_SIZE = 500;
@@ -435,7 +435,9 @@ public class FacebookAccountBalanceFetcher {
         } else if (!(null == tag) && !(null == country) && !"".equals(tag) && !"".equals(country)) {//应用+国家
             Map<String, Integer> facebookTagDetails = getFacebookTagDetails();
             Integer tag_id = facebookTagDetails.get(tag);
-            sql = "SELECT  DISTINCT campaign_id FROM web_ad_campaigns WHERE tag_id = '" + tag_id + "' AND campaign_name LIKE '%" + country + "%'";
+
+
+            sql = "SELECT  DISTINCT campaign_id FROM web_ad_campaigns WHERE tag_id = '" + tag_id + "' AND country_code LIKE '%" + country + "%'";
             archiveFacebookCampaignsByCampaignId(sql);
         } else {
             System.out.println("参数有误！请重新输入！！");

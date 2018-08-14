@@ -2,24 +2,22 @@ package com.bestgo.admanager.servlet;
 
 import com.bestgo.admanager.AdWordsFetcher;
 import com.bestgo.admanager.Config;
-import com.bestgo.admanager.FacebookAccountBalanceFetcher;
 import com.bestgo.admanager.OperationResult;
-import com.bestgo.admanager.utils.*;
+import com.bestgo.admanager.utils.NumberUtil;
+import com.bestgo.admanager.utils.Utils;
 import com.bestgo.common.database.services.DB;
 import com.bestgo.common.database.utils.JSObject;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-
-import java.lang.System;
-
 import org.apache.log4j.Logger;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.lang.System;
 import java.util.*;
 
 /**
@@ -76,11 +74,9 @@ public class CampaignAdmob extends BaseHttpServlet {
                 //更新系列
                 if (accountIds.length > 1) {
                     for (int j = 0; j < accountIds.length; j++) {
-//                        FacebookAccountBalanceFetcher.updateFBCampaignStatusMultipleConditions(accountIds[j], Boolean.parseBoolean(containsDisabledAccountId), campaignStatus);
                         AdWordsFetcher.syncStatus(accountIds[j]);
                     }
                 } else if (accountIds.length == 1) {
-//                    FacebookAccountBalanceFetcher.updateFBCampaignStatusMultipleConditions(accountId, Boolean.parseBoolean(containsDisabledAccountId), campaignStatus);
                     AdWordsFetcher.syncStatus(accountId);
                     System.out.println("完成了!");
                 }else {
@@ -91,11 +87,9 @@ public class CampaignAdmob extends BaseHttpServlet {
                 //删除系列
                 if (accountIds.length > 1) {
                     for (int i = 0; i < accountIds.length; i++) {
-//                        FacebookAccountBalanceFetcher.deleteFBCampaignMultipleConditions(accountIds[i], campaignStatus, appName, region);
                         AdWordsFetcher.deleteAdwordsCampaignMultipleConditions(accountIds[i], campaignStatus, appName, region);
                     }
                 } else {
-//                    FacebookAccountBalanceFetcher.deleteFBCampaignMultipleConditions(accountId, campaignStatus, appName, region);
                     AdWordsFetcher.deleteAdwordsCampaignMultipleConditions(accountId, campaignStatus, appName, region);
                 }
 
