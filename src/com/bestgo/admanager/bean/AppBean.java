@@ -9,8 +9,6 @@ public class AppBean {
     public String name;
     public double total_spend;
     public double seven_days_total_spend;
-    public double end_time_total_spend;
-    public double end_time_total_revenue;
     public double total_installed;
     public double total_impressions;
     public double total_click;
