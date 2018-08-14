@@ -235,7 +235,7 @@
             }, function (data) {
                 if (data && data.ret == 1) {
                     setData(data, data.same_date);
-                    var str = "TotalCost: " + data.total_cost + "&nbsp;&nbsp;&nbsp;&nbsp;PuserchaedUser: " + data.total_puserchaed_user +
+                    var str = "标签："+query+"&nbsp;&nbsp;&nbsp;&nbsp;Cost: " + "TotalCost: " + data.total_cost + "&nbsp;&nbsp;&nbsp;&nbsp;PuserchaedUser: " + data.total_puserchaed_user +
                         "&nbsp;&nbsp;&nbsp;&nbsp;CPA: " + data.total_cpa + "&nbsp;&nbsp;&nbsp;&nbsp;Revenue: " + data.total_revenue;
                     if (data.same_date == 1) {
                         str = "PuserchaedUser: " + data.total_puserchaed_user +
