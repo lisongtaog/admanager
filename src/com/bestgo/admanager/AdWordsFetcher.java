@@ -2301,24 +2301,20 @@ public class AdWordsFetcher {
         if (!(null == accountId) && !"".equals(accountId)) {//帐户非空
             if (!(null == status) && !"".equals(status)) {//帐号+状态
                 sql = "SELECT DISTINCT campaign_id FROM web_ad_campaigns_admob WHERE account_id = '" + accountId + "' AND STATUS = '" + status + "'";
-//                archiveFacebookCampaignsByCampaignId(sql);
                 removeAllAdwordsCampaignsByAccountId(sql, accountId);
             } else if (!(null == tag) && !"".equals(tag)) {//帐号+应用
                 Map<String, Integer> facebookTagDetails = getFacebookTagDetails();
                 Integer tag_id = facebookTagDetails.get(tag);
                 sql = "SELECT DISTINCT campaign_id FROM web_ad_campaigns_admob WHERE account_id = '" + accountId + "' AND tag_id = '" + tag_id + "'";
-//                archiveFacebookCampaignsByCampaignId(sql);
                 removeAllAdwordsCampaignsByAccountId(sql, accountId);
             } else {//帐户下所有系列
                 sql = "SELECT DISTINCT campaign_id FROM web_ad_campaigns_admob where account_id = '" + accountId + "'";
-//                archiveFacebookCampaignsByCampaignId(sql);
                 removeAllAdwordsCampaignsByAccountId(sql, accountId);
             }
         } else if (!(null == tag) && !(null == country) && !"".equals(tag) && !"".equals(country)) {//应用+国家
             Map<String, Integer> facebookTagDetails = getFacebookTagDetails();
             Integer tag_id = facebookTagDetails.get(tag);
             sql = "SELECT  DISTINCT campaign_id FROM web_ad_campaigns_admob WHERE tag_id = '" + tag_id + "' AND campaign_name LIKE '%" + country + "%'";
-//            archiveFacebookCampaignsByCampaignId(sql);
             removeAllAdwordsCampaignsByAccountId(sql, accountId);
         } else {
             System.out.println("参数有误！请重新输入！！");
