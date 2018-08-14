@@ -40,7 +40,7 @@
 	-->
 	<Resource name="jdbc/mysql" auth="Container" type="javax.sql.DataSource"
 			  driverClassName="com.mysql.jdbc.Driver" url="jdbc:mysql://10.23.3.192/admanager?characterEncoding=UTF-8&amp;noAccessToProcedureBodies=true&amp;autoReconnect=true"
-			  username="root" password="root" maxIdle="10" minIdle="1" maxWaitMillis="10000" maxTotal="100"
+			  username="aduser" password="aduser1234" maxIdle="10" minIdle="1" maxWaitMillis="10000" maxTotal="100"
 			  validationQuery="select 1" initialSize="1" testOnBorrow="true" testWhileIdle="true"/>
 	<!--<Valve className="com.request.tomcat.session.management.RequestSessionHandlerValve"/>-->
 	<!--<Manager className="com.request.tomcat.session.management.RequestSessionManager"/>-->
