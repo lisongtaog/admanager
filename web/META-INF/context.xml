@@ -39,7 +39,7 @@
 		NOTE: jdbc url里的server ip写死了10.23.3.192
 	-->
 	<Resource name="jdbc/mysql" auth="Container" type="javax.sql.DataSource"
-			  driverClassName="com.mysql.jdbc.Driver" url="jdbc:mysql://10.23.3.192/admanager?characterEncoding=UTF-8&amp;noAccessToProcedureBodies=true&amp;autoReconnect=true"
+			  driverClassName="com.mysql.jdbc.Driver" url="jdbc:mysql://10.23.3.192/admanager?characterEncoding=UTF-8&amp;noAccessToProcedureBodies=true&amp;autoReconnect=true&amp;useOldAliasMetadataBehavior=true"
 			  username="aduser" password="aduser1234" maxIdle="10" minIdle="1" maxWaitMillis="10000" maxTotal="100"
 			  validationQuery="select 1" initialSize="1" testOnBorrow="true" testWhileIdle="true"/>
 	<!--<Valve className="com.request.tomcat.session.management.RequestSessionHandlerValve"/>-->
