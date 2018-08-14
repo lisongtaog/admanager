@@ -34,6 +34,7 @@
         #results_body tr td.editColumn input.editInput{
             width:60px;
             height:25px;
+            border: none;
         }
 
         .red {
@@ -227,9 +228,9 @@
                 } else if('cost_upper_limit' == key){//国家花费上限
                     isColumnEditable = true;
                     if(r ==""){
-                        td = $("<td><input type='text' class='editInput' /></td>");
+                        td = $("<td><input type='text' class='editInput' onchange='editInputChange(this);'  /></td>");
                     }else{
-                        td = $("<td><input type='text' class='editInput' value='"+ one['cost_upper_limit'] +"' /></td>");
+                        td = $("<td><input type='text' class='editInput' onchange='editInputChange(this);' value='"+ one['cost_upper_limit'] +"' /></td>");
                     }
                     td.addClass("editColumn");
                 }else if('tag_cpa' == key || 'tag_ecpm' == key || 'tag_impression' == key){//期望 cpa、期望 ecpm、期望 用户平均展示次数
@@ -238,7 +239,7 @@
                     if(!value || undefined === value){
                         value = "";
                     }
-                    td = $("<td><input type='text' class='editInput' value='"+ value +"' /></td>");
+                    td = $("<td><input type='text' class='editInput' onchange='editInputChange(this);' value='"+ value +"' /></td>");
                     td.addClass("editColumn");
                 }
                 if(!isColumnEditable){//不可编辑列 输出td文本
@@ -447,6 +448,17 @@
             $("#editMaxCostBtn").prop("disabled", false);
             $("#editBtn").prop("disabled", false);
         },"json");
+    }
+
+    //表格 可编辑区域：输入值校验
+    function editInputChange(thizz) {
+        var input = $(thizz);
+        var value = input.val();
+        var reg = /^\d+(\.\d+)?$/;
+        if(value != "" && !reg.test(value)){
+            alert("输入不合规，请输入正数数值");
+            input.focus();
+        }
     }
 
 </script>
