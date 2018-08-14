@@ -212,7 +212,7 @@
 
 <jsp:include page="common/loading_dialog.jsp"></jsp:include>
 
-<script src="js/index.js?t=20180814"></script>
+<script src="js/index.js?t=20180531"></script>
 
 <script>
     $("li[role='presentation']:eq(0)").addClass("active");

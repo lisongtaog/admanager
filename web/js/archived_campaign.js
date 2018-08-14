@@ -1,12 +1,12 @@
 var firstInitForm = false;
 
-var regionList = [{
-        "key": "AD",
-        "name": "Andorra",
-        "type": "country",
-        "country_code": "AD",
-        "supports_region": true,
-        "supports_city": false
+var regionList = [{"name": "Worldwide"}, {
+    "key": "AD",
+    "name": "Andorra",
+    "type": "country",
+    "country_code": "AD",
+    "supports_region": true,
+    "supports_city": false
 }, {
     "key": "AE",
     "name": "United Arab Emirates",
@@ -1731,6 +1731,7 @@ var regionList = [{
     "supports_city": false
 }];
 var admobRegionCodes = {
+    "All": "",
     "Sint Maarten": "SX",
     "Cuba": "CU",
     "Curacao": "CW",
@@ -1978,27 +1979,6 @@ var campaignStatusList = ["ARCHIVED", "ACTIVE", "PAUSED"];
 var campaignStatusListAdmob = ["removed", "enabled", "paused"];
 var appList = [];
 
-var countryFBMapFunction = function () {
-    var map = {};
-    for(var i = 0;i<regionList.length;i++){
-        var item = regionList[i];
-        var key = item["name"];
-        map[key] = item["country_code"];
-    }
-    return map;
-}
-var countryFBMap = countryFBMapFunction();
-
-var countryAdmobMapFunction = function () {
-    var map = {};
-    for(var i = 0;i<admobRegionCodes.length;i++){
-        var item = admobRegionCodes[i];
-        var key = item["name"];
-        map[key] = item["country_code"];
-    }
-    return map;
-}
-var countryAdmobMap = countryAdmobMapFunction();
 
 //一种可多选的autocomplete方法封装
 function multiSelectAutocomplete(selector, valueList) {
@@ -2167,7 +2147,7 @@ $('#btnDelete').click(function () {
     //国家地区数组
     var region = [];
     regionSelect.each(function () {
-        region.push(countryFBMap[$(this).text()]);
+        region.push($(this).text())
     });
 
     //删除系列请求
@@ -2208,7 +2188,7 @@ $('#btnDeleteAdmob').click(function () {
     //国家地区数组
     var region = [];
     regionSelect.each(function () {
-        region.push(countryAdmobMap[$(this).text()]);
+        region.push($(this).text())
     });
 
     //删除系列请求
