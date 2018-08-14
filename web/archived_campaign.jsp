@@ -73,7 +73,7 @@
                 </select>
             </div>
             <div class="col-sm-2">
-                <label><input type="checkbox"  class="form-check-input" id="containsDisabledAccountId">包含被禁账号</label>
+                <label><input type="checkbox" class="form-check-input" id="containsDisabledAccountId">包含被禁账号</label>
             </div>
         </div>
         <br>
@@ -166,6 +166,18 @@
     </form>
 
 </div>
+
+<div>
+    <br>
+    <h4 style="margin-left: 300px">1.对（一个或多个）账号不管什么状态系列全部删除的</h4>
+    <br>
+    <h4 style="margin-left: 300px">2.对（一个或多个）账号里的一个状态进行删除的</h4>
+    <br>
+    <h4 style="margin-left: 300px">3.对（一个或多个）账号中指定对某个应用进行删除</h4>
+    <br>
+    <h4 style="margin-left: 300px">4.对一个应用的一个国家进行删除</h4>
+</div>
+
 
 </div>
 
