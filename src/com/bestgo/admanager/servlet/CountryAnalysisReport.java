@@ -2,6 +2,7 @@ package com.bestgo.admanager.servlet;
 
 import com.bestgo.admanager.utils.NumberUtil;
 import com.bestgo.admanager.utils.Utils;
+import com.bestgo.common.database.MySqlHelper;
 import com.bestgo.common.database.services.DB;
 import com.bestgo.common.database.utils.JSObject;
 import com.google.gson.JsonArray;
@@ -49,60 +50,11 @@ public class CountryAnalysisReport extends BaseHttpServlet {
 //        String beforeTwentyTwoDay = DateUtil.addDay(endTime, -22, "yyyy-MM-dd");//不包括endTime
 
         HashMap<String, String> countryNameCodeMap = Utils.getCountryNameCodeMap();
-        if (path.matches("/modify_web_ad_rules")) {
-            String cost_array = request.getParameter("cost_array");
-            String app_name = request.getParameter("app_name");
-            JsonParser parser = new JsonParser();
-            JsonArray cost_JsonArray = parser.parse(cost_array).getAsJsonArray();
-            boolean flag = false;
-            for (int i = 0; i < cost_JsonArray.size(); i++) {
-                JsonObject json = cost_JsonArray.get(i).getAsJsonObject();
-                String countryName = json.get("countryName").getAsString();
-                String countryCode = countryNameCodeMap.get(countryName);
-                String cost = json.get("cost_upper_limit").getAsString();
-                try {
-                    String sql = "SELECT id,rule_content FROM web_ad_rules WHERE rule_type = 3 AND rule_content LIKE '%app_name=" + app_name + "%country_code=" + countryCode + "%'";
-                    JSObject one = DB.findOneBySql(sql);
-
-                    if (one.hasObjectData()) {
-                        long id = one.get("id");
-                        String rule_content = one.get("rule_content");
-
-                        String newLine = rule_content.replaceAll("cost>\\d*", "cost>" + cost);
-                        flag = DB.update("web_ad_rules")
-                                .put("rule_content", newLine)
-                                .where(DB.filter().whereEqualTo("id", id))
-                                .execute();
-                    } else {
-                        Long tagId = tagNameIdMap.get(app_name);
-                        String ruleContent = "app_name=" + app_name + ",country_code=" + countryCode + ",cpa_div_ecpm>0.2,cost>" + cost;
-                        if (tagId == null || tagId == 0L) {
-                            jsonObject.addProperty("ret", 0);
-                            jsonObject.addProperty("message", "标签ID为空，请联系管理员");
-                        } else {
-                            flag = DB.insert("web_ad_rules")
-                                    .put("rule_type", 3)
-                                    .put("rule_content", ruleContent)
-                                    .put("tag_id", tagId)
-                                    .put("tag_name", app_name)
-                                    .execute();
-                        }
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    String error = e.getMessage();
-                    jsonObject.addProperty("ret", 0);
-                    jsonObject.addProperty("message", error);
-                }
-            }
-            if (flag) {
-                jsonObject.addProperty("ret", 1);
-                jsonObject.addProperty("message", "执行成功");
-            } else {
-                jsonObject.addProperty("ret", 0);
-                jsonObject.addProperty("message", "后台未正确修改");
-            }
-        } else if (path.matches("/query_country_analysis_report")) {
+        if (path.matches("/modify_web_ad_rules")) {//修改国家 规则上限
+            jsonObject = editCountryMaxCost(request,tagNameIdMap);
+        } else if(path.matches("/modify_app_country_target")) {//修改国家 期望cpa、ecpm、用户平均广告展示数
+            jsonObject = editAppCountryTarget(request,tagNamePackageIdMap);
+        }else if (path.matches("/query_country_analysis_report")) {
             try {
                 long tagId = tagNameIdMap.get(tagName); //标签ID
                 String appId = tagNamePackageIdMap.get(tagName); //包ID
@@ -118,20 +70,25 @@ public class CountryAnalysisReport extends BaseHttpServlet {
                                     "sum(h.old_user_revenue) as old_user_revenues,sum(h.old_user_impression) as old_user_impressions, " +
                                     " (sum(revenue) - sum(cost)) as incoming,r.first_day_revenue,r.second_day_revenue,r.third_day_revenue,r.fourth_day_revenue,\n" +
                                     " (case when sum(impression) > 0 then sum(revenue) * 1000 / sum(impression) else 0 end) as ecpm,\n" +
-                                    "(case when sum(purchased_user) > 0 then sum(cost) / sum(purchased_user) else 0 end) as cpa\n" +
+                                    "(case when sum(purchased_user) > 0 then sum(cost) / sum(purchased_user) else 0 end) as cpa,\n" +
+                                    " t.cpa as tag_cpa, t.ecpm as tag_ecpm,t.avg_impression \n" +
                                     " from web_ad_country_analysis_report_history h left join web_ad_country_daily_add_revenue r\n" +
                                     " on h.date = r.date and h.app_id = r.app_id AND h.country_code = r.country_code \n" +
+                                    " LEFT JOIN web_ad_app_country_target t \n" +
+                                    " ON h.app_id = t.app_id AND h.country_code = t.country_code \n" +
                                     " where h.date = '" + endTime + "' and h.app_id = '" + appId + "' GROUP BY h.country_code";
                         } else {
-                            sql = "SELECT country_code, sum(cost) as total_cost, sum(purchased_user) as total_purchased_user, sum(ad_new_revenue) as new_revenues," +
+                            sql = "SELECT h.country_code, sum(cost) as total_cost, sum(purchased_user) as total_purchased_user, sum(ad_new_revenue) as new_revenues," +
                                     " sum(total_installed) as installed, sum(today_uninstalled) as total_today_uninstalled," +
                                     " sum(active_user) as active_users, sum(impression) as impressions, sum(revenue) as revenues," +
                                     " (sum(revenue) - sum(cost)) as incoming," +
                                     " (case when sum(impression) > 0 then sum(revenue) * 1000 / sum(impression) else 0 end) as ecpm," +
-                                    " (case when sum(purchased_user) > 0 then sum(cost) / sum(purchased_user) else 0 end) as cpa " +
-                                    " from web_ad_country_analysis_report_history " +
-                                    " where date BETWEEN '" + startTime + "' AND '" + endTime + "' " +
-                                    " and app_id = '" + appId + "' GROUP BY country_code";
+                                    " (case when sum(purchased_user) > 0 then sum(cost) / sum(purchased_user) else 0 end) as cpa, " +
+                                    " t.cpa as tag_cpa, t.ecpm as tag_ecpm,t.avg_impression \n" +
+                                    " from web_ad_country_analysis_report_history h LEFT JOIN web_ad_app_country_target t \n" +
+                                    " ON h.app_id = t.app_id AND h.country_code = t.country_code \n" +
+                                    " where h.date BETWEEN '" + startTime + "' AND '" + endTime + "' " +
+                                    " and h.app_id = '" + appId + "' GROUP BY h.country_code";
                         }
 
                         int sorter = 0;
@@ -381,10 +338,25 @@ public class CountryAnalysisReport extends BaseHttpServlet {
                                     d.addProperty("fourth_day_revenue",NumberUtil.trimDouble(fourthDayRevenue,2));
                                     double cpaDivNewUserEcpm = newUserEcpm > 0 ? cpa / newUserEcpm : 0;
                                     d.addProperty("cpa_div_new_user_ecpm", NumberUtil.trimDouble(cpaDivNewUserEcpm, 3));
+                                    //" t.cpa as tag_cpa, t.ecpm as tag_ecpm,t.avg_impression \n" +
+                                    double tag_cpa = NumberUtil.convertDouble(j.get("tag_cpa"), 0);
+                                    double tag_ecpm = NumberUtil.convertDouble(j.get("tag_ecpm"), 0);
+                                    double tag_impression = NumberUtil.convertDouble(j.get("avg_impression"), 0);
+                                    if(tag_cpa > 0){//期望 cpa
+                                        d.addProperty("tag_cpa", tag_cpa);
+                                    }
+                                    if(tag_ecpm > 0){//期望 ecpm
+                                        d.addProperty("tag_ecpm", tag_ecpm);
+                                    }
+                                    if(tag_impression > 0){//期望 用户 广告展示次数
+                                        d.addProperty("tag_impression", tag_impression);
+                                    }
+
                                 } else {
                                     double cpaDivEcpm = ecpm > 0 ? cpa / ecpm : 0;
                                     d.addProperty("cpa_div_ecpm", NumberUtil.trimDouble(cpaDivEcpm, 3));
                                 }
+                                d.addProperty("country_code", countryCode);
                                 d.addProperty("country_name", countryCodeNameMap.get(countryCode));
                                 d.addProperty("bidding_summary", biddingSummaryStr);
                                 d.addProperty("costs", NumberUtil.trimDouble(costs, 2));
@@ -407,6 +379,7 @@ public class CountryAnalysisReport extends BaseHttpServlet {
                                 d.addProperty("incoming", NumberUtil.trimDouble(incoming, 2));
                                 d.addProperty("cpa", NumberUtil.trimDouble(cpa, 3));
                                 d.addProperty("cost_upper_limit", costUpperLimit);
+
                                 jsonArray.add(d);
                             }
                         }
@@ -474,6 +447,126 @@ public class CountryAnalysisReport extends BaseHttpServlet {
             }
         }
         response.getWriter().write(jsonObject.toString());
+    }
+
+    /**
+     * 国家花费上限修改
+     */
+    private static JsonObject editCountryMaxCost(HttpServletRequest request,Map<String, Long> tagNameIdMap){
+        JsonObject jsonObject = new JsonObject();
+        String cost_array = request.getParameter("cost_array");
+        String app_name = request.getParameter("app_name");
+        String countryCode = null;
+        JsonParser parser = new JsonParser();
+        JsonArray cost_JsonArray = parser.parse(cost_array).getAsJsonArray();
+        boolean flag = false;
+        for (int i = 0; i < cost_JsonArray.size(); i++) {//countryCode
+            JsonObject json = cost_JsonArray.get(i).getAsJsonObject();
+            countryCode = json.get("countryCode").getAsString();
+            String cost = json.get("cost_upper_limit").getAsString();
+            try {
+                String sql = "SELECT id,rule_content FROM web_ad_rules WHERE rule_type = 3 AND rule_content LIKE '%app_name=" + app_name + "%country_code=" + countryCode + "%'";
+                JSObject one = DB.findOneBySql(sql);
+
+                if (one.hasObjectData() && "".equals(cost)) {//删除
+                    long id = one.get("id");
+                    DB.delete("web_ad_rules").where(DB.filter().whereEqualTo("id", id)).execute();
+                }else if(one.hasObjectData() && !"".equals(cost)){//更新
+                    long id = one.get("id");
+                    String rule_content = one.get("rule_content");
+                    String newLine = rule_content.replaceAll("cost>\\d*", "cost>" + cost);
+                    flag = DB.update("web_ad_rules")
+                            .put("rule_content", newLine)
+                            .where(DB.filter().whereEqualTo("id", id))
+                            .execute();
+                } else if(!one.hasObjectData() && !"".equals(cost)) {//数据库查询无值，并且设置了cost，则为插入新规则
+                    Long tagId = tagNameIdMap.get(app_name);
+                    String ruleContent = "app_name=" + app_name + ",country_code=" + countryCode + ",cpa_div_ecpm>0.2,cost>" + cost;
+                    if (tagId == null || tagId == 0L) {
+                        jsonObject.addProperty("ret", 0);
+                        jsonObject.addProperty("message", "标签ID为空，请联系管理员");
+                    } else {
+                        flag = DB.insert("web_ad_rules")
+                                .put("rule_type", 3)
+                                .put("rule_content", ruleContent)
+                                .put("tag_id", tagId)
+                                .put("tag_name", app_name)
+                                .execute();
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                String error = e.getMessage();
+                jsonObject.addProperty("ret", 0);
+                jsonObject.addProperty("message", error);
+            }
+        }
+        if (flag) {
+            jsonObject.addProperty("ret", 1);
+            jsonObject.addProperty("message", "执行成功");
+        } else {
+            jsonObject.addProperty("ret", 0);
+            jsonObject.addProperty("message", "后台未正确修改");
+        }
+
+        return jsonObject;
+    }
+
+    /**
+     * app国家 期望cpa、ecpm、用户广告展示次数
+     * @param request
+     * @param tagNamePackageIdMap
+     * @return
+     */
+    private static JsonObject editAppCountryTarget(HttpServletRequest request,Map<String, String> tagNamePackageIdMap) {
+        JsonObject jsonObject = new JsonObject();
+
+        String tagArray = request.getParameter("tag_array");
+        String app_name = request.getParameter("app_name");
+        String countryCode = null;
+        String appId = tagNamePackageIdMap.get(app_name);
+        JsonParser parser = new JsonParser();
+        JsonArray dataArray = parser.parse(tagArray).getAsJsonArray();
+
+        if(null == appId || "".equals(appId) || dataArray.size() == 0){
+            jsonObject.addProperty("ret", 0);
+            jsonObject.addProperty("message", "app_name参数错误，或未传入待修改的值");
+            return jsonObject;
+        }
+
+        List<String> sqlList = new ArrayList<String>();
+        JsonObject jsonItem = null;String itemStr;
+        Double tagCpa,tagEcpm,tagImpression;
+        String sql = null;
+        for (int i = 0; i < dataArray.size(); i++) {//countryCode
+            jsonItem = dataArray.get(i).getAsJsonObject();
+            countryCode = jsonItem.get("countryCode").getAsString();
+            itemStr = jsonItem.get("tagCpa").getAsString();
+            tagCpa = "".equals(itemStr) ? null : jsonItem.get("tagCpa").getAsDouble();
+            itemStr = jsonItem.get("tagEcpm").getAsString();
+            tagEcpm = "".equals(itemStr) ? null : jsonItem.get("tagEcpm").getAsDouble();
+            itemStr = jsonItem.get("tagImpression").getAsString();
+            tagImpression = "".equals(itemStr) ? null : jsonItem.get("tagImpression").getAsDouble();
+            sql = "REPLACE INTO web_ad_app_country_target (tag_name,country_code,app_id,cpa,ecpm,avg_impression) "
+                    + " values('"+ app_name + "','"+ countryCode + "','" + appId + "'," + tagCpa + "," + tagEcpm + "," + tagImpression + ")";
+            sqlList.add(sql);
+        }
+
+        try {
+            if(sqlList.size() > 0){
+                MySqlHelper helper = new MySqlHelper();
+                helper.excuteBatch2DB(sqlList);//执行更新
+            }
+            jsonObject.addProperty("ret", 1);
+            jsonObject.addProperty("message", "期望值更新成功");
+        }catch (Exception e){
+            e.printStackTrace();
+            jsonObject.addProperty("ret", 0);
+            jsonObject.addProperty("message", e.getMessage());
+        }
+
+
+        return jsonObject;
     }
 
 

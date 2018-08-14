@@ -9,6 +9,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Enumeration;
+import java.util.List;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -57,4 +58,36 @@ public class MySqlHelper {
 		
 		return conn;
 	}
+
+	/**
+	 * 批量持久化 到数据库
+	 * @param sqlList
+	 * @return
+	 */
+	public boolean excuteBatch2DB(List<String> sqlList){
+		boolean rtn = true;
+		Connection conn = getConnection();
+		Statement stmt = null;
+		try {
+			conn.setAutoCommit(false);
+			stmt = conn.createStatement();
+			int index = 0;
+			for (String sql : sqlList){
+				index ++;
+				stmt.addBatch(sql);
+				if (index % 1000 == 0){//1000条一次提交
+					stmt.executeBatch();
+					conn.commit();
+				}
+			}
+			stmt.executeBatch();
+			conn.commit();
+			conn.setAutoCommit(true);
+		}catch (Exception e){
+			rtn = false;
+			e.printStackTrace();
+		}
+		return rtn;
+	}
+
 }
