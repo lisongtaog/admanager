@@ -27,7 +27,6 @@
         /*表格可编辑的列*/
         #result_header tr th.editColumn,
         #results_body tr td.editColumn{
-            background-color: #dcdcdc;
             padding-left: 3px;
             padding-right: 3px;
         }
@@ -75,9 +74,8 @@
             <input type="text" value="2012-05-15" id="inputEndTime" onchange="initTableHead();" readonly>
             <span>标签</span>
             <input id="inputSearch" class="form-control" style="display: inline; width: auto;" type="text"/>
-            <button id="btnSearch" class="btn btn-default glyphicon glyphicon-search"></button>&nbsp;&nbsp;|&nbsp;
-            <button id="editMaxCostBtn" class="btn btn-default glyphicon glyphicon-edit">修改花费上限</button>&nbsp;&nbsp;|&nbsp;
-            <button id="editBtn" class="btn btn-default glyphicon glyphicon-edit">修改配置</button>
+            <button id="btnSearch" class="btn btn-default glyphicon glyphicon-search"></button>
+            <button id="editBtn" class="btn btn-default glyphicon glyphicon-edit" style="float: right">修改配置</button>
         </div>
     </div>
     <div class="panel panel-default">
@@ -180,9 +178,9 @@
             "cpa_div_ecpm", "bidding_summary"];
         if (same_date == 1) {
             keyset = ["costs","cost_upper_limit","purchased_users", "installed", "uninstalled_rate",
-                "active_users","revenues", "new_revenues","recovery_cost_ratio","incoming", "ecpm","tag_cpa",
-                "cpa","cpa_div_new_user_ecpm", "tag_ecpm","new_user_ecpm","old_user_ecpm","tag_impression",
-                "new_user_avg_impression","old_user_avg_impression", "first_day_revenue","second_day_revenue",
+                "active_users","revenues", "new_revenues","recovery_cost_ratio","incoming", "ecpm","cpa","tag_cpa",
+                "cpa_div_new_user_ecpm", "new_user_ecpm","tag_ecpm","old_user_ecpm","new_user_avg_impression","tag_impression",
+                "old_user_avg_impression", "first_day_revenue","second_day_revenue",
                 "third_day_revenue","fourth_day_revenue","bidding_summary"];
         }
 
@@ -304,7 +302,6 @@
         var startTime = $('#inputStartTime').val();
         var endTime = $('#inputEndTime').val();
         var isSameDate = startTime == endTime ? true : false;
-        $("#editMaxCostBtn").css("display", "none");
         $("#editBtn").css("display", "none");
         var headHtml;
         if(isSameDate){
@@ -322,14 +319,14 @@
                 +'    <th>当天<br>回本率</th>'
                 +'    <th>Incoming<span sorterid="1042" class="sorter glyphicon glyphicon-arrow-down"></span></th>  '
                 +'    <th>ECPM<span sorterid="1040" class="sorter glyphicon glyphicon-arrow-down"></span></th>'
-                +'    <th class="editColumn">期望CPA</th>'//ML
                 +'    <th>CPA<span sorterid="1041" class="sorter glyphicon glyphicon-arrow-down"></span></th> '
+                +'    <th class="editColumn">期望CPA</th>'//ML
                 +'    <th>CPA/新用户ECPM</th>'
-                +'    <th class="editColumn">期望Ecpm</th>' //ML
                 +'    <th>新用户<br>Ecpm</th>'
+                +'    <th class="editColumn">期望Ecpm</th>' //ML
                 +'    <th>老用户<br>Ecpm</th>'
-                +'    <th class="editColumn">期望新用户<br>平均展示</th>'//ML
                 +'    <th>新用户<br>平均展示</th>'
+                +'    <th class="editColumn">期望新用户<br>平均展示</th>'//ML
                 +'    <th>老用户<br>平均展示</th>'
                 +'    <th>1Day<br>Revenue</th>'
                 +'    <th>2Day<br>Revenue</th>'
@@ -357,13 +354,14 @@
         }
         $('#result_header').html(headHtml);
         $('#results_body').html("");//清空结果表
+        var editMaxCostBtnHtml = '<button id="editMaxCostBtn" onclick="saveEditMaxCost();" class="btn btn-link glyphicon glyphicon-pencil" style="display: none" title="修改花费上限"></button></th>';
+        $("#result_header tr th.editColumn:first").append(editMaxCostBtnHtml);
         bindSortOp();//绑定排序事件
     }
 
     //var countryMaxCost = [];//最大花费 数组存储
     //var appCountryTarget = [];//app country期望值
 
-    $("#editMaxCostBtn").click(saveEditMaxCost);//绑定编辑修改：修改花费上限
     $("#editBtn").click(saveEdit);//期望cpa、期望新用户ECPM、期望用户平均展示次数
     function saveEditMaxCost() {
         $("#editMaxCostBtn").prop("disabled", true);
@@ -418,9 +416,9 @@
         $("#results_body > tr").each(function (index,element) {
             tr = $(element);
             countryCode = tr.children("td:eq(0)").children("input").val();
-            tag_cpa = tr.children("td:eq(12)").children("input.editInput").val();//期望cpa
-            tag_ecpm = tr.children("td:eq(15)").children("input.editInput").val();//期望ecpm
-            tag_impression = tr.children("td:eq(18)").children("input.editInput").val();//期望 用户展示次数
+            tag_cpa = tr.children("td:eq(13)").children("input.editInput").val();//期望cpa
+            tag_ecpm = tr.children("td:eq(16)").children("input.editInput").val();//期望ecpm
+            tag_impression = tr.children("td:eq(19)").children("input.editInput").val();//期望 用户展示次数
             //console.info(maxCost);
             item = {};
             item.countryCode = countryCode; //国家代码
