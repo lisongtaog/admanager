@@ -360,8 +360,8 @@ function init() {
         }, function (data) {
             $("#btnSummary").prop("disabled", false);
             if (data && data.ret == 1) {
-                $('#result_header').html("<tr><th>应用名称</th><th>总花费<span sorterId=\"70\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>预计总花费<span sorterId=\"71\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
-                    "<th>总营收<span sorterId=\"72\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>预计总营收<span sorterId=\"73\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
+                $('#result_header').html("<tr><th>应用名称</th><th>总花费<span sorterId=\"70\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
+                    "<th>总营收<span sorterId=\"72\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
                     "<th>总安装<span sorterId=\"74\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>总展示<span sorterId=\"75\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
                     "<th>总点击<span sorterId=\"76\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>CTR<span sorterId=\"77\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
                     "<th>CPA<span sorterId=\"78\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>CVR<span sorterId=\"79\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
@@ -388,22 +388,20 @@ function setDataSummary(data) {
     var total_cpa = 0;
     var total_cvr = 0;
     var total_incoming = 0;
-    var keyset = ["name", "total_spend", "endTime_total_spend", "total_revenue", "endTime_total_revenue", "total_installed", "total_impressions", "total_click",
+    var keyset = ["name", "total_spend", "total_revenue", "total_installed", "total_impressions", "total_click",
         "total_ctr", "total_cpa", "total_cvr", "ecpm", "incoming"];
 
-    //total_spend是每20分钟抓一次，total_revenue是每小时抓一次
-
-    var d = new Date(); //创建一个Date对象:这个对象返回创建时的本机系统时间
-    var localTime = d.getTime();
-    var localOffset = d.getTimezoneOffset() * 60000; //获得当地时间与UTC（1970）偏移的毫秒数
-    var utc = localTime + localOffset; //utc即GMT时间
-    var offset = 8; //美西时间，西八区差值
-    var Los = utc - (3600000 * offset);    //得到相应美西时间 Date类型
-    var nd = new Date(Los);
-    var westTime = nd.getHours();  //返回美西时间的小时数
-    westTime = westTime - 1;
-    var minutes = nd.getMinutes();
-    var d_minutes = westTime * 60 + minutes;   //得到北京时间与美西时间相差小时数
+    // var d = new Date(); //创建一个Date对象:这个对象返回创建时的本机系统时间
+    // var localTime = d.getTime();
+    // var localOffset = d.getTimezoneOffset() * 60000; //获得当地时间与UTC（1970）偏移的毫秒数
+    // var utc = localTime + localOffset; //utc即GMT时间
+    // var offset = 8; //美西时间，西八区差值
+    // var Los = utc - (3600000 * offset);    //得到相应美西时间 Date类型
+    // var nd = new Date(Los);
+    // var westTime = nd.getHours();  //返回美西时间的小时数
+    // westTime = westTime - 1;
+    // var minutes = nd.getMinutes();
+    // var d_minutes = westTime * 60 + minutes;   //得到北京时间与美西时间相差小时数
 
 
     $('#results_body > tr').remove();
@@ -412,42 +410,32 @@ function setDataSummary(data) {
         var tr = $("<tr></tr>");
         var con;
         for (var j = 0; j < keyset.length; j++) {
-            if (keyset[j] == "total_spend") {
+            var key = keyset[j];
+            if (key == "total_spend") {
                 var td = $('<td title ="' + data[i]["spend_14"] + '"></td>');
             }
-            else if (keyset[j] == "total_revenue") {
+            else if (key == "total_revenue") {
                 var td = $('<td title ="' + data[i]["revenue_14"] + '"></td>');
             }
-            else if (keyset[j] == "total_installed") {
+            else if (key == "total_installed") {
                 var td = $('<td title ="' + data[i]["installed_14"] + '"></td>');
             }
-            else if (keyset[j] == "total_cpa") {
+            else if (key == "total_cpa") {
                 var td = $('<td title ="' + data[i]["cpa_14"] + '"></td>');
             }
-            else if (keyset[j] == "total_cvr") {
+            else if (key == "total_cvr") {
                 var td = $('<td title ="' + data[i]["cvr_14"] + '"></td>');
             } else {
                 var td = $("<td></td>");
             }
-            var key = keyset[j];
-            if (key == "endTime_total_spend") {
-                var endTime_total_spend = data[i][key]; //取当前数组成员 属性名为key 的属性值
-                var expected_total_spend = parseInt(endTime_total_spend / d_minutes * 24 * 60);
-                con = expected_total_spend;
-            } else if (key == "endTime_total_revenue") {
-                var endTime_total_revenue = data[i][key];
-                var expected_total_revenue = parseInt(endTime_total_revenue / d_minutes * 24 * 60);
-                con = expected_total_revenue;
-            } else {
-                if (key == 'total_spend') {     //对total_spend 条目进行颜色处理
-                    if (one['warning_level'] == 1) {
-                        td.addClass("yellow");
-                    } else if (one['warning_level'] == 2) {
-                        td.addClass("red");
-                    }
+            if (key == 'total_spend') {     //对total_spend 条目进行颜色处理
+                if (one['warning_level'] == 1) {
+                    td.addClass("yellow");
+                } else if (one['warning_level'] == 2) {
+                    td.addClass("red");
                 }
-                con = one[key];
             }
+            con = one[key];
             td.text(con);
             tr.append(td);
         }
