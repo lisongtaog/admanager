@@ -78,6 +78,13 @@ public class Query2 extends BaseHttpServlet {
                             continue;
                         }
                         appBean.total_spend = admob.get("total_spend").getAsDouble() + facebook.get("total_spend").getAsDouble();
+                        if(sameTime){
+                            appBean.end_time_total_spend = appBean.total_spend;
+                        }else{
+                            JsonObject admob1 = fetchOneAppDataSummary(id, endTime, endTime, true,true);
+                            JsonObject facebook1 = fetchOneAppDataSummary(id, endTime, endTime, false,true);
+                            appBean.end_time_total_spend = NumberUtil.trimDouble(admob1.get("total_spend").getAsDouble() + facebook1.get("total_spend").getAsDouble(), 0);
+                        }
 
                         appBean.total_installed = admob.get("total_installed").getAsDouble() + facebook.get("total_installed").getAsDouble();
                         appBean.total_click = admob.get("total_click").getAsDouble() + facebook.get("total_click").getAsDouble();
@@ -88,6 +95,12 @@ public class Query2 extends BaseHttpServlet {
                             continue;
                         }
                         appBean.total_spend = admob.get("total_spend").getAsDouble();
+                        if(sameTime){
+                            appBean.end_time_total_spend = appBean.total_spend;
+                        }else{
+                            JsonObject admob1 = fetchOneAppDataSummary(id, endTime, endTime, true,true);
+                            appBean.end_time_total_spend = NumberUtil.trimDouble(admob1.get("total_spend").getAsDouble(),0);
+                        }
 
                         appBean.total_installed = admob.get("total_installed").getAsDouble();
                         appBean.total_click = admob.get("total_click").getAsDouble();
@@ -98,6 +111,12 @@ public class Query2 extends BaseHttpServlet {
                             continue;
                         }
                         appBean.total_spend = facebook.get("total_spend").getAsDouble();
+                        if(sameTime){
+                            appBean.end_time_total_spend = appBean.total_spend;
+                        }else{
+                            JsonObject facebook1 = fetchOneAppDataSummary(id, endTime, endTime, false,true);
+                            appBean.end_time_total_spend = NumberUtil.trimDouble(facebook1.get("total_spend").getAsDouble(), 0);
+                        }
 
                         appBean.total_installed = facebook.get("total_installed").getAsDouble();
                         appBean.total_click = facebook.get("total_click").getAsDouble();
@@ -115,6 +134,7 @@ public class Query2 extends BaseHttpServlet {
                             JSObject oneR = DB.findOneBySql(sqlR);
                             if (oneR.hasObjectData()) {
                                 appBean.total_revenue = NumberUtil.convertDouble(oneR.get("revenues"), 0);
+                                appBean.end_time_total_revenue = appBean.total_revenue;
                             }
                         }else{
                             String sqlR = "select sum(revenue) as revenues " +
@@ -124,6 +144,13 @@ public class Query2 extends BaseHttpServlet {
                             JSObject oneR = DB.findOneBySql(sqlR);
                             if (oneR.hasObjectData()) {
                                 appBean.total_revenue = NumberUtil.convertDouble(oneR.get("revenues"), 0);
+                            }
+                            sqlR = "select sum(revenue) as revenues " +
+                                    "from web_ad_country_analysis_report_history where app_id = '"
+                                    + google_package_id + "' and date = '" + endTime + "'";
+                            oneR = DB.findOneBySql(sqlR);
+                            if (oneR.hasObjectData()) {
+                                appBean.end_time_total_revenue = NumberUtil.trimDouble(NumberUtil.convertDouble(oneR.get("revenues"), 0), 0);
                             }
                         }
 
@@ -151,6 +178,8 @@ public class Query2 extends BaseHttpServlet {
                             j.addProperty("warning_level", warningLevel);
                         }
                         j.addProperty("total_spend", NumberUtil.trimDouble(cs.total_spend, 0));
+                        j.addProperty("endTime_total_spend", NumberUtil.trimDouble(cs.end_time_total_spend, 0));
+                        j.addProperty("endTime_total_revenue", NumberUtil.trimDouble(cs.end_time_total_revenue, 0));
                         j.addProperty("total_installed", cs.total_installed);
                         j.addProperty("total_impressions", cs.total_impressions);
                         j.addProperty("total_click", cs.total_click);
