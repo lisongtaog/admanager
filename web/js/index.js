@@ -42,7 +42,15 @@ $("#new_campaign_dlg .btn-primary").click(function () {
 
 var appQueryData = [];
 var strFullPath = "";
-
+//功能：将浮点数四舍五入，取小数点后2位
+// function toDecimal(x) {
+//     var f = parseFloat(x);
+//     if (isNaN(f)) {
+//         return;
+//     }
+//     f = Math.round(x*100)/100;
+//     return f;
+// }
 function init() {
     var now = new Date(new Date().getTime() - 86400 * 1000);
     var month = now.getMonth() + 1;
@@ -85,16 +93,6 @@ function init() {
             $box.prop("checked", false);
         }
     });
-
-    //功能：将浮点数四舍五入，取小数点后2位
-    // function toDecimal(x) {
-    //     var f = parseFloat(x);
-    //     if (isNaN(f)) {
-    //         return;
-    //     }
-    //     f = Math.round(x*100)/100;
-    //     return f;
-    // }
 
     $("#btnQueryNoData").click(function () {
         var startTime = $('#inputStartTime').val();
@@ -487,31 +485,38 @@ function setDataSummary(result,same_time) {
         $('#results_body').append(tr);
     }
     var str = "";
+    total_ctr = Math.round(total_ctr*1000)/1000;
+    total_cpa = Math.round(total_cpa*1000)/1000;
+    total_cvr = Math.round(total_cvr*1000)/1000;
     if (same_time == 1) {
         var total_roi = 0;
         if (total_spend > 0) {
             total_roi = total_new_revenue / total_spend;
         }
-        str = "总花费: " + total_spend
-            + "  总营收: " + total_revenue
-            + " 新用户总营收: " + total_new_revenue
-            + " 新用户回本率: " + total_roi
-            + " 总安装: " + total_installed
-            + " 总展示: " + total_impressions
-            + " 总点击: " + total_click
-            + " CTR: " + total_ctr
-            + " CPA: " + total_cpa
-            + " CVR: " + total_cvr
-            + " 总营收: " + total_revenue
-            + " Incoming: " + total_incoming;
+        total_roi = Math.round(total_roi*1000)/1000;
+        total_new_revenue = Math.round(total_new_revenue*1000)/1000;
+        str = "总花费:" + total_spend
+            + "&nbsp;&nbsp;&nbsp;&nbsp;总营收:" + total_revenue
+            + "&nbsp;&nbsp;&nbsp;&nbsp;新用户总营收:" + total_new_revenue
+            + "&nbsp;&nbsp;&nbsp;&nbsp;新用户回本率:" + total_roi
+            + "&nbsp;&nbsp;&nbsp;&nbsp;总安装:" + total_installed
+            + "&nbsp;&nbsp;&nbsp;&nbsp;总展示:" + total_impressions
+            + "&nbsp;&nbsp;&nbsp;&nbsp;总点击:" + total_click
+            + "&nbsp;&nbsp;&nbsp;&nbsp;CTR:" + total_ctr
+            + "&nbsp;&nbsp;&nbsp;&nbsp;CPA:" + total_cpa
+            + "&nbsp;&nbsp;&nbsp;&nbsp;CVR:" + total_cvr
+            + "&nbsp;&nbsp;&nbsp;&nbsp;Incoming:" + total_incoming;
     } else {
-        str = "总花费: " + total_spend + "  总营收: " + total_revenue + " 总安装: " + total_installed +
-            " 总展示: " + total_impressions + " 总点击: " + total_click +
-            " CTR: " + total_ctr + " CPA: " + total_cpa + " CVR: " + total_cvr +
-            " 总营收: " + total_revenue + " Incoming: " + total_incoming;
+        str = "&nbsp;&nbsp;&nbsp;&nbsp;总花费: "
+             + total_spend + "&nbsp;&nbsp;&nbsp;&nbsp;总营收: "
+            + total_revenue + "&nbsp;&nbsp;&nbsp;&nbsp;总安装: " + total_installed +
+            "&nbsp;&nbsp;&nbsp;&nbsp;总展示: " + total_impressions + "&nbsp;&nbsp;&nbsp;&nbsp;总点击: " + total_click +
+            "&nbsp;&nbsp;&nbsp;&nbsp;CTR: " + total_ctr + "&nbsp;&nbsp;&nbsp;&nbsp;CPA: " + total_cpa
+            + "&nbsp;&nbsp;&nbsp;&nbsp;CVR: " + total_cvr
+            + "&nbsp;&nbsp;&nbsp;&nbsp;Incoming: " + total_incoming;
 
     }
-    $('#total_result').text(str);
+    $('#total_result').html(str);
     $('#total_result').removeClass("editable");
 }
 
