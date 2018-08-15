@@ -252,7 +252,7 @@
 
 
     function checkNum(theObj) {//校验为正数
-        var reg = /^[0-9]+.?[0-9]*$/;
+        var reg = /^\d+(\.\d+)?$/;
         return reg.test(theObj);
     }
 
