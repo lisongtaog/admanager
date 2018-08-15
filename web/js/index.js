@@ -86,6 +86,16 @@ function init() {
         }
     });
 
+    //功能：将浮点数四舍五入，取小数点后2位
+    // function toDecimal(x) {
+    //     var f = parseFloat(x);
+    //     if (isNaN(f)) {
+    //         return;
+    //     }
+    //     f = Math.round(x*100)/100;
+    //     return f;
+    // }
+
     $("#btnQueryNoData").click(function () {
         var startTime = $('#inputStartTime').val();
         var endTime = $('#inputEndTime').val();
@@ -360,15 +370,27 @@ function init() {
         }, function (data) {
             $("#btnSummary").prop("disabled", false);
             if (data && data.ret == 1) {
-                $('#result_header').html("<tr><th>应用名称</th><th>总花费<span sorterId=\"70\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
-                    "<th>总营收<span sorterId=\"72\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
-                    "<th>总安装<span sorterId=\"74\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>总展示<span sorterId=\"75\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
-                    "<th>总点击<span sorterId=\"76\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>CTR<span sorterId=\"77\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
-                    "<th>CPA<span sorterId=\"78\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>CVR<span sorterId=\"79\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
-                    "<th>ECPM<span sorterId=\"80\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>Incoming<span sorterId=\"81\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th></tr>");
-
-                data = data.data; //这里把返回数据里的 data属性 的值给了变量data，即变量data 是Query.java里的 arr[{},{},...,{}]
-                setDataSummary(data);
+                if (data.same_time && data.same_time == 1) {
+                    $('#result_header').html("<tr><th>应用名称</th>" +
+                        "<th>总花费<span sorterId=\"70\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
+                        "<th>总营收<span sorterId=\"72\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
+                        "<th>新用户总营收</th>" +
+                        "<th>新用户回本率</th>" +
+                        "<th>总安装<span sorterId=\"74\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
+                        "<th>总展示<span sorterId=\"75\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
+                        "<th>总点击<span sorterId=\"76\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>CTR<span sorterId=\"77\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
+                        "<th>CPA<span sorterId=\"78\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>CVR<span sorterId=\"79\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
+                        "<th>ECPM<span sorterId=\"80\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>Incoming<span sorterId=\"81\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th></tr>");
+                    setDataSummary(data,1);
+                } else {
+                    $('#result_header').html("<tr><th>应用名称</th><th>总花费<span sorterId=\"70\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
+                        "<th>总营收<span sorterId=\"72\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
+                        "<th>总安装<span sorterId=\"74\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>总展示<span sorterId=\"75\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
+                        "<th>总点击<span sorterId=\"76\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>CTR<span sorterId=\"77\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
+                        "<th>CPA<span sorterId=\"78\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>CVR<span sorterId=\"79\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
+                        "<th>ECPM<span sorterId=\"80\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>Incoming<span sorterId=\"81\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th></tr>");
+                    setDataSummary(data,0);
+                }
                 bindSortOpSummary();
             } else {
                 admanager.showCommonDlg("错误", data.message);
@@ -378,7 +400,7 @@ function init() {
 }
 
 //把各个应用的汇总信息（合并国家）显示出来
-function setDataSummary(data) {
+function setDataSummary(result,same_time) {
     var total_spend = 0;
     var total_revenue = 0;
     var total_installed = 0;
@@ -388,8 +410,17 @@ function setDataSummary(data) {
     var total_cpa = 0;
     var total_cvr = 0;
     var total_incoming = 0;
-    var keyset = ["name", "total_spend", "total_revenue", "total_installed", "total_impressions", "total_click",
-        "total_ctr", "total_cpa", "total_cvr", "ecpm", "incoming"];
+    var total_new_revenue = 0;
+
+    var keyset = [];
+    if (same_time == 1) {
+        keyset = ["name", "total_spend", "total_revenue", "total_new_revenue","roi", "total_installed", "total_impressions", "total_click",
+            "total_ctr", "total_cpa", "total_cvr", "ecpm", "incoming"];
+    } else {
+        keyset = ["name", "total_spend", "total_revenue", "total_installed", "total_impressions", "total_click",
+            "total_ctr", "total_cpa", "total_cvr", "ecpm", "incoming"];
+    }
+
 
     // var d = new Date(); //创建一个Date对象:这个对象返回创建时的本机系统时间
     // var localTime = d.getTime();
@@ -405,6 +436,7 @@ function setDataSummary(data) {
 
 
     $('#results_body > tr').remove();
+    var data = result.data;
     for (var i = 0; i < data.length; i++) {
         var one = data[i];
         var tr = $("<tr></tr>");
@@ -445,26 +477,41 @@ function setDataSummary(data) {
         total_impressions += one['total_impressions'];
         total_click += one['total_click'];
         total_incoming += one['incoming'];
+        if (same_time == 1) {
+            total_new_revenue += one['total_new_revenue'];
+        }
 
         total_ctr = total_impressions > 0 ? total_click / total_impressions : 0;
         total_cpa = total_installed > 0 ? total_spend / total_installed : 0;
         total_cvr = total_click > 0 ? total_installed / total_click : 0;
         $('#results_body').append(tr);
     }
-    if (adwordsCheck || facebookCheck) {
-        var str = "总花费: " + total_spend + " 总安装: " + total_installed +
-            " 总展示: " + total_impressions + " 总点击: " + total_click +
-            " CTR: " + total_ctr + " CPA: " + total_cpa + " CVR: " + total_cvr +
-            " 总营收: " + total_revenue + " Incoming: " + total_incoming;
-        $('#total_result').text(str);
+    var str = "";
+    if (same_time == 1) {
+        var total_roi = 0;
+        if (total_spend > 0) {
+            total_roi = total_new_revenue / total_spend;
+        }
+        str = "总花费: " + total_spend
+            + "  总营收: " + total_revenue
+            + " 新用户总营收: " + total_new_revenue
+            + " 新用户回本率: " + total_roi
+            + " 总安装: " + total_installed
+            + " 总展示: " + total_impressions
+            + " 总点击: " + total_click
+            + " CTR: " + total_ctr
+            + " CPA: " + total_cpa
+            + " CVR: " + total_cvr
+            + " 总营收: " + total_revenue
+            + " Incoming: " + total_incoming;
     } else {
-        var str = "总花费: " + total_spend + "  总营收: " + total_revenue + " 总安装: " + total_installed +
+        str = "总花费: " + total_spend + "  总营收: " + total_revenue + " 总安装: " + total_installed +
             " 总展示: " + total_impressions + " 总点击: " + total_click +
             " CTR: " + total_ctr + " CPA: " + total_cpa + " CVR: " + total_cvr +
             " 总营收: " + total_revenue + " Incoming: " + total_incoming;
-        $('#total_result').text(str);
-    }
 
+    }
+    $('#total_result').text(str);
     $('#total_result').removeClass("editable");
 }
 
@@ -633,8 +680,11 @@ function bindSortOpSummary() {
             summary: true
         }, function (data) {
             if (data && data.ret == 1) {
-                data = data.data;
-                setDataSummary(data);
+                if (data.same_time && data.same_time == 1) {
+                    setDataSummary(data,1);
+                } else {
+                    setDataSummary(data,0);
+                }
             } else {
                 admanager.showCommonDlg("错误", data.message);
             }
