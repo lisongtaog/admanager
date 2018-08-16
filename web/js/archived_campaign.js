@@ -1,12 +1,12 @@
 var firstInitForm = false;
 
 var regionList = [{
-        "key": "AD",
-        "name": "Andorra",
-        "type": "country",
-        "country_code": "AD",
-        "supports_region": true,
-        "supports_city": false
+    "key": "AD",
+    "name": "Andorra",
+    "type": "country",
+    "country_code": "AD",
+    "supports_region": true,
+    "supports_city": false
 }, {
     "key": "AE",
     "name": "United Arab Emirates",
@@ -1980,7 +1980,7 @@ var appList = [];
 
 var countryFBMapFunction = function () {
     var map = {};
-    for(var i = 0;i<regionList.length;i++){
+    for (var i = 0; i < regionList.length; i++) {
         var item = regionList[i];
         var key = item["name"];
         map[key] = item["country_code"];
@@ -1991,7 +1991,7 @@ var countryFBMap = countryFBMapFunction();
 
 var countryAdmobMapFunction = function () {
     var map = {};
-    for(var i = 0;i<admobRegionCodes.length;i++){
+    for (var i = 0; i < admobRegionCodes.length; i++) {
         var item = admobRegionCodes[i];
         var key = item["name"];
         map[key] = item["country_code"];
@@ -2143,6 +2143,48 @@ $('#checkAdmob').click(function () {
     }
 });
 
+//更新facebook系列
+$('#btnUpdate').click(function () {
+
+    //帐号
+    var accountName = [];
+    var accountId = [];
+    var selectOptions = $('#selectAccount option:selected');
+    selectOptions.each(function () {
+        accountName.push($(this).text());
+        accountId.push($(this).val());
+    });
+    //包含被禁用的帐号
+    var containsDisabledAccountId = $('#containsDisabledAccountId').prop("checked");
+
+    //系列状态
+    var campaignStatus = $('#selectCampaignStatus').val();
+    //应用
+    var appName = $('#selectApp').val();
+
+    var regionSelect = $('#selectRegion option:selected');
+    //国家地区数组
+    var region = [];
+    regionSelect.each(function () {
+        region.push(countryFBMap[$(this).text()]);
+    });
+
+    //更新系列请求
+    $.post('campaign/upCampaign', {
+        accountId: accountId.toString(),
+        accountName: accountName.toString(),
+        containsDisabledAccountId: containsDisabledAccountId,
+        appName: appName.toString(),
+        campaignStatus: campaignStatus.toString(),
+        region: region.toString()
+    }, function (data) {
+        if (data && data.ret == 1) {
+            alert(data.message);
+        }
+    }, 'json');
+
+    return false;
+});
 
 //删除facebook系列
 $('#btnDelete').click(function () {
@@ -2172,14 +2214,59 @@ $('#btnDelete').click(function () {
 
     //删除系列请求
     $.post('campaign/archivedCampaign', {
-        accountId:accountId.toString(),
-        accountName:accountName.toString(),
-        containsDisabledAccountId:containsDisabledAccountId,
-        appName:appName.toString(),
-        campaignStatus:campaignStatus.toString(),
-        region:region.toString()
+        accountId: accountId.toString(),
+        accountName: accountName.toString(),
+        containsDisabledAccountId: containsDisabledAccountId,
+        appName: appName.toString(),
+        campaignStatus: campaignStatus.toString(),
+        region: region.toString()
     }, function (data) {
+        if (data && data.ret == 1) {
+            alert(data.message);
+        }
+    }, 'json');
 
+    return false;
+});
+
+//更新adWords系列
+$('#btnUpdateAdmob').click(function () {
+
+    //帐号
+    var accountName = [];
+    var accountId = [];
+    var selectOptions = $('#selectAccountAdmob option:selected');
+    selectOptions.each(function () {
+        accountName.push($(this).text());
+        accountId.push($(this).val());
+    });
+    //包含被禁用的帐号
+    var containsDisabledAccountId = $('#containsDisabledAccountIdAdmob').prop("checked");
+
+    //系列状态
+    var campaignStatus = $('#selectCampaignStatusAdmob').val();
+    //应用
+    var appName = $('#selectAppAdmob').val();
+
+    var regionSelect = $('#selectRegionAdmob option:selected');
+    //国家地区数组
+    var region = [];
+    regionSelect.each(function () {
+        region.push(countryAdmobMap[$(this).text()]);
+    });
+
+    //删除系列请求
+    $.post('campaign_admob/upCampaign', {
+        accountId: accountId.toString(),
+        accountName: accountName.toString(),
+        containsDisabledAccountId: containsDisabledAccountId,
+        appName: appName.toString(),
+        campaignStatus: campaignStatus.toString(),
+        region: region.toString()
+    }, function (data) {
+        if (data && data.ret == 1) {
+            alert(data.message);
+        }
     }, 'json');
 
     return false;
@@ -2213,15 +2300,19 @@ $('#btnDeleteAdmob').click(function () {
 
     //删除系列请求
     $.post('campaign_admob/archivedCampaign', {
-        accountId:accountId.toString(),
-        accountName:accountName.toString(),
-        containsDisabledAccountId:containsDisabledAccountId,
-        appName:appName.toString(),
-        campaignStatus:campaignStatus.toString(),
-        region:region.toString()
+        accountId: accountId.toString(),
+        accountName: accountName.toString(),
+        containsDisabledAccountId: containsDisabledAccountId,
+        appName: appName.toString(),
+        campaignStatus: campaignStatus.toString(),
+        region: region.toString()
     }, function (data) {
-
+        if (data && data.ret == 1) {
+            alert(data.message);
+        }
     }, 'json');
 
     return false;
 });
+
+

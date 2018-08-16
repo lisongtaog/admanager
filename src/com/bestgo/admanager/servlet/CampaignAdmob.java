@@ -1,10 +1,10 @@
 package com.bestgo.admanager.servlet;
 
-import com.bestgo.admanager.AdWordsFetcher;
 import com.bestgo.admanager.Config;
 import com.bestgo.admanager.OperationResult;
 import com.bestgo.admanager.utils.NumberUtil;
 import com.bestgo.admanager.utils.Utils;
+import com.bestgo.admanager_tools.DefaultConfig;
 import com.bestgo.common.database.services.DB;
 import com.bestgo.common.database.utils.JSObject;
 import com.google.gson.JsonArray;
@@ -19,6 +19,9 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.System;
 import java.util.*;
+
+import static com.bestgo.admanager_tools.AdWordsFetcher.deleteAdWordsCampaignMultipleConditions;
+import static com.bestgo.admanager_tools.AdWordsFetcher.syncStatus;
 
 /**
  * Desc: 有关Adwords系列创建的操作
@@ -53,8 +56,8 @@ public class CampaignAdmob extends BaseHttpServlet {
 
         String path = request.getPathInfo();
         JsonObject json = new JsonObject();
-
-        if (path.startsWith("/archivedCampaign")) {
+        if (path.startsWith("/upCampaign")){
+            OperationResult result = new OperationResult();
             try {
                 String accountId = request.getParameter("accountId");
                 String accountName = request.getParameter("accountName");
@@ -70,32 +73,72 @@ public class CampaignAdmob extends BaseHttpServlet {
                 String[] regions = region.split(",");
 
 
+                DB.init();
+
+                DefaultConfig.setProxy();
 
                 //更新系列
                 if (accountIds.length > 1) {
                     for (int j = 0; j < accountIds.length; j++) {
-                        AdWordsFetcher.syncStatus(accountIds[j]);
+                        syncStatus(accountIds[j]);
                     }
                 } else if (accountIds.length == 1) {
-                    AdWordsFetcher.syncStatus(accountId);
+                    syncStatus(accountId);
                     System.out.println("完成了!");
                 }else {
                     return;
                 }
+                System.out.println("更新完成，请点击删除！");
+                result.message = "更新完成，请点击删除！";
+                result.result = true;
 
+            } catch (Exception e) {
+                result.message = e.getMessage();
+                result.result = false;
+            }
+
+            json.addProperty("ret", result.result ? 1 : 0);
+            json.addProperty("message", result.message);
+        } else if (path.startsWith("/archivedCampaign")) {
+            OperationResult result = new OperationResult();
+            try {
+                String accountId = request.getParameter("accountId");
+                String accountName = request.getParameter("accountName");
+                String containsDisabledAccountId = request.getParameter("containsDisabledAccountId");
+
+                String campaignStatus = request.getParameter("campaignStatus");
+                String region = request.getParameter("region");
+                String appName = request.getParameter("appName");
+
+                String[] accountIds = accountId.split(",");
+                String[] accountNames = accountName.split(",");
+                String[] campaignStatuss = campaignStatus.split(",");
+                String[] regions = region.split(",");
+
+
+                DB.init();
+
+                DefaultConfig.setProxy();
 
                 //删除系列
                 if (accountIds.length > 1) {
                     for (int i = 0; i < accountIds.length; i++) {
-                        AdWordsFetcher.deleteAdwordsCampaignMultipleConditions(accountIds[i], campaignStatus, appName, region);
+                        deleteAdWordsCampaignMultipleConditions(accountIds[i], campaignStatus, appName, region);
                     }
                 } else {
-                    AdWordsFetcher.deleteAdwordsCampaignMultipleConditions(accountId, campaignStatus, appName, region);
+                    deleteAdWordsCampaignMultipleConditions(accountId, campaignStatus, appName, region);
                 }
+                System.out.println("删除完成！！");
+                result.message = "删除完成！！";
+                result.result = true;
 
             } catch (Exception e) {
-                e.printStackTrace();
+                result.message = e.getMessage();
+                result.result = false;
             }
+
+            json.addProperty("ret", result.result ? 1 : 0);
+            json.addProperty("message", result.message);
         } else if (path.startsWith("/create")) {
             String appName = request.getParameter("appName");
             String gpPackageId = request.getParameter("gpPackageId");
@@ -614,4 +657,5 @@ public class CampaignAdmob extends BaseHttpServlet {
         }
         return retList;
     }
+
 }
