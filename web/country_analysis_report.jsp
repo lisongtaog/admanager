@@ -327,7 +327,7 @@
                 +'    <th class="editColumn">期望Ecpm</th>' //ML
                 +'    <th>老用户<br>Ecpm</th>'
                 +'    <th>新用户<br>平均展示</th>'
-                +'    <th class="editColumn">期望新用户<br>平均展示</th>'//ML
+                +'    <th class="editColumn">期望展示</th>'//ML
                 +'    <th>老用户<br>平均展示</th>'
                 +'    <th>1Day<br>Revenue</th>'
                 +'    <th>2Day<br>Revenue</th>'

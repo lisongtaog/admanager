@@ -246,6 +246,24 @@
                 checkFlag = false;
                 alert("country_code必须为2位大写字母");
             }
+        }else if (ruleType == 4) {
+            //app_name=xxx,country_code=xxx,purchased_user>10,roi<0.5
+            if (!checkNum(rule["purchased_user"]) || !checkNum(rule["roi"])) {
+                checkFlag = false;
+                alert("purchased_user、roi 必须为正数数字");
+            }
+            var reg = /^[A-Z]{2}$/;
+            if (!reg.test(rule["country_code"])) {
+                checkFlag = false;
+                alert("country_code必须为2位大写字母");
+            }
+
+        }else if (ruleType == 5) {
+            //app_name=xxx,purchased_user>10,roi<0.5
+            if (!checkNum(rule["purchased_user"]) || !checkNum(rule["roi"])) {
+                checkFlag = false;
+                alert("purchased_user、roi 必须为正数数字");
+            }
         }
         return checkFlag;
     }
