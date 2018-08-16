@@ -2,11 +2,13 @@ package com.bestgo.admanager.servlet;
 
 import com.bestgo.admanager.utils.NumberUtil;
 import com.bestgo.admanager.bean.AppBean;
+import com.bestgo.admanager.utils.StringUtil;
 import com.bestgo.admanager.utils.Utils;
 import com.bestgo.common.database.services.DB;
 import com.bestgo.common.database.utils.JSObject;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.mysql.jdbc.StringUtils;
 import org.apache.log4j.Logger;
 
 import javax.servlet.ServletException;
@@ -57,6 +59,8 @@ public class Query extends BaseHttpServlet {
             sorter = NumberUtil.parseInt(sorterId, 0);
         }
         try {
+            Map<String, AppBean> appRevenueMap = getAppRevenueMap(endTime);//仅当天的收入和新用户收入
+            Map<String, Integer> tagNameWarningLevelMap = getTagNameWarningLevelMap(endTime);
             JsonArray arr = new JsonArray();
             if (sorter > 0) {
                     ArrayList<AppBean> appBeanList = new ArrayList<>();
@@ -102,14 +106,13 @@ public class Query extends BaseHttpServlet {
                         appBean.total_cpa = appBean.total_installed > 0 ? appBean.total_spend / appBean.total_installed : 0;
                         appBean.total_cvr = appBean.total_click > 0 ? appBean.total_installed / appBean.total_click : 0;
 
-                        if (google_package_id != null && google_package_id != "") {
+                        if (StringUtil.isNotEmpty(google_package_id)) {
                             if(sameTime){
-                                String sqlR = "select sum(revenue) as revenues " +
-                                        "from web_ad_country_analysis_report_history where app_id = '"
-                                        + google_package_id + "' and date = '" + endTime + "'";
-                                JSObject oneR = DB.findOneBySql(sqlR);
-                                if (oneR.hasObjectData()) {
-                                    appBean.total_revenue = NumberUtil.convertDouble(oneR.get("revenues"), 0);
+                                AppBean appBean1 = appRevenueMap.get(google_package_id);
+                                if (appBean1 != null) {
+                                    appBean.total_revenue = appBean1.total_revenue;
+                                    appBean.totalNewRevenue = appBean1.totalNewRevenue;
+                                    appBean.roi = appBean.total_spend > 0 ? appBean.totalNewRevenue / appBean.total_spend : 0;
                                 }
                             }else{
                                 String sqlR = "select sum(revenue) as revenues " +
@@ -132,15 +135,14 @@ public class Query extends BaseHttpServlet {
                     if (appBeanList != null && appBeanList.size() > 0) {
                         //对应用进行排序
                         sorting(appBeanList,sorter);
-
                         for (AppBean cs : appBeanList) {
                             JsonObject j = new JsonObject();
                             j.addProperty("name", cs.name);
-                            String sql = "select warning_level from  web_app_logs where app_name = '" + cs.name + "' and log_date = '" + endTime + "'";
-                            JSObject one = DB.findOneBySql(sql);
-                            if (one.hasObjectData()) {
-                                int warningLevel = one.get("warning_level");             //指标warning_level 仅仅与endTime有关
+                            Integer warningLevel = tagNameWarningLevelMap.get(cs.name);
+                            if (warningLevel != null) {
                                 j.addProperty("warning_level", warningLevel);
+                            } else {
+                                j.addProperty("warning_level", 0);
                             }
                             j.addProperty("total_spend", NumberUtil.trimDouble(cs.total_spend, 0));
                             j.addProperty("total_installed", cs.total_installed);
@@ -152,7 +154,8 @@ public class Query extends BaseHttpServlet {
                             j.addProperty("total_revenue", NumberUtil.trimDouble(cs.total_revenue, 0));
                             j.addProperty("ecpm",NumberUtil.trimDouble(cs.ecpm,3));
                             j.addProperty("incoming",NumberUtil.trimDouble(cs.incoming,0));
-
+                            j.addProperty("roi",NumberUtil.trimDouble(cs.roi,3));
+                            j.addProperty("total_new_revenue",NumberUtil.trimDouble(cs.totalNewRevenue,3));
                             arr.add(j);
                         }
                     }
@@ -178,7 +181,7 @@ public class Query extends BaseHttpServlet {
                             total_spend = admob.get("total_spend").getAsDouble() + facebook.get("total_spend").getAsDouble();
                             total_installed = admob.get("total_installed").getAsDouble() + facebook.get("total_installed").getAsDouble();
                             total_click = admob.get("total_click").getAsDouble() + facebook.get("total_click").getAsDouble();
-                        }else if(facebookCheck.equals("true")){
+                        } else if(facebookCheck.equals("true")) {
                             facebook = fetchOneAppDataSummary(id, startTime, endTime, false,sameTime);
                             total_impressions = facebook.get("total_impressions").getAsDouble();
                             if (total_impressions == 0) {
@@ -187,7 +190,7 @@ public class Query extends BaseHttpServlet {
                             total_spend =  facebook.get("total_spend").getAsDouble();
                             total_installed =  facebook.get("total_installed").getAsDouble();
                             total_click =  facebook.get("total_click").getAsDouble();
-                        }else if(adwordsCheck.equals("true")){
+                        } else if(adwordsCheck.equals("true")) {
                             admob = fetchOneAppDataSummary(id, startTime, endTime, true,sameTime);
                             total_impressions = admob.get("total_impressions").getAsDouble();
                             if (total_impressions == 0) {
@@ -198,29 +201,11 @@ public class Query extends BaseHttpServlet {
                             total_click = admob.get("total_click").getAsDouble();
                         }
 
-                        double endTime_total_spend = 0;
-                        if(sameTime){
-                            endTime_total_spend = total_spend;
-                        }else{
-                            if(facebookCheck.equals("false") && adwordsCheck.equals("false")){
-                                JsonObject admob1 = fetchOneAppDataSummary(id, endTime, endTime, true,true);
-                                JsonObject facebook1 = fetchOneAppDataSummary(id, endTime, endTime, false,true);
-                                endTime_total_spend = admob1.get("total_spend").getAsDouble() + facebook1.get("total_spend").getAsDouble();
-                            }else if(facebookCheck.equals("true")){
-                                JsonObject facebook1 = fetchOneAppDataSummary(id, endTime, endTime, false,true);
-                                endTime_total_spend = facebook1.get("total_spend").getAsDouble();
-                            }else if(adwordsCheck.equals("true")){
-                                JsonObject admob1 = fetchOneAppDataSummary(id, endTime, endTime, true,true);
-                                endTime_total_spend = admob1.get("total_spend").getAsDouble();
-                            }
-                        }
-
                         double total_ctr = total_impressions > 0 ? total_click / total_impressions : 0;
                         double total_cpa = total_installed > 0 ? total_spend / total_installed : 0;
                         double total_cvr = total_click > 0 ? total_installed / total_click : 0;
 
                         JsonObject j = new JsonObject();
-                        j.addProperty("endTime_total_spend", NumberUtil.trimDouble(endTime_total_spend, 0));
                         j.addProperty("total_spend", NumberUtil.trimDouble(total_spend, 0));
                         j.addProperty("total_installed", total_installed);
                         j.addProperty("total_impressions", total_impressions);
@@ -229,25 +214,22 @@ public class Query extends BaseHttpServlet {
                         j.addProperty("total_cpa", NumberUtil.trimDouble(total_cpa, 3));
                         j.addProperty("total_cvr", NumberUtil.trimDouble(total_cvr, 3));
                         j.addProperty("name", tagName);
-                        String sql = "select warning_level from  web_app_logs where app_name = '" + tagName + "' and log_date = '" + endTime + "'";
-                        JSObject one = DB.findOneBySql(sql);
-                        if (one.hasObjectData()) {
-                            int warningLevel = one.get("warning_level");
+                        Integer warningLevel = tagNameWarningLevelMap.get(tagName);
+                        if (warningLevel != null) {
                             j.addProperty("warning_level", warningLevel);
+                        } else {
+                            j.addProperty("warning_level", 0);
                         }
 
-                        //计算这个应用的总营收和最后一天的营收
                         double totalRevenue = 0;
-                        double endTimeTotalRevenue = 0;
-                        if (googlePackageId != null && googlePackageId != "") {
+                        if (StringUtil.isNotEmpty(googlePackageId)) {
                             if(sameTime){
-                                String sqlR = "select sum(revenue) as revenues " +
-                                        "from web_ad_country_analysis_report_history where app_id = '"
-                                        + googlePackageId + "' and date = '" + endTime + "'";
-                                JSObject oneR = DB.findOneBySql(sqlR);
-                                if (oneR.hasObjectData()) {
-                                    endTimeTotalRevenue = NumberUtil.convertDouble(oneR.get("revenues"), 0);
-                                    totalRevenue = endTimeTotalRevenue;
+                                AppBean appBean1 = appRevenueMap.get(googlePackageId);
+                                if (appBean1 != null) {
+                                    totalRevenue = appBean1.total_revenue;
+                                    double roi = total_spend > 0 ? appBean1.totalNewRevenue / total_spend : 0;//回本率
+                                    j.addProperty("roi",NumberUtil.trimDouble(roi,3));
+                                    j.addProperty("total_new_revenue",NumberUtil.trimDouble(appBean1.totalNewRevenue,3));
                                 }
                             }else{
                                 String sqlR = "select sum(revenue) as revenues " +
@@ -257,17 +239,9 @@ public class Query extends BaseHttpServlet {
                                 if (oneR.hasObjectData()) {
                                     totalRevenue = NumberUtil.convertDouble(oneR.get("revenues"), 0);
                                 }
-                                sqlR = "select sum(revenue) as revenues " +
-                                        "from web_ad_country_analysis_report_history where app_id = '"
-                                        + googlePackageId + "' and date = '" + endTime + "'";
-                                oneR = DB.findOneBySql(sqlR);
-                                if (oneR.hasObjectData()) {
-                                    endTimeTotalRevenue = NumberUtil.convertDouble(oneR.get("revenues"), 0);
-                                }
                             }
 
                         }
-                        j.addProperty("endTime_total_revenue", NumberUtil.trimDouble(endTimeTotalRevenue, 0));
                         j.addProperty("total_revenue", NumberUtil.trimDouble(totalRevenue, 0));
 
                         //计算ECPM和Incoming
@@ -282,6 +256,9 @@ public class Query extends BaseHttpServlet {
                 }
 
             json.addProperty("ret", 1);
+            if (sameTime) {
+                json.addProperty("same_time", 1);
+            }
             json.addProperty("message", "执行成功");
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -336,6 +313,54 @@ public class Query extends BaseHttpServlet {
         jsonObject.addProperty("total_cpa", NumberUtil.trimDouble(total_cpa, 3));
         jsonObject.addProperty("total_cvr", NumberUtil.trimDouble(total_cvr, 3));
         return jsonObject;
+    }
+
+    /**
+     * 应用与警戒级别map
+     * @param date
+     * @return
+     * @throws Exception
+     */
+    private Map<String,Integer> getTagNameWarningLevelMap(String date) throws Exception {
+        Map<String,Integer> map = new HashMap<>();
+        List<JSObject> list = DB.findListBySql("SELECT app_name,warning_level \n" +
+                "FROM  web_app_logs \n" +
+                "WHERE log_date = '" + date + "' \n" +
+                "GROUP BY app_name");
+        String tagName = null;
+        Integer warningLevel = null;
+        for (int i = 0,len = list.size();i < len;i++) {
+            JSObject one = list.get(i);
+            tagName = one.get("app_name");
+            warningLevel = one.get("warning_level");
+            map.put(tagName,warningLevel);
+        }
+        return map;
+    }
+
+    /**
+     * 获取应用于收入新用户收入Map
+     * @param date
+     * @return
+     * @throws Exception
+     */
+    private Map<String, AppBean> getAppRevenueMap(String date) throws Exception {
+        Map<String, AppBean> map = new HashMap<>();
+        List<JSObject> list = DB.findListBySql("SELECT h.app_id,sum(ad_new_revenue) AS new_revenues,sum(revenue) AS revenues\n" +
+                "FROM web_ad_country_analysis_report_history h\n" +
+                "WHERE h.date = '" + date + "' GROUP BY h.app_id");
+        AppBean appBean = null;
+        for (int i = 0,len = list.size();i < len;i++) {
+            JSObject one = list.get(i);
+            if (one.hasObjectData()) {
+                appBean = new AppBean();
+                appBean.appId = one.get("app_id");
+                appBean.total_revenue = one.get("revenues");
+                appBean.totalNewRevenue = one.get("new_revenues");
+                map.put(appBean.appId,appBean);
+            }
+        }
+        return map;
     }
 
 

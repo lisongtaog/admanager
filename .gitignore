@@ -1,4 +1,4 @@
 out
 .idea
-.iml
+*.iml
 .ini

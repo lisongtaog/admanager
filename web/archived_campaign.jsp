@@ -110,6 +110,7 @@
 
         <div class="form-group">
             <div class="col-sm-10" style="text-align: center">
+                <input type="submit" class="btn btn-primary" style="width: 100px;" id="btnUpdate" value="更新"/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                 <input type="submit" class="btn btn-primary" style="width: 100px;" id="btnDelete" value="删除"/>
             </div>
             <br>
@@ -175,6 +176,7 @@
 
         <div class="form-group">
             <div class="col-sm-10" style="text-align: center">
+                <input type="submit" class="btn btn-primary" style="width: 100px;" id="btnUpdateAdmob" value="更新"/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                 <input type="submit" class="btn btn-primary" style="width: 100px;" id="btnDeleteAdmob" value="删除"/>
             </div>
             <br>
@@ -191,8 +193,6 @@
                 <h4>2.对（一个或多个）账号里的一个状态进行删除的</h4>
                 <br>
                 <h4>3.对（一个或多个）账号中指定对某个应用进行删除</h4>
-                <br>
-                <h4>4.对一个应用的一个国家进行删除</h4>
             </div>
         </div>
     </form>
