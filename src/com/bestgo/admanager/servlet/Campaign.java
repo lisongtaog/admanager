@@ -8,7 +8,6 @@ import com.bestgo.admanager.utils.NumberUtil;
 import com.bestgo.admanager.utils.StringUtil;
 import com.bestgo.admanager.utils.Utils;
 import com.bestgo.admanager_tools.DefaultConfig;
-import com.bestgo.admanager_tools.Main;
 import com.bestgo.common.database.services.DB;
 import com.bestgo.common.database.utils.JSObject;
 import com.google.gson.Gson;
@@ -28,7 +27,6 @@ import java.util.*;
 
 import static com.bestgo.admanager_tools.FacebookAccountBalanceFetcher.deleteFBCampaignMultipleConditions;
 import static com.bestgo.admanager_tools.FacebookAccountBalanceFetcher.updateFBCampaignStatusMultipleConditions;
-import static com.bestgo.admanager_tools.Main.initContext;
 
 /**
  * Desc: 有关Facebook系列创建的操作
@@ -89,26 +87,31 @@ public class Campaign extends BaseHttpServlet {
 
                 DefaultConfig.setProxy();
                 DB.init();
-
+                int index = 0;
                 //更新系列
                 if (accountIds.length > 1) {
                     for (int j = 0; j < accountIds.length; j++) {
-                        updateFBCampaignStatusMultipleConditions(accountIds[j], Boolean.parseBoolean(containsDisabledAccountId), campaignStatus);
+                        index = updateFBCampaignStatusMultipleConditions(accountIds[j], Boolean.parseBoolean(containsDisabledAccountId), campaignStatus);
                     }
                 } else {
-                    updateFBCampaignStatusMultipleConditions(accountId, Boolean.parseBoolean(containsDisabledAccountId), campaignStatus);
-                }
-                System.out.println("更新完成，请点击删除！");
-                result.message = "更新完成，请点击删除！";
-                result.result = true;
+                    index = updateFBCampaignStatusMultipleConditions(accountId, Boolean.parseBoolean(containsDisabledAccountId), campaignStatus);
 
+                }
+                if (index == 1) {
+                    result.message = "帐号已经关闭!";
+                    result.result = true;
+                } else {
+                    System.out.println("更新完成，请点击删除！");
+                    result.message = "更新完成，请点击删除！";
+                    result.result = true;
+                }
             } catch (Exception e) {
                 result.message = e.getMessage();
-                result.result = false;
+                result.result = true;
             }
 
-        json.addProperty("ret", result.result ? 1 : 0);
-        json.addProperty("message", result.message);
+            json.addProperty("ret", result.result ? 1 : 0);
+            json.addProperty("message", result.message);
         } else if (path.startsWith("/archivedCampaign")) {
             OperationResult result = new OperationResult();
             try {

@@ -465,10 +465,8 @@ public class CampaignAdmob extends BaseHttpServlet {
                         one.addProperty("cvr", NumberUtil.trimDouble(cvr, 3));
                         //one.addProperty("tagStr", "");
                         array.add(one);
-
                     }
                 }
-
             } catch (Exception e) {
                 e.printStackTrace();
             }
