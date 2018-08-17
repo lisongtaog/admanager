@@ -15,7 +15,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
+import java.lang.*;
 import java.util.*;
 
 /**
@@ -158,7 +158,6 @@ public class CountryAnalysisReport extends BaseHttpServlet {
                             floatDataMap = getFloatData(appId,endTime);
                         }
 
-
                         double totalCost = 0; //当前应用的总花费
                         double totalPuserchaedUser = 0; //当前应用的总购买用户
                         double totalRevenue = 0; //当前应用的总收入
@@ -249,21 +248,21 @@ public class CountryAnalysisReport extends BaseHttpServlet {
 
                                     double newUserEcpm = newUserImpression == 0 ? 0 : newUserRevenue * 1000 / newUserImpression;
                                     double oldUserEcpm = oldUserImpression == 0 ? 0 : oldUserRevenue * 1000 / oldUserImpression;
-                                    d.addProperty("new_user_ecpm",NumberUtil.trimDouble(newUserEcpm,4));
-                                    d.addProperty("old_user_ecpm",NumberUtil.trimDouble(oldUserEcpm,4));
+                                    d.addProperty("newUserEcpm",NumberUtil.trimDouble(newUserEcpm,4));
+                                    d.addProperty("oldUserEcpm",NumberUtil.trimDouble(oldUserEcpm,4));
 
                                     double totalUsers = NumberUtil.convertDouble(j.get("total_users"), 0);
                                     double oldUser = totalUsers - installed;
                                     double oldUserAvgImpression = oldUser > 0 ? oldUserImpression / oldUser : 0;
                                     double newUserAvgImpression = installed > 0 ? newUserImpression / installed : 0;
-                                    d.addProperty("old_user_avg_impression",NumberUtil.trimDouble(oldUserAvgImpression,4));
-                                    d.addProperty("new_user_avg_impression",NumberUtil.trimDouble(newUserAvgImpression,4));
+                                    d.addProperty("oldUserAvgImpression",NumberUtil.trimDouble(oldUserAvgImpression,4));
+                                    d.addProperty("newUserAvgImpression",NumberUtil.trimDouble(newUserAvgImpression,4));
 
                                     //当天回本率=newRevenues/总花费
                                     double recoveryCostRatio = costs > 0 ? newRevenues / costs : 0;
 
-                                    d.addProperty("new_revenues", NumberUtil.trimDouble(newRevenues, 2));
-                                    d.addProperty("recovery_cost_ratio", NumberUtil.trimDouble(recoveryCostRatio, 3));
+                                    d.addProperty("newRevenue", NumberUtil.trimDouble(newRevenues, 2));
+                                    d.addProperty("recoveryCostRatio", NumberUtil.trimDouble(recoveryCostRatio, 3));//回本率
                                     double firstDayRevenue = NumberUtil.convertDouble(j.get("first_day_revenue"),0);
                                     double secondDayRevenue = NumberUtil.convertDouble(j.get("second_day_revenue"),0);
                                     secondDayRevenue += firstDayRevenue;
@@ -276,7 +275,7 @@ public class CountryAnalysisReport extends BaseHttpServlet {
                                     d.addProperty("third_day_revenue",NumberUtil.trimDouble(thirdDayRevenue,2));
                                     d.addProperty("fourth_day_revenue",NumberUtil.trimDouble(fourthDayRevenue,2));
                                     double cpaDivNewUserEcpm = newUserEcpm > 0 ? cpa / newUserEcpm : 0;
-                                    d.addProperty("cpa_div_new_user_ecpm", NumberUtil.trimDouble(cpaDivNewUserEcpm, 3));
+                                    d.addProperty("cpaDivNewEcpm", NumberUtil.trimDouble(cpaDivNewUserEcpm, 3));
                                     //" t.cpa as tag_cpa, t.ecpm as tag_ecpm,t.avg_impression \n" +
                                     double tag_cpa = NumberUtil.convertDouble(j.get("tag_cpa"), 0);
                                     double tag_ecpm = NumberUtil.convertDouble(j.get("tag_ecpm"), 0);
@@ -299,17 +298,17 @@ public class CountryAnalysisReport extends BaseHttpServlet {
                                 d.addProperty("country_name", countryCodeNameMap.get(countryCode));
                                 d.addProperty("bidding_summary", biddingSummaryStr);
                                 d.addProperty("costs", NumberUtil.trimDouble(costs, 2));
-                                d.addProperty("purchased_users", purchasedUsers);
+                                d.addProperty("purchasedUser", purchasedUsers);
                                 d.addProperty("installed", installed);
-                                d.addProperty("uninstalled_rate", NumberUtil.trimDouble(uninstalledRate, 3));
-                                d.addProperty("active_users", activeUsers);
-                                d.addProperty("revenues", NumberUtil.trimDouble(revenues, 2));
+                                d.addProperty("uninstalledRate", NumberUtil.trimDouble(uninstalledRate, 3));
+                                d.addProperty("activeUser", activeUsers);
+                                d.addProperty("revenue", NumberUtil.trimDouble(revenues, 2));
                                 d.addProperty("ecpm", NumberUtil.trimDouble(ecpm, 3));
 
 
                                 floatItem = sameDate ? floatDataMap.get(countryCode) : null;//获取悬浮数据项 && 只有日期相同时 显示悬浮
                                 if(null != floatItem){//只有日期相同时 显示悬浮
-                                    d.addProperty("float_cost", String.join("\n",floatItem.get("cost")));
+                                    d.addProperty("float_costs", String.join("\n",floatItem.get("cost")));
                                     d.addProperty("float_purchasedUser", String.join("\n",floatItem.get("purchasedUser")));
                                     d.addProperty("float_installed", String.join("\n",floatItem.get("installed")));
                                     d.addProperty("float_uninstalledRate", String.join("\n",floatItem.get("uninstalledRate")));
@@ -318,8 +317,15 @@ public class CountryAnalysisReport extends BaseHttpServlet {
                                     d.addProperty("float_newRevenue", String.join("\n",floatItem.get("newRevenue")));
                                     d.addProperty("float_ecpm", String.join("\n",floatItem.get("ecpm")));
                                     d.addProperty("float_cpa", String.join("\n",floatItem.get("cpa")));
-                                    d.addProperty("float_cpaDivEcpm", String.join("\n",floatItem.get("cpaDivEcpm")));
+                                    d.addProperty("float_cpaDivNewEcpm", String.join("\n",floatItem.get("cpaDivEcpm")));
                                     d.addProperty("float_incoming", String.join("\n",floatItem.get("incoming")));
+
+                                    d.addProperty("float_recoveryCostRatio", String.join("\n",floatItem.get("recoveryCostRatio")));
+                                    d.addProperty("float_newUserEcpm", String.join("\n",floatItem.get("newUserEcpm")));
+                                    d.addProperty("float_oldUserEcpm", String.join("\n",floatItem.get("oldUserEcpm")));
+                                    d.addProperty("float_newUserAvgImpression", String.join("\n",floatItem.get("newUserAvgImpression")));
+                                    d.addProperty("float_oldUserAvgImpression", String.join("\n",floatItem.get("oldUserAvgImpression")));
+
                                 }
 
                                 d.addProperty("incoming", NumberUtil.trimDouble(incoming, 2));
@@ -405,10 +411,11 @@ public class CountryAnalysisReport extends BaseHttpServlet {
         try {
             String sinceDate = DateUtil.addDay(endTime, -7, "yyyy-MM-dd");//悬浮 展示起始日期
             String floatSql = null;//国家分析报告悬浮展示
-            floatSql = "select date,country_code,cost, purchased_user,total_installed,revenue,active_user,ad_new_revenue, " +
+            floatSql = "select date,country_code,cost, purchased_user,total_user,total_installed,revenue,active_user,ad_new_revenue, " +
                     "(case when total_installed > 0 then today_uninstalled / total_installed else 0 end) as uninstall_rate," +
                     "(case when impression > 0 then revenue * 1000 / impression else 0 end) as ecpm," +
-                    "(case when purchased_user > 0 then cost / purchased_user else 0 end) as cpa " +
+                    "(case when purchased_user > 0 then cost / purchased_user else 0 end) as cpa, " +
+                    "new_user_revenue,new_user_impression,old_user_revenue,old_user_impression " +
                     "from web_ad_country_analysis_report_history where " +
                     " date BETWEEN '" + sinceDate + "' AND '" + endTime + "'" +
                     " and app_id = '" + appId + "' " +
@@ -416,13 +423,16 @@ public class CountryAnalysisReport extends BaseHttpServlet {
 
             List<JSObject> dataList = DB.findListBySql(floatSql);
             List costList,purchasedUserList,installedList,uninstalledRateList,activeUserList,
-                    revenueList,newRevenueList,ecpmList,cpaList,cpaDivEcpmList,incomingList;
+                    revenueList,newRevenueList,ecpmList,cpaList,cpaDivEcpmList,incomingList,
+                    ratioList,newUserEcpmList,oldUserEcpmList,newUserAvgImpList,oldUserAvgImpList;
 
             Map<String,List> item = null;
             String date,countryCode;
             String split = " : ";int precision = 2;
-            long purchasedUser,installed,activeUser;
-            double cost,uninstallRate,revenue,newRevenue,ecpm,cpa,cpaDivEcpm,incoming;
+            long purchasedUser,installed,activeUser,totalUser,oldUser;
+            double newUserImpression,oldUserImpression;
+            double cost,uninstallRate,revenue,newRevenue,ecpm,cpa,cpaDivEcpm,incoming,
+                    recoveryCostRatio,newUserRevenue,oldUserRevenue,newUserAvgImpression,oldUserAvgImpression, newUserEcpm,oldUserEcpm;
             for (JSObject one : dataList) {
                 if (one.hasObjectData()) {
                     date = one.get("date").toString();
@@ -441,17 +451,38 @@ public class CountryAnalysisReport extends BaseHttpServlet {
                     cpaDivEcpmList = item.get("cpaDivEcpm");
                     incomingList = item.get("incoming");
 
+                    ratioList = item.get("recoveryCostRatio");
+                    newUserEcpmList = item.get("newUserEcpm");
+                    oldUserEcpmList = item.get("oldUserEcpm");
+                    newUserAvgImpList = item.get("newUserAvgImpression");
+                    oldUserAvgImpList = item.get("oldUserAvgImpression");
+
+
                     cost = NumberUtil.convertDouble(one.get("cost"), 0);
                     purchasedUser = NumberUtil.convertLong(one.get("purchased_user"), 0);
+                    totalUser = NumberUtil.convertLong(one.get("total_user"), 0);
                     installed = NumberUtil.convertLong(one.get("total_installed"), 0);
+                    oldUser = totalUser - installed;
                     uninstallRate = NumberUtil.convertDouble(one.get("uninstall_rate"), 0);
                     activeUser = NumberUtil.convertLong(one.get("active_user"), 0);
                     revenue = NumberUtil.convertDouble(one.get("revenue"), 0);
                     newRevenue = NumberUtil.convertDouble(one.get("ad_new_revenue"), 0);
+                    newUserRevenue = NumberUtil.convertDouble(one.get("new_user_revenue"), 0);//新用户收益
+                    oldUserRevenue = NumberUtil.convertDouble(one.get("old_user_revenue"), 0);//老用户收益
+                    newUserImpression = NumberUtil.convertDouble(one.get("new_user_impression"), 0);//新用户展示次数
+                    oldUserImpression = NumberUtil.convertDouble(one.get("old_user_impression"), 0);//老用户展示次数
+
                     ecpm = NumberUtil.convertDouble(one.get("ecpm"), 0);
                     cpa = NumberUtil.convertDouble(one.get("cpa"), 0);
-                    cpaDivEcpm = ecpm == 0 ? 0 : cpa / ecpm;
+                    newUserEcpm = newUserImpression > 0 ? newUserRevenue * 1000 / newUserImpression : 0 ;
+                    oldUserEcpm = oldUserImpression > 0 ? oldUserRevenue * 1000 / oldUserImpression : 0 ;
+                    newUserAvgImpression = installed > 0 ? newUserImpression / installed : 0;//新用户平均展示
+                    oldUserAvgImpression = oldUser > 0 ? oldUserImpression / oldUser : 0;//老用户平均展示
+
+                    cpaDivEcpm = ecpm == 0 ? 0 : cpa / newUserEcpm;
                     incoming = revenue - cost;
+                    //当天回本率=newRevenues/总花费
+                    recoveryCostRatio = cost > 0 ? newRevenue / cost : 0;
 
                     costList.add(date + split + NumberUtil.trimDouble(cost,precision) );
                     purchasedUserList.add(date + split + purchasedUser );
@@ -460,10 +491,16 @@ public class CountryAnalysisReport extends BaseHttpServlet {
                     activeUserList.add(date + split + activeUser );
                     revenueList.add(date + split + NumberUtil.trimDouble(revenue,precision) );
                     newRevenueList.add(date + split + NumberUtil.trimDouble(newRevenue,precision) );
-                    ecpmList.add(date + split +  NumberUtil.trimDouble(ecpm, precision) );
-                    cpaList.add(date + split + NumberUtil.trimDouble(cpa, precision) );
-                    cpaDivEcpmList.add(date + split + NumberUtil.trimDouble(cpaDivEcpm, precision) );
+                    ecpmList.add(date + split +  NumberUtil.trimDouble(ecpm, 3) );
+                    cpaList.add(date + split + NumberUtil.trimDouble(cpa, 3) );
+                    cpaDivEcpmList.add(date + split + NumberUtil.trimDouble(cpaDivEcpm, 3) );
                     incomingList.add(date + split + NumberUtil.trimDouble(incoming, precision) );
+
+                    ratioList.add(date + split + NumberUtil.trimDouble(recoveryCostRatio,3));
+                    newUserEcpmList.add(date + split + NumberUtil.trimDouble(newUserEcpm,4));
+                    oldUserEcpmList.add(date + split + NumberUtil.trimDouble(oldUserEcpm,4));
+                    newUserAvgImpList.add(date + split + NumberUtil.trimDouble(newUserAvgImpression,4));
+                    oldUserAvgImpList.add(date + split + NumberUtil.trimDouble(oldUserAvgImpression,4));
                 }
             }
 
@@ -476,7 +513,8 @@ public class CountryAnalysisReport extends BaseHttpServlet {
 
     private static void initFloadDataItem(Map<String,Map<String,List>> dataMap,String countryCode){
         List costList,purchasedUserList,installedList,uninstalledRateList,activeUserList,
-                revenueList,newRevenueList,ecpmList,cpaList,cpaDivEcpmList,incomingList;
+                revenueList,newRevenueList,ecpmList,cpaList,cpaDivEcpmList,incomingList,
+                ratioList,newUserEcpmList,oldUserEcpmList,newUserAvgImpList,oldUserAvgImpList;
         Map<String,List> item = null;
 
         item = dataMap.get(countryCode);
@@ -493,6 +531,11 @@ public class CountryAnalysisReport extends BaseHttpServlet {
             cpaList = new ArrayList();
             cpaDivEcpmList = new ArrayList();
             incomingList = new ArrayList();
+            ratioList = new ArrayList();
+            newUserEcpmList = new ArrayList();
+            oldUserEcpmList = new ArrayList();
+            newUserAvgImpList = new ArrayList();
+            oldUserAvgImpList = new ArrayList();
 
             item.put("cost",costList);
             item.put("purchasedUser",purchasedUserList);
@@ -505,6 +548,13 @@ public class CountryAnalysisReport extends BaseHttpServlet {
             item.put("cpa",cpaList);
             item.put("cpaDivEcpm",cpaDivEcpmList);
             item.put("incoming",incomingList);
+
+            item.put("recoveryCostRatio",ratioList);//回本率
+            item.put("newUserEcpm",newUserEcpmList);
+            item.put("oldUserEcpm",oldUserEcpmList);
+            item.put("newUserAvgImpression",newUserAvgImpList);
+            item.put("oldUserAvgImpression",oldUserAvgImpList);
+
             dataMap.put(countryCode,item);
         }
     }

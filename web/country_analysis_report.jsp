@@ -175,57 +175,35 @@
                 $("#editBtn").css("display", "");
             }
         }
-        var one,value;
-        var keyset = ["costs","cost_upper_limit","purchased_users", "installed", "uninstalled_rate",
-            "active_users","revenues", "incoming", "ecpm", "cpa",
+
+        var keyset = ["costs","cost_upper_limit","purchasedUser", "installed", "uninstalledRate",
+            "activeUser","revenue", "incoming", "ecpm", "cpa",
             "cpa_div_ecpm", "bidding_summary"];
         if (same_date == 1) {
-            keyset = ["costs","cost_upper_limit","purchased_users", "installed", "uninstalled_rate",
-                "active_users","revenues", "new_revenues","recovery_cost_ratio","incoming", "ecpm","cpa","tag_cpa",
-                "cpa_div_new_user_ecpm", "new_user_ecpm","tag_ecpm","old_user_ecpm","new_user_avg_impression","tag_impression",
-                "old_user_avg_impression", "first_day_revenue","second_day_revenue",
+            keyset = ["costs","cost_upper_limit","purchasedUser", "installed", "uninstalledRate",
+                "activeUser","revenue", "newRevenue","recoveryCostRatio","incoming", "ecpm","cpa","tag_cpa",
+                "cpaDivNewEcpm", "newUserEcpm","tag_ecpm","oldUserEcpm","newUserAvgImpression","tag_impression",
+                "oldUserAvgImpression", "first_day_revenue","second_day_revenue",
                 "third_day_revenue","fourth_day_revenue","bidding_summary"];
         }
 
+
+        var one,key,val,floatKey;
+        var tr,td;
         var isColumnEditable;//列是否可编辑
         for (var i = 0; i < len; i++) {
             one = arr[i];
-            var tr = $('<tr></tr>');
-            var td_outer_a = $('<td>'+ one['country_name'] +'<input type="hidden" value="'+one['country_code']+'"/></td>');
-            tr.append(td_outer_a);
+            tr = $('<tr></tr>');
+            td = $('<td>'+ one['country_name'] +'<input type="hidden" value="'+one['country_code']+'"/></td>');
+            tr.append(td);//第一列 国家
             for (var j = 0; j < keyset.length; j++) {
                 isColumnEditable = false;//默认不可编辑
-                var key = keyset[j];
-                var td = $('<td></td>');
-                var r = one[key];
-                if('costs' == key){
-                    td = $('<td title="'+ one['float_cost'] + '"></td>');
-                }else if('purchased_users' == key){
-                    td = $('<td title="'+ one['float_purchasedUser'] + '"></td>');
-                }else if('installed' == key){
-                    td = $('<td title="'+ one['float_installed'] + '"></td>');
-                }else if('uninstalled_rate' == key){
-                    td = $('<td title="'+ one['float_uninstalledRate'] + '"></td>');
-                }else if('active_users' == key){
-                    td = $('<td title="'+ one['float_activeUser'] + '"></td>');
-                }else if('new_revenues' == key){
-                    td = $('<td title="'+ one['float_newRevenue'] + '"></td>');
-                }else if('revenues' == key){
-                    td = $('<td title="'+ one['float_revenue'] + '"></td>');
-                }else if('ecpm' == key){
-                    td = $('<td title="'+ one['float_ecpm'] + '"></td>');
-                }else if('cpa' == key){
-                    td = $('<td title="'+ one['float_cpa'] + '"></td>');
-                }else if('cpa_div_ecpm' == key){
-                    td = $('<td title="'+ one['float_cpaDivEcpm'] + '"></td>');
-                }else if('incoming' == key){
-                    td = $('<td title="'+ one['float_incoming'] + '"></td>');
-                    if(r < 0){
-                        td.addClass("red");
-                    }
-                } else if('cost_upper_limit' == key){//国家花费上限
+                key = keyset[j];
+                val = one[key];
+
+                if('cost_upper_limit' == key){//国家花费上限
                     isColumnEditable = true;
-                    if(r ==""){
+                    if(val ==""){
                         td = $("<td><input type='text' class='editInput' onchange='editInputChange(this);'  /></td>");
                     }else{
                         td = $("<td><input type='text' class='editInput' onchange='editInputChange(this);' value='"+ one['cost_upper_limit'] +"' /></td>");
@@ -239,9 +217,17 @@
                     }
                     td = $("<td><input type='text' class='editInput' onchange='editInputChange(this);' value='"+ value +"' /></td>");
                     td.addClass("editColumn");
+                }else if(key.indexOf("_") > -1){//key包含下划线 则该列没有浮动数据显示；反之则有
+                    td = $('<td></td>');
+                }else {
+                    floatKey = "float_" + key;
+                    td = $('<td '+ getFloatTitle(same_date,one[floatKey]) +'></td>');
+                    if('incoming' == key && val < 0){
+                        td.addClass("red");
+                    }
                 }
                 if(!isColumnEditable){//不可编辑列 输出td文本
-                    td.text(r);
+                    td.text(val);
                 }
                 tr.append(td);
             }
@@ -266,6 +252,11 @@
             tr.append(td_outer);*/
             $('#results_body').append(tr);
         }
+    }
+
+    function getFloatTitle(same_date,value) {
+        var floatTitleStr = same_date == 1 ? 'title="'+ value + '"' : "";
+        return floatTitleStr;
     }
 
     /**初始化*/
