@@ -129,6 +129,8 @@
                 <h4>3.对一个账号中指定对某个应用进行删除</h4>
                 <br>
                 <h4>4.对一个应用的一个国家进行删除（不需要更新）</h4>
+                <br>
+                <h4  style="color: deepskyblue">没有选择任何条件更新，会更新所有帐号下所有系列</h4>
             </div>
         </div>
     </form>
@@ -188,11 +190,13 @@
             <label class="col-sm-2"></label>
             <div class="col-sm-8">
                 <br>
-                <h4 >1.对（一个或多个）账号不管什么状态系列全部删除的</h4>
+                <h4 >1.对一个账号不管什么状态系列全部删除的</h4>
                 <br>
-                <h4>2.对（一个或多个）账号里的一个状态进行删除的</h4>
+                <h4>2.对一个账号里的一个状态进行删除的</h4>
                 <br>
-                <h4>3.对（一个或多个）账号中指定对某个应用进行删除</h4>
+                <h4>3.对一个账号中指定对某个应用进行删除</h4>
+                <br>
+                <h4  style="color: deepskyblue">没有选择任何条件更新，会更新所有帐号下所有系列</h4>
             </div>
         </div>
     </form>
@@ -203,7 +207,6 @@
 
 <script>
     $("li[role='presentation']:eq(3)").addClass("active");
-    var campaignStatus = ["", "ARCHIVED", "ACTIVE", "PAUSED"];
 
 </script>
 <script src="js/archived_campaign.js?t=<%=Math.random()%>"></script>

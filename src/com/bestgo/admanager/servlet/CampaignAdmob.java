@@ -4,6 +4,7 @@ import com.bestgo.admanager.Config;
 import com.bestgo.admanager.OperationResult;
 import com.bestgo.admanager.utils.NumberUtil;
 import com.bestgo.admanager.utils.Utils;
+import com.bestgo.admanager_tools.AdWordsFetcher;
 import com.bestgo.admanager_tools.DefaultConfig;
 import com.bestgo.common.database.services.DB;
 import com.bestgo.common.database.utils.JSObject;
@@ -20,7 +21,6 @@ import java.io.IOException;
 import java.lang.System;
 import java.util.*;
 
-import static com.bestgo.admanager_tools.AdWordsFetcher.deleteAdWordsCampaignMultipleConditions;
 import static com.bestgo.admanager_tools.AdWordsFetcher.syncStatus;
 
 /**
@@ -56,7 +56,7 @@ public class CampaignAdmob extends BaseHttpServlet {
 
         String path = request.getPathInfo();
         JsonObject json = new JsonObject();
-        if (path.startsWith("/upCampaign")){
+        if (path.startsWith("/upCampaign")) {
             OperationResult result = new OperationResult();
             try {
                 String accountId = request.getParameter("accountId");
@@ -85,7 +85,7 @@ public class CampaignAdmob extends BaseHttpServlet {
                 } else if (accountIds.length == 1) {
                     syncStatus(accountId);
                     System.out.println("完成了!");
-                }else {
+                } else {
                     return;
                 }
                 System.out.println("更新完成，请点击删除！");
@@ -123,13 +123,58 @@ public class CampaignAdmob extends BaseHttpServlet {
                 //删除系列
                 if (accountIds.length > 1) {
                     for (int i = 0; i < accountIds.length; i++) {
-                        deleteAdWordsCampaignMultipleConditions(accountIds[i], campaignStatus, appName, region);
+                        AdWordsFetcher.deleteAdwordsCampaignMultipleConditions(accountIds[i], campaignStatus, appName, region);
                     }
                 } else {
-                    deleteAdWordsCampaignMultipleConditions(accountId, campaignStatus, appName, region);
+                    AdWordsFetcher.deleteAdwordsCampaignMultipleConditions(accountId, campaignStatus, appName, region);
                 }
                 System.out.println("删除完成！！");
                 result.message = "删除完成！！";
+                result.result = true;
+
+            } catch (Exception e) {
+                result.message = e.getMessage();
+                result.result = false;
+            }
+
+            json.addProperty("ret", result.result ? 1 : 0);
+            json.addProperty("message", result.message);
+        } else if (path.startsWith("/countArchivedCampaign")) {
+            OperationResult result = new OperationResult();
+            try {
+                String accountId = request.getParameter("accountId");
+                String accountName = request.getParameter("accountName");
+                String containsDisabledAccountId = request.getParameter("containsDisabledAccountId");
+
+                String campaignStatus = request.getParameter("campaignStatus");
+                String region = request.getParameter("region");
+                String appName = request.getParameter("appName");
+
+                String[] accountIds = accountId.split(",");
+                String[] accountNames = accountName.split(",");
+                String[] campaignStatuss = campaignStatus.split(",");
+                String[] regions = region.split(",");
+
+
+                DB.init();
+
+                DefaultConfig.setProxy();
+
+                long index = 0;
+
+                //删除系列个数统计
+                if (accountIds.length > 1) {
+                    for (int i = 0; i < accountIds.length; i++) {
+                        index = countArchivedCampaignAdmob(accountIds[i], campaignStatus, appName, region);
+                    }
+                } else {
+                    index = countArchivedCampaignAdmob(accountId, campaignStatus, appName, region);
+                }
+
+                int index1 = (int) index / 1000;
+
+                System.out.println("需要删除" + index + "个系列，每次删除1000个。剩余" + index1 + "次操作！");
+                result.message = "需要删除" + index + "个系列，每次删除1000个。剩余" + index1 + "次操作！";
                 result.result = true;
 
             } catch (Exception e) {
@@ -654,6 +699,51 @@ public class CampaignAdmob extends BaseHttpServlet {
             e.printStackTrace();
         }
         return retList;
+    }
+
+    /**
+     * 多情况下删除Adwords的广告系列个数统计
+     *
+     * @param accountId
+     * @param status
+     * @param tag
+     * @param country
+     */
+    public static long countArchivedCampaignAdmob(String accountId, String status, String tag, String country) {
+        try {
+            String sql = "";
+            JSObject oneBySql;
+            long geShu = 0;
+            if (!(null == accountId) && !"".equals(accountId)) {//帐户非空
+                if (!(null == status) && !"".equals(status)) {//帐号+状态
+                    sql = "SELECT COUNT(*) AS geShu  FROM web_ad_campaigns_admob WHERE account_id = '" + accountId + "' AND STATUS = '" + status + "' ";
+                    oneBySql = DB.findOneBySql(sql);
+                    geShu = oneBySql.get("geShu");
+                } else if (!(null == tag) && !"".equals(tag)) {//帐号+应用
+                    Map<String, Integer> facebookTagDetails = AdWordsFetcher.getFacebookTagDetails();
+                    Integer tag_id = facebookTagDetails.get(tag);
+                    sql = "SELECT COUNT(*) AS geShu FROM web_ad_campaigns_admob WHERE account_id = '" + accountId + "' AND tag_id = '" + tag_id + "' AND status != 'ARCHIVED' ";
+                    oneBySql = DB.findOneBySql(sql);
+                    geShu = oneBySql.get("geShu");
+                } else {//帐户下所有系列
+                    sql = "SELECT COUNT(*) AS geShu FROM web_ad_campaigns_admob where account_id = '" + accountId + "' AND status != 'ARCHIVED' ";
+                    oneBySql = DB.findOneBySql(sql);
+                    geShu = oneBySql.get("geShu");
+                }
+            } else if (!(null == tag) && !(null == country) && !"".equals(tag) && !"".equals(country)) {//应用+国家
+                Map<String, Integer> facebookTagDetails = AdWordsFetcher.getFacebookTagDetails();
+                Integer tag_id = facebookTagDetails.get(tag);
+                sql = "SELECT  COUNT(*) AS geShu FROM web_ad_campaigns_admob WHERE tag_id = '" + tag_id + "' AND country_code LIKE '%" + country + "%' AND status != 'ARCHIVED' ";
+                oneBySql = DB.findOneBySql(sql);
+                geShu = oneBySql.get("geShu");
+            } else {
+                System.out.println("参数有误！请重新输入！！");
+            }
+            return geShu;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
     }
 
 }

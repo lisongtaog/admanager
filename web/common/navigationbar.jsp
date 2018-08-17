@@ -65,7 +65,7 @@
                 <li><a href="tags.jsp" target="_blank">标签管理</a></li>
                 <li><a href="tagsBidAdmanager.jsp" target="_blank">标签下国家出价管理</a></li>
                 <li><a href="team_category_management.jsp" target="_blank">项目组/应用品类管理</a></li>
-                <li><a href="archived_campaign.jsp" target="_blank">删除广告系列(测试中)</a></li>
+                <li><a href="archived_campaign.jsp" target="_blank">更新和删除系列</a></li>
             </ul>
         </li>
 
