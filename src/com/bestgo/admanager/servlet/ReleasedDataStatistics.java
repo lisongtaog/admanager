@@ -69,7 +69,7 @@ public class ReleasedDataStatistics extends BaseHttpServlet {
                     JSObject one = DB.findOneBySql("select id from web_ad_login_user where nickname = '" + nickname + "'");
                     if (one.hasObjectData()) {
                         long id = one.get("id");
-                        sql = "select team_name,category_name,t.tag_name,anticipated_incoming,anticipated_revenue,t.user_id " +
+                        sql = "select team_name,category_name,t.tag_name,anticipated_incoming,anticipated_revenue,t.user_id,is_display " +
                                 "from web_ad_category_team ct, web_ad_tag_category tc, web_tag t " +
                                 "where tc.id = t.tag_category_id and ct.id = tc.team_id and is_statistics = 1 and t.user_id = " + id +
                                 (StringUtil.isEmpty(likeTeamName) ? " " : " and team_name like '%" + likeTeamName + "%' ") +

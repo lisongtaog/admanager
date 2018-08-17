@@ -108,6 +108,8 @@
             admanager.showCommonDlg("错误", "标签为必录项!");
             return false;
         }
+        $('#results_body').html("");//清空结果表
+        $('#total_result').html("");
 
         var params = {"tagName":query,"startTime":startTime,"endTime":endTime};
         if(sorterId && sorterId >= 0){
@@ -197,31 +199,27 @@
                 var td = $('<td></td>');
                 var r = one[key];
                 if('costs' == key){
-                    td = $('<td title="'+ one['every_day_cost_for_fourteen_days'] + '"></td>');
+                    td = $('<td title="'+ one['float_cost'] + '"></td>');
                 }else if('purchased_users' == key){
-                    td = $('<td title="'+ one['every_day_purchased_user_for_fourteen_days'] + '"></td>');
+                    td = $('<td title="'+ one['float_purchasedUser'] + '"></td>');
                 }else if('installed' == key){
-                    td = $('<td title="'+ one['every_day_installed_for_fourteen_days'] + '"></td>');
+                    td = $('<td title="'+ one['float_installed'] + '"></td>');
                 }else if('uninstalled_rate' == key){
-                    td = $('<td title="'+ one['every_day_uninstalled_rate_for_fourteen_days'] + '"></td>');
+                    td = $('<td title="'+ one['float_uninstalledRate'] + '"></td>');
                 }else if('active_users' == key){
-                    td = $('<td title="'+ one['every_day_active_user_for_fourteen_days'] + '"></td>');
+                    td = $('<td title="'+ one['float_activeUser'] + '"></td>');
                 }else if('new_revenues' == key){
-                    td = $('<td title="'+ one['every_day_ad_new_revenue_for_fourteen_days'] + '"></td>');
+                    td = $('<td title="'+ one['float_newRevenue'] + '"></td>');
                 }else if('revenues' == key){
-                    td = $('<td title="'+ one['every_day_revenue_for_fourteen_days'] + '"></td>');
-                }else if('pi' == key){
-                    td = $('<td title="'+ one['every_day_pi_for_fourteen_days'] + '"></td>');
-                }else if('arpu' == key){
-                    td = $('<td></td>');
+                    td = $('<td title="'+ one['float_revenue'] + '"></td>');
                 }else if('ecpm' == key){
-                    td = $('<td title="'+ one['every_day_ecpm_for_fourteen_days'] + '"></td>');
+                    td = $('<td title="'+ one['float_ecpm'] + '"></td>');
                 }else if('cpa' == key){
-                    td = $('<td title="'+ one['every_day_cpa_for_fourteen_days'] + '"></td>');
+                    td = $('<td title="'+ one['float_cpa'] + '"></td>');
                 }else if('cpa_div_ecpm' == key){
-                    td = $('<td title="'+ one['every_day_cpa_div_ecpm_for_fourteen_days'] + '"></td>');
+                    td = $('<td title="'+ one['float_cpaDivEcpm'] + '"></td>');
                 }else if('incoming' == key){
-                    td = $('<td title="'+ one['every_day_incoming_for_fourteen_days'] + '"></td>');
+                    td = $('<td title="'+ one['float_incoming'] + '"></td>');
                     if(r < 0){
                         td.addClass("red");
                     }
