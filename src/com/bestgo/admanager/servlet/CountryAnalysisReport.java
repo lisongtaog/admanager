@@ -1,5 +1,6 @@
 package com.bestgo.admanager.servlet;
 
+import com.bestgo.admanager.utils.DateUtil;
 import com.bestgo.admanager.utils.NumberUtil;
 import com.bestgo.admanager.utils.Utils;
 import com.bestgo.common.database.MySqlHelper;
@@ -14,6 +15,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -21,7 +23,6 @@ import java.util.*;
  */
 @WebServlet(name = "CountryAnalysisReport", urlPatterns = {"/country_analysis_report/*"}, asyncSupported = true)
 public class CountryAnalysisReport extends BaseHttpServlet {
-
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         doPost(request, response);
     }
@@ -149,6 +150,14 @@ public class CountryAnalysisReport extends BaseHttpServlet {
 
                         }
                         List<JSObject> countryDetailJSObjectList = DB.findListBySql(sql);
+                        //获取悬浮窗数据
+                        //key为country_code ； value(维度，各日期维度值的集合)
+                        Map<String,Map<String,List>> floatDataMap = null;
+                        Map<String,List> floatItem = null;
+                        if(sameDate){ //只有日期相同时 才显示 悬浮
+                            floatDataMap = getFloatData(appId,endTime);
+                        }
+
 
                         double totalCost = 0; //当前应用的总花费
                         double totalPuserchaedUser = 0; //当前应用的总购买用户
@@ -159,76 +168,6 @@ public class CountryAnalysisReport extends BaseHttpServlet {
                         for (JSObject j : countryDetailJSObjectList) {
                             if (j.hasObjectData()) {
                                 countryCode = j.get("country_code");
-
-                                //计算七天的总花费、总营收、总盈利等
-//                                sql = "select cost, revenue,purchased_user,impression " +
-//                                        "from web_ad_country_analysis_report_history where " +
-//                                        " date BETWEEN '" + sevenDaysAgo + "' AND '" + endTime + "'" +
-//                                        " and app_id = '" + appId + "' " +
-//                                        " and country_code = '" + countryCode + "' ";
-//
-//                                List<JSObject> listCR = DB.findListBySql(sql);
-
-//                                double sevenDaysRevenues = 0;
-//                                double sevenDaysImpressions = 0;
-//                                for (JSObject one : listCR) {
-//                                    if (one.hasObjectData()) {
-//                                        double revenue = NumberUtil.convertDouble(one.get("revenue"), 0);
-//                                        double impression = NumberUtil.convertDouble(one.get("impression"), 0);
-//                                        sevenDaysRevenues += revenue;
-//                                        sevenDaysImpressions += impression;
-//                                    }
-//                                }
-//                                double sevenDaysAvgEcpm = sevenDaysImpressions == 0 ? 0 : sevenDaysRevenues * 1000 / sevenDaysImpressions;
-
-
-                                //悬浮显示十四天的总花费、总营收、总盈利等
-//                                sql = "select date,cost, purchased_user,total_installed,revenue,active_user, " +
-//                                        "(case when total_installed > 0 then today_uninstalled / total_installed else 0 end) as uninstall_rate," +
-//                                        "(case when impression > 0 then revenue * 1000 / impression else 0 end) as ecpm," +
-//                                        "(case when purchased_user > 0 then cost / purchased_user else 0 end) as cpa " +
-//                                        "from web_ad_country_analysis_report_history where " +
-//                                        " date BETWEEN '" + fourteenDaysAgo + "' AND '" + endTime + "'" +
-//                                        " and app_id = '" + appId + "' " +
-//                                        " and country_code = '" + countryCode + "' ";
-
-//                                listCR = DB.findListBySql(sql);
-//                                String everyDayCostForFourteenDays = "";
-//                                String everyDayPurchasedUserForFourteenDays = "";
-//                                String everyDayInstalledForFourteenDays = "";
-//                                String everyDayUninstalledRateForFourteenDays = "";
-//                                String everyDayActiveUserForFourteenDays = "";
-//                                String everyDayRevenueForFourteenDays = "";
-//                                String everyDayEcpmForFourteenDays = "";
-//                                String everyDayCpaForFourteenDays = "";
-//                                String everyDayCpaDivEcpmForFourteenDays = "";
-//                                String everyDayIncomingForFourteenDays = "";
-/*                                for (JSObject one : listCR) {
-                                    if (one.hasObjectData()) {
-                                        Date date = one.get("date");
-                                        double cost = NumberUtil.convertDouble(one.get("cost"), 0);
-                                        double purchasedUser = NumberUtil.convertDouble(one.get("purchased_user"), 0);
-                                        double installed = NumberUtil.convertDouble(one.get("total_installed"), 0);
-                                        double uninstallRate = NumberUtil.convertDouble(one.get("uninstall_rate"), 0);
-                                        double activeUser = NumberUtil.convertDouble(one.get("active_user"), 0);
-                                        double revenue = NumberUtil.convertDouble(one.get("revenue"), 0);
-                                        double ecpm = NumberUtil.convertDouble(one.get("ecpm"), 0);
-                                        double cpa = NumberUtil.convertDouble(one.get("cpa"), 0);
-                                        double cpaDivEcpm = ecpm == 0 ? 0 : cpa / ecpm;
-                                        double incoming = revenue - cost;
-                                        everyDayCostForFourteenDays += date + "(" + (int) cost + ")" + "\n";
-                                        everyDayPurchasedUserForFourteenDays += date + "(" + (int) purchasedUser + ")" + "\n";
-                                        everyDayInstalledForFourteenDays += date + "(" + (int) installed + ")" + "\n";
-                                        everyDayUninstalledRateForFourteenDays += date + "(" + NumberUtil.trimDouble(uninstallRate, 3) + ")" + "\n";
-                                        everyDayActiveUserForFourteenDays += date + "(" + (int) activeUser + ")" + "\n";
-                                        everyDayRevenueForFourteenDays += date + "(" + (int) revenue + ")" + "\n";
-                                        everyDayEcpmForFourteenDays += date + "(" + NumberUtil.trimDouble(ecpm, 3) + ")" + "\n";
-                                        everyDayCpaForFourteenDays += date + "(" + NumberUtil.trimDouble(cpa, 3) + ")" + "\n";
-                                        everyDayCpaDivEcpmForFourteenDays += date + "(" + NumberUtil.trimDouble(cpaDivEcpm, 3) + ")" + "\n";
-                                        everyDayIncomingForFourteenDays += date + "(" + (int) incoming + ")" + "\n";
-                                    }
-                                }*/
-
                                 double revenues = NumberUtil.convertDouble(j.get("revenues"), 0);
                                 double ecpm = NumberUtil.convertDouble(j.get("ecpm"), 0);
                                 double costs = NumberUtil.convertDouble(j.get("total_cost"), 0);
@@ -366,16 +305,23 @@ public class CountryAnalysisReport extends BaseHttpServlet {
                                 d.addProperty("active_users", activeUsers);
                                 d.addProperty("revenues", NumberUtil.trimDouble(revenues, 2));
                                 d.addProperty("ecpm", NumberUtil.trimDouble(ecpm, 3));
-//                                d.addProperty("every_day_cost_for_fourteen_days", everyDayCostForFourteenDays);
-//                                d.addProperty("every_day_purchased_user_for_fourteen_days", everyDayPurchasedUserForFourteenDays);
-//                                d.addProperty("every_day_installed_for_fourteen_days", everyDayInstalledForFourteenDays);
-//                                d.addProperty("every_day_uninstalled_rate_for_fourteen_days", everyDayUninstalledRateForFourteenDays);
-//                                d.addProperty("every_day_active_user_for_fourteen_days", everyDayActiveUserForFourteenDays);
-//                                d.addProperty("every_day_revenue_for_fourteen_days", everyDayRevenueForFourteenDays);
-//                                d.addProperty("every_day_ecpm_for_fourteen_days", everyDayEcpmForFourteenDays);
-//                                d.addProperty("every_day_cpa_for_fourteen_days", everyDayCpaForFourteenDays);
-//                                d.addProperty("every_day_cpa_div_ecpm_for_fourteen_days", everyDayCpaDivEcpmForFourteenDays);
-//                                d.addProperty("every_day_incoming_for_fourteen_days", everyDayIncomingForFourteenDays);
+
+
+                                floatItem = sameDate ? floatDataMap.get(countryCode) : null;//获取悬浮数据项 && 只有日期相同时 显示悬浮
+                                if(null != floatItem){//只有日期相同时 显示悬浮
+                                    d.addProperty("float_cost", String.join("\n",floatItem.get("cost")));
+                                    d.addProperty("float_purchasedUser", String.join("\n",floatItem.get("purchasedUser")));
+                                    d.addProperty("float_installed", String.join("\n",floatItem.get("installed")));
+                                    d.addProperty("float_uninstalledRate", String.join("\n",floatItem.get("uninstalledRate")));
+                                    d.addProperty("float_activeUser", String.join("\n",floatItem.get("activeUser")));
+                                    d.addProperty("float_revenue", String.join("\n",floatItem.get("revenue")));
+                                    d.addProperty("float_newRevenue", String.join("\n",floatItem.get("newRevenue")));
+                                    d.addProperty("float_ecpm", String.join("\n",floatItem.get("ecpm")));
+                                    d.addProperty("float_cpa", String.join("\n",floatItem.get("cpa")));
+                                    d.addProperty("float_cpaDivEcpm", String.join("\n",floatItem.get("cpaDivEcpm")));
+                                    d.addProperty("float_incoming", String.join("\n",floatItem.get("incoming")));
+                                }
+
                                 d.addProperty("incoming", NumberUtil.trimDouble(incoming, 2));
                                 d.addProperty("cpa", NumberUtil.trimDouble(cpa, 3));
                                 d.addProperty("cost_upper_limit", costUpperLimit);
@@ -447,6 +393,120 @@ public class CountryAnalysisReport extends BaseHttpServlet {
             }
         }
         response.getWriter().write(jsonObject.toString());
+    }
+
+    /**
+     * 获取 悬浮展示数据
+     * @return
+     */
+    private static Map<String,Map<String,List>> getFloatData(String appId,String endTime){
+        Map<String,Map<String,List>> dataMap = new HashMap<String,Map<String,List>>();
+
+        try {
+            String sinceDate = DateUtil.addDay(endTime, -7, "yyyy-MM-dd");//悬浮 展示起始日期
+            String floatSql = null;//国家分析报告悬浮展示
+            floatSql = "select date,country_code,cost, purchased_user,total_installed,revenue,active_user,ad_new_revenue, " +
+                    "(case when total_installed > 0 then today_uninstalled / total_installed else 0 end) as uninstall_rate," +
+                    "(case when impression > 0 then revenue * 1000 / impression else 0 end) as ecpm," +
+                    "(case when purchased_user > 0 then cost / purchased_user else 0 end) as cpa " +
+                    "from web_ad_country_analysis_report_history where " +
+                    " date BETWEEN '" + sinceDate + "' AND '" + endTime + "'" +
+                    " and app_id = '" + appId + "' " +
+                    " GROUP BY date,country_code ORDER BY date DESC ";
+
+            List<JSObject> dataList = DB.findListBySql(floatSql);
+            List costList,purchasedUserList,installedList,uninstalledRateList,activeUserList,
+                    revenueList,newRevenueList,ecpmList,cpaList,cpaDivEcpmList,incomingList;
+
+            Map<String,List> item = null;
+            String date,countryCode;
+            String split = " : ";int precision = 2;
+            long purchasedUser,installed,activeUser;
+            double cost,uninstallRate,revenue,newRevenue,ecpm,cpa,cpaDivEcpm,incoming;
+            for (JSObject one : dataList) {
+                if (one.hasObjectData()) {
+                    date = one.get("date").toString();
+                    countryCode = one.get("country_code");
+                    initFloadDataItem(dataMap,countryCode);
+                    item = dataMap.get(countryCode);
+                    costList = item.get("cost");
+                    purchasedUserList = item.get("purchasedUser");
+                    installedList = item.get("installed");
+                    uninstalledRateList = item.get("uninstalledRate");
+                    activeUserList = item.get("activeUser");
+                    revenueList = item.get("revenue");
+                    newRevenueList = item.get("newRevenue");
+                    ecpmList = item.get("ecpm");
+                    cpaList = item.get("cpa");
+                    cpaDivEcpmList = item.get("cpaDivEcpm");
+                    incomingList = item.get("incoming");
+
+                    cost = NumberUtil.convertDouble(one.get("cost"), 0);
+                    purchasedUser = NumberUtil.convertLong(one.get("purchased_user"), 0);
+                    installed = NumberUtil.convertLong(one.get("total_installed"), 0);
+                    uninstallRate = NumberUtil.convertDouble(one.get("uninstall_rate"), 0);
+                    activeUser = NumberUtil.convertLong(one.get("active_user"), 0);
+                    revenue = NumberUtil.convertDouble(one.get("revenue"), 0);
+                    newRevenue = NumberUtil.convertDouble(one.get("ad_new_revenue"), 0);
+                    ecpm = NumberUtil.convertDouble(one.get("ecpm"), 0);
+                    cpa = NumberUtil.convertDouble(one.get("cpa"), 0);
+                    cpaDivEcpm = ecpm == 0 ? 0 : cpa / ecpm;
+                    incoming = revenue - cost;
+
+                    costList.add(date + split + NumberUtil.trimDouble(cost,precision) );
+                    purchasedUserList.add(date + split + purchasedUser );
+                    installedList.add(date + split + installed );
+                    uninstalledRateList.add(date + split + NumberUtil.trimDouble(uninstallRate, precision) );
+                    activeUserList.add(date + split + activeUser );
+                    revenueList.add(date + split + NumberUtil.trimDouble(revenue,precision) );
+                    newRevenueList.add(date + split + NumberUtil.trimDouble(newRevenue,precision) );
+                    ecpmList.add(date + split +  NumberUtil.trimDouble(ecpm, precision) );
+                    cpaList.add(date + split + NumberUtil.trimDouble(cpa, precision) );
+                    cpaDivEcpmList.add(date + split + NumberUtil.trimDouble(cpaDivEcpm, precision) );
+                    incomingList.add(date + split + NumberUtil.trimDouble(incoming, precision) );
+                }
+            }
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+        return dataMap;
+    }
+
+    private static void initFloadDataItem(Map<String,Map<String,List>> dataMap,String countryCode){
+        List costList,purchasedUserList,installedList,uninstalledRateList,activeUserList,
+                revenueList,newRevenueList,ecpmList,cpaList,cpaDivEcpmList,incomingList;
+        Map<String,List> item = null;
+
+        item = dataMap.get(countryCode);
+        if (null == item){
+            item = new HashMap<String,List>();
+            costList = new ArrayList();
+            purchasedUserList = new ArrayList();
+            installedList = new ArrayList();
+            uninstalledRateList = new ArrayList();
+            activeUserList = new ArrayList();
+            revenueList = new ArrayList();
+            newRevenueList = new ArrayList();
+            ecpmList = new ArrayList();
+            cpaList = new ArrayList();
+            cpaDivEcpmList = new ArrayList();
+            incomingList = new ArrayList();
+
+            item.put("cost",costList);
+            item.put("purchasedUser",purchasedUserList);
+            item.put("installed",installedList);
+            item.put("uninstalledRate",uninstalledRateList);
+            item.put("activeUser",activeUserList);
+            item.put("revenue",revenueList);
+            item.put("newRevenue",newRevenueList);
+            item.put("ecpm",ecpmList);
+            item.put("cpa",cpaList);
+            item.put("cpaDivEcpm",cpaDivEcpmList);
+            item.put("incoming",incomingList);
+            dataMap.put(countryCode,item);
+        }
     }
 
     /**
