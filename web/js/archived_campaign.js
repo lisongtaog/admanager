@@ -1974,8 +1974,8 @@ var admobRegionCodes = {
     "Zambia": "ZM",
     "Kosovo": "XK"
 };
-var campaignStatusList = ["ARCHIVED", "ACTIVE", "PAUSED"];
-var campaignStatusListAdmob = ["removed", "enabled", "paused"];
+var campaignStatusList = ["ACTIVE", "PAUSED"];
+var campaignStatusListAdmob = ["enabled", "paused"];
 var appList = [];
 
 var countryFBMapFunction = function () {
@@ -2145,6 +2145,7 @@ $('#checkAdmob').click(function () {
 
 //更新facebook系列
 $('#btnUpdate').click(function () {
+    $("#btnUpdate").prop("disabled", true);
 
     //帐号
     var accountName = [];
@@ -2179,6 +2180,7 @@ $('#btnUpdate').click(function () {
         region: region.toString()
     }, function (data) {
         if (data && data.ret == 1) {
+            $("#btnUpdate").prop("disabled", false);
             alert(data.message);
         }
     }, 'json');
@@ -2188,6 +2190,7 @@ $('#btnUpdate').click(function () {
 
 //删除facebook系列
 $('#btnDelete').click(function () {
+    $("#btnDelete").prop("disabled", true);
 
     //帐号
     var accountName = [];
@@ -2212,8 +2215,8 @@ $('#btnDelete').click(function () {
         region.push(countryFBMap[$(this).text()]);
     });
 
-    //删除系列请求
-    $.post('campaign/archivedCampaign', {
+    //统计个数
+    $.post('campaign/countArchivedCampaign', {
         accountId: accountId.toString(),
         accountName: accountName.toString(),
         containsDisabledAccountId: containsDisabledAccountId,
@@ -2222,8 +2225,25 @@ $('#btnDelete').click(function () {
         region: region.toString()
     }, function (data) {
         if (data && data.ret == 1) {
-            alert(data.message);
+            if (!confirm(data.message)){
+                $("#btnDelete").prop("disabled", false);
+                return;
+            }
         }
+        // 删除系列请求
+        $.post('campaign/archivedCampaign', {
+            accountId: accountId.toString(),
+            accountName: accountName.toString(),
+            containsDisabledAccountId: containsDisabledAccountId,
+            appName: appName.toString(),
+            campaignStatus: campaignStatus.toString(),
+            region: region.toString()
+        }, function (data) {
+            if (data && data.ret == 1) {
+                $("#btnDelete").prop("disabled", false);
+                alert(data.message);
+            }
+        }, 'json');
     }, 'json');
 
     return false;
@@ -2231,6 +2251,7 @@ $('#btnDelete').click(function () {
 
 //更新adWords系列
 $('#btnUpdateAdmob').click(function () {
+    $("#btnUpdateAdmob").prop("disabled", true);
 
     //帐号
     var accountName = [];
@@ -2265,6 +2286,7 @@ $('#btnUpdateAdmob').click(function () {
         region: region.toString()
     }, function (data) {
         if (data && data.ret == 1) {
+            $("#btnUpdateAdmob").prop("disabled", false);
             alert(data.message);
         }
     }, 'json');
@@ -2274,6 +2296,7 @@ $('#btnUpdateAdmob').click(function () {
 
 //删除adWords系列
 $('#btnDeleteAdmob').click(function () {
+    $("#btnDeleteAdmob").prop("disabled", true);
 
     //帐号
     var accountName = [];
@@ -2298,8 +2321,8 @@ $('#btnDeleteAdmob').click(function () {
         region.push(countryAdmobMap[$(this).text()]);
     });
 
-    //删除系列请求
-    $.post('campaign_admob/archivedCampaign', {
+    //统计个数
+    $.post('campaign_admob/countArchivedCampaign', {
         accountId: accountId.toString(),
         accountName: accountName.toString(),
         containsDisabledAccountId: containsDisabledAccountId,
@@ -2308,8 +2331,27 @@ $('#btnDeleteAdmob').click(function () {
         region: region.toString()
     }, function (data) {
         if (data && data.ret == 1) {
-            alert(data.message);
+            if (!confirm(data.message)){
+                $("#btnDeleteAdmob").prop("disabled", false);
+                return;
+            }
         }
+
+        //删除系列请求
+        $.post('campaign_admob/archivedCampaign', {
+            accountId: accountId.toString(),
+            accountName: accountName.toString(),
+            containsDisabledAccountId: containsDisabledAccountId,
+            appName: appName.toString(),
+            campaignStatus: campaignStatus.toString(),
+            region: region.toString()
+        }, function (data) {
+            if (data && data.ret == 1) {
+                $("#btnDeleteAdmob").prop("disabled", false);
+                alert(data.message);
+            }
+        }, 'json');
+
     }, 'json');
 
     return false;
