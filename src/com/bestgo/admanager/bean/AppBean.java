@@ -24,4 +24,5 @@ public class AppBean {
     public String appId; //包ID,应用ID
     public double totalNewRevenue; //新用户总收入
     public double roi;//回本率
+    public long tagId;
 }
