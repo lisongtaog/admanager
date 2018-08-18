@@ -5,7 +5,14 @@
 var admanager = {};
 
 admanager.showCommonDlg = function(title, message, callback) {
-    $('#common_message_dialog').modal('show');
+    //$('#common_message_dialog').modal('show');
+    var config = {
+        backdrop : 'static',//默认为true
+        keyboard: true,//默认为true
+        show: true
+    };
+
+    $('#common_message_dialog').modal(config);
     $("#common_dlg_title").text(title);
     //换行的格式化输出
     if( typeof message === 'string' && message.indexOf("\n") > -1 ){
@@ -16,10 +23,15 @@ admanager.showCommonDlg = function(title, message, callback) {
         $("#common_dlg_message").text(message);
     }
 
-    $("#common_message_dialog").off("hidden.bs.modal");
+    //$("#common_message_dialog").off("hidden.bs.modal");
     $("#common_message_dialog").on("hidden.bs.modal", function(e) {
         if (callback) callback();
     });
+}
+
+admanager.hideCommonDlg = function(callback) {
+    $("#common_message_dialog").modal("hide");
+    if (callback) callback();
 }
 
 function popupCenter(url, title, w, h) {

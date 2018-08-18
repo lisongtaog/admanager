@@ -116,11 +116,13 @@
             params.sorterId = sorterId;
         }
         $("#btnSearch").prop("disabled", true);
+        admanager.showCommonDlg("Please wait", "Querying data...");
         $.post('country_analysis_report/query_country_analysis_report', params ,function(data){
             if(data && data.ret == 1){
                 var sameDate = data.same_date == 1 ? 1 : 0;
                 setData(data,sameDate);
                 renderSummary(data);//设置表头汇总信息
+                admanager.hideCommonDlg();
             } else {
                 admanager.showCommonDlg("错误", data.message);
             }
@@ -183,8 +185,8 @@
             keyset = ["costs","cost_upper_limit","purchasedUser", "installed", "uninstalledRate",
                 "activeUser","revenue", "newRevenue","recoveryCostRatio","incoming", "ecpm","cpa","tag_cpa",
                 "cpaDivNewEcpm", "newUserEcpm","tag_ecpm","oldUserEcpm","newUserAvgImpression","tag_impression",
-                "oldUserAvgImpression", "first_day_revenue","second_day_revenue",
-                "third_day_revenue","fourth_day_revenue","bidding_summary"];
+                "oldUserAvgImpression", "newUserTagRevenue",
+                "first_day_revenue","second_day_revenue","third_day_revenue","fourth_day_revenue","bidding_summary"];
         }
 
 
@@ -318,6 +320,7 @@
                 +'    <th>新用户<br>平均展示</th>'
                 +'    <th class="editColumn">期望展示</th>'//ML
                 +'    <th>老用户<br>平均展示</th>'
+                +'    <th title="新用户Ecpm * 新用户平均展示 / 1000">目标收益</th>'
                 +'    <th>1Day<br>Revenue</th>'
                 +'    <th>2Day<br>Revenue</th>'
                 +'    <th>3Day<br>Revenue</th>'
@@ -376,7 +379,7 @@
 
         var cost_array_string = JSON.stringify(cost_array);
         var app_name = $("#inputSearch").val();
-        admanager.showCommonDlg("提示","修改中，请稍后");
+        admanager.showCommonDlg("提示","修改中，请稍后...");
 
         $.post("country_analysis_report/modify_web_ad_rules",{
             app_name:app_name,
@@ -385,9 +388,8 @@
             if(data && data.ret == 1){
                 admanager.showCommonDlg("提示",data.message+"✪ω✪");
                 setTimeout(function(){
-                    $("#common_message_dialog").modal("hide");
                     doResearch();
-                },2000)
+                },2000);
             }else{
                 admanager.showCommonDlg("提示",data.message);
             }
@@ -428,9 +430,8 @@
             if(data && data.ret == 1){
                 admanager.showCommonDlg("提示",data.message+"✪ω✪");
                 setTimeout(function(){
-                    $("#common_message_dialog").modal("hide");
                     doResearch();
-                },2000)
+                },2000);
             }else{
                 admanager.showCommonDlg("提示",data.message);
             }

@@ -255,8 +255,12 @@ public class CountryAnalysisReport extends BaseHttpServlet {
                                     double oldUser = totalUsers - installed;
                                     double oldUserAvgImpression = oldUser > 0 ? oldUserImpression / oldUser : 0;
                                     double newUserAvgImpression = installed > 0 ? newUserImpression / installed : 0;
-                                    d.addProperty("oldUserAvgImpression",NumberUtil.trimDouble(oldUserAvgImpression,4));
                                     d.addProperty("newUserAvgImpression",NumberUtil.trimDouble(newUserAvgImpression,4));
+                                    d.addProperty("oldUserAvgImpression",NumberUtil.trimDouble(oldUserAvgImpression,4));
+
+                                    //newUserTagRevenue = newUserEcpm /1000 * newUserAvgImpression
+                                    double newUserTagRevenue = newUserEcpm * newUserAvgImpression / 1000 ;
+                                    d.addProperty("newUserTagRevenue",NumberUtil.trimDouble(newUserTagRevenue,4));
 
                                     //当天回本率=newRevenues/总花费
                                     double recoveryCostRatio = costs > 0 ? newRevenues / costs : 0;
@@ -325,6 +329,7 @@ public class CountryAnalysisReport extends BaseHttpServlet {
                                     d.addProperty("float_oldUserEcpm", String.join("\n",floatItem.get("oldUserEcpm")));
                                     d.addProperty("float_newUserAvgImpression", String.join("\n",floatItem.get("newUserAvgImpression")));
                                     d.addProperty("float_oldUserAvgImpression", String.join("\n",floatItem.get("oldUserAvgImpression")));
+                                    d.addProperty("float_newUserTagRevenue", String.join("\n",floatItem.get("newUserTagRevenue")));
 
                                 }
 
@@ -424,7 +429,7 @@ public class CountryAnalysisReport extends BaseHttpServlet {
             List<JSObject> dataList = DB.findListBySql(floatSql);
             List costList,purchasedUserList,installedList,uninstalledRateList,activeUserList,
                     revenueList,newRevenueList,ecpmList,cpaList,cpaDivEcpmList,incomingList,
-                    ratioList,newUserEcpmList,oldUserEcpmList,newUserAvgImpList,oldUserAvgImpList;
+                    ratioList,newUserEcpmList,oldUserEcpmList,newUserAvgImpList,oldUserAvgImpList,newUserTagRevenueList;
 
             Map<String,List> item = null;
             String date,countryCode;
@@ -432,7 +437,7 @@ public class CountryAnalysisReport extends BaseHttpServlet {
             long purchasedUser,installed,activeUser,totalUser,oldUser;
             double newUserImpression,oldUserImpression;
             double cost,uninstallRate,revenue,newRevenue,ecpm,cpa,cpaDivEcpm,incoming,
-                    recoveryCostRatio,newUserRevenue,oldUserRevenue,newUserAvgImpression,oldUserAvgImpression, newUserEcpm,oldUserEcpm;
+                    recoveryCostRatio,newUserRevenue,oldUserRevenue,newUserAvgImpression,oldUserAvgImpression, newUserEcpm,oldUserEcpm,newUserTagRevenue;
             for (JSObject one : dataList) {
                 if (one.hasObjectData()) {
                     date = one.get("date").toString();
@@ -456,6 +461,7 @@ public class CountryAnalysisReport extends BaseHttpServlet {
                     oldUserEcpmList = item.get("oldUserEcpm");
                     newUserAvgImpList = item.get("newUserAvgImpression");
                     oldUserAvgImpList = item.get("oldUserAvgImpression");
+                    newUserTagRevenueList = item.get("newUserTagRevenue");
 
 
                     cost = NumberUtil.convertDouble(one.get("cost"), 0);
@@ -479,6 +485,9 @@ public class CountryAnalysisReport extends BaseHttpServlet {
                     newUserAvgImpression = installed > 0 ? newUserImpression / installed : 0;//新用户平均展示
                     oldUserAvgImpression = oldUser > 0 ? oldUserImpression / oldUser : 0;//老用户平均展示
 
+                    //目标收益（单个新用户）：newUserTagRevenue = newUserEcpm /1000 * newUserAvgImpression
+                    newUserTagRevenue = newUserEcpm * newUserAvgImpression / 1000 ;
+
                     cpaDivEcpm = ecpm == 0 ? 0 : cpa / newUserEcpm;
                     incoming = revenue - cost;
                     //当天回本率=newRevenues/总花费
@@ -501,6 +510,8 @@ public class CountryAnalysisReport extends BaseHttpServlet {
                     oldUserEcpmList.add(date + split + NumberUtil.trimDouble(oldUserEcpm,4));
                     newUserAvgImpList.add(date + split + NumberUtil.trimDouble(newUserAvgImpression,4));
                     oldUserAvgImpList.add(date + split + NumberUtil.trimDouble(oldUserAvgImpression,4));
+
+                    newUserTagRevenueList.add(date + split + NumberUtil.trimDouble(newUserTagRevenue,4) + " = " + NumberUtil.trimDouble(newUserEcpm,4) +" * "+ NumberUtil.trimDouble(newUserAvgImpression,4) +" / "+ 1000);
                 }
             }
 
@@ -514,7 +525,7 @@ public class CountryAnalysisReport extends BaseHttpServlet {
     private static void initFloadDataItem(Map<String,Map<String,List>> dataMap,String countryCode){
         List costList,purchasedUserList,installedList,uninstalledRateList,activeUserList,
                 revenueList,newRevenueList,ecpmList,cpaList,cpaDivEcpmList,incomingList,
-                ratioList,newUserEcpmList,oldUserEcpmList,newUserAvgImpList,oldUserAvgImpList;
+                ratioList,newUserEcpmList,oldUserEcpmList,newUserAvgImpList,oldUserAvgImpList,newUserTagRevenueList;
         Map<String,List> item = null;
 
         item = dataMap.get(countryCode);
@@ -536,6 +547,7 @@ public class CountryAnalysisReport extends BaseHttpServlet {
             oldUserEcpmList = new ArrayList();
             newUserAvgImpList = new ArrayList();
             oldUserAvgImpList = new ArrayList();
+            newUserTagRevenueList = new ArrayList();
 
             item.put("cost",costList);
             item.put("purchasedUser",purchasedUserList);
@@ -554,6 +566,7 @@ public class CountryAnalysisReport extends BaseHttpServlet {
             item.put("oldUserEcpm",oldUserEcpmList);
             item.put("newUserAvgImpression",newUserAvgImpList);
             item.put("oldUserAvgImpression",oldUserAvgImpList);
+            item.put("newUserTagRevenue",newUserTagRevenueList);
 
             dataMap.put(countryCode,item);
         }
