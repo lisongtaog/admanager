@@ -1,5 +1,7 @@
 <%@ page import="com.bestgo.common.database.utils.JSObject" %>
 <%@ page import="java.util.List" %>
+<%@ page import="com.google.gson.JsonArray" %>
+<%@ page import="com.bestgo.admanager.servlet.Tags" %>
 <%@ page import="com.bestgo.common.database.services.DB" %>
 
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
@@ -8,6 +10,12 @@
 <html>
   <head>
     <title>系统管理</title>
+    <style>
+      .ui-autocomplete{
+        display:block;
+        z-index:99999;
+      }
+    </style>
   </head>
   <body>
 
@@ -31,6 +39,11 @@
     }
 
     List<JSObject> list = DB.scan("web_system_config").select("config_key", "config_value").execute();
+    List<JSObject> allTags = Tags.fetchAllTags();
+    JsonArray array = new JsonArray();
+    for (int i = 0; i < allTags.size(); i++) {
+      array.add((String) allTags.get(i).get("tag_name"));
+    }
   %>
 
   <div class="container-fluid">
@@ -127,7 +140,7 @@
               <div class="form-group">
                 <label for="inputTagName" class="col-sm-2 control-label">标签</label>
                 <div class="col-sm-10">
-                  <input class="form-control" id="inputTagName" placeholder="标签" autocomplete="off">
+                  <input class="form-control" id="inputTagName" placeholder="标签" type="text" />
                 </div>
               </div>
               <div class="form-group">
@@ -182,6 +195,10 @@
   <jsp:include page="common/loading_dialog.jsp"></jsp:include>
 
   <script type="text/javascript">
+    var tagdata = <%=array.toString()%>;
+    $("#inputTagName").autocomplete({
+        source: tagdata
+    });
     var modifyType;
     var id;
     var _tagName;
@@ -221,7 +238,7 @@
       $('#tableFBAppRel .link_delete').click(function () {
         var tds = $(this).parents("tr").find('td');
         id = $(tds.get(0)).text();
-      _tagName = $(tds.get(1)).text();
+        _tagName = $(tds.get(1)).text();
         modifyType = 'delete';
         $('#delete_rel_message').show();
         $('#modify_rel_form').hide();
