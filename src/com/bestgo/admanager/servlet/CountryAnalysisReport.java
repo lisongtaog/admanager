@@ -485,7 +485,7 @@ public class CountryAnalysisReport extends BaseHttpServlet {
                     newUserAvgImpression = installed > 0 ? newUserImpression / installed : 0;//新用户平均展示
                     oldUserAvgImpression = oldUser > 0 ? oldUserImpression / oldUser : 0;//老用户平均展示
 
-                    //目标收益（单个新用户）：newUserTagRevenue = newUserEcpm /1000 * newUserAvgImpression
+                    //当日变现能力（单个新用户）：newUserTagRevenue = newUserEcpm /1000 * newUserAvgImpression
                     newUserTagRevenue = newUserEcpm * newUserAvgImpression / 1000 ;
 
                     cpaDivEcpm = ecpm == 0 ? 0 : cpa / newUserEcpm;
@@ -510,7 +510,7 @@ public class CountryAnalysisReport extends BaseHttpServlet {
                     oldUserEcpmList.add(date + split + NumberUtil.trimDouble(oldUserEcpm,4));
                     newUserAvgImpList.add(date + split + NumberUtil.trimDouble(newUserAvgImpression,4));
                     oldUserAvgImpList.add(date + split + NumberUtil.trimDouble(oldUserAvgImpression,4));
-
+                    //当日变现能力
                     newUserTagRevenueList.add(date + split + NumberUtil.trimDouble(newUserTagRevenue,4) + " = " + NumberUtil.trimDouble(newUserEcpm,4) +" * "+ NumberUtil.trimDouble(newUserAvgImpression,4) +" / "+ 1000);
                 }
             }
@@ -547,7 +547,7 @@ public class CountryAnalysisReport extends BaseHttpServlet {
             oldUserEcpmList = new ArrayList();
             newUserAvgImpList = new ArrayList();
             oldUserAvgImpList = new ArrayList();
-            newUserTagRevenueList = new ArrayList();
+            newUserTagRevenueList = new ArrayList();//当日变现能力
 
             item.put("cost",costList);
             item.put("purchasedUser",purchasedUserList);

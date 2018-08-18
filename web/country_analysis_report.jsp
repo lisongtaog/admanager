@@ -320,7 +320,7 @@
                 +'    <th>新用户<br>平均展示</th>'
                 +'    <th class="editColumn">期望展示</th>'//ML
                 +'    <th>老用户<br>平均展示</th>'
-                +'    <th title="新用户Ecpm * 新用户平均展示 / 1000">目标收益</th>'
+                +'    <th title="新用户Ecpm * 新用户平均展示 / 1000">当日变现能力</th>'
                 +'    <th>1Day<br>Revenue</th>'
                 +'    <th>2Day<br>Revenue</th>'
                 +'    <th>3Day<br>Revenue</th>'
