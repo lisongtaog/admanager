@@ -23,7 +23,7 @@ admanager.showCommonDlg = function(title, message, callback) {
         $("#common_dlg_message").text(message);
     }
 
-    //$("#common_message_dialog").off("hidden.bs.modal");
+    $("#common_message_dialog").off("hidden.bs.modal");
     $("#common_message_dialog").on("hidden.bs.modal", function(e) {
         if (callback) callback();
     });
