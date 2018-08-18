@@ -73,15 +73,15 @@
         <li role="presentation"><a href="rules.jsp">规则</a></li>
         <li role="presentation"><a href="query.jsp">查询</a></li>
         <li role="presentation"><a href="advert_insert.jsp">广告存储</a></li>
+        <li role="presentation"><a href="adReplace.jsp">广告语替换</a></li>
 
         <%-- 7 --%>
         <li role="presentation"><a href="advert_conversions_insert.jsp">转化录入</a></li>
-        <li role="presentation"><a href="app_activity_daily.jsp">应用日更记录</a></li>
+        <%--<li role="presentation"><a href="app_activity_daily.jsp">应用日更记录</a></li>--%>
 
         <%-- 9 --%>
         <li role="presentation"><a href="project_team_total_ revenue_and_total_cost.jsp">项目组总收支</a></li>
         <li role="presentation"><a href="app_image_video_rel_insert.jsp">应用图片视频关联录入</a></li>
-        <li role="presentation"><a href="adReplace.jsp">广告语替换</a></li>
         <li role="presentation"><a href="ad_old_account_create_copy_to_new.jsp">模板账号to创建系列账号</a></li>
 
 </ul>

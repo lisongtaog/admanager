@@ -95,35 +95,6 @@
         <tr><th>ID</th><th>标签</th><th>广告账号</th><th>FB应用ID</th><th>FB主页ID</th><th>应用包名</th><th>Firebase工程ID</th><th>操作</th></tr>
         </thead>
         <tbody>
-        <%--<%
-          List<JSObject> data = new ArrayList<>();
-          long totalPage = 0;
-          long count = com.bestgo.admanager.servlet.System.countFacebookAppRelation();
-          int index = Utils.parseInt(request.getParameter("page_index"), 0);
-          int size = Utils.parseInt(request.getParameter("page_size"), 20);
-          totalPage = count / size + (count % size == 0 ? 0 : 1);
-
-          int preIndex = index > 0 ? index-1 : 0;
-          int nextPage = index < totalPage - 1 ? index+1 : index;
-
-          data = com.bestgo.admanager.servlet.System.fetchFacebookAppRelationData(index, size);
-        %>
-
-        <%
-          for (int i = 0; i < data.size(); i++) {
-            JSObject one = data.get(i);
-        %>
-        <tr>
-          <td><%=one.get("id")%></td>
-          <td><%=one.get("tag_name")%></td>
-          <td><%=one.get("account_id")%></td>
-          <td><%=one.get("fb_app_id")%></td>
-          <td><%=one.get("page_id")%></td>
-          <td><%=one.get("google_package_id")%></td>
-          <td><%=one.get("firebase_project_id")%></td>
-          <td><a class="link_modify glyphicon glyphicon-pencil" href="#" fbpages = "<%=one.get("fbPages")%>"></a><a class="link_delete glyphicon glyphicon-remove" href="#"></a></td>
-        </tr>
-        <% } %>--%>
         </tbody>
       </table>
 
@@ -143,23 +114,6 @@
       </nav>
     </div>
 
-    <div class="panel panel-default">
-      <!-- Default panel contents -->
-      <div class="panel-heading">
-        广告语列表
-        <button id="btn_add_new_message" class="btn btn-default">添加</button>
-        <input id="inputSearch" class="form-control" style="display: inline; width: auto;" type="text" />
-        <button id="btnSearch" class="btn btn-default">查找</button>
-      </div>
-
-      <table class="table">
-        <thead>
-        <tr><th>ID</th><th>主题</th><th>内容</th></tr>
-        </thead>
-        <tbody>
-        </tbody>
-      </table>
-    </div>
 
     <div id="new_fb_app_rel_dlg" class="modal fade" tabindex="-1" role="dialog">
       <div class="modal-dialog" role="document">
