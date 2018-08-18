@@ -2,6 +2,7 @@ package com.bestgo.admanager.servlet;
 
 import com.bestgo.admanager.OperationResult;
 import com.bestgo.admanager.utils.NumberUtil;
+import com.bestgo.admanager.utils.StringUtil;
 import com.bestgo.admanager.utils.Utils;
 import com.bestgo.common.database.services.DB;
 import com.bestgo.common.database.utils.JSObject;
@@ -53,8 +54,10 @@ public class Rules extends BaseHttpServlet {
                 json.addProperty("ret", result.result ? 1 : 0);
                 json.addProperty("message", result.message);
             } else if (path.startsWith("/query")) {
-                String text = request.getParameter("text");
-                List<JSObject> data = fetchData(text);
+                String ruleType = request.getParameter("ruleType");
+                String tagName = request.getParameter("tagName");
+                String ruleText = request.getParameter("ruleText");
+                List<JSObject> data = fetchData(ruleType,tagName,ruleText);
                 json.addProperty("ret", 1);
                 JsonArray array = new JsonArray();
                 for (int i = 0; i < data.size(); i++) {
@@ -111,10 +114,20 @@ public class Rules extends BaseHttpServlet {
         return list;
     }
 
-    public static List<JSObject> fetchData(String query) {
+    public static List<JSObject> fetchData(String ruleType,String tagName, String query) {
         List<JSObject> list = new ArrayList<>();
         try {
-            return DB.scan("web_ad_rules").select("id", "rule_type", "rule_content", "tag_id", "tag_name").where(DB.filter().whereLikeTo("rule_content", "%" + query + "%")).orderByAsc("id").execute();
+            String sql = "select id,rule_type,rule_content,tag_id,tag_name from web_ad_rules where 1=1 ";
+            if(StringUtil.isNotEmpty(ruleType)){
+                sql += " and rule_type = " + ruleType ;
+            }
+            if(StringUtil.isNotEmpty(tagName)){
+                sql += " and tag_name like '" + tagName + "%' " ;
+            }
+            if(StringUtil.isNotEmpty(query)){
+                sql += " and rule_content like '%" + query + "%'";
+            }
+            return DB.findListBySql(sql);
         } catch (Exception ex) {
             Logger logger = Logger.getRootLogger();
             logger.error(ex.getMessage(), ex);

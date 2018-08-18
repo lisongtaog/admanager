@@ -1,8 +1,5 @@
-<%@ page import="com.bestgo.admanager.utils.NumberUtil" %>
 <%@ page import="com.bestgo.common.database.utils.JSObject" %>
 <%@ page import="java.util.List" %>
-<%@ page import="java.util.ArrayList" %>
-<%@ page import="com.bestgo.admanager.servlet.Rules" %>
 <%@ page import="com.bestgo.admanager.servlet.Tags" %>
 <%@ page import="com.google.gson.JsonArray" %>
 
@@ -29,9 +26,9 @@
     }
 
     List<JSObject> allTags = Tags.fetchAllTags();
-    JsonArray array1 = new JsonArray();
+    JsonArray array = new JsonArray();
     for (int i = 0; i < allTags.size(); i++) {
-        array1.add((String) allTags.get(i).get("tag_name"));
+        array.add((String) allTags.get(i).get("tag_name"));
     }
 %>
 
@@ -43,6 +40,19 @@
         <div class="panel-heading">
             <a href="campain_monitor_log.jsp" target="_blank">关停记录</a>
             <button id="btn_add_new_rule" class="btn btn-default">添加</button>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <label for="ruleType">规则类型</label>
+            <select class="selectpicker" id="ruleType">
+                <option value="">所有类型</option>
+                <option value="1">类型1（监控广告系列）</option>
+                <option value="2">类型2（监控应用）</option>
+                <option value="3">类型3（监控国家花费）</option>
+                <option value="4">类型4（监控国家回本率）</option>
+                <option value="5">类型5（监控所有国家回本率）</option>
+            </select>
+            <label for="inputTag">标签</label>
+            <input id="inputTag" type="text"/>
+            <label for="inputQueryText">规则内容</label>
             <input id="inputQueryText" type="text"/>
             <button id="btnQuery" class="btn btn-default glyphicon glyphicon-search"></button>
         </div>
@@ -60,56 +70,13 @@
             </thead>
             <tbody>
 
-            <%
-                List<JSObject> data = new ArrayList<>();
-                long totalPage = 0;
-                long count = Rules.count();
-                int index = NumberUtil.parseInt(request.getParameter("page_index"), 0);
-                int size = NumberUtil.parseInt(request.getParameter("page_size"), 20);
-                totalPage = count / size + (count % size == 0 ? 0 : 1);
 
-                int preIndex = index > 0 ? index - 1 : 0;
-                int nextPage = index < totalPage - 1 ? index + 1 : index;
-
-                data = Rules.fetchData(index, size);
-            %>
-
-            <%
-                for (int i = 0; i < data.size(); i++) {
-                    JSObject one = data.get(i);
-            %>
-            <tr>
-                <%--<td><%=one.get("id")%>     这样写是有问题的。 取出来的id有/n
-                </td>--%>
-                <td><%=one.get("id")%></td>
-                <td><%=one.get("rule_type")%></td>
-                <td><%=one.get("rule_content")%></td>
-                <td><%=one.get("tag_id")%></td>
-                <td><%=one.get("tag_name")%></td>
-                <td><a class="link_modify glyphicon glyphicon-pencil" href="#"></a>&nbsp;&nbsp;<a
-                        class="link_delete glyphicon glyphicon-remove" href="#"></a></td>
-            </tr>
-            <% } %>
 
             </tbody>
         </table>
 
         <nav aria-label="Page navigation">
-            <ul class="pagination">
-                <li>
-                    <a href="rules.jsp?page_index=<%=preIndex%>" aria-label="Previous">
-                        <span aria-hidden="true">上一页</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="rules.jsp?page_index=<%=nextPage%>" aria-label="Next">
-                        <span aria-hidden="true">下一页</span>
-                    </a>
-                </li>
-                <li>
-                    共<%=totalPage%>页
-                </li>
-            </ul>
+            共 <span id="totalData">0</span> 条数据
         </nav>
     </div>
 </div>
@@ -148,8 +115,7 @@
                     <div class="form-group" id="inputSearchDiv">
                         <label for="inputSearch" class="col-sm-2 control-label">标签名称</label>
                         <div class="col-sm-10">
-                            <input id="inputSearch" class="form-control" style="display: inline; width: auto;"
-                                   type="text"/>
+                            <input id="inputSearch" class="form-control" style="display: inline; width: auto;" type="text"/>
                         </div>
                     </div>
 
@@ -167,9 +133,12 @@
 <jsp:include page="common/loading_dialog.jsp"></jsp:include>
 
 <script type="text/javascript">
-    var data1 = <%=array1.toString()%>;
+    var data = <%=array.toString()%>;
+    $("#inputTag").autocomplete({
+        source: data
+    });
     $("#inputSearch").autocomplete({
-        source: data1
+        source: data
     });
 
     var modifyType = 'new';
@@ -297,7 +266,6 @@
                 }, function (data) {
                     if (data && data.ret == 1) {
                         $("#new_rule_dlg").modal("hide");
-                        location.reload();
                     } else {
                         admanager.showCommonDlg("错误", data.message);
                     }
@@ -312,7 +280,6 @@
             }, function (data) {
                 if (data && data.ret == 1) {
                     $("#new_rule_dlg").modal("hide");
-                    location.reload();
                 } else {
                     admanager.showCommonDlg("错误", data.message);
                 }
@@ -325,12 +292,12 @@
             }, function (data) {
                 if (data && data.ret == 1) {
                     $("#new_rule_dlg").modal("hide");
-                    location.reload();
                 } else {
                     admanager.showCommonDlg("错误", data.message);
                 }
             }, 'json');
         }
+        doResearch();
     })
     ;
 
@@ -372,14 +339,20 @@
         });
     }
 
-    $('#btnQuery').click(function () {
+    $('#btnQuery').click(doResearch);
+
+    function doResearch() {
         var query = $('#inputQueryText').val();
+        var ruleType = $('#ruleType').val();
+        var tagName = $('#inputTag').val();
+        $('.table tbody ').html("");
         $.post('rules/query', {
-            text: query
+            ruleType:ruleType,
+            tagName:tagName,
+            ruleText: query
         }, function (data) {
             if (data && data.ret == 1) {
-
-                $('.table tbody tr').remove();
+                $("#totalData").text(data.data.length);
                 for (var i = 0; i < data.data.length; i++) {
                     var one = data.data[i];
                     var tr = $('<tr></tr>');
@@ -404,7 +377,8 @@
                     td.text(one.tag_name3);
                     tr.append(td);
 
-                    td = $('<td><a class="link_modify" href="#">修改</a><a class="link_delete" href="#">删除</a></td>');
+                    td = $('<td><a class="link_modify glyphicon glyphicon-pencil" href="#"></a>&nbsp;&nbsp;&nbsp;&nbsp;' +
+                        '<a class="link_delete glyphicon glyphicon-remove" href="#"></a></td>');
                     tr.append(td);
                     $('.table tbody').append(tr);
                 }
@@ -413,9 +387,8 @@
                 admanager.showCommonDlg("错误", data.message);
             }
         }, 'json');
-    });
+    }
 
-    bindOp();
 </script>
 <script src="js/interlaced-color-change.js"></script>
 </body>
