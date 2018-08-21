@@ -21,31 +21,6 @@
         response.sendRedirect("login.jsp");
     }
 
-    List<JSObject> allTags = Tags.fetchAllTags();
-    JsonArray array = new JsonArray();
-    for (int i = 0; i < allTags.size(); i++) {
-        array.add((String) allTags.get(i).get("tag_name"));
-    }
-
-    String type = request.getParameter("type");
-
-    //以下是从 campaigns_auto_create.jsp 传来的参数
-    boolean isAutoCreate = "auto_create".equals(type);
-    String network = request.getParameter("network");
-    ArrayList<String> networks = new ArrayList<>();
-    networks.add("facebook");
-    networks.add("adwords");
-    if (networks.indexOf(network) == -1) {
-        network = "facebook";
-    }
-    int recordId = NumberUtil.parseInt(request.getParameter("id"), 0);
-
-    //以下接收的是从index2传来的页面
-    String campaignId = request.getParameter("campaignId");
-    String budget = request.getParameter("budget");
-    String bidStrategy = request.getParameter("bidStrategy");
-    String bidding = request.getParameter("bidding");
-    boolean isIndexCreate = "auto_create".equals(type);
 %>
 
 <div class="container-fluid">

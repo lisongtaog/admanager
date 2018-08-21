@@ -1,7 +1,10 @@
 package com.bestgo.admanager.servlet;
 
-import com.bestgo.admanager.utils.*;
 import com.bestgo.admanager.OperationResult;
+import com.bestgo.admanager.utils.DateUtil;
+import com.bestgo.admanager.utils.NumberUtil;
+import com.bestgo.admanager.utils.StringUtil;
+import com.bestgo.admanager.utils.Utils;
 import com.bestgo.common.database.services.DB;
 import com.bestgo.common.database.utils.JSObject;
 import com.google.gson.JsonArray;
@@ -12,13 +15,15 @@ import org.apache.log4j.Logger;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
 import java.lang.System;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Created by jikai on 12/10/17.
@@ -217,7 +222,7 @@ public class AutoCreateCampaign extends BaseHttpServlet {
             "excluded_region", "language", "age", "explode_age", "gender", "explode_gender",
             "detail_target", "user_os", "user_devices", "campaign_name", "bugdet", "bidding",
             "explode_bidding", "max_cpa", "title", "message", "image_path", "create_time",
-            "update_time", "enabled", "video_path", "group_id", "bid_strategy"};
+            "update_time", "enabled", "video_path", "group_id", "publisher_platforms","bid_strategy","page_id","mode_type"};
 
     public static JSObject facebookFetchById(String id) {
         try {
@@ -663,10 +668,10 @@ public class AutoCreateCampaign extends BaseHttpServlet {
             String age = request.getParameter("age");
             String gender = request.getParameter("gender");
             String bidding = request.getParameter("bidding");
-            String explodeCountry = request.getParameter("explodeCountry");
-            String explodeAge = request.getParameter("explodeAge");
-            String explodeGender = request.getParameter("explodeGender");
-            String explodeBidding = request.getParameter("explodeBidding");
+            String pageId = request.getParameter("FBpage[pageId]");
+            String publisherPlatforms = request.getParameter("publisherPlatforms");
+            String bidStrategy = request.getParameter("bidStrategy");
+
             String imagePath = new String();
             String videoPath = new String();
             if (identification.equals("image")) {
@@ -742,20 +747,16 @@ public class AutoCreateCampaign extends BaseHttpServlet {
                         .put("create_count", NumberUtil.parseInt(createCount, 0))
                         .put("account_id", accountId)
                         .put("country_region", region)
-                        .put("explode_country", Boolean.parseBoolean(explodeCountry) ? 1 : 0)
                         .put("excluded_region", excludedRegion)
                         .put("language", language)
                         .put("age", age)
-                        .put("explode_age", Boolean.parseBoolean(explodeAge) ? 1 : 0)
                         .put("gender", gender)
-                        .put("explode_gender", Boolean.parseBoolean(explodeGender) ? 1 : 0)
                         .put("detail_target", interest)
                         .put("user_os", userOs)
                         .put("user_devices", userDevice)
                         .put("campaign_name", campaignName)
                         .put("bugdet", bugdet)
                         .put("bidding", bidding)
-                        .put("explode_bidding", Boolean.parseBoolean(explodeBidding) ? 1 : 0)
                         .put("max_cpa", maxCPA)
                         .put("group_id", groupId)
                         .put("title", title)
@@ -763,6 +764,10 @@ public class AutoCreateCampaign extends BaseHttpServlet {
                         .put("image_path", imagePath)
                         .put("video_path", videoPath)
                         .put("update_time", DateUtil.getNowTime())
+                        .put("page_id", pageId)
+                        .put("publisher_platforms", publisherPlatforms)
+                        .put("bid_strategy", bidStrategy)
+
                         .where(DB.filter().whereEqualTo("id", id))
                         .execute();
                 result.result = true;
@@ -824,7 +829,7 @@ public class AutoCreateCampaign extends BaseHttpServlet {
 
     static String[] ADWORDS_CAMPAIGN_FIELDS = {"id", "app_name", "create_count", "account_id", "country_region", "explode_country",
             "excluded_region", "language", "message1", "message2", "message3", "message4",
-            "campaign_name", "bugdet", "bidding", "explode_bidding", "max_cpa", "image_path", "create_time", "update_time", "enabled", "conversion_id"};
+            "campaign_name", "bugdet", "bidding", "explode_bidding", "max_cpa", "image_path", "create_time", "update_time", "enabled", "conversion_id","group_id","mode_type"};
 
     public static JSObject adwordsFetchById(String id) {
         try {
@@ -1145,8 +1150,7 @@ public class AutoCreateCampaign extends BaseHttpServlet {
             String imagePath = request.getParameter("imagePath");
             String region = request.getParameter("region");
             String bidding = request.getParameter("bidding");
-            String explodeCountry = request.getParameter("explodeCountry");
-            String explodeBidding = request.getParameter("explodeBidding");
+            String conversionId = request.getParameter("conversion_id");
 
             result.result = true;
             JSObject record = DB.simpleScan("web_system_config").select("config_value").where(DB.filter().whereEqualTo("config_key", "admob_image_path")).execute();
@@ -1209,7 +1213,6 @@ public class AutoCreateCampaign extends BaseHttpServlet {
                         .put("create_count", NumberUtil.parseInt(createCount, 0))
                         .put("account_id", accountId)
                         .put("country_region", region)
-                        .put("explode_country", Boolean.parseBoolean(explodeCountry) ? 1 : 0)
                         .put("excluded_region", excludedRegion)
                         .put("language", language)
                         .put("campaign_name", campaignName)
@@ -1219,11 +1222,11 @@ public class AutoCreateCampaign extends BaseHttpServlet {
                         .put("message2", message2)
                         .put("message3", message3)
                         .put("message4", message4)
-                        .put("explode_bidding", Boolean.parseBoolean(explodeBidding) ? 1 : 0)
                         .put("max_cpa", maxCPA)
                         .put("group_id", groupId)
                         .put("image_path", imagePath)
                         .put("update_time", DateUtil.getNowTime())
+                        .put("conversion_id", conversionId)
                         .where(DB.filter().whereEqualTo("id", id))
                         .execute();
                 result.result = true;

@@ -1,4 +1,3 @@
-var firstInitForm = false;
 
 var regionList = [{
     "key": "AD",
@@ -2000,49 +1999,6 @@ var countryAdmobMapFunction = function () {
 }
 var countryAdmobMap = countryAdmobMapFunction();
 
-//一种可多选的autocomplete方法封装
-function multiSelectAutocomplete(selector, valueList) {
-    function split(val) {
-        return val.split(/,\s*/);  //逗号及其后跟着的字符串作为分割标志
-    }
-
-    function extractLast(term) {
-        return split(term).pop();  //分割后的数组返回并删除数组的最后一个元素
-    }
-
-    $("#" + selector)
-    // 当选择一个条目时不离开文本域
-        .bind("keydown", function (event) {
-            if (event.keyCode === $.ui.keyCode.TAB &&
-                $(this).data("ui-autocomplete").menu.active) {
-                event.preventDefault();  //阻止event对象的默认行为发生
-            }
-        })
-        .autocomplete({
-            minLength: 0,
-            source: function (request, response) {
-                // 回到 autocomplete，但是提取最后的条目
-                response($.ui.autocomplete.filter(
-                    valueList, extractLast(request.term)));
-            },
-            focus: function () {
-                // 防止在获得焦点时插入值
-                return false;
-            },
-            select: function (event, ui) {
-                var terms = split(this.value);
-                // 移除当前输入
-                terms.pop();
-                // 添加被选项
-                terms.push(ui.item.value);
-                // 添加占位符，在结尾添加逗号
-                terms.push("");
-                this.value = terms.join(",");
-                return false;
-            }
-        });
-}
-
 function init() {
     $('.select2').select2();
 
@@ -2066,14 +2022,6 @@ function init() {
         $('#selectRegionAdmob').append($("<option value='" + value + "'>" + key + "</option>"));
     }
 
-    var pendingList = [1, 2, 3];
-
-    /*
-     * 三个 $.post 是异步执行的，哪个先返回response就先执行哪一个的 function
-     * 数组 pendingList 的作用在于当最后一个response 返回后执行 initFormData()
-     * 而initFormData()是需要三个参数 isAutoCreate, modifyNetwork,modifyRecordId
-     */
-
     //查询并自动填充应用名称
     $.post('system/fb_app_id_rel/query', {
         word: ''
@@ -2095,12 +2043,7 @@ function init() {
             accountList.forEach(function (one) {
                 $('#selectAccount').append($("<option value='" + one.account_id + "'>" + one.short_name + "</option>"));
             });
-            pendingList.shift();
-            if (pendingList.length == 0) {
-                if (isAutoCreate && modifyNetwork != null && modifyRecordId != null) {
-                    initFormData();
-                }
-            }
+
         } else {
             admanager.showCommonDlg("错误", data.message);
         }

@@ -112,7 +112,7 @@
           <td><%=one.get("campaign_name")%></td>
           <td><%=one.get("bugdet")%></td>
           <td class="bidding"><%=one.get("bidding")%></td>
-          <td><a class="link_modify" target="_blank" href="campaigns_create.jsp?type=auto_create&network=<%=network%>&id=<%=one.get("id")%>">
+          <td><a class="link_modify" target="_blank" href="campaigns_modify.jsp?type=auto_create&network=<%=network%>&id=<%=one.get("id")%>">
             <span class="glyphicon glyphicon-pencil"></span></a>&nbsp;/&nbsp;<input type="checkbox" class="delete_check"></td>
           <td><input class="checkbox_campaign_enable" type="checkbox" <% if (one.get("enabled").equals(1)) { %> checked <% }%> /></td>
         </tr>
@@ -144,6 +144,7 @@
   <jsp:include page="common/loading_dialog.jsp"></jsp:include>
 
   <script type="text/javascript">
+    //FB和Adwords切换按钮
     var network = "<%=network%>";
     if (network == 'facebook') {
       $('#checkFacebook').prop('checked', true);
@@ -157,6 +158,7 @@
       window.location.href = "campaigns_auto_create.jsp?network=adwords";
     });
 
+    //自动填充
     var tags = <%=array.toString()%>;
     $("#tagName").autocomplete({
         source:tags
@@ -171,6 +173,7 @@
     });
 
 
+    //条件查询事件
     $('#btnSearch').click(function() {
       var query = $("#inputCampaignName").val();
       var country = $("#inputCountry").val();
@@ -216,6 +219,7 @@
         $(this).empty();
         $(this).append("<input class='new_bidding' type='text' style='width:60px;height:25px'value='"+value+"'>");
     });
+    //批量修改事件
     function modifyBidding(){
         var bidding_array = [];
         var collection = $(".new_bidding");
@@ -256,7 +260,7 @@
         }
     }
 
-    //批量删除
+    //批量删除选择
     $(".all_delete_check").click(function(){
         var check = $(".all_delete_check").prop("checked");
         if(check){
@@ -265,6 +269,8 @@
             $(".delete_check").prop("checked",false);
         }
     });
+
+    //批量删除事件
     function allDelete(){
         var batch = $(".delete_check:checked");
         var id_batch = [];
@@ -294,6 +300,7 @@
             },"json")
         }
     }
+
     //批量开启
     function allChecked(){
         var checked = $(".all_checkbox_campaign_enable").prop("checked");
@@ -341,6 +348,7 @@
             });
         }
     }
+
     // 点击[开启]checkbox后往后台修改表
     function bindOp() {
         $(".checkbox_campaign_enable").click(function() {
@@ -393,7 +401,7 @@
         tr.append(td);
         td =
             $('<td><a class="link_modify glyphicon glyphicon-pencil" target="_blank" ' +
-                'href="campaigns_create.jsp?type=auto_create&network=<%=network%>&id=' + one.id +
+                'href="campaigns_modify.jsp?type=auto_create&network=<%=network%>&id=' + one.id +
             '"></a>&nbsp;/&nbsp;<input type="checkbox" class="delete_check"></td>');
         tr.append(td);
         td = $('<td></td>');
