@@ -69,6 +69,7 @@ public class CountryAnalysisReport extends BaseHttpServlet {
                                     "sum(h.total_user) as total_users, sum(active_user) as active_users, sum(impression) as impressions, sum(revenue) as revenues,\n" +
                                     "sum(h.new_user_revenue) as new_user_revenues,sum(h.new_user_impression) as new_user_impressions, " +
                                     "sum(h.old_user_revenue) as old_user_revenues,sum(h.old_user_impression) as old_user_impressions, " +
+//                                    "sum(h.sample_user) as sum_sample_user,sum(h.total_new_user) as sum_total_new_user, " +
                                     " (sum(revenue) - sum(cost)) as incoming,r.first_day_revenue,r.second_day_revenue,r.third_day_revenue,r.fourth_day_revenue,\n" +
                                     " (case when sum(impression) > 0 then sum(revenue) * 1000 / sum(impression) else 0 end) as ecpm,\n" +
                                     "(case when sum(purchased_user) > 0 then sum(cost) / sum(purchased_user) else 0 end) as cpa,\n" +
@@ -243,12 +244,12 @@ public class CountryAnalysisReport extends BaseHttpServlet {
                                     totalNewRevenues += newRevenues;
                                     double newUserRevenue = NumberUtil.convertDouble(j.get("new_user_revenues"), 0);
                                     double newUserImpression = NumberUtil.convertDouble(j.get("new_user_impressions"), 0);
-                                    double oldUserImpression = NumberUtil.convertDouble(j.get("old_user_impressions"), 0);
+//                                    double oldUserImpression = NumberUtil.convertDouble(j.get("old_user_impressions"), 0);
 
                                     double newUserEcpm = newUserImpression == 0 ? 0 : newUserRevenue * 1000 / newUserImpression;
                                     d.addProperty("newUserEcpm",NumberUtil.trimDouble(newUserEcpm,4));
 
-                                    double totalUsers = NumberUtil.convertDouble(j.get("total_users"), 0);
+//                                    double totalUsers = NumberUtil.convertDouble(j.get("total_users"), 0);
 //                                    double oldUser = totalUsers - installed;
 //                                    double oldUserAvgImpression = oldUser > 0 ? oldUserImpression / oldUser : 0;
                                     double newUserAvgImpression = installed > 0 ? newUserImpression / installed : 0;
@@ -426,15 +427,17 @@ public class CountryAnalysisReport extends BaseHttpServlet {
             List<JSObject> dataList = DB.findListBySql(floatSql);
             List costList,purchasedUserList,installedList,uninstalledRateList,activeUserList,
                     revenueList,newRevenueList,ecpmList,cpaList,cpaDivEcpmList,incomingList,
-                    ratioList,newUserEcpmList,newUserAvgImpList,oldUserAvgImpList,newUserTagRevenueList;
-
+                    ratioList,newUserEcpmList,newUserAvgImpList,newUserTagRevenueList;
+//            List oldUserAvgImpList;
             Map<String,List> item = null;
             String date,countryCode;
             String split = " : ";int precision = 2;
-            long purchasedUser,installed,activeUser,totalUser,oldUser;
-            double newUserImpression,oldUserImpression;
+            long purchasedUser,installed,activeUser,totalUser;
+            double newUserImpression;
             double cost,uninstallRate,revenue,newRevenue,ecpm,cpa,cpaDivEcpm,incoming,
-                    recoveryCostRatio,newUserRevenue,oldUserRevenue,newUserAvgImpression,oldUserAvgImpression, newUserEcpm,newUserTagRevenue;
+                    recoveryCostRatio,newUserRevenue,newUserAvgImpression, newUserEcpm,newUserTagRevenue;
+//            double oldUserAvgImpression;
+//            long oldUser;
             for (JSObject one : dataList) {
                 if (one.hasObjectData()) {
                     date = one.get("date").toString();
@@ -456,7 +459,7 @@ public class CountryAnalysisReport extends BaseHttpServlet {
                     ratioList = item.get("recoveryCostRatio");
                     newUserEcpmList = item.get("newUserEcpm");
                     newUserAvgImpList = item.get("newUserAvgImpression");
-                    oldUserAvgImpList = item.get("oldUserAvgImpression");
+//                    oldUserAvgImpList = item.get("oldUserAvgImpression");
                     newUserTagRevenueList = item.get("newUserTagRevenue");
 
 
@@ -464,21 +467,20 @@ public class CountryAnalysisReport extends BaseHttpServlet {
                     purchasedUser = NumberUtil.convertLong(one.get("purchased_user"), 0);
                     totalUser = NumberUtil.convertLong(one.get("total_user"), 0);
                     installed = NumberUtil.convertLong(one.get("total_installed"), 0);
-                    oldUser = totalUser - installed;
+//                    oldUser = totalUser - installed;
                     uninstallRate = NumberUtil.convertDouble(one.get("uninstall_rate"), 0);
                     activeUser = NumberUtil.convertLong(one.get("active_user"), 0);
                     revenue = NumberUtil.convertDouble(one.get("revenue"), 0);
                     newRevenue = NumberUtil.convertDouble(one.get("ad_new_revenue"), 0);
                     newUserRevenue = NumberUtil.convertDouble(one.get("new_user_revenue"), 0);//新用户收益
-                    oldUserRevenue = NumberUtil.convertDouble(one.get("old_user_revenue"), 0);//老用户收益
                     newUserImpression = NumberUtil.convertDouble(one.get("new_user_impression"), 0);//新用户展示次数
-                    oldUserImpression = NumberUtil.convertDouble(one.get("old_user_impression"), 0);//老用户展示次数
+//                    oldUserImpression = NumberUtil.convertDouble(one.get("old_user_impression"), 0);//老用户展示次数
 
                     ecpm = NumberUtil.convertDouble(one.get("ecpm"), 0);
                     cpa = NumberUtil.convertDouble(one.get("cpa"), 0);
                     newUserEcpm = newUserImpression > 0 ? newUserRevenue * 1000 / newUserImpression : 0 ;
                     newUserAvgImpression = installed > 0 ? newUserImpression / installed : 0;//新用户平均展示
-                    oldUserAvgImpression = oldUser > 0 ? oldUserImpression / oldUser : 0;//老用户平均展示
+//                    oldUserAvgImpression = oldUser > 0 ? oldUserImpression / oldUser : 0;//老用户平均展示
 
                     //当日变现能力（单个新用户）：newUserTagRevenue = newUserEcpm /1000 * newUserAvgImpression
                     newUserTagRevenue = newUserEcpm * newUserAvgImpression / 1000 ;
@@ -503,7 +505,7 @@ public class CountryAnalysisReport extends BaseHttpServlet {
                     ratioList.add(date + split + NumberUtil.trimDouble(recoveryCostRatio,3));
                     newUserEcpmList.add(date + split + NumberUtil.trimDouble(newUserEcpm,4));
                     newUserAvgImpList.add(date + split + NumberUtil.trimDouble(newUserAvgImpression,4));
-                    oldUserAvgImpList.add(date + split + NumberUtil.trimDouble(oldUserAvgImpression,4));
+//                    oldUserAvgImpList.add(date + split + NumberUtil.trimDouble(oldUserAvgImpression,4));
                     //当日变现能力
                     newUserTagRevenueList.add(date + split + NumberUtil.trimDouble(newUserTagRevenue,4) + " = " + NumberUtil.trimDouble(newUserEcpm,4) +" * "+ NumberUtil.trimDouble(newUserAvgImpression,4) +" / "+ 1000);
                 }
@@ -519,9 +521,9 @@ public class CountryAnalysisReport extends BaseHttpServlet {
     private static void initFloadDataItem(Map<String,Map<String,List>> dataMap,String countryCode){
         List costList,purchasedUserList,installedList,uninstalledRateList,activeUserList,
                 revenueList,newRevenueList,ecpmList,cpaList,cpaDivEcpmList,incomingList,
-                ratioList,newUserEcpmList,newUserAvgImpList,oldUserAvgImpList,newUserTagRevenueList;
+                ratioList,newUserEcpmList,newUserAvgImpList,newUserTagRevenueList;
         Map<String,List> item = null;
-
+//        List oldUserAvgImpList;
         item = dataMap.get(countryCode);
         if (null == item){
             item = new HashMap<String,List>();
@@ -539,7 +541,7 @@ public class CountryAnalysisReport extends BaseHttpServlet {
             ratioList = new ArrayList();
             newUserEcpmList = new ArrayList();
             newUserAvgImpList = new ArrayList();
-            oldUserAvgImpList = new ArrayList();
+//            oldUserAvgImpList = new ArrayList();
             newUserTagRevenueList = new ArrayList();//当日变现能力
 
             item.put("cost",costList);
@@ -557,7 +559,7 @@ public class CountryAnalysisReport extends BaseHttpServlet {
             item.put("recoveryCostRatio",ratioList);//回本率
             item.put("newUserEcpm",newUserEcpmList);
             item.put("newUserAvgImpression",newUserAvgImpList);
-            item.put("oldUserAvgImpression",oldUserAvgImpList);
+//            item.put("oldUserAvgImpression",oldUserAvgImpList);
             item.put("newUserTagRevenue",newUserTagRevenueList);
 
             dataMap.put(countryCode,item);
