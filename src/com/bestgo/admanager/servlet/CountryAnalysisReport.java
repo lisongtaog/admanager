@@ -278,8 +278,8 @@ public class CountryAnalysisReport extends BaseHttpServlet {
                                     d.addProperty("second_day_revenue",NumberUtil.trimDouble(secondDayRevenue,2));
                                     d.addProperty("third_day_revenue",NumberUtil.trimDouble(thirdDayRevenue,2));
                                     d.addProperty("fourth_day_revenue",NumberUtil.trimDouble(fourthDayRevenue,2));
-                                    double cpaDivNewUserEcpm = newUserEcpm > 0 ? cpa / newUserEcpm : 0;
-                                    d.addProperty("cpaDivNewEcpm", NumberUtil.trimDouble(cpaDivNewUserEcpm, 3));
+//                                    double cpaDivNewUserEcpm = newUserEcpm > 0 ? cpa / newUserEcpm : 0;
+//                                    d.addProperty("cpaDivNewEcpm", NumberUtil.trimDouble(cpaDivNewUserEcpm, 3));
                                     //" t.cpa as tag_cpa, t.ecpm as tag_ecpm,t.avg_impression \n" +
                                     double tag_cpa = NumberUtil.convertDouble(j.get("tag_cpa"), 0);
                                     double tag_ecpm = NumberUtil.convertDouble(j.get("tag_ecpm"), 0);
@@ -294,10 +294,11 @@ public class CountryAnalysisReport extends BaseHttpServlet {
                                         d.addProperty("tag_impression", tag_impression);
                                     }
 
-                                } else {
-                                    double cpaDivEcpm = ecpm > 0 ? cpa / ecpm : 0;
-                                    d.addProperty("cpa_div_ecpm", NumberUtil.trimDouble(cpaDivEcpm, 3));
                                 }
+//                                else {
+//                                    double cpaDivEcpm = ecpm > 0 ? cpa / ecpm : 0;
+//                                    d.addProperty("cpa_div_ecpm", NumberUtil.trimDouble(cpaDivEcpm, 3));
+//                                }
                                 d.addProperty("country_code", countryCode);
                                 d.addProperty("country_name", countryCodeNameMap.get(countryCode));
                                 d.addProperty("bidding_summary", biddingSummaryStr);

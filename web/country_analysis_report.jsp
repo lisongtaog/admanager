@@ -180,11 +180,11 @@
 
         var keyset = ["costs","cost_upper_limit","purchasedUser", "installed", "uninstalledRate",
             "activeUser","revenue", "incoming", "ecpm", "cpa",
-            "cpa_div_ecpm", "bidding_summary"];
+            "bidding_summary"];
         if (same_date == 1) {
             keyset = ["costs","cost_upper_limit","purchasedUser", "installed", "uninstalledRate",
                 "activeUser","revenue", "newRevenue","recoveryCostRatio","incoming", "ecpm","cpa","tag_cpa",
-                "cpaDivNewEcpm", "newUserEcpm","tag_ecpm","oldUserEcpm","newUserAvgImpression","tag_impression",
+                 "newUserEcpm","tag_ecpm","oldUserEcpm","newUserAvgImpression","tag_impression",
                 "oldUserAvgImpression", "newUserTagRevenue",
                 "first_day_revenue","second_day_revenue","third_day_revenue","fourth_day_revenue","bidding_summary"];
         }
@@ -313,7 +313,6 @@
                 +'    <th>ECPM<span sorterid="1040" class="sorter glyphicon glyphicon-arrow-down"></span></th>'
                 +'    <th>CPA<span sorterid="1041" class="sorter glyphicon glyphicon-arrow-down"></span></th> '
                 +'    <th class="editColumn">期望CPA</th>'//ML
-                +'    <th>CPA/新用户ECPM</th>'
                 +'    <th>新用户<br>Ecpm</th>'
                 +'    <th class="editColumn">期望Ecpm</th>' //ML
                 +'    <th>老用户<br>Ecpm</th>'
@@ -341,7 +340,6 @@
                 + '    <th>Incoming<span sorterid="1042" class="sorter glyphicon glyphicon-arrow-down"></span></th>'
                 + '    <th>ECPM<span sorterid="1040" class="sorter glyphicon glyphicon-arrow-down"></span></th>'
                 + '    <th>CPA<span sorterid="1041" class="sorter glyphicon glyphicon-arrow-down"></span></th> '
-                + '    <th>CPA/ECPM</th>'
                 + '    <th>竞价</th>'
                 + '</tr>'
         }
