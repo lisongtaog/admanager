@@ -184,8 +184,7 @@
         if (same_date == 1) {
             keyset = ["costs","cost_upper_limit","purchasedUser", "installed", "uninstalledRate",
                 "activeUser","revenue", "newRevenue","recoveryCostRatio","incoming", "ecpm","cpa","tag_cpa",
-                 "newUserEcpm","tag_ecpm","oldUserEcpm","newUserAvgImpression","tag_impression",
-                "oldUserAvgImpression", "newUserTagRevenue",
+                 "newUserEcpm","tag_ecpm","newUserAvgImpression","tag_impression","newUserTagRevenue",
                 "first_day_revenue","second_day_revenue","third_day_revenue","fourth_day_revenue","bidding_summary"];
         }
 
@@ -313,12 +312,10 @@
                 +'    <th>ECPM<span sorterid="1040" class="sorter glyphicon glyphicon-arrow-down"></span></th>'
                 +'    <th>CPA<span sorterid="1041" class="sorter glyphicon glyphicon-arrow-down"></span></th> '
                 +'    <th class="editColumn">期望CPA</th>'//ML
-                +'    <th>新用户<br>Ecpm</th>'
+                +'    <th>抽样<br>Ecpm</th>'
                 +'    <th class="editColumn">期望Ecpm</th>' //ML
-                +'    <th>老用户<br>Ecpm</th>'
                 +'    <th>新用户<br>平均展示</th>'
                 +'    <th class="editColumn">期望展示</th>'//ML
-                +'    <th>老用户<br>平均展示</th>'
                 +'    <th title="新用户Ecpm * 新用户平均展示 / 1000">当日变现能力</th>'
                 +'    <th>1Day<br>Revenue</th>'
                 +'    <th>2Day<br>Revenue</th>'
