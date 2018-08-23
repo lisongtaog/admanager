@@ -69,7 +69,7 @@ public class CountryAnalysisReport extends BaseHttpServlet {
                                     "sum(h.total_user) as total_users, sum(active_user) as active_users, sum(impression) as impressions, sum(revenue) as revenues,\n" +
                                     "sum(h.new_user_revenue) as new_user_revenues,sum(h.new_user_impression) as new_user_impressions, " +
                                     "sum(h.old_user_revenue) as old_user_revenues,sum(h.old_user_impression) as old_user_impressions, " +
-//                                    "sum(h.sample_user) as sum_sample_user,sum(h.total_new_user) as sum_total_new_user, " +
+                                    "sum(h.sample_user) as sum_sample_user,sum(h.total_new_user) as sum_total_new_user, " +
                                     " (sum(revenue) - sum(cost)) as incoming,r.first_day_revenue,r.second_day_revenue,r.third_day_revenue,r.fourth_day_revenue,\n" +
                                     " (case when sum(impression) > 0 then sum(revenue) * 1000 / sum(impression) else 0 end) as ecpm,\n" +
                                     "(case when sum(purchased_user) > 0 then sum(cost) / sum(purchased_user) else 0 end) as cpa,\n" +
@@ -240,24 +240,30 @@ public class CountryAnalysisReport extends BaseHttpServlet {
 
                                 JsonObject d = new JsonObject();
                                 if (sameDate) {
-                                    double newRevenues = NumberUtil.convertDouble(j.get("new_revenues"), 0);
+                                    double sampleUser = NumberUtil.convertDouble(j.get("sum_sample_user"), 0); //抽样用户数
+                                    double totalNewUser = NumberUtil.convertDouble(j.get("sum_total_new_user"), 0); //总的新用户数
+                                    d.addProperty("sample_user",sampleUser);
+                                    d.addProperty("total_new_user",totalNewUser);
+                                    double newUserSampleImpression = NumberUtil.convertDouble(j.get("new_user_impressions"), 0);//新用户抽样展示次数
+                                    double newUserImpression = sampleUser > 0 ? newUserSampleImpression / sampleUser * totalNewUser : 0; //新用户预估的总展示次数
+                                    // 新用户平均展示次数=新用户展示/用户数
+                                    double newUserAvgImpression = totalNewUser > 0 ? newUserImpression / totalNewUser : 0;
+                                    d.addProperty("newUserAvgImpression",NumberUtil.trimDouble(newUserAvgImpression,4));
+                                    // 总的新用户收入=总的新用户数*新用户人均广告展示次数*老的ECPM
+                                    double newRevenues = NumberUtil.trimDouble(totalNewUser * newUserAvgImpression * ecpm / 1000,2);
                                     totalNewRevenues += newRevenues;
-                                    double newUserRevenue = NumberUtil.convertDouble(j.get("new_user_revenues"), 0);
-                                    double newUserImpression = NumberUtil.convertDouble(j.get("new_user_impressions"), 0);
+                                    double newUserRevenue = NumberUtil.convertDouble(j.get("new_user_revenues"), 0); //抽样新用户收入
 //                                    double oldUserImpression = NumberUtil.convertDouble(j.get("old_user_impressions"), 0);
 
-                                    double newUserEcpm = newUserImpression == 0 ? 0 : newUserRevenue * 1000 / newUserImpression;
+                                    double newUserEcpm = newUserImpression > 0 ? newUserRevenue * 1000 / newUserImpression : 0; //抽样新用户ECPM
                                     d.addProperty("newUserEcpm",NumberUtil.trimDouble(newUserEcpm,4));
 
 //                                    double totalUsers = NumberUtil.convertDouble(j.get("total_users"), 0);
 //                                    double oldUser = totalUsers - installed;
 //                                    double oldUserAvgImpression = oldUser > 0 ? oldUserImpression / oldUser : 0;
-                                    double newUserAvgImpression = installed > 0 ? newUserImpression / installed : 0;
-                                    d.addProperty("newUserAvgImpression",NumberUtil.trimDouble(newUserAvgImpression,4));
 //                                    d.addProperty("oldUserAvgImpression",NumberUtil.trimDouble(oldUserAvgImpression,4));
-
-                                    //newUserTagRevenue = newUserEcpm /1000 * newUserAvgImpression
-                                    double newUserTagRevenue = newUserEcpm * newUserAvgImpression / 1000 ;
+                                    //当日变现能力（单个新用户）= 新用户人均展示数*老ECPM/1000
+                                    double newUserTagRevenue = newUserAvgImpression * ecpm / 1000;
                                     d.addProperty("newUserTagRevenue",NumberUtil.trimDouble(newUserTagRevenue,4));
 
                                     //当天回本率=newRevenues/总花费
@@ -282,7 +288,7 @@ public class CountryAnalysisReport extends BaseHttpServlet {
                                     double tag_cpa = NumberUtil.convertDouble(j.get("tag_cpa"), 0);
                                     double tag_ecpm = NumberUtil.convertDouble(j.get("tag_ecpm"), 0);
                                     double tag_impression = NumberUtil.convertDouble(j.get("avg_impression"), 0);
-                                    if(tag_cpa > 0){//期望 cpa
+                                    if (tag_cpa > 0) {//期望 cpa
                                         d.addProperty("tag_cpa", tag_cpa);
                                     }
                                     if(tag_ecpm > 0){//期望 ecpm
@@ -418,6 +424,7 @@ public class CountryAnalysisReport extends BaseHttpServlet {
                     "(case when total_installed > 0 then today_uninstalled / total_installed else 0 end) as uninstall_rate," +
                     "(case when impression > 0 then revenue * 1000 / impression else 0 end) as ecpm," +
                     "(case when purchased_user > 0 then cost / purchased_user else 0 end) as cpa, " +
+                    "sample_user,total_new_user," +
                     "new_user_revenue,new_user_impression,old_user_revenue,old_user_impression " +
                     "from web_ad_country_analysis_report_history where " +
                     " date BETWEEN '" + sinceDate + "' AND '" + endTime + "'" +
@@ -434,6 +441,8 @@ public class CountryAnalysisReport extends BaseHttpServlet {
             String split = " : ";int precision = 2;
             long purchasedUser,installed,activeUser,totalUser;
             double newUserImpression;
+            double sampleUser,newUserSampleImpression = 0;
+            double totalNewUser = 0;
             double cost,uninstallRate,revenue,newRevenue,ecpm,cpa,cpaDivEcpm,incoming,
                     recoveryCostRatio,newUserRevenue,newUserAvgImpression, newUserEcpm,newUserTagRevenue;
 //            double oldUserAvgImpression;
@@ -471,19 +480,25 @@ public class CountryAnalysisReport extends BaseHttpServlet {
                     uninstallRate = NumberUtil.convertDouble(one.get("uninstall_rate"), 0);
                     activeUser = NumberUtil.convertLong(one.get("active_user"), 0);
                     revenue = NumberUtil.convertDouble(one.get("revenue"), 0);
-                    newRevenue = NumberUtil.convertDouble(one.get("ad_new_revenue"), 0);
+                    sampleUser = NumberUtil.convertDouble(one.get("sample_user"), 0); //样本用户
+                    totalNewUser = NumberUtil.convertDouble(one.get("total_new_user"), 0); //总的新用户数
+                    newUserSampleImpression = NumberUtil.convertDouble(one.get("new_user_impression"), 0);//新用户抽样展示次数
+                    newUserImpression = sampleUser > 0 ? newUserSampleImpression / sampleUser * totalNewUser : 0; //新用户预估的总展示次数
+                    // 总的新用户收入=总的新用户数*新用户人均广告展示次数*老的ECPM
                     newUserRevenue = NumberUtil.convertDouble(one.get("new_user_revenue"), 0);//新用户收益
-                    newUserImpression = NumberUtil.convertDouble(one.get("new_user_impression"), 0);//新用户展示次数
 //                    oldUserImpression = NumberUtil.convertDouble(one.get("old_user_impression"), 0);//老用户展示次数
 
                     ecpm = NumberUtil.convertDouble(one.get("ecpm"), 0);
                     cpa = NumberUtil.convertDouble(one.get("cpa"), 0);
                     newUserEcpm = newUserImpression > 0 ? newUserRevenue * 1000 / newUserImpression : 0 ;
-                    newUserAvgImpression = installed > 0 ? newUserImpression / installed : 0;//新用户平均展示
+//                    newUserAvgImpression = installed > 0 ? newUserImpression / installed : 0;//新用户平均展示
+                    // 新用户平均展示次数=新用户展示/用户数
+                    newUserAvgImpression = totalNewUser > 0 ? newUserImpression / totalNewUser : 0; //新用户平均展示
 //                    oldUserAvgImpression = oldUser > 0 ? oldUserImpression / oldUser : 0;//老用户平均展示
+                    newRevenue = NumberUtil.trimDouble(totalNewUser * newUserAvgImpression * ecpm / 1000,2);
 
-                    //当日变现能力（单个新用户）：newUserTagRevenue = newUserEcpm /1000 * newUserAvgImpression
-                    newUserTagRevenue = newUserEcpm * newUserAvgImpression / 1000 ;
+                    //当日变现能力（单个新用户）= 新用户人均展示数*老ECPM/1000
+                    newUserTagRevenue = newUserAvgImpression * ecpm / 1000;
 
                     cpaDivEcpm = ecpm == 0 ? 0 : cpa / newUserEcpm;
                     incoming = revenue - cost;
