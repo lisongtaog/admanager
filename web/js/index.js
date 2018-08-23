@@ -372,8 +372,8 @@ function init() {
                     $('#result_header').html("<tr><th>应用名称</th>" +
                         "<th>总花费<span sorterId=\"70\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
                         "<th>总营收<span sorterId=\"72\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
-                        "<th>抽样新用户总营收</th>" +
-                        "<th>抽样新用户回本率</th>" +
+                        "<th>新用户总营收</th>" +
+                        "<th>新用户回本率</th>" +
                         "<th>总安装<span sorterId=\"74\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
                         "<th>总展示<span sorterId=\"75\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
                         "<th>总点击<span sorterId=\"76\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th><th>CTR<span sorterId=\"77\" class=\"sorter glyphicon glyphicon-arrow-up\"></span></th>" +
