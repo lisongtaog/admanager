@@ -11,18 +11,42 @@ import org.apache.log4j.Logger;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by jikai on 5/31/17.
  */
 @WebServlet(name = "AdAccountAdMob", urlPatterns = {"/adaccount_admob/*"})
 public class AdAccountAdmob extends BaseHttpServlet {
+
+    public static Map<String, String> accountIdNameAdmobRelationMap;
+
+    static {
+        if (accountIdNameAdmobRelationMap == null) {
+            accountIdNameAdmobRelationMap = new HashMap<>();
+        }
+        String sql = "SELECT account_id,short_name FROM web_account_id_admob";
+        List<JSObject> list = null;
+        try {
+            list = DB.findListBySql(sql);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (list != null && list.size() > 0) {
+            for (JSObject j : list) {
+                String account_id = j.get("account_id");
+                String short_name = j.get("short_name");
+                accountIdNameAdmobRelationMap.put(account_id, short_name);
+            }
+        }
+    }
+
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         super.doPost(request, response);
         if (!Utils.isAdmin(request, response)) return;

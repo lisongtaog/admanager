@@ -11,18 +11,43 @@ import org.apache.log4j.Logger;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by jikai on 5/31/17.
  */
 @WebServlet(name = "AdAccount", urlPatterns = {"/adaccount/*"})
 public class AdAccount extends BaseHttpServlet {
+
+    public static Map<String, String> accountIdNameRelationMap;
+
+    static {
+        if (accountIdNameRelationMap == null) {
+            accountIdNameRelationMap = new HashMap<>();
+        }
+        String sql = "SELECT account_id,short_name FROM web_account_id";
+        List<JSObject> list = null;
+        try {
+            list = DB.findListBySql(sql);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (list != null && list.size() > 0) {
+            for (JSObject j : list) {
+                String account_id = j.get("account_id");
+                String short_name = j.get("short_name");
+                accountIdNameRelationMap.put(account_id, short_name);
+            }
+        }
+
+    }
+
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         super.doPost(request, response);
         if (!Utils.isAdmin(request, response)) return;
@@ -50,7 +75,7 @@ public class AdAccount extends BaseHttpServlet {
                 OperationResult result = updateAdAccount(id, account, shortName);
                 json.addProperty("ret", result.result ? 1 : 0);
                 json.addProperty("message", result.message);
-            }  else if (path.matches("/archive_fb_campaigns_by_account_id")) {
+            } else if (path.matches("/archive_fb_campaigns_by_account_id")) {
 //                String account = request.getParameter("account");
                 boolean b = false;
                 try {
@@ -66,17 +91,17 @@ public class AdAccount extends BaseHttpServlet {
                     List<JSObject> data = fetchData(word);
                     json.addProperty("ret", 1);
                     JsonArray array = new JsonArray();
-                    for (int i = 0,len = data.size(); i < len; i++) {
+                    for (int i = 0, len = data.size(); i < len; i++) {
                         JSObject js = data.get(i);
                         JsonObject one = new JsonObject();
-                        one.addProperty("account_id", (String)js.get("account_id"));
-                        one.addProperty("short_name", (String)js.get("short_name"));
+                        one.addProperty("account_id", (String) js.get("account_id"));
+                        one.addProperty("short_name", (String) js.get("short_name"));
                         int status = js.get("status");
                         one.addProperty("status", status);
                         int spend_cap = data.get(i).get("spend_cap");
                         int amount_spent = data.get(i).get("amount_spent");
                         one.addProperty("balance", spend_cap - amount_spent);
-                        one.addProperty("id", (long)data.get(i).get("id"));
+                        one.addProperty("id", (long) data.get(i).get("id"));
                         array.add(one);
                     }
                     json.add("data", array);
@@ -90,13 +115,13 @@ public class AdAccount extends BaseHttpServlet {
                     JsonArray array = new JsonArray();
                     for (int i = 0; i < data.size(); i++) {
                         JsonObject one = new JsonObject();
-                        one.addProperty("account_id", (String)data.get(i).get("account_id"));
-                        one.addProperty("short_name", (String)data.get(i).get("short_name"));
-                        one.addProperty("status", (String)data.get(i).get("status"));
+                        one.addProperty("account_id", (String) data.get(i).get("account_id"));
+                        one.addProperty("short_name", (String) data.get(i).get("short_name"));
+                        one.addProperty("status", (String) data.get(i).get("status"));
                         int spend_cap = data.get(i).get("spend_cap");
                         int amount_spent = data.get(i).get("amount_spent");
                         one.addProperty("balance", String.valueOf(spend_cap - amount_spent));
-                        one.addProperty("id", (long)data.get(i).get("id"));
+                        one.addProperty("id", (long) data.get(i).get("id"));
                         array.add(one);
                     }
                     json.add("data", array);
@@ -116,7 +141,7 @@ public class AdAccount extends BaseHttpServlet {
     public static List<JSObject> fetchData(String word) {
         List<JSObject> list = new ArrayList<>();
         try {
-            return DB.scan("web_account_id").select("id", "account_id", "short_name", "status" ,"spend_cap", "amount_spent")
+            return DB.scan("web_account_id").select("id", "account_id", "short_name", "status", "spend_cap", "amount_spent")
                     .where(DB.filter().whereLikeTo("account_id", "%" + word + "%"))
                     .or(DB.filter().whereLikeTo("short_name", "%" + word + "%"))
                     .orderByAsc("id")
@@ -132,7 +157,7 @@ public class AdAccount extends BaseHttpServlet {
         List<JSObject> list = new ArrayList<>();
         try {
             return DB.scan("web_account_id")
-                    .select("id", "account_id", "short_name", "status" ,"spend_cap", "amount_spent")
+                    .select("id", "account_id", "short_name", "status", "spend_cap", "amount_spent")
                     .limit(size).start(index * size)
                     .orderByAsc("id")
                     .execute();
@@ -234,6 +259,7 @@ public class AdAccount extends BaseHttpServlet {
 
     /**
      * 根据账号ID归档FB系列
+     *
      * @param accountId
      * @return
      */
