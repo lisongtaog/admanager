@@ -247,7 +247,7 @@ public class CountryAnalysisReport extends BaseHttpServlet {
                                     double newUserSampleImpression = NumberUtil.convertDouble(j.get("new_user_impressions"), 0);//新用户抽样展示次数
                                     double newUserImpression = sampleUser > 0 ? newUserSampleImpression / sampleUser * totalNewUser : 0; //新用户预估的总展示次数
                                     // 新用户平均展示次数=新用户展示/用户数
-                                    double newUserAvgImpression = totalNewUser > 0 ? newUserImpression / totalNewUser : 0;
+                                    double newUserAvgImpression = sampleUser > 0 ? newUserSampleImpression / sampleUser : 0;
                                     d.addProperty("newUserAvgImpression",NumberUtil.trimDouble(newUserAvgImpression,4));
                                     // 总的新用户收入=总的新用户数*新用户人均广告展示次数*老的ECPM
                                     double newRevenues = NumberUtil.trimDouble(totalNewUser * newUserAvgImpression * ecpm / 1000,2);
@@ -255,7 +255,8 @@ public class CountryAnalysisReport extends BaseHttpServlet {
                                     double newUserRevenue = NumberUtil.convertDouble(j.get("new_user_revenues"), 0); //抽样新用户收入
 //                                    double oldUserImpression = NumberUtil.convertDouble(j.get("old_user_impressions"), 0);
 
-                                    double newUserEcpm = newUserImpression > 0 ? newUserRevenue * 1000 / newUserImpression : 0; //抽样新用户ECPM
+                                    double newUserEcpm = newUserImpression > 0 ? newUserRevenue * 1000 / newUserSampleImpression : 0; //抽样新用户ECPM
+//                                    double newUserEcpm = newUserImpression > 0 ? newUserRevenue * 1000 / newUserImpression : 0; //抽样新用户ECPM
                                     d.addProperty("newUserEcpm",NumberUtil.trimDouble(newUserEcpm,4));
 
 //                                    double totalUsers = NumberUtil.convertDouble(j.get("total_users"), 0);

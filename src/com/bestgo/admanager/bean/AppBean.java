@@ -25,4 +25,8 @@ public class AppBean {
     public double totalNewRevenue; //新用户总收入
     public double roi;//回本率
     public long tagId;
+    public double sampleUser;
+    public double totalNewUser;
+    public double newUserAvgImpressions;
+    public double newUserSampleImpression;
 }
