@@ -111,10 +111,7 @@ public class Query extends BaseHttpServlet {
                                 AppBean appBean1 = appRevenueMap.get(google_package_id);
                                 if (appBean1 != null) {
                                     appBean.total_revenue = appBean1.total_revenue;
-                                    //计算ECPM和Incoming
-                                    appBean.ecpm = appBean.total_revenue * 1000 / appBean.total_impressions;
-                                    appBean.incoming = appBean.total_revenue - appBean.total_spend;
-                                    appBean.totalNewRevenue = NumberUtil.trimDouble(appBean1.totalNewUser * appBean1.newUserAvgImpressions * appBean.ecpm /1000,2) ;
+                                    appBean.totalNewRevenue = appBean1.totalNewRevenue;
                                     appBean.roi = appBean.total_spend > 0 ? appBean.totalNewRevenue / appBean.total_spend : 0;
                                 }
                             }else{
@@ -126,10 +123,10 @@ public class Query extends BaseHttpServlet {
                                 if (oneR.hasObjectData()) {
                                     appBean.total_revenue = NumberUtil.convertDouble(oneR.get("revenues"), 0);
                                 }
-                                //计算ECPM和Incoming
-                                appBean.ecpm = appBean.total_revenue * 1000 / appBean.total_impressions;
-                                appBean.incoming = appBean.total_revenue - appBean.total_spend;
                             }
+                            //计算ECPM和Incoming
+                            appBean.ecpm = appBean.total_revenue * 1000 / appBean.total_impressions;
+                            appBean.incoming = appBean.total_revenue - appBean.total_spend;
                         }
                         appBeanList.add(appBean);
                     }
@@ -232,10 +229,7 @@ public class Query extends BaseHttpServlet {
                                 AppBean appBean1 = appRevenueMap.get(googlePackageId);
                                 if (appBean1 != null) {
                                     totalRevenue = appBean1.total_revenue;
-                                    //计算ECPM和Incoming
-                                    ecpm = totalRevenue * 1000 / total_impressions;
-                                    incoming = totalRevenue - total_spend;
-                                    totalNewRevenue = NumberUtil.trimDouble(appBean1.totalNewUser * appBean1.newUserAvgImpressions * ecpm /1000,2) ;
+                                    totalNewRevenue = appBean1.totalNewRevenue;
                                     double roi = total_spend > 0 ? totalNewRevenue / total_spend : 0;//回本率
                                     j.addProperty("roi",NumberUtil.trimDouble(roi,3));
                                     j.addProperty("total_new_revenue",NumberUtil.trimDouble(totalNewRevenue,3));
@@ -248,10 +242,10 @@ public class Query extends BaseHttpServlet {
                                 if (oneR.hasObjectData()) {
                                     totalRevenue = NumberUtil.convertDouble(oneR.get("revenues"), 0);
                                 }
-                                //计算ECPM和Incoming
-                                ecpm = totalRevenue * 1000 / total_impressions;
-                                incoming = totalRevenue - total_spend;
                             }
+                            //计算ECPM和Incoming
+                            ecpm = totalRevenue * 1000 / total_impressions;
+                            incoming = totalRevenue - total_spend;
                         }
                         j.addProperty("total_revenue", NumberUtil.trimDouble(totalRevenue, 0));
                         j.addProperty("ecpm",NumberUtil.trimDouble(ecpm,3));
@@ -352,24 +346,39 @@ public class Query extends BaseHttpServlet {
      */
     private Map<String, AppBean> getAppRevenueMap(String date) throws Exception {
         Map<String, AppBean> map = new HashMap<>();
-        List<JSObject> list = DB.findListBySql("SELECT h.app_id,SUM(h.sample_user) AS sum_sample_user,\n" +
-                "SUM(h.revenue) AS revenues,\n" +
-                "SUM(h.total_new_user) AS sum_total_new_user,\n" +
-                "SUM(h.new_user_impression) AS new_user_impressions\n" +
-                "FROM web_ad_country_analysis_report_history h\n" +
-                "WHERE h.date = '" + date + "' GROUP BY h.app_id");
+        //应用国家维度的数据
+        List<JSObject> list = DB.findListBySql("SELECT h.app_id,h.country_code,SUM(h.revenue) AS revenues,SUM(h.sample_user) AS sum_sample_user,\n" +
+                "SUM(h.total_new_user) AS sum_total_new_user,SUM(h.new_user_impression) AS new_user_impressions,\n" +
+                " (case when sum(impression) > 0 then sum(revenue) * 1000 / sum(impression) else 0 end) as ecpm\n" +
+                " from web_ad_country_analysis_report_history h\n" +
+                " where h.date = '" + date + "' GROUP BY h.app_id,h.country_code");
         AppBean appBean = null;
+        double ecpm = 0.0; //老ECPM
+        String appId = null;
         for (int i = 0,len = list.size();i < len;i++) {
             JSObject one = list.get(i);
             if (one.hasObjectData()) {
-                appBean = new AppBean();
-                appBean.appId = one.get("app_id");
-                appBean.total_revenue = one.get("revenues");
-                appBean.sampleUser = NumberUtil.convertDouble(one.get("sum_sample_user"),0);
-                appBean.totalNewUser = NumberUtil.convertDouble(one.get("sum_total_new_user"),0);
-                appBean.newUserSampleImpression = one.get("new_user_impressions"); //新用户样本展示
-                appBean.newUserAvgImpressions = appBean.sampleUser > 0 ? appBean.newUserSampleImpression / appBean.sampleUser : 0; //新用户样本平均展示
-                map.put(appBean.appId,appBean);
+                appId = one.get("app_id");
+                appBean = map.get(appId);
+                if (appBean == null) {
+                    appBean = new AppBean();
+                    appBean.total_revenue = NumberUtil.convertDouble(one.get("revenues"),0);
+                    appBean.sampleUser = NumberUtil.convertDouble(one.get("sum_sample_user"),0);
+                    appBean.totalNewUser = NumberUtil.convertDouble(one.get("sum_total_new_user"),0);
+                    appBean.newUserSampleImpression = NumberUtil.convertDouble(one.get("new_user_impressions"),0); //新用户样本展示
+                    appBean.newUserAvgImpressions = appBean.sampleUser > 0 ? appBean.newUserSampleImpression / appBean.sampleUser : 0; //新用户样本平均展示
+                    ecpm = NumberUtil.convertDouble(one.get("ecpm"),0);
+                    appBean.totalNewRevenue = appBean.totalNewUser * appBean.newUserAvgImpressions * ecpm / 1000;
+                } else {
+                    appBean.total_revenue += NumberUtil.convertDouble(one.get("revenues"),0);
+                    appBean.sampleUser = NumberUtil.convertDouble(one.get("sum_sample_user"),0);
+                    appBean.totalNewUser = NumberUtil.convertDouble(one.get("sum_total_new_user"),0);
+                    appBean.newUserSampleImpression = NumberUtil.convertDouble(one.get("new_user_impressions"),0); //新用户样本展示
+                    appBean.newUserAvgImpressions = appBean.sampleUser > 0 ? appBean.newUserSampleImpression / appBean.sampleUser : 0; //新用户样本平均展示
+                    ecpm = NumberUtil.convertDouble(one.get("ecpm"),0);
+                    appBean.totalNewRevenue += appBean.totalNewUser * appBean.newUserAvgImpressions * ecpm / 1000;
+                }
+                map.put(appId,appBean);
             }
         }
         return map;
