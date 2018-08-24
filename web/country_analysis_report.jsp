@@ -182,9 +182,13 @@
             "activeUser","revenue", "incoming", "ecpm", "cpa",
             "bidding_summary"];
         if (same_date == 1) {
-            keyset = ["costs","cost_upper_limit","purchasedUser", "installed", "uninstalledRate",
-                "activeUser","revenue", "newRevenue","sample_user","total_new_user","recoveryCostRatio","incoming", "ecpm","cpa","tag_cpa",
-                 "newUserEcpm","tag_ecpm","newUserAvgImpression","tag_impression","newUserTagRevenue",
+//            keyset = ["costs","cost_upper_limit","purchasedUser", "installed", "uninstalledRate",
+//                "activeUser","revenue", "newRevenue","sample_user","total_new_user","recoveryCostRatio","incoming", "ecpm","cpa","tag_cpa",
+//                 "newUserEcpm","tag_ecpm","newUserAvgImpression","tag_impression","newUserTagRevenue",
+//                "first_day_revenue","second_day_revenue","third_day_revenue","fourth_day_revenue","bidding_summary"];
+            keyset = ["costs","cost_upper_limit","purchasedUser","installed", "uninstalledRate",
+                "activeUser","revenue","incoming","cpa", "ecpm","cpa_div_ecpm","newRevenue","recoveryCostRatio","new_user_revenues",
+                "newUserEcpm","newUserAvgImpression","sample_user","total_new_user","newUserTagRevenue",
                 "first_day_revenue","second_day_revenue","third_day_revenue","fourth_day_revenue","bidding_summary"];
         }
 
@@ -306,25 +310,30 @@
                 +'    <th>卸载率</th> '
                 +'    <th>ActiveUser<span sorterid="1038" class="sorter glyphicon glyphicon-arrow-down"></span></th>'
                 +'    <th>Revenue<span sorterid="1039" class="sorter glyphicon glyphicon-arrow-down"></span></th>'
+                +'    <th>Incoming<span sorterid="1042" class="sorter glyphicon glyphicon-arrow-down"></span></th>  '
+                +'    <th>CPA<span sorterid="1041" class="sorter glyphicon glyphicon-arrow-down"></span></th> '
+                +'    <th>ECPM<span sorterid="1040" class="sorter glyphicon glyphicon-arrow-down"></span></th>'
+                +'    <th>CPA/<br>Ecpm</th>'
                 +'    <th>NewRevenue<span sorterid="1038" class="sorter glyphicon glyphicon-arrow-down"></span></th>'
+                +'    <th>当天<br>回本率</th>'
+                +'    <th>抽样用户<br>收入</th>'
+                +'    <th>抽样用户<br>ECPM</th>'
+                +'    <th>新用户<br>平均展示</th>'
                 +'    <th>抽样<br>用户</th>'
                 +'    <th>总的<br>新用户</th>'
-                +'    <th>当天<br>回本率</th>'
-                +'    <th>Incoming<span sorterid="1042" class="sorter glyphicon glyphicon-arrow-down"></span></th>  '
-                +'    <th>ECPM<span sorterid="1040" class="sorter glyphicon glyphicon-arrow-down"></span></th>'
-                +'    <th>CPA<span sorterid="1041" class="sorter glyphicon glyphicon-arrow-down"></span></th> '
-                +'    <th class="editColumn">期望CPA</th>'//ML
-                +'    <th>抽样<br>Ecpm</th>'
-                +'    <th class="editColumn">期望Ecpm</th>' //ML
-                +'    <th>新用户<br>平均展示</th>'
-                +'    <th class="editColumn">期望展示</th>'//ML
                 +'    <th title="老Ecpm * 新用户平均展示 / 1000">当日变现能力</th>'
                 +'    <th>1Day<br>Revenue</th>'
                 +'    <th>2Day<br>Revenue</th>'
                 +'    <th>3Day<br>Revenue</th>'
                 +'    <th>4Day<br>Revenue</th>'
                 +'    <th>竞价</th>'
-                +'</tr>'
+                +'</tr>';
+
+//                +'    <th class="editColumn">期望CPA</th>'//ML
+
+//                +'    <th class="editColumn">期望Ecpm</th>' //ML
+//                +'    <th class="editColumn">期望展示</th>'//ML
+
         }else {
             headHtml =
                   '<tr>'
