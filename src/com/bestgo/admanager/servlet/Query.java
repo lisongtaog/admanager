@@ -154,7 +154,7 @@ public class Query extends BaseHttpServlet {
                             j.addProperty("ecpm",NumberUtil.trimDouble(cs.ecpm,3));
                             j.addProperty("incoming",NumberUtil.trimDouble(cs.incoming,0));
                             j.addProperty("roi",NumberUtil.trimDouble(cs.roi,3));
-                            j.addProperty("total_new_revenue",cs.totalNewRevenue);
+                            j.addProperty("total_new_revenue",NumberUtil.trimDouble(cs.totalNewRevenue,0));
                             arr.add(j);
                         }
                     }
@@ -232,7 +232,7 @@ public class Query extends BaseHttpServlet {
                                     totalNewRevenue = appBean1.totalNewRevenue;
                                     double roi = total_spend > 0 ? totalNewRevenue / total_spend : 0;//回本率
                                     j.addProperty("roi",NumberUtil.trimDouble(roi,3));
-                                    j.addProperty("total_new_revenue",NumberUtil.trimDouble(totalNewRevenue,3));
+                                    j.addProperty("total_new_revenue",NumberUtil.trimDouble(totalNewRevenue,0));
                                 }
                             }else{
                                 String sqlR = "select sum(revenue) as revenues " +
