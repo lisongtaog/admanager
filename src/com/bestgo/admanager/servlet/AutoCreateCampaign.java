@@ -72,6 +72,8 @@ public class AutoCreateCampaign extends BaseHttpServlet {
                         for (int i = 0; i < data.size(); i++) {
                             JsonObject one = new JsonObject();
                             Set<String> keySet = data.get(i).getKeys();
+                            String value0 = "";
+                            String[] account_ids;
                             for (String key : keySet) {
                                 Object value = data.get(i).get(key);
                                 if (value instanceof String) {
@@ -84,6 +86,24 @@ public class AutoCreateCampaign extends BaseHttpServlet {
                                     one.addProperty(key, NumberUtil.trimDouble((Double) value, 4));
                                 } else {
                                     one.addProperty(key, value.toString());
+                                }
+                                if ("account_id".equalsIgnoreCase(key)) {
+                                    value0 = (String) value;
+                                    account_ids = value0.split(",");
+
+                                    String[] account_names = new String[account_ids.length];
+
+                                    for (int j = 0; j < account_ids.length; j++) {
+                                        account_names[j] = AdAccount.accountIdNameRelationMap.get(account_ids[j]);
+                                    }
+//                                     String.join(",", account_names);
+                                    one.addProperty(key, String.join(",", account_names));
+                                }
+                                if ("bid_strategy".equalsIgnoreCase(key)) {
+                                    one.addProperty(key, (int) value == 1 ? "TARGET_COST" : "LOWEST_COST_WITH_BID_CAP");
+                                }
+                                if ("mode_type".equalsIgnoreCase(key)) {
+                                    one.addProperty(key, (int) value == 0 ? "系统创建" : "次日留用");
                                 }
                             }
                             array.add(one);
@@ -152,6 +172,8 @@ public class AutoCreateCampaign extends BaseHttpServlet {
                     for (int i = 0; i < data.size(); i++) {
                         JsonObject one = new JsonObject();
                         Set<String> keySet = data.get(i).getKeys();
+                        String value0 = "";
+                        String[] account_ids;
                         for (String key : keySet) {
                             Object value = data.get(i).get(key);
                             if (value instanceof String) {
@@ -165,7 +187,25 @@ public class AutoCreateCampaign extends BaseHttpServlet {
                             } else {
                                 one.addProperty(key, value.toString());
                             }
+
+                            if ("account_id".equalsIgnoreCase(key)) {
+                                value0 = (String) value;
+                                account_ids = value0.split(",");
+
+                                String[] account_names = new String[account_ids.length];
+
+                                for (int j = 0; j < account_ids.length; j++) {
+                                    account_names[j] = AdAccountAdmob.accountIdNameAdmobRelationMap.get(account_ids[j]);
+                                }
+//                                     String.join(",", account_names);
+                                one.addProperty(key, String.join(",", account_names));
+                            }
+
+                            if ("mode_type".equalsIgnoreCase(key)) {
+                                one.addProperty(key, (int) value == 0 ? "系统创建" : "次日留用");
+                            }
                         }
+
                         array.add(one);
                     }
                     json.add("data", array);
@@ -222,7 +262,7 @@ public class AutoCreateCampaign extends BaseHttpServlet {
             "excluded_region", "language", "age", "explode_age", "gender", "explode_gender",
             "detail_target", "user_os", "user_devices", "campaign_name", "bugdet", "bidding",
             "explode_bidding", "max_cpa", "title", "message", "image_path", "create_time",
-            "update_time", "enabled", "video_path", "group_id", "publisher_platforms","bid_strategy","page_id","mode_type"};
+            "update_time", "enabled", "video_path", "group_id", "publisher_platforms", "bid_strategy", "page_id", "mode_type"};
 
     public static JSObject facebookFetchById(String id) {
         try {
@@ -829,7 +869,7 @@ public class AutoCreateCampaign extends BaseHttpServlet {
 
     static String[] ADWORDS_CAMPAIGN_FIELDS = {"id", "app_name", "create_count", "account_id", "country_region", "explode_country",
             "excluded_region", "language", "message1", "message2", "message3", "message4",
-            "campaign_name", "bugdet", "bidding", "explode_bidding", "max_cpa", "image_path", "create_time", "update_time", "enabled", "conversion_id","group_id","mode_type"};
+            "campaign_name", "bugdet", "bidding", "explode_bidding", "max_cpa", "image_path", "create_time", "update_time", "enabled", "conversion_id", "group_id", "mode_type"};
 
     public static JSObject adwordsFetchById(String id) {
         try {
