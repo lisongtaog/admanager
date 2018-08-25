@@ -349,11 +349,11 @@ public class Query extends BaseHttpServlet {
         //应用国家维度的数据
         List<JSObject> list = DB.findListBySql("SELECT h.app_id,h.country_code,SUM(h.revenue) AS revenues,SUM(h.sample_user) AS sum_sample_user,\n" +
                 "SUM(h.total_new_user) AS sum_total_new_user,SUM(h.new_user_impression) AS new_user_impressions,\n" +
+                "SUM(h.new_user_revenue) AS sum_new_user_revenue,\n" +
                 " (case when sum(impression) > 0 then sum(revenue) * 1000 / sum(impression) else 0 end) as ecpm\n" +
                 " from web_ad_country_analysis_report_history h\n" +
-                " where h.date = '" + date + "' GROUP BY h.app_id,h.country_code");
+                " where h.date = '"+date+"' GROUP BY h.app_id,h.country_code");
         AppBean appBean = null;
-        double ecpm = 0.0; //老ECPM
         String appId = null;
         for (int i = 0,len = list.size();i < len;i++) {
             JSObject one = list.get(i);
@@ -365,18 +365,23 @@ public class Query extends BaseHttpServlet {
                     appBean.total_revenue = NumberUtil.convertDouble(one.get("revenues"),0);
                     appBean.sampleUser = NumberUtil.convertDouble(one.get("sum_sample_user"),0);
                     appBean.totalNewUser = NumberUtil.convertDouble(one.get("sum_total_new_user"),0);
-                    appBean.newUserSampleImpression = NumberUtil.convertDouble(one.get("new_user_impressions"),0); //新用户样本展示
+                    appBean.newUserSampleImpression = NumberUtil.convertDouble(one.get("new_user_impressions"),0); //抽样新用户展示
                     appBean.newUserAvgImpressions = appBean.sampleUser > 0 ? appBean.newUserSampleImpression / appBean.sampleUser : 0; //新用户样本平均展示
-                    ecpm = NumberUtil.convertDouble(one.get("ecpm"),0);
-                    appBean.totalNewRevenue = appBean.totalNewUser * appBean.newUserAvgImpressions * ecpm / 1000;
+                    appBean.ecpm = NumberUtil.convertDouble(one.get("ecpm"),0);
+                    appBean.totalNewRevenue = appBean.totalNewUser * appBean.newUserAvgImpressions * appBean.ecpm / 1000;
+                    appBean.sampleNewUserRevenue = NumberUtil.convertDouble(one.get("sum_new_user_revenue"),0); //抽样新用户收入
+                    // 总的新用户收入=抽样新用户收入+非抽样新用户数*抽样新用户人均广告数*统一ecpm / 1000;
+                    appBean.totalNewRevenue = NumberUtil.trimDouble(appBean.sampleNewUserRevenue + (appBean.totalNewUser - appBean.sampleUser) * appBean.newUserAvgImpressions * appBean.ecpm / 1000,2);
                 } else {
                     appBean.total_revenue += NumberUtil.convertDouble(one.get("revenues"),0);
                     appBean.sampleUser = NumberUtil.convertDouble(one.get("sum_sample_user"),0);
                     appBean.totalNewUser = NumberUtil.convertDouble(one.get("sum_total_new_user"),0);
                     appBean.newUserSampleImpression = NumberUtil.convertDouble(one.get("new_user_impressions"),0); //新用户样本展示
                     appBean.newUserAvgImpressions = appBean.sampleUser > 0 ? appBean.newUserSampleImpression / appBean.sampleUser : 0; //新用户样本平均展示
-                    ecpm = NumberUtil.convertDouble(one.get("ecpm"),0);
-                    appBean.totalNewRevenue += appBean.totalNewUser * appBean.newUserAvgImpressions * ecpm / 1000;
+                    appBean.ecpm = NumberUtil.convertDouble(one.get("ecpm"),0);
+                    appBean.sampleNewUserRevenue = NumberUtil.convertDouble(one.get("sum_new_user_revenue"),0); //抽样新用户收入
+                    // 总的新用户收入=抽样新用户收入+非抽样新用户数*抽样新用户人均广告数*统一ecpm / 1000;
+                    appBean.totalNewRevenue += NumberUtil.trimDouble(appBean.sampleNewUserRevenue + (appBean.totalNewUser - appBean.sampleUser) * appBean.newUserAvgImpressions * appBean.ecpm / 1000,2);
                 }
                 map.put(appId,appBean);
             }

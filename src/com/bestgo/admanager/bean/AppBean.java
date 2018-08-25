@@ -20,7 +20,7 @@ public class AppBean {
     public String network;
     public double ecpm;
     public double incoming;
-    public int warningLevel;
+    public int warningLevel;//警戒级别
     public String appId; //包ID,应用ID
     public double totalNewRevenue; //新用户总收入
     public double roi;//回本率
@@ -29,4 +29,5 @@ public class AppBean {
     public double totalNewUser;
     public double newUserAvgImpressions;
     public double newUserSampleImpression;
+    public double sampleNewUserRevenue; //抽样新用户收入
 }
