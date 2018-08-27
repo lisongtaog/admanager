@@ -115,7 +115,7 @@
 
 <script>
     function init() {
-        $("li[role='presentation']:eq(7)").addClass("active");
+        $("li[role='presentation']:eq(8)").addClass("active");
         $('.select2').select2();
         $.post('system/fb_app_id_rel/query', {
             word: '',

@@ -2374,11 +2374,6 @@ function initFormData() {
     }
 }
 
-
-// if (isIndexCreate && campaign_id) {
-//     indexInitFormData(isIndexCreate, campaign_id);
-// }
-
 /**
  * 把一个参数数组，根据 explodeParam 交叉合并得到新的参数数组
  * @param params [{x:1,y:2},{x:1,y:3}]

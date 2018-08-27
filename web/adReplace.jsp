@@ -84,7 +84,7 @@
 
     //界面加载好以后初始化的数据
     function init() {
-        $("li[role='presentation']:eq(11)").addClass("active");
+        $("li[role='presentation']:eq(7)").addClass("active");
 
         //post用于往【应用】下拉列表里动态添加选项
         $.post('adReplace/tagName/query', {

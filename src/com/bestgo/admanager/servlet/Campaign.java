@@ -34,6 +34,7 @@ import static com.bestgo.admanager_tools.FacebookAccountBalanceFetcher.updateFBC
  */
 @WebServlet(name = "Campaign", urlPatterns = "/campaign/*")
 public class Campaign extends BaseHttpServlet {
+
     public static Map<String, Double> tagMaxBiddingRelationMap;   //声明了一个静态类，无属性，无方法，则Java会给它一个默认无参构造器
 
     static {

@@ -162,6 +162,7 @@
 <jsp:include page="common/loading_dialog.jsp"></jsp:include>
 
 <script type="text/javascript">
+    $("li[role='presentation']:eq(3)").addClass("active");
     //页面刷新，标签名称自动加载
     var data1 = <%=array1.toString()%>;
     $("#inputTagName").autocomplete({
