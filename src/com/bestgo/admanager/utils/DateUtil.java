@@ -12,6 +12,22 @@ import java.util.TimeZone;
  * @desc 处理有关日期的操作
  */
 public class DateUtil {
+    /**
+     * 将一个时间字符串通过某种格式转换成另一种时间字符串
+     * @param dateStr
+     * @param formatStr
+     * @return 时间字符串
+     */
+    public static String getFormatDateStr(String dateStr,String formatStr){
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(formatStr);
+        Date dd = null;
+        try {
+            dd = simpleDateFormat.parse(dateStr);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return simpleDateFormat.format(dd);
+    }
 
     /**
      * 时间戳转换成日期格式字符串

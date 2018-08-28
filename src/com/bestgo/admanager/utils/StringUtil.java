@@ -13,5 +13,18 @@ public class StringUtil {
 	public static boolean isNotEmpty(String s) {
 		return !isEmpty(s);
 	}
+
+	public static String setKey(String jointMark, String ... values){
+		StringBuffer buffer = new StringBuffer();
+		if (values != null) {
+			for (int i = 0,length = values.length;i< length;i++) {
+				buffer.append(values[i]);
+				if (i < length - 1) {
+					buffer.append(jointMark);
+				}
+			}
+		}
+		return buffer.toString();
+	}
 }
 
