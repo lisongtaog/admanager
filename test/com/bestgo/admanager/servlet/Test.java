@@ -1,5 +1,7 @@
 package com.bestgo.admanager.servlet;
 
+import redis.clients.jedis.Jedis;
+
 import java.lang.System;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -23,11 +25,9 @@ public class Test {
     }
 
     public static void main(String[] args) {
-        String installedDate = "2018-06-12";
-
-        //得到上限共20天内符合条件的最大日期
-        String limitDate = addDay(installedDate,20,"yyyy-MM-dd");
-        System.out.print(limitDate);
+        Jedis jedis = new Jedis("10.23.3.192");
+        jedis.set("aa","bb");
+        System.out.println(jedis.get("aa"));
 
     }
            /* try {
