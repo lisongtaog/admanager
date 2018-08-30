@@ -2918,7 +2918,7 @@ $("#selectRegionAdmob").change(function () {
     var selectOptions = $('#selectRegionAdmob option:selected');
     var regionAdmob = [];
     selectOptions.each(function () {
-        regionAdmob.push($(this).text())
+        regionAdmob.push($(this).text());
     });
     if (regionAdmob != null && regionAdmob.length > 0) {
         var appNameAdmob = $('#selectAppAdmob').val();
@@ -2972,7 +2972,8 @@ $("#selectRegionAdmob").change(function () {
             for (var i = 0; i < regionAdmob.length; i++) {
                 regionOne = regionAdmob[i];
                 // alert(regionOne);
-                var regionTrim = regionOne.replace(/\s+/g, "");
+                // var regionTrim = regionOne.replace(/\s+/g, "");
+                var regionTrim = admobRegionCodes[regionOne];
 
                 $.ajax({
                     type: "post",
@@ -4766,7 +4767,7 @@ function AdwordFormReadingByRegionExplode() {
     var language = $('#selectLanguageAdmob').val();
     var conversion_id = $('#selectIncidentAdmob').val();
     var bugdet = $('#inputBudgetAdmob').val();
-    /************************************************************************/
+    /************************次日留用*****************************/
     var flag = "";
     if ($('#flag1').prop('checked')) {
         flag = "1";
@@ -4799,7 +4800,7 @@ function AdwordFormReadingByRegionExplode() {
     //定位已经选了的广告系列，存进数组
     var adsGroupJsonObject = {};
     var adsGroup = [];
-    var regionList = region.map(function (x) {
+    var regionList = regionCode.map(function (x) {
         return x.trim();
     });
     var regionOne = "";
@@ -4808,9 +4809,9 @@ function AdwordFormReadingByRegionExplode() {
     for (var i = 0; i < regionList.length; i++) {
         adsGroup = [];
         regionOne = regionList[i];
-        regionTrim = regionOne.replace(/\s+/g, "");
+        // regionTrim = regionOne.replace(/\s+/g, "");
 
-        checkedTr = $("#tbody_admob ." + regionTrim + " input:checked").parent();
+        checkedTr = $("#tbody_admob ." + regionOne + " input:checked").parent();
         // checkedTr = $("#tbody_admob ." + regionTrim).parent();
         checkedTr.each(function (idx) {
             var group = {};
@@ -4821,6 +4822,8 @@ function AdwordFormReadingByRegionExplode() {
             group.message4 = $(this).children("td:eq(5)").text();
             adsGroup.push(group);
         });
+        // code = admobRegionCodes[regionOne];
+        // adsGroupJsonObject[code] = adsGroup;
         adsGroupJsonObject[regionOne] = adsGroup;
     }
 
@@ -4841,8 +4844,8 @@ function AdwordFormReadingByRegionExplode() {
     var regionOne = "";
     var adsGroup = [];
 
-    for (var i = 0; i < regionList.length; i++) {
-        regionOne = regionList[i];
+    for (var i = 0; i < regionCode.length; i++) {
+        regionOne = regionCode[i];
         adsGroup = [];
         if (adsGroupJsonObject.hasOwnProperty(regionOne)) {
             adsGroup = adsGroupJsonObject[regionOne];
