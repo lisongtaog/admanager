@@ -2701,7 +2701,7 @@ $("#selectApp").change(function () {
     var checkFacebook = $("#checkFacebook").prop("checked");
     if (checkFacebook) {
         var appName = $("#selectApp").val();
-        getFBPages(appName);//获取facebook主页信息下拉框
+        getFBPages(appName);//获取facebook主页信息下拉框方法
         $.post("app_image_video_rel/query_facebook_path_by_app", {
             app_name: appName
         }, function (data) {
@@ -2794,6 +2794,8 @@ $("#selectAppAdmob").change(function () {
 var countryBidding = [];
 //根据[国家地区][应用名称]回显已创建好的广告语
 $("#selectRegion").change(function () {
+    var selectRegionExplode = $('#selectRegionExplode').prop("checked");
+
     $("#appCountryBidding").text("");
     // if (isAutoCreate && !firstInitForm) {
     //     firstInitForm = true;
@@ -2823,32 +2825,81 @@ $("#selectRegion").change(function () {
                 }
             }, "json");
 
+            if (!selectRegionExplode) {     //《国家地区》不分离到系列
+                $.post("campaign_create_ads_show_up/facebook", {
+                    appName: appName,
+                    region: region.join(",")
+                }, function (data) {
+                    if (data && data.ret == 1) {
+                        var ads = data.ads;
+                        var tbody = $("#advertisement").children("tbody");
+                        ads.forEach(function (ad) {
+                            var tr = $("<tr></tr>");
+                            tr.append("<input type='checkbox' class='check_group'>");
+                            var field = ["group_id", "language", "title", "message"];
+                            for (var i = 0; i < 4; i++) {
+                                var td = $("<td></td>");
+                                var value = ad[field[i]];
+                                td.text(value);
+                                tr.append(td);
+                            }
+                            tbody.append(tr);
+                        });
+                    } else if (data && data.ret == 0) {
+                        admanager.showCommonDlg("Warning", data.message);
+                    }
+                    $("#checkbox_facebook").prop("checked", false);
+                    $("#checkbox_facebook").click();
+                }, "json");
+            } else {            //《国家地区》分离到系列
+                var regionOne = "";
+                for (var i = 0; i < region.length; i++) {
+                    regionOne = region[i];
+                    // alert(regionOne);
+                    var regionTrim = regionOne.replace(/\s+/g, "");
 
-            $.post("campaign_create_ads_show_up/facebook", {
-                appName: appName,
-                region: region.join(",")
-            }, function (data) {
-                if (data && data.ret == 1) {
-                    var ads = data.ads;
-                    var tbody = $("#advertisement").children("tbody");
-                    ads.forEach(function (ad) {
-                        var tr = $("<tr></tr>");
-                        tr.append("<input type='checkbox' class='check_group'>");
-                        var field = ["group_id", "language", "title", "message"];
-                        for (var i = 0; i < 4; i++) {
-                            var td = $("<td></td>");
-                            var value = ad[field[i]];
-                            td.text(value);
-                            tr.append(td);
+                    $.ajax({
+                        type: "post",
+                        url: 'campaign_create_ads_show_up/facebook',
+                        async: false,
+                        datatype: "json",
+                        data: {appName: appName, region: regionOne},
+                        success: function (data) {
+                            data = $.parseJSON(data);
+                            if (data && data.ret == 1) {
+                                var ads = data.ads;
+                                $("#advertisement").children("thead").empty();
+
+                                $("#tbody_facebook").append("<tr>\n" +
+                                    "                <th>" + regionOne + "&nbsp;<input type=\"checkbox\" id=\"" + regionTrim + "\" class='multiSelect'></th>\n" +
+                                    "                <th>广告语组合</th>\n" +
+                                    "                <th>语言</th>\n" +
+                                    "                <th>广告语标题</th>\n" +
+                                    "                <th>广告语</th>\n" +
+                                    "            </tr>")
+
+                                ads.forEach(function (ad) {
+                                    var tr = $("<tr class='" + regionTrim + "'></tr>");
+                                    tr.append("<input type='checkbox' class='" + regionTrim + "'>");
+                                    var field = ["group_id", "language", "title", "message"];
+                                    for (var i = 0; i < 4; i++) {
+                                        var td = $("<td></td>");
+                                        var value = ad[field[i]];
+                                        td.text(value);
+                                        tr.append(td);
+                                    }
+                                    $("#tbody_facebook").append(tr);
+                                });
+                            } else if (data && data.ret == 0) {
+                                admanager.showCommonDlg("Warning", data.message);
+                            }
                         }
-                        tbody.append(tr);
-                    });
-                } else if (data && data.ret == 0) {
-                    admanager.showCommonDlg("Warning", data.message);
+                    })
+                    bindOp();
+                    $("#" + regionTrim).prop("checked", false);
+                    $("#" + regionTrim).click();
                 }
-                $("#checkbox_facebook").prop("checked", false);
-                $("#checkbox_facebook").click();
-            }, "json");
+            }
         }
     }
     return false;
@@ -2856,6 +2907,8 @@ $("#selectRegion").change(function () {
 
 var countryBiddingAdmob = [];
 $("#selectRegionAdmob").change(function () {
+    var selectRegionAdmobExplode = $('#selectRegionAdmobExplode').prop("checked");
+
     $("#appCountryBiddingAdWords").text("");
     // if (isAutoCreate && !firstInitForm) {
     //     firstInitForm = true;
@@ -2888,31 +2941,84 @@ $("#selectRegionAdmob").change(function () {
             }
         }, "json");
 
-        $.post("campaign_create_ads_show_up/adwords", {
-            appName: appNameAdmob,
-            region: regionAdmob.join(","),
-        }, function (data) {
-            if (data && data.ret == 1) {
-                var ads = data.ads;
-                var tbody = $("#advertisement_admob").children("tbody");
-                ads.forEach(function (ad) {
-                    var tr = $("<tr></tr>");
-                    tr.append("<input type='checkbox' class='check_group_admob'>");
-                    var field = ["group_id", "language", "message1", "message2", "message3", "message4"];
-                    for (var i = 0; i < 6; i++) {
-                        var td = $("<td></td>");
-                        var value = ad[field[i]];
-                        td.text(value);
-                        tr.append(td);
+        if (!selectRegionAdmobExplode) {     //《国家地区》不分离到系列
+            $.post("campaign_create_ads_show_up/adwords", {
+                appName: appNameAdmob,
+                region: regionAdmob.join(","),
+            }, function (data) {
+                if (data && data.ret == 1) {
+                    var ads = data.ads;
+                    var tbody = $("#advertisement_admob").children("tbody");
+                    ads.forEach(function (ad) {
+                        var tr = $("<tr></tr>");
+                        tr.append("<input type='checkbox' class='check_group_admob'>");
+                        var field = ["group_id", "language", "message1", "message2", "message3", "message4"];
+                        for (var i = 0; i < 6; i++) {
+                            var td = $("<td></td>");
+                            var value = ad[field[i]];
+                            td.text(value);
+                            tr.append(td);
+                        }
+                        tbody.append(tr);
+                    });
+                } else if (data && data.ret == 0) {
+                    admanager.showCommonDlg("Warning", data.message);
+                }
+                $("#checkbox_admob").prop("checked", false);
+                $("#checkbox_admob").click();
+            }, "json");
+        } else {            //《国家地区》分离到系列
+            var regionOne = "";
+            for (var i = 0; i < regionAdmob.length; i++) {
+                regionOne = regionAdmob[i];
+                // alert(regionOne);
+                var regionTrim = regionOne.replace(/\s+/g, "");
+
+                $.ajax({
+                    type: "post",
+                    url: 'campaign_create_ads_show_up/adwords',
+                    async: false,
+                    datatype: "json",
+                    data: {appName: appNameAdmob, region: regionOne},
+                    success: function (data) {
+                        data = $.parseJSON(data);
+                        if (data && data.ret == 1) {
+                            var ads = data.ads;
+                            $("#advertisement_admob").children("thead").empty();
+
+                            $("#tbody_admob").append("<tr>\n" +
+                                "                <th>" + regionOne + "&nbsp;<input type=\"checkbox\" id=\"" + regionTrim + "\" class='multiSelect'></th>\n" +
+                                "                <th>广告语组合</th>\n" +
+                                "                <th>语言</th>\n" +
+                                "                <th>广告语1</th>\n" +
+                                "                <th>广告语2</th>\n" +
+                                "                <th>广告语3</th>\n" +
+                                "                <th>广告语4</th>\n" +
+                                "            </tr>")
+
+                            ads.forEach(function (ad) {
+                                var tr = $("<tr class='" + regionTrim + "'></tr>");
+                                tr.append("<input type='checkbox' class='" + regionTrim + "'>");
+                                var field = ["group_id", "language", "message1", "message2", "message3", "message4"];
+                                for (var i = 0; i < 6; i++) {
+                                    var td = $("<td></td>");
+                                    var value = ad[field[i]];
+                                    td.text(value);
+                                    tr.append(td);
+                                }
+                                $("#tbody_admob").append(tr);
+                            });
+                        } else if (data && data.ret == 0) {
+                            admanager.showCommonDlg("Warning", data.message);
+                        }
                     }
-                    tbody.append(tr);
-                });
-            } else if (data && data.ret == 0) {
-                admanager.showCommonDlg("Warning", data.message);
+                })
+                bindOp();
+                $("#" + regionTrim).prop("checked", false);
+                $("#" + regionTrim).click();
             }
-            $("#checkbox_admob").prop("checked", false);
-            $("#checkbox_admob").click();
-        }, "json");
+        }
+
     }
     return false;
 });
@@ -2932,6 +3038,17 @@ $("#checkbox_admob").click(function () {
         $(".check_group_admob").prop("checked", false);
     }
 });
+function bindOp() {
+    $(".multiSelect").click(function () {
+        var region = $(this).prop("id");
+        // alert(region);
+        if ($("#" + region).prop("checked")) {
+            $("." + region).prop("checked", true);
+        } else {
+            $("." + region).prop("checked", false);
+        }
+    });
+}
 
 //读取并分离Facebook表单数据
 function FacebookFormReading() {
@@ -2963,7 +3080,7 @@ function FacebookFormReading() {
     var userOs = $('#selectUserOs').val();
     var userDevice = $('#inputUserDevices').val();
     var bugdet = $('#inputBudget').val();//预算
-    /****************************************************************************/
+    /***********************次日留用的 flag*********************************/
     var flag = "";
     if ($('#flag').prop('checked')) {
         flag = "1";
@@ -3400,6 +3517,501 @@ function FacebookFormReading() {
     return explodeParams;
 }
 
+function FacebookFormReadingByRegionExplode() {
+
+    var appName = $('#selectApp').val();
+    var selectOptions = $('#selectAccount option:selected');
+    var accountName = [];
+    var accountId = [];
+    selectOptions.each(function () {
+        accountName.push($(this).text());
+        accountId.push($(this).val());
+    });
+
+    var createCount = $("#inputCreateCount").val();
+
+    var region = $('#selectRegion').val();
+    var fbPage = $('#selectFBPage').val();//facebooke主页
+    //facebook主页名称
+    var fbName = $("#selectFBPage").children("option:selected"); //这里仅用于拼写
+    var fbPageName = [];
+    fbName.each(function (idx) {
+        fbPageName.push($(this).text());
+    });
+
+    var excludedRegion = $('#selectRegionUnselected').val();
+    var language = $('#selectLanguage').val();
+    var age = $('#inputAge').val();
+    var gender = $('#selectGender').val();
+    var interest = $('#inputInterest').val();
+    var userOs = $('#selectUserOs').val();
+    var userDevice = $('#inputUserDevices').val();
+    var bugdet = $('#inputBudget').val();//预算
+    /***********************次日留用的 flag*********************************/
+    var flag = "";
+    if ($('#flag').prop('checked')) {
+        flag = "1";
+    }
+
+    var bidding = $('#inputBidding').val();//出价/竞价
+
+    var bidStrategy = $('#selectBidStrategy').val();//竞价策略
+
+    var maxCPA = $('#inputMaxCpa').val();
+    var PublisherPlatforms = $("#selectPublisherPlatforms").val();
+
+    //定位已经选了的广告系列，存进数组
+    var adsGroupJsonObject = {};
+    var adsGroup = [];
+    var regionList = region.map(function (x) {
+        return x.trim();
+    });
+    var regionOne = "";
+    var regionTrim = "";
+    var checkedTr = "";
+    for (var i = 0; i < regionList.length; i++) {
+        adsGroup = [];
+        regionOne = regionList[i];
+        regionTrim = regionOne.replace(/\s+/g, "");
+        checkedTr = $("#tbody_facebook ." + regionTrim + " input:checked").parent();
+        // checkedTr = $("#tbody_facebook ." + regionTrim + " :checked").parent();
+        checkedTr.each(function (idx) {
+            var group = {};
+            group.groupId = $(this).children("td:eq(0)").text();
+            group.title = $(this).children("td:eq(2)").text();
+            group.message = $(this).children("td:eq(3)").text();
+            adsGroup.push(group);
+        });
+        adsGroupJsonObject[regionOne] = adsGroup;
+    }
+    // checkedTr.each(function (idx) {
+    //     var group = {};
+    //     group.groupId = $(this).children("td:eq(0)").text();
+    //     group.title = $(this).children("td:eq(2)").text();
+    //     group.message = $(this).children("td:eq(3)").text();
+    //     adsGroup.push(group);
+    // });
+
+    var imagePath = $('#inputImagePath').val();
+    var videoPath = $('#inputVideoPath').val();
+
+    var app = null;
+    for (var i = 0; i < appList.length; i++) {
+        if (appList[i].tag_name == appName) {
+            app = appList[i];
+            break;
+        }
+    }
+
+    var explodeParams = [];
+
+    var explodeListImage = "";
+    var explodeParamsImage = "";
+    var explodeParamsVideo = "";
+
+    var regionOne = "";
+    var adsGroup = [];
+
+    for (var i = 0; i < regionList.length; i++) {
+        regionOne = regionList[i];
+        adsGroup = [];
+        if (adsGroupJsonObject.hasOwnProperty(regionOne)) {
+            adsGroup = adsGroupJsonObject[regionOne];
+        }
+
+        //“分离到系列”作数组处理
+        explodeListImage = [];//{key:x, values:[]}
+        //从图片路径和视频路径开始把List分裂
+        if ($("#inputImagePath").val() || $("#inputImagePath").prop("checked")) {
+            explodeListImage.push({
+                key: "identification",
+                values: ["image"]
+            }, {
+                key: "appName",
+                values: [appName]
+            }, {
+                key: "accountName",
+                values: [accountName.join(",")]
+            }, {
+                key: "accountId",
+                values: [accountId.join(",")]
+            }, {
+                key: "createCount",
+                values: [createCount]
+            }, {
+                key: "excludedRegion",
+                values: [excludedRegion.join(",")]
+            }, {
+                key: "language",
+                values: [language]
+            }, {
+                key: "interest",
+                values: [interest]
+            }, {
+                key: "bugdet",
+                values: [bugdet]
+            }, {
+                key: "bidStrategy",
+                values: [bidStrategy]
+            }, {
+                key: "maxCPA",
+                values: [maxCPA]
+            }, {
+                key: "appId",
+                values: [app.fb_app_id]
+            });
+
+            explodeListImage.push({
+                key: 'region',
+                values: [regionOne]
+            });
+
+            explodeListImage.push({
+                key: "adsGroup",
+                values: adsGroup
+            });
+
+            if ($("#selectFBPageExplode").prop("checked")) {
+                var FBarray = [];
+                for (var j = 0; j < fbPage.length; j++) {
+                    var p = {};
+                    p.pageId = fbPage[j];
+                    p.pageName = fbPageName[j];
+                    FBarray.push(p);
+                }
+                explodeListImage.push({
+                    key: 'FBpage',
+                    values: FBarray
+                });
+            } else {
+                var p = {};
+                p.pageId = fbPage.join(",");
+                p.pageName = fbPageName.join(",");
+                explodeListImage.push({
+                    key: 'FBpage',
+                    values: [p]
+                });
+            }
+
+            if ($("#selectUserOsExplode").prop("checked")) {
+                explodeListImage.push({
+                    key: 'userOs',
+                    values: userOs.map(function (x) {
+                        return x.trim();
+                    })
+                })
+            } else {
+                explodeListImage.push({
+                    key: 'userOs',
+                    values: [userOs.join(",")]
+                })
+            }
+            if ($("#selectUserDevicesExplode").prop("checked")) {
+                explodeListImage.push({
+                    key: 'userDevice',
+                    values: userDevice.split(',')
+                })
+            } else {
+                explodeListImage.push({
+                    key: 'userDevice',
+                    values: [userDevice]
+                })
+            }
+            //确保在从 campaigns_auto_create.jsp 跳转的情况下允许性别多选
+            if (isAutoCreate && modifyRecordId > 0) {
+                $("#selectGender").prop("checked", false);
+            } else if (($("#selectGenderExplode").prop("checked") == false) && gender.length > 1) {
+                admanager.showCommonDlg("错误", "不分离的情况下不允许性别多选");
+                return false;
+            }
+            if ($("#selectGenderExplode").prop("checked") == true) {
+                explodeListImage.push({
+                    key: 'gender',
+                    values: gender.map(function (x) {
+                        return x.trim();
+                    })
+                });
+            } else {
+                explodeListImage.push({
+                    key: 'gender',
+                    values: [gender.join(",")]
+                });
+            }
+
+            if (!$("#inputAgeExplode").prop("checked") && age.indexOf(",") !== -1) {
+                admanager.showCommonDlg("错误", "不分离的情况下不允许年龄多选");
+                return false;
+            }
+            if ($("#inputAgeExplode").prop("checked")) {
+                explodeListImage.push({
+                    key: 'age',
+                    values: age.split(",").map(function (x) {
+                        return x.trim();
+                    })
+                });
+            } else {
+                explodeListImage.push({
+                    key: 'age',
+                    values: [age]
+                });
+            }
+
+            if (isAutoCreate && modifyRecordId > 0) {
+                $("#inputBiddingExplode").prop("checked", false);
+            } else if (!$("#inputBiddingExplode").prop("checked") && bidding.indexOf(",") !== -1) {
+                admanager.showCommonDlg("错误", "不分离的情况下不允许出价多选");
+                return false;
+            }
+            if ($("#inputBiddingExplode").prop("checked")) {
+                explodeListImage.push({
+                    key: 'bidding',
+                    values: bidding.split(",").map(function (x) {
+                        return x.trim();
+                    })
+                });
+            } else {
+                explodeListImage.push({
+                    key: 'bidding',
+                    values: [bidding]
+                });
+            }
+            if ($("#inputImageExplode").prop("checked")) {
+                var valueList = imagePath.trim().replace(/\W*,\W*/g, ",").replace(/,$/, "").split(",");
+                explodeListImage.push({
+                    key: 'materialPath',
+                    values: valueList
+                });
+            } else {
+                var valueStr = imagePath.trim().replace(/,$/, "");
+                explodeListImage.push({
+                    key: 'materialPath',
+                    values: [valueStr]
+                });
+            }
+
+            if ($("#selectPublisherPlatformsExplode").prop("checked")) {
+                explodeListImage.push({
+                    key: "publisherPlatforms",
+                    values: PublisherPlatforms
+                });
+            } else {
+                var PublisherPlatformsString = PublisherPlatforms.join(",");
+                explodeListImage.push({
+                    key: "publisherPlatforms",
+                    values: [PublisherPlatformsString]
+                });
+            }
+        }
+        var explodeListVideo = [];
+        if ($("#inputVideoPath").val() || $("#inputVideoPath").prop("checked")) {
+            explodeListVideo.push({
+                key: "identification",
+                values: ["video"]
+            }, {
+                key: "appName",
+                values: [appName]
+            }, {
+                key: "accountName",
+                values: [accountName.join(",")]
+            }, {
+                key: "accountId",
+                values: [accountId.join(",")]
+            }, {
+                key: "createCount",
+                values: [createCount]
+            }, {
+                key: "excludedRegion",
+                values: [excludedRegion.join(",")]
+            }, {
+                key: "language",
+                values: [language]
+            }, {
+                key: "interest",
+                values: [interest]
+            }, {
+                key: "bugdet",
+                values: [bugdet]
+            }, {
+                key: "bidStrategy",
+                values: [bidStrategy]
+            }, {
+                key: "maxCPA",
+                values: [maxCPA]
+            }, {
+                key: "appId",
+                values: [app.fb_app_id]
+            });
+
+            if ($("#selectFBPageExplode").prop("checked")) {
+                var FBarray = [];
+                for (var j = 0; j < fbPage.length; j++) {
+                    var p = {};
+                    p.pageId = fbPage[j];
+                    p.pageName = fbPageName[j];
+                    FBarray.push(p);
+                }
+                explodeListVideo.push({
+                    key: 'FBpage',
+                    values: FBarray
+                });
+            } else {
+                var p = {};
+                p.pageId = fbPage.join(",");
+                p.pageName = fbPageName.join(",");
+                explodeListVideo.push({
+                    key: 'FBpage',
+                    values: [p]
+                });
+            }
+
+            explodeListVideo.push({
+                key: 'region',
+                values: [regionOne]
+            })
+
+            if ($("#selectUserOsExplode").prop("checked")) {
+                explodeListVideo.push({
+                    key: 'userOs',
+                    values: userOs.map(function (x) {
+                        return x.trim();
+                    })
+                })
+            } else {
+                explodeListVideo.push({
+                    key: 'userOs',
+                    values: [userOs.join(",")]
+                })
+            }
+            if ($("#selectUserDevicesExplode").prop("checked")) {
+                explodeListVideo.push({
+                    key: 'userDevice',
+                    values: userDevice.split(',')
+                })
+            } else {
+                explodeListVideo.push({
+                    key: 'userDevice',
+                    values: [userDevice]
+                })
+            }
+            //确保在从 campaigns_auto_create.jsp 跳转的情况下允许性别多选
+            if (isAutoCreate && modifyRecordId > 0) {
+                $("#selectGender").prop("checked", false);
+            } else if (($("#selectGenderExplode").prop("checked") == false) && gender.length > 1) {
+                admanager.showCommonDlg("错误", "不分离的情况下不允许性别多选");
+                return false;
+            }
+            if ($("#selectGenderExplode").prop("checked") == true) {
+                explodeListVideo.push({
+                    key: 'gender',
+                    values: gender.map(function (x) {
+                        return x.trim();
+                    })
+                });
+            } else {
+                explodeListVideo.push({
+                    key: 'gender',
+                    values: [gender.join(",")]
+                });
+            }
+
+            if (!$("#inputAgeExplode").prop("checked") && age.indexOf(",") !== -1) {
+                admanager.showCommonDlg("错误", "不分离的情况下不允许年龄多选");
+                return false;
+            }
+            if ($("#inputAgeExplode").prop("checked")) {
+                explodeListVideo.push({
+                    key: 'age',
+                    values: age.split(",").map(function (x) {
+                        return x.trim();
+                    })
+                });
+            } else {
+                explodeListVideo.push({
+                    key: 'age',
+                    values: [age]
+                });
+            }
+
+            if (isAutoCreate && modifyRecordId > 0) {
+                $("#inputBiddingExplode").prop("checked", false);
+            } else if (!$("#inputBiddingExplode").prop("checked") && bidding.indexOf(",") !== -1) {
+                admanager.showCommonDlg("错误", "不分离的情况下不允许出价多选");
+                return false;
+            }
+            if ($("#inputBiddingExplode").prop("checked")) {
+                explodeListVideo.push({
+                    key: 'bidding',
+                    values: bidding.split(",").map(function (x) {
+                        return x.trim();
+                    })
+                });
+            } else {
+                explodeListVideo.push({
+                    key: 'bidding',
+                    values: [bidding]
+                });
+            }
+            if ($("#inputVideoExplode").prop("checked")) {
+                var valueList = videoPath.trim().replace(/\W*,\W*/g, ",").replace(/,$/, "").split(",");
+                explodeListVideo.push({
+                    key: 'materialPath',
+                    values: valueList
+                });
+            } else {
+                var valueStr = videoPath.trim().replace(/,$/, "");
+                explodeListVideo.push({
+                    key: 'materialPath',
+                    values: [valueStr]
+                });
+            }
+            explodeListVideo.push({
+                key: "adsGroup",
+                values: adsGroup
+            });
+            if ($("#selectPublisherPlatformsExplode").prop("checked")) {
+                explodeListVideo.push({
+                    key: "publisherPlatforms",
+                    values: PublisherPlatforms
+                });
+            } else {
+                var PublisherPlatformsString = PublisherPlatforms.join(",");
+                explodeListVideo.push({
+                    key: "publisherPlatforms",
+                    values: [PublisherPlatformsString]
+                });
+            }
+        }
+        explodeParamsImage = explodeListImage.length > 0 ? explodeListImage.reduce(function (params, explodeParam) {
+            return getExplodeParams(params, explodeParam);
+        }, []) : [];
+        explodeParamsVideo = explodeListVideo.length > 0 ? explodeListVideo.reduce(function (params, explodeParam) {
+            return getExplodeParams(params, explodeParam);
+        }, []) : [];
+
+        explodeParams = explodeParams.concat(explodeParamsImage);
+        explodeParams = explodeParams.concat(explodeParamsVideo);
+    }//for循环结尾
+
+    explodeParams.forEach(function (p) {
+        p.campaignName = generateFacebookCampaignName({
+            identification: p.identification,
+            fbPageName: p.FBpage.pageName,
+            age: p.age,
+            gender: p.gender,
+            bidding: p.bidding,
+            region: p.region,
+            userOs: p.userOs,
+            userDevice: p.userDevice,
+            materialPath: p.materialPath, //改为material_path ,在后台再根据正则表达式匹配系列名决定存image还是video
+            publisherPlatforms: p.publisherPlatforms,
+            groupId: p.adsGroup.groupId
+        });
+        p.flag = flag;
+    });
+
+    return explodeParams;
+}
+
 //创建facebook系列
 $('#btnCreate').click(function () {
 
@@ -3413,7 +4025,7 @@ $('#btnCreate').click(function () {
     biddingMap.forEach(function (one) {
         countryBidding.forEach(function (two) {
             if (one > two.bidding) {
-                alert("你的出价大于 "+two.country+" 出价上限！请修改正确！");
+                alert("你的出价大于 " + two.country + " 出价上限！请修改正确！");
                 flag = 1;
                 // return;
             }
@@ -3424,8 +4036,14 @@ $('#btnCreate').click(function () {
         return false;
     }
 
+    var explodeParams = "";
 
-    var explodeParams = FacebookFormReading();
+    if ($('#selectRegionExplode').prop("checked")) {
+        explodeParams = FacebookFormReadingByRegionExplode();
+    } else {
+        explodeParams = FacebookFormReading();
+    }
+
     //用 explodeParams 构造新的请求
 
     var checkAutoCreate = $('#checkAutoCreate').prop('checked');
@@ -3986,6 +4604,10 @@ $('#btnCreate').click(function () {
     return false;
 });
 
+
+
+
+
 //读取并分离adwords表单数据
 function AdwordFormReading() {
     var appName = $('#selectAppAdmob').val();
@@ -4002,7 +4624,7 @@ function AdwordFormReading() {
     var language = $('#selectLanguageAdmob').val();
     var conversion_id = $('#selectIncidentAdmob').val();
     var bugdet = $('#inputBudgetAdmob').val();
-    /************************************************************************/
+    /************************次日留用的flag************************************/
     var flag = "";
     if ($('#flag1').prop('checked')) {
         flag = "1";
@@ -4129,6 +4751,198 @@ function AdwordFormReading() {
     return explodeParams;
 }
 
+function AdwordFormReadingByRegionExplode() {
+    var appName = $('#selectAppAdmob').val();
+    var selectOptionsAdmob = $('#selectAccountAdmob option:selected');
+    var accountNameAdmob = [];
+    var accountIdAdmob = [];
+    selectOptionsAdmob.each(function () {
+        accountNameAdmob.push($(this).text());
+        accountIdAdmob.push($(this).val());
+    });
+    var createCountAdmob = $('#inputCreateCountAdmob').val();
+
+    var excludedRegion = $('#selectRegionUnselectedAdmob').val();
+    var language = $('#selectLanguageAdmob').val();
+    var conversion_id = $('#selectIncidentAdmob').val();
+    var bugdet = $('#inputBudgetAdmob').val();
+    /************************************************************************/
+    var flag = "";
+    if ($('#flag1').prop('checked')) {
+        flag = "1";
+    }
+
+    var bidding = $('#inputBiddingAdmob').val();
+    var maxCPA = $('#inputMaxCpaAdmob').val();
+
+    //得到选中行的广告语信息
+    // var checkedTr = $("#tbody_admob input:checked").parent();
+    // var adsGroup = [];
+    // checkedTr.each(function (idx) {
+    //     var group = {};
+    //     group.groupId = $(this).children("td:eq(0)").text();
+    //     group.message1 = $(this).children("td:eq(2)").text();
+    //     group.message2 = $(this).children("td:eq(3)").text();
+    //     group.message3 = $(this).children("td:eq(4)").text();
+    //     group.message4 = $(this).children("td:eq(5)").text();
+    //     adsGroup.push(group);
+    // });
+
+    var region = [];
+    var regionCode = [];
+    var selectOptionsAdmobRegion = $('#selectRegionAdmob option:selected');
+    selectOptionsAdmobRegion.each(function () {
+        region.push($(this).text());
+        regionCode.push($(this).val());
+    });
+
+    //定位已经选了的广告系列，存进数组
+    var adsGroupJsonObject = {};
+    var adsGroup = [];
+    var regionList = region.map(function (x) {
+        return x.trim();
+    });
+    var regionOne = "";
+    var regionTrim = "";
+    var checkedTr = "";
+    for (var i = 0; i < regionList.length; i++) {
+        adsGroup = [];
+        regionOne = regionList[i];
+        regionTrim = regionOne.replace(/\s+/g, "");
+
+        checkedTr = $("#tbody_admob ." + regionTrim + " input:checked").parent();
+        // checkedTr = $("#tbody_admob ." + regionTrim).parent();
+        checkedTr.each(function (idx) {
+            var group = {};
+            group.groupId = $(this).children("td:eq(0)").text();
+            group.message1 = $(this).children("td:eq(2)").text();
+            group.message2 = $(this).children("td:eq(3)").text();
+            group.message3 = $(this).children("td:eq(4)").text();
+            group.message4 = $(this).children("td:eq(5)").text();
+            adsGroup.push(group);
+        });
+        adsGroupJsonObject[regionOne] = adsGroup;
+    }
+
+
+    var imagePath = $('#inputImagePathAdmob').val();
+    var app = null;
+    for (var i = 0; i < appList.length; i++) {
+        if (appList[i].tag_name == appName) {
+            app = appList[i];
+            break;
+        }
+    }
+
+    var explodeParams = [];
+
+    var explodeList = [];
+    var explodeParamsImage = [];
+    var regionOne = "";
+    var adsGroup = [];
+
+    for (var i = 0; i < regionList.length; i++) {
+        regionOne = regionList[i];
+        adsGroup = [];
+        if (adsGroupJsonObject.hasOwnProperty(regionOne)) {
+            adsGroup = adsGroupJsonObject[regionOne];
+        }
+
+        //处理分离到系列的字段
+        explodeList = [];//{key:x, values:[]}
+        explodeList.push({
+            key: "appName",
+            values: [appName]
+        }, {
+            key: "accountId",
+            values: [accountIdAdmob.join(",")]
+        }, {
+            key: "accountName",
+            values: [accountNameAdmob.join(",")]
+        }, {
+            key: "createCount",
+            values: [createCountAdmob]
+        }, {
+            key: "excludedRegion",
+            values: [excludedRegion.join(',')]
+        }, {
+            key: "language",
+            values: [language]
+        }, {
+            key: "conversion_id",
+            values: [conversion_id]
+        }, {
+            key: "bugdet",
+            values: [bugdet]
+        }, {
+            key: "gpPackageId",
+            values: [app.google_package_id]
+        }, {
+            key: "maxCPA",
+            values: [maxCPA]
+        }, {
+            key: "adsGroup",
+            values: adsGroup
+        });
+
+        explodeList.push({
+            key: 'region',
+            values: [regionOne]
+        })
+
+        if (isAutoCreate && modifyRecordId > 0) {
+            $("#inputBiddingAdmobExplode").prop("checked", false);
+        } else if (!$("#inputBiddingAdmobExplode").prop("checked") && bidding.indexOf(",") !== -1) {
+            admanager.showCommonDlg("错误", "不分离的情况下不允许出价多选");
+            return false;
+        }
+        if ($("#inputBiddingAdmobExplode").prop("checked")) {
+            explodeList.push({
+                key: 'bidding',
+                values: bidding.split(",").map(function (x) {
+                    return x.trim();
+                })
+            });
+        } else {
+            explodeList.push({
+                key: 'bidding',
+                values: [bidding]
+            });
+        }
+        //处理图片路径
+        if ($("#inputImageAdmobExplode").prop("checked")) {
+            var valueList = imagePath.trim().replace(/\W*,\W*/g, ",").replace(/,$/, "").split(",");    //确保正确地切分为数组
+            explodeList.push({
+                key: 'imagePath',
+                values: valueList
+            });
+        } else {
+            var valueStr = imagePath.trim().replace(/,$/, "");
+            explodeList.push({
+                key: 'imagePath',
+                values: [valueStr]
+            });
+        }
+
+        explodeParamsImage = explodeList.length > 0 ? explodeList.reduce(function (params, explodeParam) {
+            return getExplodeParams(params, explodeParam);
+        }, []) : [];
+
+        explodeParams = explodeParams.concat(explodeParamsImage);
+    }
+
+    explodeParams.forEach(function (p) {
+        p.campaignName = generateAdmobCampaignName({  //动态生成系列名字
+            bidding: p.bidding,
+            region: p.region,
+            imagePath: p.imagePath,
+            groupId: p.adsGroup.groupId
+        });
+        p.flag = flag;
+    });
+    return explodeParams;
+}
+
 //创建admob系列
 $("#btnCreateAdmob").click(function () {
     //对创建的出价进行校验
@@ -4140,7 +4954,7 @@ $("#btnCreateAdmob").click(function () {
     biddingMap2.forEach(function (one) {
         countryBiddingAdmob.forEach(function (two) {
             if (one > two.bidding) {
-                alert("你的出价大于 "+two.country+" 出价上限！请修改正确！");
+                alert("你的出价大于 " + two.country + " 出价上限！请修改正确！");
                 flag = 1;
                 return;
             }
@@ -4150,7 +4964,13 @@ $("#btnCreateAdmob").click(function () {
         return;
     }
 
-    var explodeParams = AdwordFormReading();
+
+    var explodeParams = [];
+    if ($('#selectRegionAdmobExplode').prop("checked")) {
+        explodeParams = AdwordFormReadingByRegionExplode();
+    } else {
+        explodeParams = AdwordFormReading();
+    }
 
     var checkAutoCreate = $('#checkAdmobAutoCreate').prop('checked');
     var onlyAutoCreateCheck = $('#onlyCheckAdmobAutoCreate').prop('checked');
@@ -4650,7 +5470,3 @@ $("#inputVideoPath,#inputImagePath,#inputImagePathAdmob").change(function () {
         }
     }
 });
-
-
-
-
