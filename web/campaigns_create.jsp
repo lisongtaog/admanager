@@ -312,13 +312,13 @@
         <br>
         <table class="table table-hover" id="advertisement">
             <thead>
-            <tr>
-                <th><input type="checkbox" id="checkbox_facebook"></th>
-                <th>广告语组合</th>
-                <th>语言</th>
-                <th>广告语标题</th>
-                <th>广告语</th>
-            </tr>
+            <%--<tr>--%>
+                <%--<th><input type="checkbox" id="checkbox_facebook"></th>--%>
+                <%--<th>广告语组合</th>--%>
+                <%--<th>语言</th>--%>
+                <%--<th>广告语标题</th>--%>
+                <%--<th>广告语</th>--%>
+            <%--</tr>--%>
             </thead>
             <tbody id="tbody_facebook"></tbody>
         </table>
@@ -457,15 +457,15 @@
         <br>
         <table class="table table-hover" id="advertisement_admob">
             <thead>
-            <tr>
-                <th><input type="checkbox" id="checkbox_admob"></th>
-                <th>广告语组合</th>
-                <th>语言</th>
-                <th>广告语1</th>
-                <th>广告语2</th>
-                <th>广告语3</th>
-                <th>广告语4</th>
-            </tr>
+            <%--<tr>--%>
+                <%--<th><input type="checkbox" id="checkbox_admob"></th>--%>
+                <%--<th>广告语组合</th>--%>
+                <%--<th>语言</th>--%>
+                <%--<th>广告语1</th>--%>
+                <%--<th>广告语2</th>--%>
+                <%--<th>广告语3</th>--%>
+                <%--<th>广告语4</th>--%>
+            <%--</tr>--%>
             </thead>
             <tbody id="tbody_admob"></tbody>
         </table>
