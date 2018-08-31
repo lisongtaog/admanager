@@ -2791,8 +2791,9 @@ $("#selectAppAdmob").change(function () {
     return false;
 });
 
-var countryBidding = [];
+
 //根据[国家地区][应用名称]回显已创建好的广告语
+var countryBidding = [];
 $("#selectRegion").change(function () {
     var selectRegionExplode = $('#selectRegionExplode').prop("checked");
 
@@ -2826,6 +2827,15 @@ $("#selectRegion").change(function () {
             }, "json");
 
             if (!selectRegionExplode) {     //《国家地区》不分离到系列
+                $("#tbody_facebook").empty();
+                $("#advertisement").children("thead").empty();
+                $("#advertisement").children("thead").append("<tr>\n" +
+                    "                <th><input type=\"checkbox\" id=\"checkbox_facebook\"></th>\n" +
+                    "                <th>广告语组合</th>\n" +
+                    "                <th>语言</th>\n" +
+                    "                <th>广告语标题</th>\n" +
+                    "                <th>广告语</th>\n" +
+                    "            </tr>");
                 $.post("campaign_create_ads_show_up/facebook", {
                     appName: appName,
                     region: region.join(",")
@@ -2848,6 +2858,7 @@ $("#selectRegion").change(function () {
                     } else if (data && data.ret == 0) {
                         admanager.showCommonDlg("Warning", data.message);
                     }
+                    bindOp();
                     $("#checkbox_facebook").prop("checked", false);
                     $("#checkbox_facebook").click();
                 }, "json");
@@ -2942,6 +2953,17 @@ $("#selectRegionAdmob").change(function () {
         }, "json");
 
         if (!selectRegionAdmobExplode) {     //《国家地区》不分离到系列
+            $("#tbody_admob").empty();
+            $("#advertisement_admob").children("thead").empty();
+            $("#advertisement_admob").children("thead").append("<tr>\n" +
+                "                <th><input type=\"checkbox\" id=\"checkbox_admob\"></th>\n" +
+                "                <th>广告语组合</th>\n" +
+                "                <th>语言</th>\n" +
+                "                <th>广告语1</th>\n" +
+                "                <th>广告语2</th>\n" +
+                "                <th>广告语3</th>\n" +
+                "                <th>广告语4</th>\n" +
+                "            </tr>");
             $.post("campaign_create_ads_show_up/adwords", {
                 appName: appNameAdmob,
                 region: regionAdmob.join(","),
@@ -2964,6 +2986,7 @@ $("#selectRegionAdmob").change(function () {
                 } else if (data && data.ret == 0) {
                     admanager.showCommonDlg("Warning", data.message);
                 }
+                bindOp();
                 $("#checkbox_admob").prop("checked", false);
                 $("#checkbox_admob").click();
             }, "json");
@@ -3025,21 +3048,26 @@ $("#selectRegionAdmob").change(function () {
 });
 
 //两个表单广告语的全选
-$("#checkbox_facebook").click(function () {
-    if ($("#checkbox_facebook").prop("checked")) {
-        $(".check_group").prop("checked", true);
-    } else {
-        $(".check_group").prop("checked", false);
-    }
-});
-$("#checkbox_admob").click(function () {
-    if ($("#checkbox_admob").prop("checked")) {
-        $(".check_group_admob").prop("checked", true);
-    } else {
-        $(".check_group_admob").prop("checked", false);
-    }
-});
+
+
+
 function bindOp() {
+    $("#checkbox_facebook").click(function () {
+        if ($("#checkbox_facebook").prop("checked")) {
+            $(".check_group").prop("checked", true);
+        } else {
+            $(".check_group").prop("checked", false);
+        }
+    });
+
+    $("#checkbox_admob").click(function () {
+        if ($("#checkbox_admob").prop("checked")) {
+            $(".check_group_admob").prop("checked", true);
+        } else {
+            $(".check_group_admob").prop("checked", false);
+        }
+    });
+
     $(".multiSelect").click(function () {
         var region = $(this).prop("id");
         // alert(region);
