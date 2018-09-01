@@ -1,14 +1,15 @@
 package com.bestgo.admanager.servlet;
 
-import com.bestgo.admanager.utils.*;
+import com.bestgo.admanager.utils.DateUtil;
 import com.bestgo.admanager.OperationResult;
+import com.bestgo.admanager.utils.StringUtil;
+import com.bestgo.admanager.utils.NumberUtil;
+import com.bestgo.admanager.utils.Utils;
 import com.bestgo.common.database.services.DB;
 import com.bestgo.common.database.utils.JSObject;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import org.apache.log4j.Logger;
-import redis.clients.jedis.Jedis;
-import redis.clients.jedis.JedisPool;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -75,12 +76,6 @@ public class Tags extends BaseHttpServlet {
                         maxBiddingStr = "NULL";
                     }
                     result = updateTag(idStr, tagName,maxBiddingStr,tagCategoryIdStr,anticipated_revenue,anticipated_incoming,user_id,is_statistics,is_display);
-                    if (result.result) {
-//                        Jedis jedis = new Jedis("10.23.3.192",6379);
-                        Jedis jedis = JedisPoolUtil.getJedis();
-                        jedis.hset("tagNameBiddingMap",tagName,maxBiddingStr);
-//                        java.lang.System.out.println(tagName + " = " + jedis.hget("tagNameBiddingMap",tagName));
-                    }
                     json.addProperty("ret", result.result ? 1 : 0);
                     json.addProperty("message", result.message);
                 }else{
