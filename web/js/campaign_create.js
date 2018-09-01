@@ -3289,6 +3289,7 @@ function FacebookFormReading() {
             admanager.showCommonDlg("错误", "不分离的情况下不允许出价多选");
             return false;
         }
+        bidding = (bidding.substring(bidding.length - 1) == ',') ? bidding.substring(0, bidding.length - 1) : bidding;
         if ($("#inputBiddingExplode").prop("checked")) {
             explodeListImage.push({
                 key: 'bidding',
@@ -3476,6 +3477,7 @@ function FacebookFormReading() {
             admanager.showCommonDlg("错误", "不分离的情况下不允许出价多选");
             return false;
         }
+        bidding = (bidding.substring(bidding.length - 1) == ',') ? bidding.substring(0, bidding.length - 1) : bidding;
         if ($("#inputBiddingExplode").prop("checked")) {
             explodeListVideo.push({
                 key: 'bidding',
@@ -3791,6 +3793,7 @@ function FacebookFormReadingByRegionExplode() {
                 admanager.showCommonDlg("错误", "不分离的情况下不允许出价多选");
                 return false;
             }
+            bidding = (bidding.substring(bidding.length - 1) == ',') ? bidding.substring(0, bidding.length - 1) : bidding;
             if ($("#inputBiddingExplode").prop("checked")) {
                 explodeListImage.push({
                     key: 'bidding',
@@ -3967,6 +3970,7 @@ function FacebookFormReadingByRegionExplode() {
                 admanager.showCommonDlg("错误", "不分离的情况下不允许出价多选");
                 return false;
             }
+            bidding = (bidding.substring(bidding.length - 1) == ',') ? bidding.substring(0, bidding.length - 1) : bidding;
             if ($("#inputBiddingExplode").prop("checked")) {
                 explodeListVideo.push({
                     key: 'bidding',
@@ -4634,9 +4638,6 @@ $('#btnCreate').click(function () {
 });
 
 
-
-
-
 //读取并分离adwords表单数据
 function AdwordFormReading() {
     var appName = $('#selectAppAdmob').val();
@@ -4737,6 +4738,9 @@ function AdwordFormReading() {
         admanager.showCommonDlg("错误", "不分离的情况下不允许出价多选");
         return false;
     }
+
+    bidding = (bidding.substring(bidding.length - 1) == ',') ? bidding.substring(0, bidding.length - 1) : bidding;
+
     if ($("#inputBiddingAdmobExplode").prop("checked")) {
         explodeList.push({
             key: 'bidding',
@@ -4927,6 +4931,8 @@ function AdwordFormReadingByRegionExplode() {
             admanager.showCommonDlg("错误", "不分离的情况下不允许出价多选");
             return false;
         }
+
+        bidding = (bidding.substring(bidding.length - 1) == ',') ? bidding.substring(0, bidding.length - 1) : bidding;
         if ($("#inputBiddingAdmobExplode").prop("checked")) {
             explodeList.push({
                 key: 'bidding',
