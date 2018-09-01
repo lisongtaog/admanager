@@ -20,10 +20,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
 import java.lang.System;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by jikai on 12/10/17.
@@ -31,6 +28,29 @@ import java.util.Set;
  */
 @WebServlet(name = "AutoCreateCampaign", urlPatterns = "/auto_create_campaign/*")
 public class AutoCreateCampaign extends BaseHttpServlet {
+        public static Map<String, Double> tagMaxBiddingRelationMap;   //声明了一个静态类，无属性，无方法，则Java会给它一个默认无参构造器
+
+    static {
+        if (tagMaxBiddingRelationMap == null) {
+            tagMaxBiddingRelationMap = new HashMap<>();
+        }
+        String sql = "select tag_name,max_bidding from web_tag";
+        List<JSObject> list = null;
+        try {
+            list = DB.findListBySql(sql);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (list != null && list.size() > 0) {
+            for (JSObject j : list) {
+                String currTagName = j.get("tag_name");
+                double currMaxBidding = NumberUtil.convertDouble(j.get("max_bidding"), 0);
+                if (currMaxBidding > 0) {
+                    tagMaxBiddingRelationMap.put(currTagName, currMaxBidding);
+                }
+            }
+        }
+    }
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         super.doPost(request, response);
@@ -419,7 +439,7 @@ public class AutoCreateCampaign extends BaseHttpServlet {
                 result.message = "版位不能为空";
             } else {
                 double dBidding = NumberUtil.parseDouble(bidding, 0);
-                Double maxBiddingDouble = Campaign.tagMaxBiddingRelationMap.get(appName);
+                Double maxBiddingDouble = tagMaxBiddingRelationMap.get(appName);
                 if (maxBiddingDouble != null && maxBiddingDouble != 0 && dBidding > maxBiddingDouble) {
                     result.message = "bidding超过了本应用的最大出价,   " + bidding + " > " + maxBiddingDouble;
                 } else {
@@ -584,7 +604,7 @@ public class AutoCreateCampaign extends BaseHttpServlet {
                 result.message = "版位不能为空";
             } else {
                 double dBidding = NumberUtil.parseDouble(bidding, 0);
-                Double maxBiddingDouble = Campaign.tagMaxBiddingRelationMap.get(appName);
+                Double maxBiddingDouble = tagMaxBiddingRelationMap.get(appName);
                 if (maxBiddingDouble != null && maxBiddingDouble != 0 && dBidding > maxBiddingDouble) {
                     result.message = "bidding超过了本应用的最大出价,   " + bidding + " > " + maxBiddingDouble;
                 } else {
