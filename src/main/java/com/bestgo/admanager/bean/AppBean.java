@@ -30,4 +30,5 @@ public class AppBean {
     public double newUserAvgImpressions;
     public double newUserSampleImpression;
     public double sampleNewUserRevenue; //抽样新用户收入
+    public double total_impression;
 }
