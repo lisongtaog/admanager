@@ -30,5 +30,36 @@ public class AppBean {
     public double newUserAvgImpressions;
     public double newUserSampleImpression;
     public double sampleNewUserRevenue; //抽样新用户收入
-    public double total_impression;
+    public double total_impression; //变现端总展示
+
+    @Override
+    public String toString() {
+        return "AppBean{" +
+                "name='" + name + '\'' +
+                ", total_spend=" + total_spend +
+                ", seven_days_total_spend=" + seven_days_total_spend +
+                ", total_installed=" + total_installed +
+                ", total_impressions=" + total_impressions +
+                ", total_click=" + total_click +
+                ", total_ctr=" + total_ctr +
+                ", total_cpa=" + total_cpa +
+                ", total_cvr=" + total_cvr +
+                ", total_revenue=" + total_revenue +
+                ", seven_days_total_revenue=" + seven_days_total_revenue +
+                ", network='" + network + '\'' +
+                ", ecpm=" + ecpm +
+                ", incoming=" + incoming +
+                ", warningLevel=" + warningLevel +
+                ", appId='" + appId + '\'' +
+                ", totalNewRevenue=" + totalNewRevenue +
+                ", roi=" + roi +
+                ", tagId=" + tagId +
+                ", sampleUser=" + sampleUser +
+                ", totalNewUser=" + totalNewUser +
+                ", newUserAvgImpressions=" + newUserAvgImpressions +
+                ", newUserSampleImpression=" + newUserSampleImpression +
+                ", sampleNewUserRevenue=" + sampleNewUserRevenue +
+                ", total_impression=" + total_impression +
+                '}';
+    }
 }

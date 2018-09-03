@@ -114,6 +114,7 @@ public class Query extends BaseHttpServlet {
                                 appBean.total_revenue = appBean1.total_revenue;
                                 appBean.totalNewRevenue = appBean1.totalNewRevenue;
                                 appBean.roi = appBean.total_spend > 0 ? appBean.totalNewRevenue / appBean.total_spend : 0;
+                                //变现端的ECPM=总收入*1000/变现端总展示
                                 appBean.ecpm = appBean1.total_impression > 0 ? appBean1.total_revenue * 1000 / appBean1.total_impression : 0;
                             }
                         } else {
@@ -128,11 +129,10 @@ public class Query extends BaseHttpServlet {
                                 totalImpression = NumberUtil.convertDouble(oneR.get("impressions"), 0);
                             }
 
-                            appBean.ecpm = totalRevenue * 1000 / totalImpression;
+                            appBean.ecpm = totalImpression > 0 ? totalRevenue * 1000 / totalImpression : 0;
 
                         }
-                        //计算ECPM和Incoming
-//                        appBean.ecpm = appBean.total_revenue * 1000 / appBean.total_impressions;
+                        //计算Incoming
                         appBean.incoming = appBean.total_revenue - appBean.total_spend;
                     }
                     appBeanList.add(appBean);
@@ -252,10 +252,9 @@ public class Query extends BaseHttpServlet {
                                 totalRevenue = NumberUtil.convertDouble(oneR.get("revenues"), 0);
                                 totalImpression = NumberUtil.convertDouble(oneR.get("impressions"), 0);
                             }
-                            ecpm = totalRevenue * 1000 / totalImpression;
+                            ecpm = totalImpression > 0 ? totalRevenue * 1000 / totalImpression : 0;
                         }
-                        //计算ECPM和Incoming
-//                            ecpm = totalRevenue * 1000 / total_impressions;
+                        //计算Incoming
                         incoming = totalRevenue - total_spend;
                     }
                     j.addProperty("total_revenue", NumberUtil.trimDouble(totalRevenue, 0));
