@@ -58,8 +58,9 @@ public class AdAccountAdmob extends BaseHttpServlet {
             if (path.startsWith("/create")) {
                 String account = request.getParameter("account");
                 String shortName = request.getParameter("shortName");
+                int status = NumberUtil.parseInt(request.getParameter("status"), 0);
 
-                OperationResult result = createNewAdAccount(account, shortName);
+                OperationResult result = createNewAdAccount(account, shortName,status);
                 json.addProperty("ret", result.result ? 1 : 0);
                 json.addProperty("message", result.message);
             } else if (path.startsWith("/delete")) {
@@ -71,7 +72,8 @@ public class AdAccountAdmob extends BaseHttpServlet {
                 String account = request.getParameter("account");
                 String shortName = request.getParameter("shortName");
                 int id = NumberUtil.parseInt(request.getParameter("id"), 0);
-                OperationResult result = updateAdAccount(id, account, shortName);
+                int status = NumberUtil.parseInt(request.getParameter("status"), 0);
+                OperationResult result = updateAdAccount(id, account, shortName, status);
                 json.addProperty("ret", result.result ? 1 : 0);
                 json.addProperty("message", result.message);
             } else if (path.startsWith("/query")) {
@@ -82,9 +84,10 @@ public class AdAccountAdmob extends BaseHttpServlet {
                     JsonArray array = new JsonArray();
                     for (int i = 0; i < data.size(); i++) {
                         JsonObject one = new JsonObject();
-                        one.addProperty("account_id", (String)data.get(i).get("account_id"));
-                        one.addProperty("short_name", (String)data.get(i).get("short_name"));
-                        one.addProperty("id", (long)data.get(i).get("id"));
+                        one.addProperty("account_id", (String) data.get(i).get("account_id"));
+                        one.addProperty("short_name", (String) data.get(i).get("short_name"));
+                        one.addProperty("id", (long) data.get(i).get("id"));
+                        one.addProperty("status", (Integer) data.get(i).get("status"));
                         array.add(one);
                     }
                     json.add("data", array);
@@ -98,9 +101,9 @@ public class AdAccountAdmob extends BaseHttpServlet {
                     JsonArray array = new JsonArray();
                     for (int i = 0; i < data.size(); i++) {
                         JsonObject one = new JsonObject();
-                        one.addProperty("account_id", (String)data.get(i).get("account_id"));
-                        one.addProperty("short_name", (String)data.get(i).get("short_name"));
-                        one.addProperty("id", (long)data.get(i).get("id"));
+                        one.addProperty("account_id", (String) data.get(i).get("account_id"));
+                        one.addProperty("short_name", (String) data.get(i).get("short_name"));
+                        one.addProperty("id", (long) data.get(i).get("id"));
                         array.add(one);
                     }
                     json.add("data", array);
@@ -120,7 +123,7 @@ public class AdAccountAdmob extends BaseHttpServlet {
     public static List<JSObject> fetchData(String word) {
         List<JSObject> list = new ArrayList<>();
         try {
-            return DB.scan("web_account_id_admob").select("id", "account_id", "short_name")
+            return DB.scan("web_account_id_admob").select("id", "account_id", "short_name", "status")
                     .where(DB.filter().whereLikeTo("account_id", "%" + word + "%"))
                     .or(DB.filter().whereLikeTo("short_name", "%" + word + "%")).orderByAsc("id").execute();
         } catch (Exception ex) {
@@ -133,7 +136,7 @@ public class AdAccountAdmob extends BaseHttpServlet {
     public static List<JSObject> fetchData(int index, int size) {
         List<JSObject> list = new ArrayList<>();
         try {
-            return DB.scan("web_account_id_admob").select("id", "account_id", "short_name").limit(size).start(index * size).orderByAsc("id").execute();
+            return DB.scan("web_account_id_admob").select("id", "account_id", "short_name", "status").limit(size).start(index * size).orderByAsc("id").execute();
         } catch (Exception ex) {
             Logger logger = Logger.getRootLogger();
             logger.error(ex.getMessage(), ex);
@@ -170,7 +173,7 @@ public class AdAccountAdmob extends BaseHttpServlet {
         return ret;
     }
 
-    private OperationResult createNewAdAccount(String account, String shortName) {
+    private OperationResult createNewAdAccount(String account, String shortName,int status) {
         OperationResult ret = new OperationResult();
 
         try {
@@ -179,11 +182,13 @@ public class AdAccountAdmob extends BaseHttpServlet {
                 ret.result = false;
                 ret.message = "已经存在这个账号了";
             } else {
-                DB.insert("web_account_id_admob").put("account_id", account)
+                DB.insert("web_account_id_admob")
+                        .put("account_id", account)
+                        .put("status", status)
                         .put("short_name", shortName).execute();
 
                 ret.result = true;
-                ret.message = "修改成功";
+                ret.message = "创建成功";
             }
         } catch (Exception e) {
             ret.result = false;
@@ -195,22 +200,24 @@ public class AdAccountAdmob extends BaseHttpServlet {
         return ret;
     }
 
-    private OperationResult updateAdAccount(int id, String account, String shortName) {
+    private OperationResult updateAdAccount(int id, String account, String shortName, int status) {
         OperationResult ret = new OperationResult();
 
         try {
-            JSObject one = DB.simpleScan("web_account_id_admob").select("account_id").where(DB.filter().whereEqualTo("account_id", account)).execute();
-            if (one.get("account_id") != null) {
-                ret.result = false;
-                ret.message = "已经存在这个账号了";
-            } else {
-                DB.update("web_account_id_admob").put("account_id", account)
-                        .put("short_name", shortName)
-                        .where(DB.filter().whereEqualTo("id", id)).execute();
+//            JSObject one = DB.simpleScan("web_account_id_admob").select("account_id").where(DB.filter().whereEqualTo("account_id", account)).execute();
+//            if (one.get("account_id") != null) {
+//                ret.result = false;
+//                ret.message = "已经存在这个账号了";
+//            } else {
+            DB.update("web_account_id_admob")
+                    .put("account_id", account)
+                    .put("short_name", shortName)
+                    .put("status", status)
+                    .where(DB.filter().whereEqualTo("id", id)).execute();
 
-                ret.result = true;
-                ret.message = "修改成功";
-            }
+            ret.result = true;
+            ret.message = "修改成功";
+//            }
         } catch (Exception e) {
             ret.result = false;
             ret.message = e.getMessage();

@@ -2194,6 +2194,9 @@ function init() {
         if (data && data.ret == 1) {
             var accountList = data.data;
             accountList.forEach(function (one) {
+                if (one.status == 2) {
+                    return;
+                }
                 $('#selectAccountAdmob').append($("<option value='" + one.account_id + "'>" + one.short_name + "</option>"));
             });
             pendingList.shift();
@@ -2211,6 +2214,9 @@ function init() {
         if (data && data.ret == 1) {
             var accountList = data.data;
             accountList.forEach(function (one) {
+                if (one.status == 2) {
+                    return;
+                }
                 $('#selectAccount').append($("<option value='" + one.account_id + "'>" + one.short_name + "</option>"));
             });
             pendingList.shift();
