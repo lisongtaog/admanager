@@ -1,15 +1,13 @@
 package com.bestgo.admanager.servlet;
 
-import com.bestgo.admanager.utils.DateUtil;
+import com.bestgo.admanager.utils.*;
 import com.bestgo.admanager.OperationResult;
-import com.bestgo.admanager.utils.StringUtil;
-import com.bestgo.admanager.utils.NumberUtil;
-import com.bestgo.admanager.utils.Utils;
 import com.bestgo.common.database.services.DB;
 import com.bestgo.common.database.utils.JSObject;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import org.apache.log4j.Logger;
+import redis.clients.jedis.Jedis;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -28,7 +26,7 @@ public class Tags extends BaseHttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         super.doPost(request, response);
         if (!Utils.isAdmin(request, response)) return;
-
+        Jedis jedis = JedisPoolUtil.getJedis();
         String path = request.getPathInfo();
         JsonObject json = new JsonObject();
         OperationResult result = new OperationResult();
@@ -76,6 +74,9 @@ public class Tags extends BaseHttpServlet {
                         maxBiddingStr = "NULL";
                     }
                     result = updateTag(idStr, tagName,maxBiddingStr,tagCategoryIdStr,anticipated_revenue,anticipated_incoming,user_id,is_statistics,is_display);
+                    if (result.result) {
+                        jedis.hset("tagNameBiddingMap",tagName,maxBiddingStr);
+                    }
                     json.addProperty("ret", result.result ? 1 : 0);
                     json.addProperty("message", result.message);
                 }else{
@@ -196,7 +197,9 @@ public class Tags extends BaseHttpServlet {
                 json.addProperty("message", result.message);
             }
         }
-
+        if (jedis != null) {
+            jedis.close();
+        }
         response.getWriter().write(json.toString());
     }
 
