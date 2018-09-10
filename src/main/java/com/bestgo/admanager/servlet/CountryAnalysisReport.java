@@ -33,7 +33,7 @@ public class CountryAnalysisReport extends BaseHttpServlet {
         if (!Utils.isAdmin(request, response)) return;
         Map<String, Long> tagNameIdMap = getTagNameIdMap();
         Map<String, String> tagNamePackageIdMap = getTagNamePackageIdMap();
-        HashMap<String,String> countryCodeNameMap = Utils.getCountryCodeNameMap();
+        HashMap<String, String> countryCodeNameMap = Utils.getCountryCodeNameMap();
         String path = request.getPathInfo();
         JsonObject jsonObject = new JsonObject();
         String sorterId = request.getParameter("sorterId");
@@ -51,10 +51,10 @@ public class CountryAnalysisReport extends BaseHttpServlet {
 //        String beforeTwentyTwoDay = DateUtil.addDay(endTime, -22, "yyyy-MM-dd");//不包括endTime
 
         if (path.matches("/modify_web_ad_rules")) {//修改国家 规则上限
-            jsonObject = editCountryMaxCost(request,tagNameIdMap);
-        } else if(path.matches("/modify_app_country_target")) {//修改国家 期望cpa、ecpm、用户平均广告展示数
-            jsonObject = editAppCountryTarget(request,tagNamePackageIdMap);
-        }else if (path.matches("/query_country_analysis_report")) {
+            jsonObject = editCountryMaxCost(request, tagNameIdMap);
+        } else if (path.matches("/modify_app_country_target")) {//修改国家 期望cpa、ecpm、用户平均广告展示数
+            jsonObject = editAppCountryTarget(request, tagNamePackageIdMap);
+        } else if (path.matches("/query_country_analysis_report")) {
             try {
                 long tagId = tagNameIdMap.get(tagName); //标签ID
                 String appId = tagNamePackageIdMap.get(tagName); //包ID
@@ -63,7 +63,7 @@ public class CountryAnalysisReport extends BaseHttpServlet {
                         JsonArray jsonArray = new JsonArray();
                         String sql = "";
                         if (sameDate) {
-                            sql =   "SELECT h.country_code, sum(cost) as total_cost, sum(purchased_user) as total_purchased_user, sum(ad_new_revenue) as new_revenues,\n" +
+                            sql = "SELECT h.fourteen_days_ltv,h.seven_days_ltv,h.country_code, sum(cost) as total_cost, sum(purchased_user) as total_purchased_user, sum(ad_new_revenue) as new_revenues,\n" +
                                     "sum(total_installed) as installed, sum(today_uninstalled) as total_today_uninstalled,\n" +
                                     "sum(h.total_user) as total_users, sum(active_user) as active_users, sum(impression) as impressions, sum(revenue) as revenues,\n" +
                                     "sum(h.new_user_revenue) as new_user_revenues,sum(h.new_user_impression) as new_user_impressions, " +
@@ -152,10 +152,10 @@ public class CountryAnalysisReport extends BaseHttpServlet {
                         List<JSObject> countryDetailJSObjectList = DB.findListBySql(sql);
                         //获取悬浮窗数据
                         //key为country_code ； value(维度，各日期维度值的集合)
-                        Map<String,Map<String,List>> floatDataMap = null;
-                        Map<String,List> floatItem = null;
-                        if(sameDate){ //只有日期相同时 才显示 悬浮
-                            floatDataMap = getFloatData(appId,endTime);
+                        Map<String, Map<String, List>> floatDataMap = null;
+                        Map<String, List> floatItem = null;
+                        if (sameDate) { //只有日期相同时 才显示 悬浮
+                            floatDataMap = getFloatData(appId, endTime);
                         }
 
                         double totalCost = 0; //当前应用的总花费
@@ -167,6 +167,9 @@ public class CountryAnalysisReport extends BaseHttpServlet {
                         for (JSObject j : countryDetailJSObjectList) {
                             if (j.hasObjectData()) {
                                 countryCode = j.get("country_code");
+                                //在这里添加了国家分析报告的LTV字段
+                                double seven_days_ltv = NumberUtil.convertDouble(j.get("seven_days_ltv"), 0);
+                                double fourteen_days_ltv = NumberUtil.convertDouble(j.get("fourteen_days_ltv"), 0);
                                 double revenues = NumberUtil.convertDouble(j.get("revenues"), 0);
                                 double ecpm = NumberUtil.convertDouble(j.get("ecpm"), 0);
                                 double costs = NumberUtil.convertDouble(j.get("total_cost"), 0);
@@ -243,25 +246,25 @@ public class CountryAnalysisReport extends BaseHttpServlet {
                                     double sampleUser = NumberUtil.convertDouble(j.get("sum_sample_user"), 0); //抽样用户数
                                     double totalNewUser = NumberUtil.convertDouble(j.get("sum_total_new_user"), 0); //总的新用户数
                                     double newUserRevenue = NumberUtil.convertDouble(j.get("new_user_revenues"), 0); //抽样新用户收入
-                                    d.addProperty("new_user_revenues",NumberUtil.trimDouble(newUserRevenue,3));
-                                    d.addProperty("sample_user",sampleUser);
-                                    d.addProperty("total_new_user",totalNewUser);
+                                    d.addProperty("new_user_revenues", NumberUtil.trimDouble(newUserRevenue, 3));
+                                    d.addProperty("sample_user", sampleUser);
+                                    d.addProperty("total_new_user", totalNewUser);
                                     double newUserSampleImpression = NumberUtil.convertDouble(j.get("new_user_impressions"), 0);//新用户抽样展示次数
 //                                    double newUserImpression = sampleUser > 0 ? newUserSampleImpression / sampleUser * totalNewUser : 0; //新用户预估的总展示次数
                                     // 新用户平均展示次数=新用户展示/用户数
                                     double newUserAvgImpression = sampleUser > 0 ? newUserSampleImpression / sampleUser : 0;
-                                    d.addProperty("newUserAvgImpression",NumberUtil.trimDouble(newUserAvgImpression,4));
+                                    d.addProperty("newUserAvgImpression", NumberUtil.trimDouble(newUserAvgImpression, 4));
                                     // 总的新用户收入=总的新用户数*新用户人均广告展示次数*老的ECPM
 //                                    double newRevenues = NumberUtil.trimDouble(totalNewUser * newUserAvgImpression * ecpm / 1000,2);
                                     // 总的新用户收入=抽样新用户收入+非抽样新用户数*抽样新用户人均广告数*统一ecpm / 1000;
-                                    double newRevenues = NumberUtil.trimDouble(newUserRevenue + (totalNewUser - sampleUser) * newUserAvgImpression * ecpm / 1000,2);
+                                    double newRevenues = NumberUtil.trimDouble(newUserRevenue + (totalNewUser - sampleUser) * newUserAvgImpression * ecpm / 1000, 2);
                                     totalNewRevenues += newRevenues;
 
 //                                    double oldUserImpression = NumberUtil.convertDouble(j.get("old_user_impressions"), 0);
 
                                     double newUserEcpm = newUserSampleImpression > 0 ? newUserRevenue * 1000 / newUserSampleImpression : 0; //抽样新用户ECPM
 //                                    double newUserEcpm = newUserImpression > 0 ? newUserRevenue * 1000 / newUserImpression : 0; //抽样新用户ECPM
-                                    d.addProperty("newUserEcpm",NumberUtil.trimDouble(newUserEcpm,4));
+                                    d.addProperty("newUserEcpm", NumberUtil.trimDouble(newUserEcpm, 4));
 
 //                                    double totalUsers = NumberUtil.convertDouble(j.get("total_users"), 0);
 //                                    double oldUser = totalUsers - installed;
@@ -269,24 +272,24 @@ public class CountryAnalysisReport extends BaseHttpServlet {
 //                                    d.addProperty("oldUserAvgImpression",NumberUtil.trimDouble(oldUserAvgImpression,4));
                                     //当日变现能力（单个新用户）= 新用户人均展示数*老ECPM/1000
                                     double newUserTagRevenue = newUserAvgImpression * ecpm / 1000;
-                                    d.addProperty("newUserTagRevenue",NumberUtil.trimDouble(newUserTagRevenue,4));
+                                    d.addProperty("newUserTagRevenue", NumberUtil.trimDouble(newUserTagRevenue, 4));
 
                                     //当天回本率=newRevenues/总花费
                                     double recoveryCostRatio = costs > 0 ? newRevenues / costs : 0;
 
                                     d.addProperty("newRevenue", NumberUtil.trimDouble(newRevenues, 2));
                                     d.addProperty("recoveryCostRatio", NumberUtil.trimDouble(recoveryCostRatio, 3));//回本率
-                                    double firstDayRevenue = NumberUtil.convertDouble(j.get("first_day_revenue"),0);
-                                    double secondDayRevenue = NumberUtil.convertDouble(j.get("second_day_revenue"),0);
+                                    double firstDayRevenue = NumberUtil.convertDouble(j.get("first_day_revenue"), 0);
+                                    double secondDayRevenue = NumberUtil.convertDouble(j.get("second_day_revenue"), 0);
                                     secondDayRevenue += firstDayRevenue;
-                                    double thirdDayRevenue = NumberUtil.convertDouble(j.get("third_day_revenue"),0);
+                                    double thirdDayRevenue = NumberUtil.convertDouble(j.get("third_day_revenue"), 0);
                                     thirdDayRevenue += secondDayRevenue;
-                                    double fourthDayRevenue = NumberUtil.convertDouble(j.get("fourth_day_revenue"),0);
+                                    double fourthDayRevenue = NumberUtil.convertDouble(j.get("fourth_day_revenue"), 0);
                                     fourthDayRevenue += thirdDayRevenue;
-                                    d.addProperty("first_day_revenue",NumberUtil.trimDouble(firstDayRevenue,2));
-                                    d.addProperty("second_day_revenue",NumberUtil.trimDouble(secondDayRevenue,2));
-                                    d.addProperty("third_day_revenue",NumberUtil.trimDouble(thirdDayRevenue,2));
-                                    d.addProperty("fourth_day_revenue",NumberUtil.trimDouble(fourthDayRevenue,2));
+                                    d.addProperty("first_day_revenue", NumberUtil.trimDouble(firstDayRevenue, 2));
+                                    d.addProperty("second_day_revenue", NumberUtil.trimDouble(secondDayRevenue, 2));
+                                    d.addProperty("third_day_revenue", NumberUtil.trimDouble(thirdDayRevenue, 2));
+                                    d.addProperty("fourth_day_revenue", NumberUtil.trimDouble(fourthDayRevenue, 2));
 //                                    double cpaDivNewUserEcpm = newUserEcpm > 0 ? cpa / newUserEcpm : 0;
 //                                    d.addProperty("cpaDivNewEcpm", NumberUtil.trimDouble(cpaDivNewUserEcpm, 3));
                                     //" t.cpa as tag_cpa, t.ecpm as tag_ecpm,t.avg_impression \n" +
@@ -296,14 +299,18 @@ public class CountryAnalysisReport extends BaseHttpServlet {
                                     if (tag_cpa > 0) {//期望 cpa
                                         d.addProperty("tag_cpa", tag_cpa);
                                     }
-                                    if(tag_ecpm > 0){//期望 ecpm
+                                    if (tag_ecpm > 0) {//期望 ecpm
                                         d.addProperty("tag_ecpm", tag_ecpm);
                                     }
-                                    if(tag_impression > 0){//期望 用户 广告展示次数
+                                    if (tag_impression > 0) {//期望 用户 广告展示次数
                                         d.addProperty("tag_impression", tag_impression);
                                     }
 
                                 }
+
+                                d.addProperty("seven_days_ltv", NumberUtil.trimDouble(seven_days_ltv, 3));
+                                d.addProperty("fourteen_days_ltv", NumberUtil.trimDouble(fourteen_days_ltv, 3));
+
                                 d.addProperty("country_code", countryCode);
                                 d.addProperty("country_name", countryCodeNameMap.get(countryCode));
                                 d.addProperty("bidding_summary", biddingSummaryStr);
@@ -315,28 +322,28 @@ public class CountryAnalysisReport extends BaseHttpServlet {
                                 d.addProperty("revenue", NumberUtil.trimDouble(revenues, 2));
                                 d.addProperty("ecpm", NumberUtil.trimDouble(ecpm, 3));
                                 cpaDivEcpm = ecpm > 0 ? cpa / ecpm : 0;
-                                d.addProperty("cpa_div_ecpm",NumberUtil.trimDouble(cpaDivEcpm,3));
+                                d.addProperty("cpa_div_ecpm", NumberUtil.trimDouble(cpaDivEcpm, 3));
 
 
                                 floatItem = sameDate ? floatDataMap.get(countryCode) : null;//获取悬浮数据项 && 只有日期相同时 显示悬浮
-                                if(null != floatItem){//只有日期相同时 显示悬浮
-                                    d.addProperty("float_costs", String.join("\n",floatItem.get("cost")));
-                                    d.addProperty("float_purchasedUser", String.join("\n",floatItem.get("purchasedUser")));
-                                    d.addProperty("float_installed", String.join("\n",floatItem.get("installed")));
-                                    d.addProperty("float_uninstalledRate", String.join("\n",floatItem.get("uninstalledRate")));
-                                    d.addProperty("float_activeUser", String.join("\n",floatItem.get("activeUser")));
-                                    d.addProperty("float_revenue", String.join("\n",floatItem.get("revenue")));
-                                    d.addProperty("float_newRevenue", String.join("\n",floatItem.get("newRevenue")));
-                                    d.addProperty("float_ecpm", String.join("\n",floatItem.get("ecpm")));
-                                    d.addProperty("float_cpa", String.join("\n",floatItem.get("cpa")));
-                                    d.addProperty("float_cpaDivNewEcpm", String.join("\n",floatItem.get("cpaDivEcpm")));
-                                    d.addProperty("float_incoming", String.join("\n",floatItem.get("incoming")));
+                                if (null != floatItem) {//只有日期相同时 显示悬浮
+                                    d.addProperty("float_costs", String.join("\n", floatItem.get("cost")));
+                                    d.addProperty("float_purchasedUser", String.join("\n", floatItem.get("purchasedUser")));
+                                    d.addProperty("float_installed", String.join("\n", floatItem.get("installed")));
+                                    d.addProperty("float_uninstalledRate", String.join("\n", floatItem.get("uninstalledRate")));
+                                    d.addProperty("float_activeUser", String.join("\n", floatItem.get("activeUser")));
+                                    d.addProperty("float_revenue", String.join("\n", floatItem.get("revenue")));
+                                    d.addProperty("float_newRevenue", String.join("\n", floatItem.get("newRevenue")));
+                                    d.addProperty("float_ecpm", String.join("\n", floatItem.get("ecpm")));
+                                    d.addProperty("float_cpa", String.join("\n", floatItem.get("cpa")));
+                                    d.addProperty("float_cpaDivNewEcpm", String.join("\n", floatItem.get("cpaDivEcpm")));
+                                    d.addProperty("float_incoming", String.join("\n", floatItem.get("incoming")));
 
-                                    d.addProperty("float_recoveryCostRatio", String.join("\n",floatItem.get("recoveryCostRatio")));
-                                    d.addProperty("float_newUserEcpm", String.join("\n",floatItem.get("newUserEcpm")));
-                                    d.addProperty("float_newUserAvgImpression", String.join("\n",floatItem.get("newUserAvgImpression")));
+                                    d.addProperty("float_recoveryCostRatio", String.join("\n", floatItem.get("recoveryCostRatio")));
+                                    d.addProperty("float_newUserEcpm", String.join("\n", floatItem.get("newUserEcpm")));
+                                    d.addProperty("float_newUserAvgImpression", String.join("\n", floatItem.get("newUserAvgImpression")));
 //                                    d.addProperty("float_oldUserAvgImpression", String.join("\n",floatItem.get("oldUserAvgImpression")));
-                                    d.addProperty("float_newUserTagRevenue", String.join("\n",floatItem.get("newUserTagRevenue")));
+                                    d.addProperty("float_newUserTagRevenue", String.join("\n", floatItem.get("newUserTagRevenue")));
 
                                 }
 
@@ -353,7 +360,7 @@ public class CountryAnalysisReport extends BaseHttpServlet {
                             jsonObject.addProperty("message", "此应用下当前日期中没有数据!");
                         } else {
                             if (sameDate) {
-                                jsonObject.addProperty("same_date",1);
+                                jsonObject.addProperty("same_date", 1);
                                 jsonObject.addProperty("total_new_revenue", NumberUtil.trimDouble(totalNewRevenues, 3));
                                 double totalNewRevenueDivCost = totalCost > 0 ? totalNewRevenues / totalCost : 0;
                                 jsonObject.addProperty("total_new_revenue_div_cost", NumberUtil.trimDouble(totalNewRevenueDivCost, 3));
@@ -377,7 +384,6 @@ public class CountryAnalysisReport extends BaseHttpServlet {
                 jsonObject.addProperty("ret", 0);
                 jsonObject.addProperty("message", e.getMessage());
             }
-
 
 
         } else if (path.matches("/query_id_of_auto_create_campaigns")) {
@@ -415,10 +421,11 @@ public class CountryAnalysisReport extends BaseHttpServlet {
 
     /**
      * 获取 悬浮展示数据
+     *
      * @return
      */
-    private static Map<String,Map<String,List>> getFloatData(String appId,String endTime){
-        Map<String,Map<String,List>> dataMap = new HashMap<String,Map<String,List>>();
+    private static Map<String, Map<String, List>> getFloatData(String appId, String endTime) {
+        Map<String, Map<String, List>> dataMap = new HashMap<String, Map<String, List>>();
 
         try {
             String sinceDate = DateUtil.addDay(endTime, -7, "yyyy-MM-dd");//悬浮 展示起始日期
@@ -435,26 +442,27 @@ public class CountryAnalysisReport extends BaseHttpServlet {
                     " GROUP BY date,country_code ORDER BY date DESC ";
 
             List<JSObject> dataList = DB.findListBySql(floatSql);
-            List costList,purchasedUserList,installedList,uninstalledRateList,activeUserList,
-                    revenueList,newRevenueList,ecpmList,cpaList,cpaDivEcpmList,incomingList,
-                    ratioList,newUserEcpmList,newUserAvgImpList,newUserTagRevenueList;
+            List costList, purchasedUserList, installedList, uninstalledRateList, activeUserList,
+                    revenueList, newRevenueList, ecpmList, cpaList, cpaDivEcpmList, incomingList,
+                    ratioList, newUserEcpmList, newUserAvgImpList, newUserTagRevenueList;
 //            List oldUserAvgImpList;
-            Map<String,List> item = null;
-            String date,countryCode;
-            String split = " : ";int precision = 2;
-            long purchasedUser,installed,activeUser,totalUser;
+            Map<String, List> item = null;
+            String date, countryCode;
+            String split = " : ";
+            int precision = 2;
+            long purchasedUser, installed, activeUser, totalUser;
             double newUserImpression;
-            double sampleUser,newUserSampleImpression = 0;
+            double sampleUser, newUserSampleImpression = 0;
             double totalNewUser = 0;
-            double cost,uninstallRate,revenue,newRevenue,ecpm,cpa,cpaDivEcpm,incoming,
-                    recoveryCostRatio,newUserRevenue,newUserAvgImpression, newUserEcpm,newUserTagRevenue;
+            double cost, uninstallRate, revenue, newRevenue, ecpm, cpa, cpaDivEcpm, incoming,
+                    recoveryCostRatio, newUserRevenue, newUserAvgImpression, newUserEcpm, newUserTagRevenue;
 //            double oldUserAvgImpression;
 //            long oldUser;
             for (JSObject one : dataList) {
                 if (one.hasObjectData()) {
                     date = one.get("date").toString();
                     countryCode = one.get("country_code");
-                    initFloadDataItem(dataMap,countryCode);
+                    initFloadDataItem(dataMap, countryCode);
                     item = dataMap.get(countryCode);
                     costList = item.get("cost");
                     purchasedUserList = item.get("purchasedUser");
@@ -493,13 +501,13 @@ public class CountryAnalysisReport extends BaseHttpServlet {
 
                     ecpm = NumberUtil.convertDouble(one.get("ecpm"), 0);
                     cpa = NumberUtil.convertDouble(one.get("cpa"), 0);
-                    newUserEcpm = newUserSampleImpression > 0 ? newUserRevenue * 1000 / newUserSampleImpression : 0 ;
+                    newUserEcpm = newUserSampleImpression > 0 ? newUserRevenue * 1000 / newUserSampleImpression : 0;
 //                    newUserAvgImpression = installed > 0 ? newUserImpression / installed : 0;//新用户平均展示
                     // 新用户平均展示次数=新用户展示/用户数
                     newUserAvgImpression = sampleUser > 0 ? newUserSampleImpression / sampleUser : 0; //新用户平均展示
 //                    oldUserAvgImpression = oldUser > 0 ? oldUserImpression / oldUser : 0;//老用户平均展示
                     // 总的新用户收入=抽样新用户收入+非抽样新用户数*抽样新用户人均广告数*统一ecpm / 1000;
-                    newRevenue = NumberUtil.trimDouble(newUserRevenue + (totalNewUser - sampleUser) * newUserAvgImpression * ecpm / 1000,2);
+                    newRevenue = NumberUtil.trimDouble(newUserRevenue + (totalNewUser - sampleUser) * newUserAvgImpression * ecpm / 1000, 2);
 //                    newRevenue = NumberUtil.trimDouble(totalNewUser * newUserAvgImpression * ecpm / 1000,2);
 
                     //当日变现能力（单个新用户）= 新用户人均展示数*老ECPM/1000
@@ -510,43 +518,43 @@ public class CountryAnalysisReport extends BaseHttpServlet {
                     //当天回本率=newRevenue/总花费
                     recoveryCostRatio = cost > 0 ? newRevenue / cost : 0;
 
-                    costList.add(date + split + NumberUtil.trimDouble(cost,precision) );
-                    purchasedUserList.add(date + split + purchasedUser );
-                    installedList.add(date + split + installed );
-                    uninstalledRateList.add(date + split + NumberUtil.trimDouble(uninstallRate, precision) );
-                    activeUserList.add(date + split + activeUser );
-                    revenueList.add(date + split + NumberUtil.trimDouble(revenue,precision) );
-                    newRevenueList.add(date + split + NumberUtil.trimDouble(newRevenue,precision) );
-                    ecpmList.add(date + split +  NumberUtil.trimDouble(ecpm, 3) );
-                    cpaList.add(date + split + NumberUtil.trimDouble(cpa, 3) );
-                    cpaDivEcpmList.add(date + split + NumberUtil.trimDouble(cpaDivEcpm, 3) );
-                    incomingList.add(date + split + NumberUtil.trimDouble(incoming, precision) );
+                    costList.add(date + split + NumberUtil.trimDouble(cost, precision));
+                    purchasedUserList.add(date + split + purchasedUser);
+                    installedList.add(date + split + installed);
+                    uninstalledRateList.add(date + split + NumberUtil.trimDouble(uninstallRate, precision));
+                    activeUserList.add(date + split + activeUser);
+                    revenueList.add(date + split + NumberUtil.trimDouble(revenue, precision));
+                    newRevenueList.add(date + split + NumberUtil.trimDouble(newRevenue, precision));
+                    ecpmList.add(date + split + NumberUtil.trimDouble(ecpm, 3));
+                    cpaList.add(date + split + NumberUtil.trimDouble(cpa, 3));
+                    cpaDivEcpmList.add(date + split + NumberUtil.trimDouble(cpaDivEcpm, 3));
+                    incomingList.add(date + split + NumberUtil.trimDouble(incoming, precision));
 
-                    ratioList.add(date + split + NumberUtil.trimDouble(recoveryCostRatio,3));
-                    newUserEcpmList.add(date + split + NumberUtil.trimDouble(newUserEcpm,4));
-                    newUserAvgImpList.add(date + split + NumberUtil.trimDouble(newUserAvgImpression,4));
+                    ratioList.add(date + split + NumberUtil.trimDouble(recoveryCostRatio, 3));
+                    newUserEcpmList.add(date + split + NumberUtil.trimDouble(newUserEcpm, 4));
+                    newUserAvgImpList.add(date + split + NumberUtil.trimDouble(newUserAvgImpression, 4));
 //                    oldUserAvgImpList.add(date + split + NumberUtil.trimDouble(oldUserAvgImpression,4));
                     //当日变现能力
-                    newUserTagRevenueList.add(date + split + NumberUtil.trimDouble(newUserTagRevenue,4) + " = " + NumberUtil.trimDouble(newUserEcpm,4) +" * "+ NumberUtil.trimDouble(newUserAvgImpression,4) +" / "+ 1000);
+                    newUserTagRevenueList.add(date + split + NumberUtil.trimDouble(newUserTagRevenue, 4) + " = " + NumberUtil.trimDouble(newUserEcpm, 4) + " * " + NumberUtil.trimDouble(newUserAvgImpression, 4) + " / " + 1000);
                 }
             }
 
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
         return dataMap;
     }
 
-    private static void initFloadDataItem(Map<String,Map<String,List>> dataMap,String countryCode){
-        List costList,purchasedUserList,installedList,uninstalledRateList,activeUserList,
-                revenueList,newRevenueList,ecpmList,cpaList,cpaDivEcpmList,incomingList,
-                ratioList,newUserEcpmList,newUserAvgImpList,newUserTagRevenueList;
-        Map<String,List> item = null;
+    private static void initFloadDataItem(Map<String, Map<String, List>> dataMap, String countryCode) {
+        List costList, purchasedUserList, installedList, uninstalledRateList, activeUserList,
+                revenueList, newRevenueList, ecpmList, cpaList, cpaDivEcpmList, incomingList,
+                ratioList, newUserEcpmList, newUserAvgImpList, newUserTagRevenueList;
+        Map<String, List> item = null;
 //        List oldUserAvgImpList;
         item = dataMap.get(countryCode);
-        if (null == item){
-            item = new HashMap<String,List>();
+        if (null == item) {
+            item = new HashMap<String, List>();
             costList = new ArrayList();
             purchasedUserList = new ArrayList();
             installedList = new ArrayList();
@@ -564,32 +572,32 @@ public class CountryAnalysisReport extends BaseHttpServlet {
 //            oldUserAvgImpList = new ArrayList();
             newUserTagRevenueList = new ArrayList();//当日变现能力
 
-            item.put("cost",costList);
-            item.put("purchasedUser",purchasedUserList);
-            item.put("installed",installedList);
-            item.put("uninstalledRate",uninstalledRateList);
-            item.put("activeUser",activeUserList);
-            item.put("revenue",revenueList);
-            item.put("newRevenue",newRevenueList);
-            item.put("ecpm",ecpmList);
-            item.put("cpa",cpaList);
-            item.put("cpaDivEcpm",cpaDivEcpmList);
-            item.put("incoming",incomingList);
+            item.put("cost", costList);
+            item.put("purchasedUser", purchasedUserList);
+            item.put("installed", installedList);
+            item.put("uninstalledRate", uninstalledRateList);
+            item.put("activeUser", activeUserList);
+            item.put("revenue", revenueList);
+            item.put("newRevenue", newRevenueList);
+            item.put("ecpm", ecpmList);
+            item.put("cpa", cpaList);
+            item.put("cpaDivEcpm", cpaDivEcpmList);
+            item.put("incoming", incomingList);
 
-            item.put("recoveryCostRatio",ratioList);//回本率
-            item.put("newUserEcpm",newUserEcpmList);
-            item.put("newUserAvgImpression",newUserAvgImpList);
+            item.put("recoveryCostRatio", ratioList);//回本率
+            item.put("newUserEcpm", newUserEcpmList);
+            item.put("newUserAvgImpression", newUserAvgImpList);
 //            item.put("oldUserAvgImpression",oldUserAvgImpList);
-            item.put("newUserTagRevenue",newUserTagRevenueList);
+            item.put("newUserTagRevenue", newUserTagRevenueList);
 
-            dataMap.put(countryCode,item);
+            dataMap.put(countryCode, item);
         }
     }
 
     /**
      * 国家花费上限修改
      */
-    private static JsonObject editCountryMaxCost(HttpServletRequest request,Map<String, Long> tagNameIdMap){
+    private static JsonObject editCountryMaxCost(HttpServletRequest request, Map<String, Long> tagNameIdMap) {
         JsonObject jsonObject = new JsonObject();
         String cost_array = request.getParameter("cost_array");
         String app_name = request.getParameter("app_name");
@@ -608,7 +616,7 @@ public class CountryAnalysisReport extends BaseHttpServlet {
                 if (one.hasObjectData() && "".equals(cost)) {//删除
                     long id = one.get("id");
                     DB.delete("web_ad_rules").where(DB.filter().whereEqualTo("id", id)).execute();
-                }else if(one.hasObjectData() && !"".equals(cost)){//更新
+                } else if (one.hasObjectData() && !"".equals(cost)) {//更新
                     long id = one.get("id");
                     String rule_content = one.get("rule_content");
                     String newLine = rule_content.replaceAll("cost>\\d*", "cost>" + cost);
@@ -616,7 +624,7 @@ public class CountryAnalysisReport extends BaseHttpServlet {
                             .put("rule_content", newLine)
                             .where(DB.filter().whereEqualTo("id", id))
                             .execute();
-                } else if(!one.hasObjectData() && !"".equals(cost)) {//数据库查询无值，并且设置了cost，则为插入新规则
+                } else if (!one.hasObjectData() && !"".equals(cost)) {//数据库查询无值，并且设置了cost，则为插入新规则
                     Long tagId = tagNameIdMap.get(app_name);
                     String ruleContent = "app_name=" + app_name + ",country_code=" + countryCode + ",cpa_div_ecpm>0.2,cost>" + cost;
                     if (tagId == null || tagId == 0L) {
@@ -651,11 +659,12 @@ public class CountryAnalysisReport extends BaseHttpServlet {
 
     /**
      * app国家 期望cpa、ecpm、用户广告展示次数
+     *
      * @param request
      * @param tagNamePackageIdMap
      * @return
      */
-    private static JsonObject editAppCountryTarget(HttpServletRequest request,Map<String, String> tagNamePackageIdMap) {
+    private static JsonObject editAppCountryTarget(HttpServletRequest request, Map<String, String> tagNamePackageIdMap) {
         JsonObject jsonObject = new JsonObject();
 
         String tagArray = request.getParameter("tag_array");
@@ -665,15 +674,16 @@ public class CountryAnalysisReport extends BaseHttpServlet {
         JsonParser parser = new JsonParser();
         JsonArray dataArray = parser.parse(tagArray).getAsJsonArray();
 
-        if(null == appId || "".equals(appId) || dataArray.size() == 0){
+        if (null == appId || "".equals(appId) || dataArray.size() == 0) {
             jsonObject.addProperty("ret", 0);
             jsonObject.addProperty("message", "app_name参数错误，或未传入待修改的值");
             return jsonObject;
         }
 
         List<String> sqlList = new ArrayList<String>();
-        JsonObject jsonItem = null;String itemStr;
-        Double tagCpa,tagEcpm,tagImpression;
+        JsonObject jsonItem = null;
+        String itemStr;
+        Double tagCpa, tagEcpm, tagImpression;
         String sql = null;
         for (int i = 0; i < dataArray.size(); i++) {//countryCode
             jsonItem = dataArray.get(i).getAsJsonObject();
@@ -685,18 +695,18 @@ public class CountryAnalysisReport extends BaseHttpServlet {
             itemStr = jsonItem.get("tagImpression").getAsString();
             tagImpression = "".equals(itemStr) ? null : jsonItem.get("tagImpression").getAsDouble();
             sql = "REPLACE INTO web_ad_app_country_target (tag_name,country_code,app_id,cpa,ecpm,avg_impression) "
-                    + " values('"+ app_name + "','"+ countryCode + "','" + appId + "'," + tagCpa + "," + tagEcpm + "," + tagImpression + ")";
+                    + " values('" + app_name + "','" + countryCode + "','" + appId + "'," + tagCpa + "," + tagEcpm + "," + tagImpression + ")";
             sqlList.add(sql);
         }
 
         try {
-            if(sqlList.size() > 0){
+            if (sqlList.size() > 0) {
                 MySqlHelper helper = new MySqlHelper();
                 helper.excuteBatch2DB(sqlList);//执行更新
             }
             jsonObject.addProperty("ret", 1);
             jsonObject.addProperty("message", "期望值更新成功");
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             jsonObject.addProperty("ret", 0);
             jsonObject.addProperty("message", e.getMessage());
@@ -709,19 +719,20 @@ public class CountryAnalysisReport extends BaseHttpServlet {
 
     /**
      * 获取标签名称与ID的Map
+     *
      * @return
      * @throws Exception
      */
-    private static Map<String,Long> getTagNameIdMap() {
-        Map<String,Long> map = new HashMap<>();
+    private static Map<String, Long> getTagNameIdMap() {
+        Map<String, Long> map = new HashMap<>();
         List<JSObject> list = null;
         try {
             list = DB.findListBySql("SELECT id,tag_name FROM web_tag");
-            for (int i = 0,len = list.size();i<len;i++) {
+            for (int i = 0, len = list.size(); i < len; i++) {
                 JSObject js = list.get(i);
                 long id = js.get("id");
                 String tagName = js.get("tag_name");
-                map.put(tagName,id);
+                map.put(tagName, id);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -731,18 +742,19 @@ public class CountryAnalysisReport extends BaseHttpServlet {
 
     /**
      * 获取标签名称与包ID（appID）的Map
+     *
      * @return
      */
-    private static Map<String,String> getTagNamePackageIdMap() {
-        Map<String,String> map = new HashMap<>();
+    private static Map<String, String> getTagNamePackageIdMap() {
+        Map<String, String> map = new HashMap<>();
         List<JSObject> list = null;
         try {
             list = DB.findListBySql("SELECT tag_name,google_package_id FROM web_facebook_app_ids_rel");
-            for (int i = 0,len = list.size();i<len;i++) {
+            for (int i = 0, len = list.size(); i < len; i++) {
                 JSObject js = list.get(i);
                 String tagName = js.get("tag_name");
                 String googlePackageId = js.get("google_package_id");
-                map.put(tagName,googlePackageId);
+                map.put(tagName, googlePackageId);
             }
         } catch (Exception e) {
             e.printStackTrace();
