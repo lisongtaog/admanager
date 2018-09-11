@@ -147,7 +147,7 @@
 
     $("#btn_add_new_rule").click(function () {
         document.getElementById("modify_form").reset();
-        $('#inputRuleContent').val("campaign_id=xxx,conversions>xxx,cpa>xxx")
+        $('#inputRuleContent').val("appName=VpnV10,countryCode=US,costDivBudget>0.9,budget+=cpa*40")
         modifyType = 'new';
         $('#delete_message').hide();
         $('#inputSearchDiv').show();
@@ -161,7 +161,7 @@
         var ruleContent = $('#inputRuleContent').val();
         var ruleType = $('#inputRuleType').val();
         if (ruleType == 1) {
-            $('#inputRuleContent').val("campaign_id=xxx,conversions>xxx,cpa>xxx")
+            $('#inputRuleContent').val("appName=VpnV10,countryCode=US,costDivBudget>0.9,budget+=cpa*40")
         } else if (ruleType == 2) {//是应用维度    app_name=应用名称,cost>花费数字,cpa>cpa值
             $('#inputRuleContent').val("app_name=xxx,cost>xxx,cpa>xxx")
         } else if (ruleType == 3) {//是应用+国家维度 app_name=应用名称,country_code=国家代号,cpa_div_ecpm>cpa除以ecpm,cost>花费
@@ -195,10 +195,7 @@
         var checkFlag = true;
 
         if (ruleType == 1) {
-            if (!checkNum(rule["conversions"]) || !checkNum(rule["cpa"])) {
-                checkFlag = false;
-                alert("conversions、cpa 必须为正数数字");
-            }
+
         } else if (ruleType == 2) {//是应用维度    app_name=应用名称,cost>花费数字,cpa>cpa值
             if (!checkNum(rule["cost"]) || !checkNum(rule["cpa"])) {
                 checkFlag = false;
