@@ -250,6 +250,8 @@
                     <%--设置 出价 平均费用--%>
                     <option value="2">LOWEST_COST_WITH_BID_CAP</option>
                     <%--需要 设置竞价上限--%>
+                    <option value="3">LOWEST_COST_WITHOUT_CAP</option>
+                    <%--无上限--%>
                 </select>
             </div>
         </div>
