@@ -193,10 +193,14 @@
 //                "activeUser","revenue", "newRevenue","sample_user","total_new_user","recoveryCostRatio","incoming", "ecpm","cpa","tag_cpa",
 //                 "newUserEcpm","tag_ecpm","newUserAvgImpression","tag_impression","newUserTagRevenue",
 //                "first_day_revenue","second_day_revenue","third_day_revenue","fourth_day_revenue","bidding_summary"];
+//             keyset = ["costs", "cost_upper_limit", "purchasedUser", "installed", "uninstalledRate",
+//                 "activeUser", "revenue", "incoming", "cpa", "ecpm", "cpa_div_ecpm", "newRevenue", "recoveryCostRatio", "new_user_revenues",
+//                 "newUserEcpm", "newUserAvgImpression", "sample_user", "total_new_user", "newUserTagRevenue",
+//                 "first_day_revenue", "second_day_revenue", "third_day_revenue", "fourth_day_revenue", "seven_days_ltv", "fourteen_days_ltv", "bidding_summary"];
             keyset = ["costs", "cost_upper_limit", "purchasedUser", "installed", "uninstalledRate",
                 "activeUser", "revenue", "incoming", "cpa", "ecpm", "cpa_div_ecpm", "newRevenue", "recoveryCostRatio", "new_user_revenues",
                 "newUserEcpm", "newUserAvgImpression", "sample_user", "total_new_user", "newUserTagRevenue",
-                "first_day_revenue", "second_day_revenue", "third_day_revenue", "fourth_day_revenue", "seven_days_ltv", "fourteen_days_ltv", "bidding_summary"];
+                "seven_days_ltv", "fourteen_days_ltv", "bidding_summary"];
         }
 
 
@@ -330,10 +334,10 @@
                 + '    <th>抽样<br>用户</th>'
                 + '    <th>总的<br>新用户</th>'
                 + '    <th title="老Ecpm * 新用户平均展示 / 1000">当日变现能力</th>'
-                + '    <th>1Day<br>Revenue</th>'
-                + '    <th>2Day<br>Revenue</th>'
-                + '    <th>3Day<br>Revenue</th>'
-                + '    <th>4Day<br>Revenue</th>'
+                // + '    <th>1Day<br>Revenue</th>'
+                // + '    <th>2Day<br>Revenue</th>'
+                // + '    <th>3Day<br>Revenue</th>'
+                // + '    <th>4Day<br>Revenue</th>'
                 + '    <th>7Day<br>&nbsp;LTV</th>'
                 + '    <th>14Day<br>&nbsp;&nbsp;LTV</th>'
                 + '    <th>竞价</th>'
