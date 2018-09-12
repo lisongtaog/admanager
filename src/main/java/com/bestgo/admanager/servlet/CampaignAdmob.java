@@ -2,6 +2,7 @@ package com.bestgo.admanager.servlet;
 
 import com.bestgo.admanager.Config;
 import com.bestgo.admanager.OperationResult;
+import com.bestgo.admanager.utils.DateUtil;
 import com.bestgo.admanager.utils.NumberUtil;
 import com.bestgo.admanager.utils.Utils;
 import com.bestgo.admanager_tools.AdWordsFetcher;
@@ -355,7 +356,10 @@ public class CampaignAdmob extends BaseHttpServlet {
             json.addProperty("message", result.message);
         } else if (path.startsWith("/update")) {
             String id = request.getParameter("id");
+            String campaignId = request.getParameter("campaignId");
             String tags = request.getParameter("tags");
+            String  region = request.getParameter("selectRegionAdmob");
+            String selectRegion = region == null ? "" : region;
 
             OperationResult result = new OperationResult();
             if (id != null) {
@@ -363,13 +367,19 @@ public class CampaignAdmob extends BaseHttpServlet {
                     String sql = "SELECT id FROM web_tag WHERE tag_name = '" + tags + "'";
                     JSObject one = DB.findOneBySql(sql);
                     if (one.hasObjectData()) {
+
                         long tagId = one.get("id");
-                        sql = "UPDATE web_ad_campaigns_admob SET tag_id = " + tagId + " WHERE id = " + id;
+                        sql = "UPDATE web_ad_campaigns_admob SET tag_id = " + tagId + ", country_code = '" + selectRegion + "' WHERE id = " + id;
                         boolean b = DB.updateBySql(sql);
                         if (b) {
-                            result.result = true;
-                            result.message = "更新成功！";
+                            sql = "UPDATE web_ad_campaigns_history_admob SET tag_id = " + tagId + ", country_code = '" + selectRegion + "' WHERE campaign_id = '" + campaignId + "'";
+                            b = DB.updateBySql(sql);
+                            if (b) {
+                                result.result = true;
+                                result.message = "更新成功！";
+                            }
                         }
+
                     } else {
                         result.result = false;
                         result.message = "没有在web_tag表找到这个应用！";
@@ -460,6 +470,8 @@ public class CampaignAdmob extends BaseHttpServlet {
                 json.add("data", array);
             }
         } else if (path.startsWith("/fetch_campaigns_not_exist_tag")) {
+            String today = DateUtil.getNowDate();
+            String tenDaysAgo = DateUtil.addDay(today, -10, "yyyy-MM-dd");//十天前
             JsonArray array = new JsonArray();
 //            String sqlCampaignIds = "select campaign_id from web_ad_campaign_tag_admob_rel";
 //
@@ -482,9 +494,9 @@ public class CampaignAdmob extends BaseHttpServlet {
 //                    allStr += j + ",";
 //                }
 //                allStr = allStr.substring(0,allStr.length()-1);
-                String sqlFilterAll = "select id,campaign_id,campaign_name,account_id,create_time,status,budget,bidding," +
-                        "total_spend,total_click,total_installed,total_impressions,cpa,ctr from web_ad_campaigns_admob " +
-                        "where tag_id = 0";
+                String sqlFilterAll = "SELECT id,campaign_id,campaign_name,account_id,create_time,STATUS,budget,bidding,total_spend,total_click,total_installed,total_impressions,cpa,ctr,tag_id,country_code\n" +
+                        "\tFROM web_ad_campaigns_admob \n" +
+                        "\t\tWHERE create_time > '" + tenDaysAgo + "' AND  (tag_id = 0 OR country_code = '')";
                 List<JSObject> data = DB.findListBySql(sqlFilterAll);
                 if (data != null) {
                     for (int i = 0, len = data.size(); i < len; i++) {
@@ -492,6 +504,11 @@ public class CampaignAdmob extends BaseHttpServlet {
                         Set<String> keySet = data.get(i).getKeys();
                         for (String key : keySet) {
                             Object value = data.get(i).get(key);
+
+                            if ("tag_id".equalsIgnoreCase(key) && !"0".equalsIgnoreCase(value.toString())) {
+                                value = selTagName(value.toString());
+                            }
+
                             if (value instanceof String) {
                                 one.addProperty(key, (String) value);
                             } else if (value instanceof Integer) {
@@ -656,7 +673,7 @@ public class CampaignAdmob extends BaseHttpServlet {
         List<JSObject> list = new ArrayList<>();
         try {
             return DB.scan("web_ad_campaigns_admob").select("id", "campaign_id", "campaign_name", "account_id", "create_time",
-                    "status", "budget", "bidding", "total_spend", "total_installed", "total_click", "cpa", "ctr")
+                    "status", "budget", "bidding", "total_spend", "total_installed", "total_click", "cpa", "ctr", "country_code")
                     .limit(size).start(index * size).orderByAsc("id").execute();
         } catch (Exception ex) {
             Logger logger = Logger.getRootLogger();
@@ -744,6 +761,20 @@ public class CampaignAdmob extends BaseHttpServlet {
             e.printStackTrace();
         }
         return 0;
+    }
+
+    public static String selTagName(String tag_id) {
+        ArrayList<String> retList = new ArrayList<>();
+        String tag_name = "";
+        String sql = "SELECT tag_name FROM web_tag WHERE id = " + tag_id;
+        try {
+            JSObject oneBySql = DB.findOneBySql(sql);
+            tag_name = oneBySql.get("tag_name");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return tag_name;
     }
 
 }

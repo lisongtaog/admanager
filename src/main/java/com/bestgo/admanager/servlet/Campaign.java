@@ -22,6 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.lang.System;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static com.bestgo.admanager_tools.FacebookAccountBalanceFetcher.deleteFBCampaignMultipleConditions;
@@ -149,7 +150,6 @@ public class Campaign extends BaseHttpServlet {
                 DB.init();
 
 
-
                 //删除系列个数统计
                 if (accountIds.length > 1) {
                     for (int i = 0; i < accountIds.length; i++) {
@@ -269,7 +269,7 @@ public class Campaign extends BaseHttpServlet {
                         JSObject one = DB.findOneBySql("select max_bidding from web_tag where tag_name = '" + appName + "'");
                         if (one.hasObjectData()) {
                             maxBidding = NumberUtil.convertDouble(one.get("max_bidding"), 0);
-                            jedis.hset("tagNameBiddingMap",appName,maxBidding + "");
+                            jedis.hset("tagNameBiddingMap", appName, maxBidding + "");
                         }
                     } else {
                         maxBidding = NumberUtil.parseDouble(maxBiddingStr, 0);
@@ -414,7 +414,10 @@ public class Campaign extends BaseHttpServlet {
             json.addProperty("warning", result.warning); //目前仅在Media导致的系列创建后又删除下有用
         } else if (path.startsWith("/update")) {
             String id = request.getParameter("id");
+            String campaignId = request.getParameter("campaignId");
             String tags = request.getParameter("tags");
+            String  region = request.getParameter("selectRegion");
+            String selectRegion = region == null ? "" : region;
 
             OperationResult result = new OperationResult();
             if (id != null) {
@@ -423,11 +426,15 @@ public class Campaign extends BaseHttpServlet {
                     JSObject one = DB.findOneBySql(sql);
                     if (one.hasObjectData()) {
                         long tagId = one.get("id");
-                        sql = "UPDATE web_ad_campaigns SET tag_id = " + tagId + " WHERE id = " + id;
+                        sql = "UPDATE web_ad_campaigns SET tag_id = " + tagId + ", country_code = '" + selectRegion + "' WHERE id = " + id;
                         boolean b = DB.updateBySql(sql);
                         if (b) {
-                            result.result = true;
-                            result.message = "更新成功！";
+                            sql = "UPDATE web_ad_campaigns_history SET tag_id = " + tagId + ", country_code = '" + selectRegion + "' WHERE campaign_id = '" + campaignId + "'";
+                            DB.updateBySql(sql);
+                            if (b) {
+                                result.result = true;
+                                result.message = "更新成功！";
+                            }
                         }
                     } else {
                         result.result = false;
@@ -591,10 +598,13 @@ public class Campaign extends BaseHttpServlet {
                 json.add("data", array);
             }
         } else if (path.startsWith("/fetch_not_exist_tag_campaigns")) {
+            String today = DateUtil.getNowDate();
+            String tenDaysAgo = DateUtil.addDay(today, -10, "yyyy-MM-dd");//十天前
             JsonArray array = new JsonArray();
             try {
-                String sqlFilterAll = "select id,campaign_id,adset_id,account_id,campaign_name,create_time,status,budget,bidding," +
-                        "total_spend,total_click,total_installed,cpa,ctr,effective_status from web_ad_campaigns where tag_id = 0 ";
+                String sqlFilterAll = "SELECT id,campaign_id,adset_id,account_id,campaign_name,create_time,STATUS,budget,bidding,total_spend,total_click,total_installed,cpa,ctr,effective_status,tag_id,country_code \n" +
+                        "FROM web_ad_campaigns \n" +
+                        "WHERE create_time > '" + tenDaysAgo + "' AND  (tag_id = 0 OR country_code = '')";
                 List<JSObject> data = DB.findListBySql(sqlFilterAll);
                 if (data != null) {
                     for (int i = 0, len = data.size(); i < len; i++) {
@@ -602,6 +612,11 @@ public class Campaign extends BaseHttpServlet {
                         Set<String> keySet = data.get(i).getKeys();
                         for (String key : keySet) {
                             Object value = data.get(i).get(key);
+
+                            if ("tag_id".equalsIgnoreCase(key) && !"0".equalsIgnoreCase(value.toString())) {
+                                value = selTagName(value.toString());
+                            }
+
                             if (value instanceof String) {
                                 one.addProperty(key, (String) value);
                             } else if (value instanceof Integer) {
@@ -687,7 +702,7 @@ public class Campaign extends BaseHttpServlet {
                         JSObject one = DB.findOneBySql("select max_bidding from web_tag where tag_name = '" + appName + "'");
                         if (one.hasObjectData()) {
                             maxBidding = NumberUtil.convertDouble(one.get("max_bidding"), 0);
-                            jedis.hset("tagNameBiddingMap",appName,maxBidding + "");
+                            jedis.hset("tagNameBiddingMap", appName, maxBidding + "");
                         }
                     } else {
                         maxBidding = NumberUtil.parseDouble(maxBiddingStr, 0);
@@ -778,7 +793,7 @@ public class Campaign extends BaseHttpServlet {
                 }
                 if (one.hasObjectData()) {
                     maxBiddingStr = NumberUtil.convertDouble(one.get("max_bidding"), 0) + "";
-                    jedis.hset("tagNameBiddingMap",appName,maxBiddingStr);
+                    jedis.hset("tagNameBiddingMap", appName, maxBiddingStr);
                 }
             }
             if (maxBiddingStr != null) {
@@ -964,7 +979,7 @@ public class Campaign extends BaseHttpServlet {
         List<JSObject> list = new ArrayList<>();
         try {
             return DB.scan("web_ad_campaigns").select("id", "campaign_id", "adset_id", "account_id", "campaign_name", "create_time",
-                    "status", "budget", "bidding", "total_spend", "total_installed", "total_click", "cpa", "ctr")
+                    "status", "budget", "bidding", "total_spend", "total_installed", "total_click", "cpa", "ctr", "country_code")
                     .where(DB.filter().whereLikeTo("campaign_name", "%" + word + "%")).or(DB.filter().whereEqualTo("campaign_id", word)).orderByAsc("id").execute();
         } catch (Exception ex) {
             Logger logger = Logger.getRootLogger();
@@ -977,7 +992,7 @@ public class Campaign extends BaseHttpServlet {
         List<JSObject> list = new ArrayList<>();
         try {
             return DB.scan("web_ad_campaigns").select("id", "campaign_id", "adset_id", "account_id", "campaign_name", "create_time",
-                    "status", "budget", "bidding", "total_spend", "total_installed", "total_click", "cpa", "ctr")
+                    "status", "budget", "bidding", "total_spend", "total_installed", "total_click", "cpa", "ctr", "country_code")
                     .limit(size).start(index * size).orderByAsc("id").execute();
         } catch (Exception ex) {
             Logger logger = Logger.getRootLogger();
@@ -1020,6 +1035,20 @@ public class Campaign extends BaseHttpServlet {
             e.printStackTrace();
         }
         return retList;
+    }
+
+    public static String selTagName(String tag_id) {
+        ArrayList<String> retList = new ArrayList<>();
+        String tag_name = "";
+        String sql = "SELECT tag_name FROM web_tag WHERE id = " + tag_id;
+        try {
+            JSObject oneBySql = DB.findOneBySql(sql);
+            tag_name = oneBySql.get("tag_name");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return tag_name;
     }
 
     /**
