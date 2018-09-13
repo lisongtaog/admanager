@@ -251,7 +251,7 @@ public class Campaign extends BaseHttpServlet {
                     result.message = "广告系列名称不能为空";
                 } else if (bugdet.isEmpty()) {
                     result.message = "预算不能为空";
-                } else if (bidding.isEmpty()) {
+                } else if (bidding.isEmpty() && !"3".equals(bidStrategy)) {
                     result.message = "出价不能为空";
                 } else if (bidding.indexOf(" ") != -1) {
                     result.message = "出价不能包含空格！";
@@ -325,6 +325,9 @@ public class Campaign extends BaseHttpServlet {
                     String accountNameArrStr = accountName.replace(",", "");
                     accountIdArr = accountId.split(",");
                     int createCountInt = NumberUtil.parseInt(createCount, 0);
+                    if ("3".equals(bidStrategy)){
+                        bidding = "0";
+                    }
                     for (int j = 0, len = accountNameArr.length; j < len; j++) {
                         for (int i = 0; i < createCountInt; i++) {
                             String now = String.format("%d-%02d-%02d %02d:%02d:%02d", calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH),
@@ -335,6 +338,7 @@ public class Campaign extends BaseHttpServlet {
                             if (campaignName.length() > 150) {
                                 campaignName = campaignName.substring(0, 150);
                             }
+
                             long genId = DB.insert("ad_campaigns")
                                     .put("facebook_app_id", appId)
                                     .put("account_id", accountIdArr[j])
