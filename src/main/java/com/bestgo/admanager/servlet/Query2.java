@@ -29,20 +29,20 @@ public class Query2 extends BaseHttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         doPost(request, response);
     }
-
+  42342342342342342342342
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 //        String[] fourteen_arr = null;
         super.doPost(request, response);
         if (!Utils.isAdmin(request, response)) return;
 
-        JsonObject json = new JsonObject();
+        JsonObject json = new JsonObject();4234234234234
 
         //开始日期
         String startTime = request.getParameter("startTime");
 
         //结束日期
-        String endTime = request.getParameter("endTime");
+        String endTime = request.getParameter("endTime");4234234234234
 
         //判断开始日期和结束日期是否相同，默认为不同
         boolean sameTime = false;
@@ -85,7 +85,7 @@ public class Query2 extends BaseHttpServlet {
                     }else if("true".equals(adwordsCheck)){
                         JsonObject admob = fetchOneAppDataSummary(id, startTime, endTime, true,sameTime);
                         appBean.total_impressions = admob.get("total_impressions").getAsDouble();
-                        if (appBean.total_impressions == 0) {
+                        if (appBean.total_impressions == 0) {42342342342423
                             continue;
                         }
                         appBean.total_spend = admob.get("total_spend").getAsDouble();
