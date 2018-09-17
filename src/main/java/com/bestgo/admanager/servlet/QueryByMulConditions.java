@@ -71,7 +71,9 @@ public class QueryByMulConditions extends BaseHttpServlet {
 
         String likeCampaignName = request.getParameter("likeCampaignName");
         HashMap<String, String> countryMap = Utils.getCountryCodeNameMap();
-
+        JsonArray newArr = new JsonArray();
+        JsonArray jsonArray = new JsonArray();
+        JsonArray array = null;
         try {
             JSObject tagObject = DB.simpleScan("web_tag")
                     .select("id", "tag_name")
@@ -83,7 +85,6 @@ public class QueryByMulConditions extends BaseHttpServlet {
                     countryCheck = "false";
                 }
 
-                JsonArray array = null;
                 double total_spend = 0;
                 double total_installed = 0;
                 double total_impressions = 0;
@@ -492,7 +493,6 @@ public class QueryByMulConditions extends BaseHttpServlet {
                                 });
                                 break;
                         }
-                        JsonArray jsonArray = new JsonArray();
 
                         for (Campaigns c : campaignsList) {
                             JsonObject j = new JsonObject();
@@ -542,7 +542,6 @@ public class QueryByMulConditions extends BaseHttpServlet {
                         record.click += one.get("click").getAsDouble();
                         record.spend += one.get("spend").getAsDouble();
                     }
-                    JsonArray newArr = new JsonArray();
                     if (sorter > 0) {
                         List<CountryRecord> countryRecordList = new ArrayList<>();
                         for (String key : dataSets.keySet()) {
@@ -846,6 +845,10 @@ public class QueryByMulConditions extends BaseHttpServlet {
             json.addProperty("message", ex.getMessage());
             Logger logger = Logger.getRootLogger();
             logger.error(ex.getMessage(), ex);
+        } finally {
+            newArr = null;
+            jsonArray = null;
+            array = null;
         }
         response.getWriter().write(json.toString());
     }
@@ -1065,24 +1068,6 @@ public class QueryByMulConditions extends BaseHttpServlet {
                 String campaignId = one.get("campaign_id");
                 double spend = NumberUtil.convertDouble(one.get("spend"), 0);
                 double cpa = NumberUtil.convertDouble(one.get("cpa"), 0);
-
-                //目前只有Adwords能收集到unRate和openRate
-//                if(admobCheck){
-//                    String sqlQuery = "SELECT un_rate,open_rate FROM web_ad_campaign_un_rate_open_rate_admob " +
-//                            "WHERE campaign_id = '" + campaignId + "' AND date = '" + beforeThreeDays + "'";
-//                    JSObject oneQ = DB.findOneBySql(sqlQuery);
-//                    if(oneQ.hasObjectData()){
-//
-//                        //系列卸载率 = 系列卸载数量 / 系列安装数量
-//                        double unRate = Utils.convertDouble(oneQ.get("un_rate"),0);
-//                        d.addProperty("un_rate", Utils.trimDouble(unRate,3));
-//
-//                        //系列开启率 = 系列安装数量 / 系列总安装
-//                        double openRate = Utils.convertDouble(oneQ.get("open_rate"),0);
-//                        d.addProperty("open_rate", Utils.trimDouble(openRate,3));
-//                    }
-//                }
-
                 String short_name = one.get("short_name");
                 String account_id = one.get("account_id");
                 String campaign_name = one.get("campaign_name");
