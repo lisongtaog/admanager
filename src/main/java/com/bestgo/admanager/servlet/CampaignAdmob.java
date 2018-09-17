@@ -3,6 +3,7 @@ package com.bestgo.admanager.servlet;
 import com.bestgo.admanager.Config;
 import com.bestgo.admanager.OperationResult;
 import com.bestgo.admanager.utils.DateUtil;
+import com.bestgo.admanager.utils.JedisPoolUtil;
 import com.bestgo.admanager.utils.NumberUtil;
 import com.bestgo.admanager.utils.Utils;
 import com.bestgo.admanager_tools.AdWordsFetcher;
@@ -12,6 +13,7 @@ import com.bestgo.common.database.utils.JSObject;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import org.apache.log4j.Logger;
+import redis.clients.jedis.Jedis;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -29,32 +31,11 @@ import static com.bestgo.admanager_tools.AdWordsFetcher.syncStatus;
  */
 @WebServlet(name = "CampaignAdMob", urlPatterns = "/campaign_admob/*")
 public class CampaignAdmob extends BaseHttpServlet {
-    public static Map<String, Double> tagMaxBiddingRelationMap;
-
-    static {
-        if (tagMaxBiddingRelationMap == null) {
-            tagMaxBiddingRelationMap = new HashMap<>();
-        }
-        String sql = "select tag_name,max_bidding from web_tag";
-        List<JSObject> list = null;
-        try {
-            list = DB.findListBySql(sql);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        if (list != null && list.size() > 0) {
-            for (JSObject j : list) {
-                String currTagName = j.get("tag_name");
-                double currMaxBidding = NumberUtil.convertDouble(j.get("max_bidding"), 0);
-                tagMaxBiddingRelationMap.put(currTagName, currMaxBidding);
-            }
-        }
-    }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         super.doPost(request, response);
         if (!Utils.isAdmin(request, response)) return;
-
+        Jedis jedis = JedisPoolUtil.getJedis();
         String path = request.getPathInfo();
         JsonObject json = new JsonObject();
         if (path.startsWith("/upCampaign")) {
@@ -238,19 +219,19 @@ public class CampaignAdmob extends BaseHttpServlet {
                     result.message = "国家不能为空";
                 } else {
                     double dBidding = NumberUtil.parseDouble(bidding, 0);
-                    Double maxBiddingDouble = tagMaxBiddingRelationMap.get(appName);
-                    if (maxBiddingDouble == null) {
+                    double maxBidding = 0.1;
+                    String maxBiddingStr = jedis.hget("tagNameBiddingMap", appName);
+                    if (maxBiddingStr == null) {
                         JSObject one = DB.findOneBySql("select max_bidding from web_tag where tag_name = '" + appName + "'");
-                        if (one != null && one.hasObjectData()) {
-                            maxBiddingDouble = NumberUtil.convertDouble(one.get("max_bidding"), 0);
-                            tagMaxBiddingRelationMap.put(appName, maxBiddingDouble);
+                        if (one.hasObjectData()) {
+                            maxBidding = NumberUtil.convertDouble(one.get("max_bidding"), 0);
+                            jedis.hset("tagNameBiddingMap", appName, maxBidding + "");
                         }
-                        if (maxBiddingDouble == null || maxBiddingDouble == 0) {
-                            maxBiddingDouble = 0.01;
-                        }
+                    } else {
+                        maxBidding = NumberUtil.parseDouble(maxBiddingStr, 0);
                     }
-                    if (maxBiddingDouble != null && maxBiddingDouble != 0 && dBidding > maxBiddingDouble) {
-                        result.message = "bidding超过了本应用的最大出价,   " + bidding + " > " + maxBiddingDouble;
+                    if (dBidding > maxBidding) {
+                        result.message = "bidding超过了本应用的最大出价,   " + bidding + " > " + maxBidding;
                     } else {
                         JSObject record = DB.simpleScan("web_system_config").select("config_value").where(DB.filter().whereEqualTo("config_key", "admob_image_path")).execute();
                         String imageRoot = "";
@@ -473,27 +454,7 @@ public class CampaignAdmob extends BaseHttpServlet {
             String today = DateUtil.getNowDate();
             String tenDaysAgo = DateUtil.addDay(today, -10, "yyyy-MM-dd");//十天前
             JsonArray array = new JsonArray();
-//            String sqlCampaignIds = "select campaign_id from web_ad_campaign_tag_admob_rel";
-//
-//            String sqlAll = "select campaign_id from web_ad_campaigns_admob";
-//            List<JSObject> data = new ArrayList<>();
             try {
-//                List<JSObject> campaignIdsList = DB.findListBySql(sqlCampaignIds);
-//                Set<String>  campaignIdsSet = new HashSet<>();
-//                for(JSObject j : campaignIdsList){
-//                    campaignIdsSet.add(j.get("campaign_id"));
-//                }
-//                List<JSObject> allList = DB.findListBySql(sqlAll);
-//                Set<String>  allSet = new HashSet<>();
-//                for(JSObject k : allList){
-//                    allSet.add(k.get("campaign_id"));
-//                }
-//                List<String> diffList = Utils.getDiffrentStrList(allSet, campaignIdsSet);
-//                String allStr = "";
-//                for(String j : diffList){
-//                    allStr += j + ",";
-//                }
-//                allStr = allStr.substring(0,allStr.length()-1);
                 String sqlFilterAll = "SELECT id,campaign_id,campaign_name,account_id,create_time,STATUS,budget,bidding,total_spend,total_click,total_installed,total_impressions,cpa,ctr,tag_id,country_code\n" +
                         "\tFROM web_ad_campaigns_admob \n" +
                         "\t\tWHERE create_time > '" + tenDaysAgo + "' AND  (tag_id = 0 OR country_code = '')";
@@ -559,26 +520,28 @@ public class CampaignAdmob extends BaseHttpServlet {
             }
         } else if (path.startsWith("/selectMaxBiddingByAppName")) {
             String appName = request.getParameter("appName");
-            try {
-                String sql = "select max_bidding from web_tag where tag_name = '" + appName + "'";
-                JSObject j = null;
+            String maxBiddingStr = jedis.hget("tagNameBiddingMap", appName);
+            if (maxBiddingStr == null) {
+                JSObject one = null;
                 try {
-                    j = DB.findOneBySql(sql);
+                    one = DB.findOneBySql("select max_bidding from web_tag where tag_name = '" + appName + "'");
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                if (j != null && j.hasObjectData()) {
-                    double maxBidding = NumberUtil.convertDouble(j.get("max_bidding"), 0);
-                    if (maxBidding != 0) {
-                        json.addProperty("max_bidding", maxBidding);
-                        json.addProperty("ret", 1);
-                    }
+                if (one.hasObjectData()) {
+                    maxBiddingStr = NumberUtil.convertDouble(one.get("max_bidding"), 0) + "";
+                    jedis.hset("tagNameBiddingMap", appName, maxBiddingStr);
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
+            }
+            if (maxBiddingStr != null) {
+                json.addProperty("max_bidding", maxBiddingStr);
+                json.addProperty("ret", 1);
             }
         }
-
+        //将jedis连接释放，回收到连接池
+        if (jedis != null) {
+            jedis.close();
+        }
         response.getWriter().write(json.toString());
     }
 
