@@ -1,10 +1,7 @@
 package com.bestgo.admanager.servlet;
 
 import com.bestgo.admanager.OperationResult;
-import com.bestgo.admanager.utils.DateUtil;
-import com.bestgo.admanager.utils.NumberUtil;
-import com.bestgo.admanager.utils.StringUtil;
-import com.bestgo.admanager.utils.Utils;
+import com.bestgo.admanager.utils.*;
 import com.bestgo.common.database.services.DB;
 import com.bestgo.common.database.utils.JSObject;
 import com.google.gson.JsonArray;
@@ -12,6 +9,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
+import redis.clients.jedis.Jedis;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -28,34 +26,11 @@ import java.util.*;
  */
 @WebServlet(name = "AutoCreateCampaign", urlPatterns = "/auto_create_campaign/*")
 public class AutoCreateCampaign extends BaseHttpServlet {
-    public static Map<String, Double> tagMaxBiddingRelationMap;   //声明了一个静态类，无属性，无方法，则Java会给它一个默认无参构造器
-
-    static {
-        if (tagMaxBiddingRelationMap == null) {
-            tagMaxBiddingRelationMap = new HashMap<>();
-        }
-        String sql = "select tag_name,max_bidding from web_tag";
-        List<JSObject> list = null;
-        try {
-            list = DB.findListBySql(sql);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        if (list != null && list.size() > 0) {
-            for (JSObject j : list) {
-                String currTagName = j.get("tag_name");
-                double currMaxBidding = NumberUtil.convertDouble(j.get("max_bidding"), 0);
-                if (currMaxBidding > 0) {
-                    tagMaxBiddingRelationMap.put(currTagName, currMaxBidding);
-                }
-            }
-        }
-    }
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         super.doPost(request, response);
         if (!Utils.isAdmin(request, response)) return;
-
+        Jedis jedis = JedisPoolUtil.getJedis();
         String path = request.getPathInfo();
         JsonObject json = new JsonObject();
 
@@ -67,10 +42,10 @@ public class AutoCreateCampaign extends BaseHttpServlet {
                     result = facebookCampaignBiddingBatchUpdate(request);
                     break;
                 case "/create":
-                    result = facebookCampaignCreate(request);
+                    result = facebookCampaignCreate(request,jedis);
                     break;
                 case "/create2":
-                    result = facebookCampaignCreate2(request);
+                    result = facebookCampaignCreate2(request,jedis);
                     break;
                 case "/delete":
                     result = facebookCampaignDelete(request);
@@ -168,10 +143,10 @@ public class AutoCreateCampaign extends BaseHttpServlet {
                     result = adwordsCampaignBiddingBatchUpdate(request);
                     break;
                 case "/create":
-                    result = adwordsCampaignCreate(request);
+                    result = adwordsCampaignCreate(request,jedis);
                     break;
                 case "/create2":
-                    result = adwordsCampaignCreate2(request);
+                    result = adwordsCampaignCreate2(request,jedis);
                     break;
                 case "/delete":
                     result = adwordsCampaignDelete(request);
@@ -268,7 +243,10 @@ public class AutoCreateCampaign extends BaseHttpServlet {
             json.addProperty("ret", 0);
             json.addProperty("message", "执行失败");
         }
-
+        //将jedis连接释放，回收到连接池
+        if (jedis != null) {
+            jedis.close();
+        }
         response.getWriter().write(json.toString());
     }
 
@@ -373,7 +351,7 @@ public class AutoCreateCampaign extends BaseHttpServlet {
         return result;
     }
 
-    private OperationResult facebookCampaignCreate(HttpServletRequest request) {
+    private OperationResult facebookCampaignCreate(HttpServletRequest request,Jedis jedis) {
         OperationResult result = new OperationResult();
         try {
             String appName = request.getParameter("appName");
@@ -439,9 +417,19 @@ public class AutoCreateCampaign extends BaseHttpServlet {
                 result.message = "版位不能为空";
             } else {
                 double dBidding = NumberUtil.parseDouble(bidding, 0);
-                Double maxBiddingDouble = tagMaxBiddingRelationMap.get(appName);
-                if (maxBiddingDouble != null && maxBiddingDouble != 0 && dBidding > maxBiddingDouble) {
-                    result.message = "bidding超过了本应用的最大出价,   " + bidding + " > " + maxBiddingDouble;
+                double maxBidding = 0.1;
+                String maxBiddingStr = jedis.hget("tagNameBiddingMap", appName);
+                if (maxBiddingStr == null) {
+                    JSObject one = DB.findOneBySql("select max_bidding from web_tag where tag_name = '" + appName + "'");
+                    if (one.hasObjectData()) {
+                        maxBidding = NumberUtil.convertDouble(one.get("max_bidding"), 0);
+                        jedis.hset("tagNameBiddingMap", appName, maxBidding + "");
+                    }
+                } else {
+                    maxBidding = NumberUtil.parseDouble(maxBiddingStr, 0);
+                }
+                if (dBidding > maxBidding) {
+                    result.message = "bidding超过了本应用的最大出价,   " + bidding + " > " + maxBidding;
                 } else {
                     //路径检查
                     if (!imagePath.isEmpty()) {
@@ -537,7 +525,7 @@ public class AutoCreateCampaign extends BaseHttpServlet {
         return result;
     }
 
-    private OperationResult facebookCampaignCreate2(HttpServletRequest request) {
+    private OperationResult facebookCampaignCreate2(HttpServletRequest request,Jedis jedis) {
         OperationResult result = new OperationResult();
         try {
             String flag = request.getParameter("flag");
@@ -604,9 +592,19 @@ public class AutoCreateCampaign extends BaseHttpServlet {
                 result.message = "版位不能为空";
             } else {
                 double dBidding = NumberUtil.parseDouble(bidding, 0);
-                Double maxBiddingDouble = tagMaxBiddingRelationMap.get(appName);
-                if (maxBiddingDouble != null && maxBiddingDouble != 0 && dBidding > maxBiddingDouble) {
-                    result.message = "bidding超过了本应用的最大出价,   " + bidding + " > " + maxBiddingDouble;
+                double maxBidding = 0.1;
+                String maxBiddingStr = jedis.hget("tagNameBiddingMap", appName);
+                if (maxBiddingStr == null) {
+                    JSObject one = DB.findOneBySql("select max_bidding from web_tag where tag_name = '" + appName + "'");
+                    if (one.hasObjectData()) {
+                        maxBidding = NumberUtil.convertDouble(one.get("max_bidding"), 0);
+                        jedis.hset("tagNameBiddingMap", appName, maxBidding + "");
+                    }
+                } else {
+                    maxBidding = NumberUtil.parseDouble(maxBiddingStr, 0);
+                }
+                if (dBidding > maxBidding) {
+                    result.message = "bidding超过了本应用的最大出价,   " + bidding + " > " + maxBidding;
                 } else {
                     //路径检查
                     if (!imagePath.isEmpty()) {
@@ -979,7 +977,7 @@ public class AutoCreateCampaign extends BaseHttpServlet {
         return result;
     }
 
-    private OperationResult adwordsCampaignCreate(HttpServletRequest request) {
+    private OperationResult adwordsCampaignCreate(HttpServletRequest request,Jedis jedis) {
         OperationResult result = new OperationResult();
         try {
             String appName = request.getParameter("appName");
@@ -1022,9 +1020,19 @@ public class AutoCreateCampaign extends BaseHttpServlet {
                 result.message = "出价不能为空";
             } else {
                 double dBidding = NumberUtil.parseDouble(bidding, 0);
-                Double maxBiddingDouble = tagMaxBiddingRelationMap.get(appName);
-                if (maxBiddingDouble != null && maxBiddingDouble != 0 && dBidding > maxBiddingDouble) {
-                    result.message = "bidding超过了本应用的最大出价,   " + bidding + " > " + maxBiddingDouble;
+                double maxBidding = 0.1;
+                String maxBiddingStr = jedis.hget("tagNameBiddingMap", appName);
+                if (maxBiddingStr == null) {
+                    JSObject one = DB.findOneBySql("select max_bidding from web_tag where tag_name = '" + appName + "'");
+                    if (one.hasObjectData()) {
+                        maxBidding = NumberUtil.convertDouble(one.get("max_bidding"), 0);
+                        jedis.hset("tagNameBiddingMap", appName, maxBidding + "");
+                    }
+                } else {
+                    maxBidding = NumberUtil.parseDouble(maxBiddingStr, 0);
+                }
+                if (dBidding > maxBidding) {
+                    result.message = "bidding超过了本应用的最大出价,   " + bidding + " > " + maxBidding;
                 } else {
                     JSObject record = DB.simpleScan("web_system_config").select("config_value").where(DB.filter().whereEqualTo("config_key", "admob_image_path")).execute();
                     String imageRoot = "";
@@ -1083,7 +1091,7 @@ public class AutoCreateCampaign extends BaseHttpServlet {
         return result;
     }
 
-    private OperationResult adwordsCampaignCreate2(HttpServletRequest request) {
+    private OperationResult adwordsCampaignCreate2(HttpServletRequest request,Jedis jedis) {
         OperationResult result = new OperationResult();
         try {
             String flag = request.getParameter("flag");
@@ -1127,9 +1135,19 @@ public class AutoCreateCampaign extends BaseHttpServlet {
                 result.message = "出价不能为空";
             } else {
                 double dBidding = NumberUtil.parseDouble(bidding, 0);
-                Double maxBiddingDouble = tagMaxBiddingRelationMap.get(appName);
-                if (maxBiddingDouble != null && maxBiddingDouble != 0 && dBidding > maxBiddingDouble) {
-                    result.message = "bidding超过了本应用的最大出价,   " + bidding + " > " + maxBiddingDouble;
+                double maxBidding = 0.1;
+                String maxBiddingStr = jedis.hget("tagNameBiddingMap", appName);
+                if (maxBiddingStr == null) {
+                    JSObject one = DB.findOneBySql("select max_bidding from web_tag where tag_name = '" + appName + "'");
+                    if (one.hasObjectData()) {
+                        maxBidding = NumberUtil.convertDouble(one.get("max_bidding"), 0);
+                        jedis.hset("tagNameBiddingMap", appName, maxBidding + "");
+                    }
+                } else {
+                    maxBidding = NumberUtil.parseDouble(maxBiddingStr, 0);
+                }
+                if (dBidding > maxBidding) {
+                    result.message = "bidding超过了本应用的最大出价,   " + bidding + " > " + maxBidding;
                 } else {
                     JSObject record = DB.simpleScan("web_system_config").select("config_value").where(DB.filter().whereEqualTo("config_key", "admob_image_path")).execute();
                     String imageRoot = "";
