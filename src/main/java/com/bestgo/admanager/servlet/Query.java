@@ -56,12 +56,14 @@ public class Query extends BaseHttpServlet {
         if (sorterId != null) {
             sorter = NumberUtil.parseInt(sorterId, 0);
         }
+        Map<String, AppBean> appRevenueMap = null;
+        Map<String, Integer> tagNameWarningLevelMap = null;
+        JsonArray arr = new JsonArray();
+        ArrayList<AppBean> appBeanList = new ArrayList<>();
         try {
-            Map<String, AppBean> appRevenueMap = getAppRevenueMap(endTime);//仅当天的收入和新用户收入
-            Map<String, Integer> tagNameWarningLevelMap = getTagNameWarningLevelMap(endTime);
-            JsonArray arr = new JsonArray();
+            appRevenueMap = getAppRevenueMap(endTime);//仅当天的收入和新用户收入
+            tagNameWarningLevelMap = getTagNameWarningLevelMap(endTime);
             if (sorter > 0) {                                       //排序的情况
-                ArrayList<AppBean> appBeanList = new ArrayList<>();
                 for (Map.Entry<String, Long> entry : tagNameIdMap.entrySet()) {
                     AppBean appBean = new AppBean();
                     appBean.name = entry.getKey(); //标签名称
@@ -276,6 +278,13 @@ public class Query extends BaseHttpServlet {
             json.addProperty("message", ex.getMessage());
             Logger logger = Logger.getRootLogger();
             logger.error(ex.getMessage(), ex);
+        } finally {
+            tagNameIdMap = null;
+            tagNamePackageIdMap = null;
+            arr = null;
+            appBeanList = null;
+            appRevenueMap = null;
+            tagNameWarningLevelMap = null;
         }
         response.getWriter().write(json.toString());
     }
