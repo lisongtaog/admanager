@@ -16,6 +16,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.lang.*;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -62,34 +64,114 @@ public class CountryAnalysisReport extends BaseHttpServlet {
                     if (appId != null) {
                         JsonArray jsonArray = new JsonArray();
                         String sql = "";
-                        if (sameDate) {
-                            sql = "SELECT h.fourteen_days_ltv,h.seven_days_ltv,h.country_code, sum(cost) as total_cost, sum(purchased_user) as total_purchased_user, sum(ad_new_revenue) as new_revenues,\n" +
-                                    "sum(total_installed) as installed, sum(today_uninstalled) as total_today_uninstalled,\n" +
-                                    "sum(h.total_user) as total_users, sum(active_user) as active_users, sum(impression) as impressions, sum(revenue) as revenues,\n" +
-                                    "sum(h.new_user_revenue) as new_user_revenues,sum(h.new_user_impression) as new_user_impressions, " +
-                                    "sum(h.old_user_revenue) as old_user_revenues,sum(h.old_user_impression) as old_user_impressions, " +
-                                    "sum(h.sample_user) as sum_sample_user,sum(h.total_new_user) as sum_total_new_user, " +
-                                    " (sum(revenue) - sum(cost)) as incoming,r.first_day_revenue,r.second_day_revenue,r.third_day_revenue,r.fourth_day_revenue,\n" +
-                                    " (case when sum(impression) > 0 then sum(revenue) * 1000 / sum(impression) else 0 end) as ecpm,\n" +
-                                    "(case when sum(purchased_user) > 0 then sum(cost) / sum(purchased_user) else 0 end) as cpa,\n" +
-                                    " t.cpa as tag_cpa, t.ecpm as tag_ecpm,t.avg_impression \n" +
-                                    " from web_ad_country_analysis_report_history h left join web_ad_country_daily_add_revenue r\n" +
-                                    " on h.date = r.date and h.app_id = r.app_id AND h.country_code = r.country_code \n" +
-                                    " LEFT JOIN web_ad_app_country_target t \n" +
-                                    " ON h.app_id = t.app_id AND h.country_code = t.country_code \n" +
-                                    " where h.date = '" + endTime + "' and h.app_id = '" + appId + "' GROUP BY h.country_code";
-                        } else {
-                            sql = "SELECT h.country_code, sum(cost) as total_cost, sum(purchased_user) as total_purchased_user, sum(ad_new_revenue) as new_revenues," +
-                                    " sum(total_installed) as installed, sum(today_uninstalled) as total_today_uninstalled," +
-                                    " sum(active_user) as active_users, sum(impression) as impressions, sum(revenue) as revenues," +
-                                    " (sum(revenue) - sum(cost)) as incoming," +
-                                    " (case when sum(impression) > 0 then sum(revenue) * 1000 / sum(impression) else 0 end) as ecpm," +
-                                    " (case when sum(purchased_user) > 0 then sum(cost) / sum(purchased_user) else 0 end) as cpa, " +
-                                    " t.cpa as tag_cpa, t.ecpm as tag_ecpm,t.avg_impression \n" +
-                                    " from web_ad_country_analysis_report_history h LEFT JOIN web_ad_app_country_target t \n" +
-                                    " ON h.app_id = t.app_id AND h.country_code = t.country_code \n" +
-                                    " where h.date BETWEEN '" + startTime + "' AND '" + endTime + "' " +
-                                    " and h.app_id = '" + appId + "' GROUP BY h.country_code";
+
+                        String sevenDayAgo = DateUtil.addDay(DateUtil.getNowDate(), -6, "yyyy-MM-dd");
+                        DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+                        Date dateStart = df.parse(startTime);
+                        Date dateEnd = df.parse(endTime);
+                        Date dateSeven = df.parse(sevenDayAgo);
+
+                        if (sameDate) {//同一天
+                            if (dateEnd.getTime() < dateSeven.getTime()) {//在历史表里查询
+                                sql = "SELECT h.fourteen_days_ltv,h.seven_days_ltv,h.country_code, sum(cost) as total_cost, sum(purchased_user) as total_purchased_user, sum(ad_new_revenue) as new_revenues,\n" +
+                                        "sum(total_installed) as installed, sum(today_uninstalled) as total_today_uninstalled,\n" +
+                                        "sum(h.total_user) as total_users, sum(active_user) as active_users, sum(impression) as impressions, sum(revenue) as revenues,\n" +
+                                        "sum(h.new_user_revenue) as new_user_revenues,sum(h.new_user_impression) as new_user_impressions, " +
+                                        "sum(h.old_user_revenue) as old_user_revenues,sum(h.old_user_impression) as old_user_impressions, " +
+                                        "sum(h.sample_user) as sum_sample_user,sum(h.total_new_user) as sum_total_new_user, " +
+                                        " (sum(revenue) - sum(cost)) as incoming,r.first_day_revenue,r.second_day_revenue,r.third_day_revenue,r.fourth_day_revenue,\n" +
+                                        " (case when sum(impression) > 0 then sum(revenue) * 1000 / sum(impression) else 0 end) as ecpm,\n" +
+                                        "(case when sum(purchased_user) > 0 then sum(cost) / sum(purchased_user) else 0 end) as cpa,\n" +
+                                        " t.cpa as tag_cpa, t.ecpm as tag_ecpm,t.avg_impression \n" +
+                                        " from web_ad_country_analysis_report_history h left join web_ad_country_daily_add_revenue r\n" +
+                                        " on h.date = r.date and h.app_id = r.app_id AND h.country_code = r.country_code \n" +
+                                        " LEFT JOIN web_ad_app_country_target t \n" +
+                                        " ON h.app_id = t.app_id AND h.country_code = t.country_code \n" +
+                                        " where h.date = '" + endTime + "' and h.app_id = '" + appId + "' GROUP BY h.country_code";
+                            } else {//在七天表里查询
+                                sql = "SELECT h.fourteen_days_ltv,h.seven_days_ltv,h.country_code, sum(cost) as total_cost, sum(purchased_user) as total_purchased_user, sum(ad_new_revenue) as new_revenues,\n" +
+                                        "sum(total_installed) as installed, sum(today_uninstalled) as total_today_uninstalled,\n" +
+                                        "sum(h.total_user) as total_users, sum(active_user) as active_users, sum(impression) as impressions, sum(revenue) as revenues,\n" +
+                                        "sum(h.new_user_revenue) as new_user_revenues,sum(h.new_user_impression) as new_user_impressions, " +
+                                        "sum(h.old_user_revenue) as old_user_revenues,sum(h.old_user_impression) as old_user_impressions, " +
+                                        "sum(h.sample_user) as sum_sample_user,sum(h.total_new_user) as sum_total_new_user, " +
+                                        " (sum(revenue) - sum(cost)) as incoming,r.first_day_revenue,r.second_day_revenue,r.third_day_revenue,r.fourth_day_revenue,\n" +
+                                        " (case when sum(impression) > 0 then sum(revenue) * 1000 / sum(impression) else 0 end) as ecpm,\n" +
+                                        "(case when sum(purchased_user) > 0 then sum(cost) / sum(purchased_user) else 0 end) as cpa,\n" +
+                                        " t.cpa as tag_cpa, t.ecpm as tag_ecpm,t.avg_impression \n" +
+                                        " from web_ad_country_analysis_report h left join web_ad_country_daily_add_revenue r\n" +
+                                        " on h.date = r.date and h.app_id = r.app_id AND h.country_code = r.country_code \n" +
+                                        " LEFT JOIN web_ad_app_country_target t \n" +
+                                        " ON h.app_id = t.app_id AND h.country_code = t.country_code \n" +
+                                        " where h.date = '" + endTime + "' and h.app_id = '" + appId + "' GROUP BY h.country_code";
+                            }
+
+                        } else {//不在一天
+                            if (dateEnd.getTime() < dateSeven.getTime()) { //全都在历史表中
+                                sql = "SELECT h.country_code, sum(cost) as total_cost, sum(purchased_user) as total_purchased_user, sum(ad_new_revenue) as new_revenues," +
+                                        " sum(total_installed) as installed, sum(today_uninstalled) as total_today_uninstalled," +
+                                        " sum(active_user) as active_users, sum(impression) as impressions, sum(revenue) as revenues," +
+                                        " (sum(revenue) - sum(cost)) as incoming," +
+                                        " (case when sum(impression) > 0 then sum(revenue) * 1000 / sum(impression) else 0 end) as ecpm," +
+                                        " (case when sum(purchased_user) > 0 then sum(cost) / sum(purchased_user) else 0 end) as cpa, " +
+                                        " t.cpa as tag_cpa, t.ecpm as tag_ecpm,t.avg_impression \n" +
+                                        " from web_ad_country_analysis_report_history h LEFT JOIN web_ad_app_country_target t \n" +
+                                        " ON h.app_id = t.app_id AND h.country_code = t.country_code \n" +
+                                        " where h.date BETWEEN '" + startTime + "' AND '" + endTime + "' " +
+                                        " and h.app_id = '" + appId + "' GROUP BY h.country_code";
+                            } else if (dateStart.getTime() >= dateSeven.getTime()) { //全都在七天表中
+                                sql = "SELECT h.country_code, sum(cost) as total_cost, sum(purchased_user) as total_purchased_user, sum(ad_new_revenue) as new_revenues," +
+                                        " sum(total_installed) as installed, sum(today_uninstalled) as total_today_uninstalled," +
+                                        " sum(active_user) as active_users, sum(impression) as impressions, sum(revenue) as revenues," +
+                                        " (sum(revenue) - sum(cost)) as incoming," +
+                                        " (case when sum(impression) > 0 then sum(revenue) * 1000 / sum(impression) else 0 end) as ecpm," +
+                                        " (case when sum(purchased_user) > 0 then sum(cost) / sum(purchased_user) else 0 end) as cpa, " +
+                                        " t.cpa as tag_cpa, t.ecpm as tag_ecpm,t.avg_impression \n" +
+                                        " from web_ad_country_analysis_report h LEFT JOIN web_ad_app_country_target t \n" +
+                                        " ON h.app_id = t.app_id AND h.country_code = t.country_code \n" +
+                                        " where h.date BETWEEN '" + startTime + "' AND '" + endTime + "' " +
+                                        " and h.app_id = '" + appId + "' GROUP BY h.country_code";
+                            } else if (dateEnd.getTime() >= dateSeven.getTime() && dateStart.getTime() < dateSeven.getTime()) { //一半在历史表中，一半在七天表中
+
+                                String eightDayAgo = DateUtil.addDay(DateUtil.getNowDate(), -7, "yyyy-MM-dd");
+                                sql = "SELECT\n" +
+                                        "  h.country_code,\n" +
+                                        "  SUM(cost) AS total_cost,\n" +
+                                        "  SUM(purchased_user) AS total_purchased_user,\n" +
+                                        "  SUM(ad_new_revenue) AS new_revenues,\n" +
+                                        "  SUM(total_installed) AS installed,\n" +
+                                        "  SUM(today_uninstalled) AS total_today_uninstalled,\n" +
+                                        "  SUM(active_user) AS active_users,\n" +
+                                        "  SUM(impression) AS impressions,\n" +
+                                        "  SUM(revenue) AS revenues,\n" +
+                                        "  (SUM(revenue) - SUM(cost)) AS incoming,\n" +
+                                        "  (\n" +
+                                        "    CASE\n" +
+                                        "      WHEN SUM(impression) > 0\n" +
+                                        "      THEN SUM(revenue) * 1000 / SUM(impression)\n" +
+                                        "      ELSE 0\n" +
+                                        "    END\n" +
+                                        "  ) AS ecpm,\n" +
+                                        "  (\n" +
+                                        "    CASE\n" +
+                                        "      WHEN SUM(purchased_user) > 0\n" +
+                                        "      THEN SUM(cost) / SUM(purchased_user)\n" +
+                                        "      ELSE 0\n" +
+                                        "    END\n" +
+                                        "  ) AS cpa,\n" +
+                                        "  t.cpa AS tag_cpa,\n" +
+                                        "  t.ecpm AS tag_ecpm,\n" +
+                                        "  t.avg_impression\n" +
+                                        "FROM(\n" +
+                                        " SELECT * FROM web_ad_country_analysis_report WHERE DATE BETWEEN '" + sevenDayAgo + "' AND '" + endTime + "'  AND app_id = '" + appId + "' \n" +
+                                        " UNION ALL  \n" +
+                                        " SELECT * FROM web_ad_country_analysis_report_history WHERE DATE BETWEEN '" + startTime + "' AND '" + eightDayAgo + "'  AND app_id = '" + appId + "' \n" +
+                                        " ) h LEFT JOIN web_ad_country_daily_add_revenue r\n" +
+                                        " ON h.date = r.date AND h.app_id = r.app_id AND h.country_code = r.country_code \n" +
+                                        " LEFT JOIN web_ad_app_country_target t \n" +
+                                        " ON h.app_id = t.app_id AND h.country_code = t.country_code \n" +
+                                        " GROUP BY h.country_code";
+                            }
                         }
 
                         int sorter = 0;
@@ -428,18 +510,83 @@ public class CountryAnalysisReport extends BaseHttpServlet {
         Map<String, Map<String, List>> dataMap = new HashMap<String, Map<String, List>>();
 
         try {
-            String sinceDate = DateUtil.addDay(endTime, -7, "yyyy-MM-dd");//悬浮 展示起始日期
+            String sevenDayAgo = DateUtil.addDay(DateUtil.getNowDate(), -6, "yyyy-MM-dd");
+            String eightDayAgo = DateUtil.addDay(DateUtil.getNowDate(), -7, "yyyy-MM-dd");
+            String sinceDate = DateUtil.addDay(endTime, -5, "yyyy-MM-dd");//悬浮 展示起始日期
+            DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+            Date dateStart = df.parse(sinceDate);
+            Date dateEnd = df.parse(endTime);
+            Date dateSeven = df.parse(sevenDayAgo);
+
             String floatSql = null;//国家分析报告悬浮展示
-            floatSql = "select date,country_code,cost, purchased_user,total_user,total_installed,revenue,active_user,ad_new_revenue, " +
-                    "(case when total_installed > 0 then today_uninstalled / total_installed else 0 end) as uninstall_rate," +
-                    "(case when impression > 0 then revenue * 1000 / impression else 0 end) as ecpm," +
-                    "(case when purchased_user > 0 then cost / purchased_user else 0 end) as cpa, " +
-                    "sample_user,total_new_user," +
-                    "new_user_revenue,new_user_impression,old_user_revenue,old_user_impression " +
-                    "from web_ad_country_analysis_report_history where " +
-                    " date BETWEEN '" + sinceDate + "' AND '" + endTime + "'" +
-                    " and app_id = '" + appId + "' " +
-                    " GROUP BY date,country_code ORDER BY date DESC ";
+            if (dateEnd.getTime() < dateSeven.getTime()) { //历史表中查询
+                floatSql = "select date,country_code,cost, purchased_user,total_user,total_installed,revenue,active_user,ad_new_revenue, " +
+                        "(case when total_installed > 0 then today_uninstalled / total_installed else 0 end) as uninstall_rate," +
+                        "(case when impression > 0 then revenue * 1000 / impression else 0 end) as ecpm," +
+                        "(case when purchased_user > 0 then cost / purchased_user else 0 end) as cpa, " +
+                        "sample_user,total_new_user," +
+                        "new_user_revenue,new_user_impression,old_user_revenue,old_user_impression " +
+                        "from web_ad_country_analysis_report_history where " +
+                        " date BETWEEN '" + sinceDate + "' AND '" + endTime + "'" +
+                        " and app_id = '" + appId + "' " +
+                        " GROUP BY date,country_code ORDER BY date DESC ";
+            } else if (dateStart.getTime() >= dateSeven.getTime()) { //七天表中查询
+                floatSql = "select date,country_code,cost, purchased_user,total_user,total_installed,revenue,active_user,ad_new_revenue, " +
+                        "(case when total_installed > 0 then today_uninstalled / total_installed else 0 end) as uninstall_rate," +
+                        "(case when impression > 0 then revenue * 1000 / impression else 0 end) as ecpm," +
+                        "(case when purchased_user > 0 then cost / purchased_user else 0 end) as cpa, " +
+                        "sample_user,total_new_user," +
+                        "new_user_revenue,new_user_impression,old_user_revenue,old_user_impression " +
+                        "from web_ad_country_analysis_report where " +
+                        " date BETWEEN '" + sinceDate + "' AND '" + endTime + "'" +
+                        " and app_id = '" + appId + "' " +
+                        " GROUP BY date,country_code ORDER BY date DESC ";
+            } else if (dateEnd.getTime() >= dateSeven.getTime() && dateStart.getTime() < dateSeven.getTime()) { //两张表中同时查询
+                floatSql = "SELECT\n" +
+                        "  date,\n" +
+                        "  country_code,\n" +
+                        "  cost,\n" +
+                        "  purchased_user,\n" +
+                        "  total_user,\n" +
+                        "  total_installed,\n" +
+                        "  revenue,\n" +
+                        "  active_user,\n" +
+                        "  ad_new_revenue,\n" +
+                        "  (\n" +
+                        "    CASE\n" +
+                        "      WHEN total_installed > 0\n" +
+                        "      THEN today_uninstalled / total_installed\n" +
+                        "      ELSE 0\n" +
+                        "    END\n" +
+                        "  ) AS uninstall_rate,\n" +
+                        "  (\n" +
+                        "    CASE\n" +
+                        "      WHEN impression > 0\n" +
+                        "      THEN revenue * 1000 / impression\n" +
+                        "      ELSE 0\n" +
+                        "    END\n" +
+                        "  ) AS ecpm,\n" +
+                        "  (\n" +
+                        "    CASE\n" +
+                        "      WHEN purchased_user > 0\n" +
+                        "      THEN cost / purchased_user\n" +
+                        "      ELSE 0\n" +
+                        "    END\n" +
+                        "  ) AS cpa,\n" +
+                        "  sample_user,\n" +
+                        "  total_new_user,\n" +
+                        "  new_user_revenue,\n" +
+                        "  new_user_impression,\n" +
+                        "  old_user_revenue,\n" +
+                        "  old_user_impression\n" +
+                        "FROM\n" +
+                        "(SELECT * FROM web_ad_country_analysis_report_history WHERE DATE BETWEEN '" + sinceDate + "'  AND '" + eightDayAgo + "' AND app_id = '" + appId + "'\n" +
+                        "UNION ALL\n" +
+                        "SELECT * FROM web_ad_country_analysis_report WHERE DATE BETWEEN '" + sevenDayAgo + "'  AND '" + endTime + "' AND app_id = '" + appId + "')t\n" +
+                        "GROUP BY DATE,country_code\n" +
+                        "ORDER BY DATE DESC";
+            }
+
 
             List<JSObject> dataList = DB.findListBySql(floatSql);
             List costList, purchasedUserList, installedList, uninstalledRateList, activeUserList,
