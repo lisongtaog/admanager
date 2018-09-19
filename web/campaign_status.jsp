@@ -28,7 +28,6 @@
 
     <div class="panel panel-default">
       <div>
-        <%--这里还能再好看一点么--%>
         💚💜💙💖<input id="btnSetZero" type="button" value="置零" style="color: #2b542c">💚💜💙💖<input id="btnDelete" type="button" value="删除" style="color: #c08b5f">
       </div>
       <table class="table">

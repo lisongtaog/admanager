@@ -46,6 +46,7 @@
                 <li><a href="campaign_active_user_analysis.jsp">活跃用户报告</a></li>
                 <li><a href="campaign_impressions_revenue_analysis.jsp">广告收益报告</a></li>
                 <li><a href="material_analysis_report.jsp">素材分析报告</a></li>
+                <li><a href="app_campaign_uninstall_rate_statistics.jsp">系列卸载率报告</a></li>
             </ul>
         </li>
         <%-- 3 --%>
