@@ -1,0 +1,5 @@
+###所有的数据都是字符串存储，如果遇到数字类型，需要转换
+tagNameBiddingMap         标签名称与最大出价Map
+tagNameAppIdMap           标签名称与应用ID(包ID)Map
+countryNameCodeMap        对应国家代号表的数据key=国家名称value=国家代号
+countryCodeNameMap        对应国家代号表的数据key=国家代号value=国家名称
