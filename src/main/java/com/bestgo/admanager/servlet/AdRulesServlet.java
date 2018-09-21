@@ -1,6 +1,7 @@
 package com.bestgo.admanager.servlet;
 
 import com.bestgo.admanager.OperationResult;
+import com.bestgo.admanager.bean.WebAdRules;
 import com.bestgo.admanager.utils.NumberUtil;
 import com.bestgo.admanager.utils.StringUtil;
 import com.bestgo.admanager.utils.Utils;
@@ -19,11 +20,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by jikai on 5/31/17.
- * 目前web_rules包含了Facebook和Adwords两个的所有规则
+ * @author mengjun
+ * @date 2018/9/21 11:44
+ * @desc 设置监控规则，用来监控花费、预算等
  */
-@WebServlet(name = "Rules", urlPatterns = {"/rules/*"})
-public class Rules extends BaseHttpServlet {
+@WebServlet(name = "AdRulesServlet", urlPatterns = {"/rules/*"})
+public class AdRulesServlet extends BaseHttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         super.doPost(request, response);
         if (!Utils.isAdmin(request, response)) return;
@@ -33,12 +35,12 @@ public class Rules extends BaseHttpServlet {
 
         if (path != null) {
             if (path.startsWith("/create")) {
-                String ruleType = request.getParameter("ruleType");
-                String ruleContent = request.getParameter("ruleContent");
-                String tag_id = request.getParameter("tag_id");
-                String tag_name = request.getParameter("tag_name");
-
-                OperationResult result = createNewRule(ruleType, ruleContent, tag_id, tag_name);
+                WebAdRules webAdRules = new WebAdRules();
+                webAdRules.setRuleType(NumberUtil.parseInt(request.getParameter("ruleType"),0));
+                webAdRules.setTagId(NumberUtil.parseInt(request.getParameter("tag_id"),0));
+                webAdRules.setRuleContent(request.getParameter("ruleContent"));
+                webAdRules.setTagName(request.getParameter("tag_name"));
+                OperationResult result = createNewRule(webAdRules);
                 json.addProperty("ret", result.result ? 1 : 0);
                 json.addProperty("message", result.message);
             } else if (path.startsWith("/delete")) {
@@ -99,6 +101,26 @@ public class Rules extends BaseHttpServlet {
         response.getWriter().write(json.toString());
     }
 
+    private OperationResult createNewRule(WebAdRules webAdRules) {
+        OperationResult ret = new OperationResult();
+        try {
+            DB.insert("web_ad_rules")
+                    .put("rule_type", webAdRules.getRuleType())
+                    .put("rule_content", webAdRules.getRuleContent())
+                    .put("tag_id", webAdRules.getTagId())
+                    .put("tag_name", webAdRules.getTagName())
+                    .execute();
+            ret.result = true;
+            ret.message = "添加成功";
+        } catch (Exception e) {
+            ret.result = false;
+            ret.message = e.getMessage();
+            Logger logger = Logger.getRootLogger();
+            logger.error(e.getMessage(), e);
+        }
+        return ret;
+    }
+
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         doPost(request, response);
     }
@@ -154,29 +176,6 @@ public class Rules extends BaseHttpServlet {
 
             ret.result = true;
             ret.message = "执行成功";
-        } catch (Exception e) {
-            ret.result = false;
-            ret.message = e.getMessage();
-            Logger logger = Logger.getRootLogger();
-            logger.error(e.getMessage(), e);
-        }
-
-        return ret;
-    }
-
-    private OperationResult createNewRule(String ruleType, String ruleContent, String tag_id, String tag_name) {
-        OperationResult ret = new OperationResult();
-
-        try {
-            DB.insert("web_ad_rules")
-                    .put("rule_type", ruleType)
-                    .put("rule_content", ruleContent)
-                    .put("tag_id", Integer.parseInt(tag_id))
-                    .put("tag_name", tag_name)
-                    .execute();
-
-            ret.result = true;
-            ret.message = "添加成功";
         } catch (Exception e) {
             ret.result = false;
             ret.message = e.getMessage();

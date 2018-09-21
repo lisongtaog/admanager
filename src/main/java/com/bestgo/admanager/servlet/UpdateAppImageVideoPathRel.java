@@ -36,8 +36,6 @@ public class UpdateAppImageVideoPathRel extends BaseHttpServlet {
                 for (JSObject config : configList) {
                     String configKey = config.get("config_key");
                     String rootPath = config.get("config_value"); // rootPath 里是表格里存的根路径
-//                        rootPath = rootPath.replace("/", File.separator);
-//                        rootPath = rootPath.replace("\\",File.separator);
                     String appParentPath = rootPath + File.separatorChar + appName;
                     File file = new File(appParentPath);
                     List<String> PathList = Utils.ergodicImageDirectory(file, new ArrayList<>(), false);
