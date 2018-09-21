@@ -62,6 +62,7 @@ public class Utils {
 
     /**
      * 获取key=countryCode,value=countryName的Map
+     *
      * @return
      */
     public static HashMap getCountryCodeNameMap() {
@@ -85,6 +86,7 @@ public class Utils {
 
     /**
      * 获取key=countryName,value=countryCode的Map
+     *
      * @return
      */
     public static HashMap getCountryNameCodeMap() {
@@ -108,28 +110,26 @@ public class Utils {
 
     /**
      * 从较大的Set集合中，找到与较小的Set集合不同的字符串对象，并放到list中返回
+     *
      * @param maxSet
      * @param minSet
      * @return 字符串集合
      */
     public static List<String> getDiffrentStrList(Set<String> maxSet, Set<String> minSet) {
         List<String> diff = new ArrayList<>();
-        Map<String,Integer> map = new HashMap<>(maxSet.size());
+        Map<String, Integer> map = new HashMap<>(maxSet.size());
         for (String str : maxSet) {
             map.put(str, 1);
         }
         for (String str : minSet) {
-            if(map.get(str)!=null)
-            {
+            if (map.get(str) != null) {
                 map.put(str, 2);
                 continue;
             }
             diff.add(str);
         }
-        for(Map.Entry<String, Integer> entry:map.entrySet())
-        {
-            if(entry.getValue()==1)
-            {
+        for (Map.Entry<String, Integer> entry : map.entrySet()) {
+            if (entry.getValue() == 1) {
                 diff.add(entry.getKey());
             }
         }
@@ -138,36 +138,37 @@ public class Utils {
 
     /**
      * 将一个list根据某个属性去重，并遍历以逗号分隔拼接成字符串，用于in()里面的查询条件
+     *
      * @param list List<JSObject>
      * @param attr JSObject的某个属性,根据它来获取值
      * @return 字符串
      */
-    public static String getStrForListDistinctByAttrWithCommmas(List<JSObject> list,String attr){
-        if(list == null || list.size() == 0) return "";
+    public static String getStrForListDistinctByAttrWithCommmas(List<JSObject> list, String attr) {
+        if (list == null || list.size() == 0) return "";
 
         Set<String> set = new HashSet<>();
         String returnStr = "";
-        for(JSObject j : list){
-            if(j.hasObjectData()){
+        for (JSObject j : list) {
+            if (j.hasObjectData()) {
                 String str = j.get(attr);
-                if(str == null || str == "" || str.equals("''")) {
+                if (str == null || str == "" || str.equals("''")) {
                     continue;
-                }else {
+                } else {
                     set.add(str);
                 }
             }
         }
 
-        if(set.size() == 1){
-            for(String s : set){
+        if (set.size() == 1) {
+            for (String s : set) {
                 return "'" + s + "'";
             }
-        }else{
-            for(String s : set){
-                returnStr += "'" +s + "',";
+        } else {
+            for (String s : set) {
+                returnStr += "'" + s + "',";
             }
-            if(returnStr.length() > 0){
-                return  returnStr.substring(0,returnStr.length() - 1);
+            if (returnStr.length() > 0) {
+                return returnStr.substring(0, returnStr.length() - 1);
             }
         }
         return "";
@@ -176,30 +177,31 @@ public class Utils {
 
     /**
      * 获取两个List不同的部分
+     *
      * @param mainList
      * @param compareList 被比较的List参照物
      * @param commonFiled 对象之间比较的属性
      * @return
      */
-    public static List<JSObject> getDiffJSObjectList(List<JSObject> mainList, List<JSObject> compareList,String commonFiled) {
-        if(compareList == null){
+    public static List<JSObject> getDiffJSObjectList(List<JSObject> mainList, List<JSObject> compareList, String commonFiled) {
+        if (compareList == null) {
             return mainList;
         }
-        if(mainList == null){
+        if (mainList == null) {
             return null;
         }
         List<JSObject> diff = new ArrayList<>();
-        Map<String,String> map = new HashMap<>(mainList.size());
+        Map<String, String> map = new HashMap<>(mainList.size());
         for (JSObject x : compareList) {
             String key = x.get(commonFiled);
-            if(key != null && key != ""){
-                map.put(key,"compare");
+            if (key != null && key != "") {
+                map.put(key, "compare");
             }
         }
         for (JSObject i : mainList) {
             String key = i.get(commonFiled);
-            if(key != null && key != ""){
-                if(!"compare".equals(map.get(key))) {
+            if (key != null && key != "") {
+                if (!"compare".equals(map.get(key))) {
                     diff.add(i);
                 }
             }
@@ -209,25 +211,26 @@ public class Utils {
 
     /**
      * 图片目录遍历:获取这个目录下的所有文件夹路径和文件路径,并且只返回有效文件的路径
+     *
      * @param file
-     * @param resultAll 经校验合法的文件路径
+     * @param resultAll       经校验合法的文件路径
      * @param returnDirectory 如果为true，则返回所有文件夹路径,否则返回文件路径
      * @return
      */
-    public static List<String> ergodicImageDirectory(File file, List<String> resultAll, boolean returnDirectory){
+    public static List<String> ergodicImageDirectory(File file, List<String> resultAll, boolean returnDirectory) {
         File[] files = file.listFiles();
-        if(files == null) return resultAll;// 判断目录下是不是空的
+        if (files == null) return resultAll;// 判断目录下是不是空的
         for (File f : files) {
-            if(f.isDirectory()){
-                if(returnDirectory){
+            if (f.isDirectory()) {
+                if (returnDirectory) {
                     resultAll.add(f.getPath());
                 }
-                ergodicImageDirectory(f,resultAll,returnDirectory);
-            }else{
+                ergodicImageDirectory(f, resultAll, returnDirectory);
+            } else {
                 //需要在判断为文件以后判断文件后缀名是否合法
-                String[] allowType = new String[]{".jpeg",".gif",".jpg",".png"};
+                String[] allowType = new String[]{".jpeg", ".gif", ".jpg", ".png"};
                 String fileName = f.toString();
-                if(typeValid(fileName,allowType)){
+                if (typeValid(fileName, allowType)) {
                     resultAll.add(f.getPath());
                 }
             }
@@ -237,25 +240,26 @@ public class Utils {
 
     /**
      * 视频目录遍历:获取这个目录下的所有文件夹路径和文件路径,并且只返回有效文件的路径
+     *
      * @param file
-     * @param resultAll 经校验合法的文件路径
+     * @param resultAll       经校验合法的文件路径
      * @param returnDirectory 如果为true，则返回所有文件夹路径,否则返回文件路径
      * @return
      */
-    public static List<String> ergodicVideoDirectory(File file, List<String> resultAll, boolean returnDirectory){
+    public static List<String> ergodicVideoDirectory(File file, List<String> resultAll, boolean returnDirectory) {
         File[] files = file.listFiles();
-        if(files == null) return resultAll;// 判断目录下是不是空的
+        if (files == null) return resultAll;// 判断目录下是不是空的
         for (File f : files) {
-            if(f.isDirectory()){
-                if(returnDirectory){
+            if (f.isDirectory()) {
+                if (returnDirectory) {
                     resultAll.add(f.getPath());
                 }
-                ergodicVideoDirectory(f,resultAll,returnDirectory);
-            }else{
+                ergodicVideoDirectory(f, resultAll, returnDirectory);
+            } else {
                 //需要在判断为文件以后判断文件后缀名是否合法
-                String[] allowType = new String[]{".mov",".mp4"};
+                String[] allowType = new String[]{".mov", ".mp4"};
                 String fileName = f.toString();
-                if(typeValid(fileName,allowType)){
+                if (typeValid(fileName, allowType)) {
                     resultAll.add(f.getPath());
                 }
             }
@@ -271,7 +275,7 @@ public class Utils {
             return false;
         }
         for (String type : allowTypes) {
-            if (contentType.indexOf(type) > -1 || contentType.indexOf(type.toUpperCase())>-1) {
+            if (contentType.indexOf(type) > -1 || contentType.indexOf(type.toUpperCase()) > -1) {
                 return true;
             }
         }
@@ -280,6 +284,7 @@ public class Utils {
 
     /**
      * 执行Shell命令
+     *
      * @param cmd
      * @return
      * @throws InterruptedException
@@ -290,5 +295,49 @@ public class Utils {
         Process process = Runtime.getRuntime().exec(cmdparts);
         process.waitFor();
         return true;
+    }
+
+    /**
+     * 获取标签名称与包ID（appID）的Map
+     *
+     * @return
+     */
+    public static Map<String, String> getTagNamePackageIdMap() {
+        Map<String, String> map = new HashMap<>();
+        List<JSObject> list = null;
+        try {
+            list = DB.findListBySql("SELECT tag_name,google_package_id FROM web_facebook_app_ids_rel");
+            for (int i = 0, len = list.size(); i < len; i++) {
+                JSObject js = list.get(i);
+                String tagName = js.get("tag_name");
+                String googlePackageId = js.get("google_package_id");
+                map.put(googlePackageId, tagName);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return map;
+    }
+
+    /**
+     * 获取标签名称与包ID（appID）的Map
+     *
+     * @return
+     */
+    public static Map<String, String> getPackageIdByTagNameMap() {
+        Map<String, String> map = new HashMap<>();
+        List<JSObject> list = null;
+        try {
+            list = DB.findListBySql("SELECT tag_name,google_package_id FROM web_facebook_app_ids_rel");
+            for (int i = 0, len = list.size(); i < len; i++) {
+                JSObject js = list.get(i);
+                String tagName = js.get("tag_name");
+                String googlePackageId = js.get("google_package_id");
+                map.put(tagName, googlePackageId);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return map;
     }
 }
