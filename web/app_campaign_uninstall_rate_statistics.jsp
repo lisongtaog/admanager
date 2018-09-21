@@ -90,7 +90,7 @@
         </div>
     </div>
 
-    <table class="table table-hover">
+    <table class="table table-hover" id="theTable">
         <thead id="result_header">
         </thead>
         <tbody id="results_body">
@@ -159,13 +159,13 @@
         }, function (data) {
             if (data) {
                 $('#results_body > tr').remove();
-                $('#result_header').html("<tr><th>ID</th><th>应用名称</th><th>系列名称</th><th>国家</th><th>安装日期</th><th>卸载率</th></tr>");
+                $('#result_header').html("<tr><th onclick=sort(theTable,0,'int')>ID</th><th>应用名称</th><th>系列名称</th><th>国家</th><th>安装日期</th><th onclick=sort(theTable,5,'float')>安装数量</th><th onclick=sort(theTable,6,'float')>购买用户</th><th onclick=sort(theTable,7,'float')>卸载率</th></tr>");
 
                 for (var i = 0; i < data.length; i++) {
                     var one = data[i];
 
                     var tr = $('<tr></tr>');
-                    var keySet = ["id", "appId", "campaignName", "countryCode", "installedDate", "uninstallRate"];
+                    var keySet = ["id", "appId", "campaignName", "countryCode", "installedDate","installNum","purchaseUser", "uninstallRate"];
 
                     for (var j = 0; j < keySet.length; j++) {
                         var e = one[keySet[j]];
@@ -348,6 +348,60 @@
     //     });
     // }
 
+    function sort(tableId, sortColumn,nodeType) {
+        var table = document.getElementById("theTable");
+        var tableBody = table.tBodies[0];
+        var tableRows = tableBody.rows;
+
+
+        var rowArray = new Array();
+        for (var i = 0; i < tableRows.length; i++) {
+            rowArray[i] = tableRows[i];
+        }
+
+        if (table.sortColumn == sortColumn) {
+            rowArray.reverse();
+        } else {
+            rowArray.sort(generateCompareTR(sortColumn, nodeType));
+        }
+
+
+        var tbodyFragment = document.createDocumentFragment();
+        for (var i = 0; i < rowArray.length; i++) {
+            tbodyFragment.appendChild(rowArray[i]);
+        }
+        tableBody.appendChild(tbodyFragment);
+        table.sortColumn = sortColumn;
+    }
+
+    function generateCompareTR(sortColumn, nodeType) {
+        return function compareTR(trLeft, trRight) {
+            var leftValue = convert(trLeft.cells[sortColumn].firstChild.nodeValue, nodeType);
+            var rightValue = convert(trRight.cells[sortColumn].firstChild.nodeValue, nodeType);
+            if (leftValue < rightValue) {
+                return -1;
+            } else {
+                if (leftValue > rightValue) {
+                    return 1;
+                } else {
+                    return 0;
+                }
+            }
+        };
+    }
+
+    function convert(value, dataType) {
+        switch (dataType) {
+            case "int":
+                return parseInt(value);
+            case "float":
+                return parseFloat(value);
+            case "date":
+                return new Date(Date.parse(value));
+            default:
+                return value.toString();
+        }
+    }
 
 </script>
 </body>

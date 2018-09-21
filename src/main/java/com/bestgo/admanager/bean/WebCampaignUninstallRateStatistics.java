@@ -13,24 +13,22 @@ public class WebCampaignUninstallRateStatistics {
     private String campaignName;
     private double uninstallRate;
 
+    private double installNum;
+    private double purchaseUser;
+
     public WebCampaignUninstallRateStatistics() {
     }
 
-    public WebCampaignUninstallRateStatistics(String installedDate, String appId, String countryCode, String campaignName, double uninstallRate) {
-        this.installedDate = installedDate;
-        this.appId = appId;
-        this.countryCode = countryCode;
-        this.campaignName = campaignName;
-        this.uninstallRate = uninstallRate;
-    }
+    public WebCampaignUninstallRateStatistics(long id, String installedDate, String appId, String countryCode, String campaignName, double uninstallRate, double installNum, double purchaseUser) {
 
-    public WebCampaignUninstallRateStatistics(long id, String installedDate, String appId, String countryCode, String campaignName, double uninstallRate) {
         this.id = id;
         this.installedDate = installedDate;
         this.appId = appId;
         this.countryCode = countryCode;
         this.campaignName = campaignName;
         this.uninstallRate = uninstallRate;
+        this.installNum = installNum;
+        this.purchaseUser = purchaseUser;
     }
 
     public long getId() {
@@ -81,6 +79,22 @@ public class WebCampaignUninstallRateStatistics {
         this.uninstallRate = uninstallRate;
     }
 
+    public double getInstallNum() {
+        return installNum;
+    }
+
+    public void setInstallNum(double installNum) {
+        this.installNum = installNum;
+    }
+
+    public double getPurchaseUser() {
+        return purchaseUser;
+    }
+
+    public void setPurchaseUser(double purchaseUser) {
+        this.purchaseUser = purchaseUser;
+    }
+
     @Override
     public String toString() {
         return "WebCampaignUninstallRateStatistics{" +
@@ -90,6 +104,8 @@ public class WebCampaignUninstallRateStatistics {
                 ", countryCode='" + countryCode + '\'' +
                 ", campaignName='" + campaignName + '\'' +
                 ", uninstallRate=" + uninstallRate +
+                ", installNum=" + installNum +
+                ", purchaseUser=" + purchaseUser +
                 '}';
     }
 }

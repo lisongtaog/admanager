@@ -82,7 +82,9 @@ public class AppCampaignUninstallRateStatistics extends BaseHttpServlet {
                 "  app_id,\n" +
                 "  country_code,\n" +
                 "  campaign_name,\n" +
-                "  uninstall_rate\n" +
+                "  uninstall_rate,\n" +
+                "  install_num,\n" +
+                "  purchase_user\n" +
                 "FROM\n" +
                 "  web_campaign_uninstall_rate_statistics\n" +
                 "WHERE installed_date BETWEEN '" + startDate + "'  AND '" + endDate + "'\n" +
@@ -103,6 +105,8 @@ public class AppCampaignUninstallRateStatistics extends BaseHttpServlet {
                     currStatistics = new WebCampaignUninstallRateStatistics();
                     currStatistics.setId(js.get("id"));
                     currStatistics.setInstalledDate(js.get("installed_date").toString());
+                    currStatistics.setInstallNum(NumberUtil.parseDouble(js.get("install_num").toString(),0));
+                    currStatistics.setPurchaseUser(NumberUtil.parseDouble(js.get("purchase_user").toString(),0));
                     currStatistics.setCampaignName(js.get("campaign_name").toString());
                     currStatistics.setAppId(tagNamePackageIdMap.get(js.get("app_id")));
                     currStatistics.setCountryCode(countryCodeNameMap.get(js.get("country_code")));
