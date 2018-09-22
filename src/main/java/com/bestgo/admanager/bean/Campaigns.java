@@ -25,6 +25,8 @@ public class Campaigns {
     public double open_cpa;
     public double un_rate;
     public double open_rate;
+    public double cEcpm; //也就是cpm
+    public double ctrMulCvr;  //ctr * cvr
     public double campaign_spends;
     public String network;
 }

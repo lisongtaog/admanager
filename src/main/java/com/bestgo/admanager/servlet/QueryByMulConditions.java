@@ -512,6 +512,9 @@ public class QueryByMulConditions extends BaseHttpServlet {
                             j.addProperty("ctr", c.ctr);
                             j.addProperty("cpa", c.cpa);
                             j.addProperty("cvr", c.cvr);
+                            j.addProperty("cvr", c.cvr);
+                            j.addProperty("cEcpm", c.cEcpm);
+                            j.addProperty("ctrMulCvr", c.ctrMulCvr);
                             j.addProperty("un_rate", c.un_rate);
                             j.addProperty("campaign_spends", c.campaign_spends);
                             j.addProperty("network", c.network);
@@ -1116,7 +1119,7 @@ public class QueryByMulConditions extends BaseHttpServlet {
                 total_cvr = total_click > 0 ? total_installed / total_click : 0;
 
                 //针对系列的ECPM,其实就是CPM，cECPM
-                double ecpm = impressions > 0 ? spend * 1000 / impressions : 0;
+                double cEcpm = impressions > 0 ? spend * 1000 / impressions : 0;
 
                 d.addProperty("campaign_id", campaignId);
                 d.addProperty("short_name", short_name);
@@ -1136,8 +1139,8 @@ public class QueryByMulConditions extends BaseHttpServlet {
                 d.addProperty("ctr", NumberUtil.trimDouble(ctr, 3));
                 d.addProperty("cpa", NumberUtil.trimDouble(cpa, 3));
                 d.addProperty("cvr", NumberUtil.trimDouble(cvr, 3));
-                d.addProperty("ecpm", NumberUtil.trimDouble(ecpm, 3));
-                d.addProperty("ctr_mul_cvr", NumberUtil.trimDouble(ctr * cvr, 3));
+                d.addProperty("cEcpm", NumberUtil.trimDouble(cEcpm, 3));
+                d.addProperty("ctrMulCvr", NumberUtil.trimDouble(ctr * cvr, 3));
 
 
                 if (admobCheck) {
@@ -1196,7 +1199,8 @@ public class QueryByMulConditions extends BaseHttpServlet {
                 d.addProperty("ctr", 0);
                 d.addProperty("cpa", 0);
                 d.addProperty("cvr", 0);
-                d.addProperty("ctr_mul_cvr", 0);
+                d.addProperty("cEcpm", 0);
+                d.addProperty("ctrMulCvr", 0);
                 d.addProperty("un_rate", -100000);
                 if (admobCheck) {
                     d.addProperty("network", "admob");

@@ -527,7 +527,7 @@ function setData(data) {
         var tr = $('<tr></tr>');
         var countryCheck = $('#countryCheck').is(':checked');
         var keyset = ["campaign_id", "account_id", "short_name", "campaign_name", "create_time",
-            "status", "budget", "bidding", "spend", "installed", "click", "cpa", "ecpm", "ctr", "cvr", "ctr_mul_cvr", "un_rate"];
+            "status", "budget", "bidding", "spend", "installed", "click", "cpa", "cEcpm", "ctr", "cvr", "ctrMulCvr", "un_rate"];
         var modifyColumns = ["campaign_name", "budget", "bidding"];
         if (countryCheck) {
             keyset = ["country_name", "impressions", "spend", "installed", "click", "cpa", "ctr", "cvr"];
