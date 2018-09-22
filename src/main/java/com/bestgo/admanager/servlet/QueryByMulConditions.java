@@ -516,7 +516,7 @@ public class QueryByMulConditions extends BaseHttpServlet {
                             j.addProperty("cEcpm", c.cEcpm);
                             j.addProperty("ctrMulCvr", c.ctrMulCvr);
                             j.addProperty("un_rate", c.un_rate);
-                            j.addProperty("campaign_spends", c.campaign_spends);
+                            j.addProperty("campaign_spends", NumberUtil.trimDouble(c.campaign_spends,2));
                             j.addProperty("network", c.network);
                             jsonArray.add(j);
                         }
@@ -1133,7 +1133,7 @@ public class QueryByMulConditions extends BaseHttpServlet {
                 d.addProperty("bidding", bidding);
                 d.addProperty("impressions", impressions);
                 d.addProperty("spend", NumberUtil.trimDouble(spend, 2));
-                d.addProperty("campaign_spends", campaign_spends);
+                d.addProperty("campaign_spends", NumberUtil.trimDouble(campaign_spends,2));
                 d.addProperty("installed", installed);
                 d.addProperty("click", click);
                 d.addProperty("ctr", NumberUtil.trimDouble(ctr, 3));
@@ -1193,7 +1193,7 @@ public class QueryByMulConditions extends BaseHttpServlet {
                 d.addProperty("bidding", bidding);
                 d.addProperty("impressions", 0);
                 d.addProperty("spend", NumberUtil.trimDouble(spend, 2));
-                d.addProperty("campaign_spends", campaign_spends);
+                d.addProperty("campaign_spends", NumberUtil.trimDouble(campaign_spends,2));
                 d.addProperty("installed", 0);
                 d.addProperty("click", 0);
                 d.addProperty("ctr", 0);
