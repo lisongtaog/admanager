@@ -542,7 +542,7 @@ public class QueryByMulConditions extends BaseHttpServlet {
                         record.click += one.get("click").getAsDouble();
                         record.spend += one.get("spend").getAsDouble();
                     }
-                    if (sorter > 0) {
+                    if (sorter > 0) {  //如果【细分到国家】被选中并且有排序
                         List<CountryRecord> countryRecordList = new ArrayList<>();
                         for (String key : dataSets.keySet()) {
                             CountryRecord record = dataSets.get(key);
@@ -791,7 +791,7 @@ public class QueryByMulConditions extends BaseHttpServlet {
                             one.addProperty("un_rate", NumberUtil.trimDouble(record.un_rate, 3));
                             newArr.add(one);
                         }
-                    } else {
+                    } else {  //如果【细分到国家】被选中并且没有排序
                         for (String key : dataSets.keySet()) {
                             JsonObject one = new JsonObject();
                             CountryRecord record = dataSets.get(key);
@@ -1115,8 +1115,8 @@ public class QueryByMulConditions extends BaseHttpServlet {
                 total_cpa = total_installed > 0 ? total_spend / total_installed : 0;
                 total_cvr = total_click > 0 ? total_installed / total_click : 0;
 
-                //针对系列的ECPM
-                double ecpm = impressions == 0 ? 0 : spend * 1000 / impressions;
+                //针对系列的ECPM,其实就是CPM，cECPM
+                double ecpm = impressions > 0 ? spend * 1000 / impressions : 0;
 
                 d.addProperty("campaign_id", campaignId);
                 d.addProperty("short_name", short_name);

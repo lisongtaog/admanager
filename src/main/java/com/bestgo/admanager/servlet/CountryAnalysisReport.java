@@ -49,9 +49,6 @@ public class CountryAnalysisReport extends BaseHttpServlet {
             }
         }
 
-//        String beforeFourDay = DateUtil.addDay(endTime, -4, "yyyy-MM-dd");//不包括endTime
-//        String beforeTwentyTwoDay = DateUtil.addDay(endTime, -22, "yyyy-MM-dd");//不包括endTime
-
         if (path.matches("/modify_web_ad_rules")) {//修改国家 规则上限
             jsonObject = editCountryMaxCost(request, tagNameIdMap);
         } else if (path.matches("/modify_app_country_target")) {//修改国家 期望cpa、ecpm、用户平均广告展示数
@@ -680,7 +677,6 @@ public class CountryAnalysisReport extends BaseHttpServlet {
                     ratioList.add(date + split + NumberUtil.trimDouble(recoveryCostRatio, 3));
                     newUserEcpmList.add(date + split + NumberUtil.trimDouble(newUserEcpm, 4));
                     newUserAvgImpList.add(date + split + NumberUtil.trimDouble(newUserAvgImpression, 4));
-//                    oldUserAvgImpList.add(date + split + NumberUtil.trimDouble(oldUserAvgImpression,4));
                     //当日变现能力
                     newUserTagRevenueList.add(date + split + NumberUtil.trimDouble(newUserTagRevenue, 4) + " = " + NumberUtil.trimDouble(newUserEcpm, 4) + " * " + NumberUtil.trimDouble(newUserAvgImpression, 4) + " / " + 1000);
                 }
@@ -698,7 +694,6 @@ public class CountryAnalysisReport extends BaseHttpServlet {
                 revenueList, newRevenueList, ecpmList, cpaList, cpaDivEcpmList, incomingList,
                 ratioList, newUserEcpmList, newUserAvgImpList, newUserTagRevenueList;
         Map<String, List> item = null;
-//        List oldUserAvgImpList;
         item = dataMap.get(countryCode);
         if (null == item) {
             item = new HashMap<String, List>();
@@ -716,7 +711,6 @@ public class CountryAnalysisReport extends BaseHttpServlet {
             ratioList = new ArrayList();
             newUserEcpmList = new ArrayList();
             newUserAvgImpList = new ArrayList();
-//            oldUserAvgImpList = new ArrayList();
             newUserTagRevenueList = new ArrayList();//当日变现能力
 
             item.put("cost", costList);
@@ -743,6 +737,9 @@ public class CountryAnalysisReport extends BaseHttpServlet {
 
     /**
      * 国家花费上限修改
+     * @param request
+     * @param tagNameIdMap
+     * @return
      */
     private static JsonObject editCountryMaxCost(HttpServletRequest request, Map<String, Long> tagNameIdMap) {
         JsonObject jsonObject = new JsonObject();
@@ -759,31 +756,36 @@ public class CountryAnalysisReport extends BaseHttpServlet {
             try {
                 String sql = "SELECT id,rule_content FROM web_ad_rules WHERE rule_type = 3 AND rule_content LIKE '%app_name=" + app_name + "%country_code=" + countryCode + "%'";
                 JSObject one = DB.findOneBySql(sql);
-
-                if (one.hasObjectData() && "".equals(cost)) {//删除
+                if (one.hasObjectData()) {
                     long id = one.get("id");
-                    DB.delete("web_ad_rules").where(DB.filter().whereEqualTo("id", id)).execute();
-                } else if (one.hasObjectData() && !"".equals(cost)) {//更新
-                    long id = one.get("id");
-                    String rule_content = one.get("rule_content");
-                    String newLine = rule_content.replaceAll("cost>\\d*", "cost>" + cost);
-                    flag = DB.update("web_ad_rules")
-                            .put("rule_content", newLine)
-                            .where(DB.filter().whereEqualTo("id", id))
-                            .execute();
-                } else if (!one.hasObjectData() && !"".equals(cost)) {//数据库查询无值，并且设置了cost，则为插入新规则
-                    Long tagId = tagNameIdMap.get(app_name);
-                    String ruleContent = "app_name=" + app_name + ",country_code=" + countryCode + ",cpa_div_ecpm>0.2,cost>" + cost;
-                    if (tagId == null || tagId == 0L) {
-                        jsonObject.addProperty("ret", 0);
-                        jsonObject.addProperty("message", "标签ID为空，请联系管理员");
+                    if (cost == null || "".equals(cost) || "0".equals(cost)) {//删除
+                        DB.delete("web_ad_rules").where(DB.filter().whereEqualTo("id", id)).execute();
+                        flag = true;
                     } else {
-                        flag = DB.insert("web_ad_rules")
-                                .put("rule_type", 3)
-                                .put("rule_content", ruleContent)
-                                .put("tag_id", tagId)
-                                .put("tag_name", app_name)
+                        String rule_content = one.get("rule_content");
+                        rule_content = rule_content.replaceAll("cost>\\d*", "cost>" + cost);
+                        flag = DB.update("web_ad_rules")
+                                .put("rule_content", rule_content)
+                                .where(DB.filter().whereEqualTo("id", id))
                                 .execute();
+                    }
+                } else {
+                    if (cost == null || "".equals(cost) || "0".equals(cost)) {//不操作数据库
+                        flag = true;
+                    } else {
+                        Long tagId = tagNameIdMap.get(app_name);
+                        String ruleContent = "app_name=" + app_name + ",country_code=" + countryCode + ",cpa_div_ecpm>0.2,cost>" + cost;
+                        if (tagId == null || tagId == 0L) {
+                            jsonObject.addProperty("ret", 0);
+                            jsonObject.addProperty("message", "标签ID为空，请联系管理员");
+                        } else {
+                            flag = DB.insert("web_ad_rules")
+                                    .put("rule_type", 3)
+                                    .put("rule_content", ruleContent)
+                                    .put("tag_id", tagId)
+                                    .put("tag_name", app_name)
+                                    .execute();
+                        }
                     }
                 }
             } catch (Exception e) {
