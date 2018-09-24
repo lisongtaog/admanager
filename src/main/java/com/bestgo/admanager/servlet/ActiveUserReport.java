@@ -1,12 +1,14 @@
 package com.bestgo.admanager.servlet;
 
 import com.bestgo.admanager.utils.DateUtil;
+import com.bestgo.admanager.utils.JedisPoolUtil;
 import com.bestgo.admanager.utils.NumberUtil;
 import com.bestgo.admanager.utils.Utils;
 import com.bestgo.common.database.services.DB;
 import com.bestgo.common.database.utils.JSObject;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import redis.clients.jedis.Jedis;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -23,34 +25,10 @@ import java.util.*;
  */
 @WebServlet(name = "ActiveUserReport", urlPatterns = {"/active_user_report/*"})
 public class ActiveUserReport extends BaseHttpServlet {
-    private static Map<String,String> countryCodeMap;
-    static{
-        if(countryCodeMap == null){
-            countryCodeMap = new HashMap<>();
-        }
-        String sql = "select country_code,country_name from app_country_code_dict";
-        List<JSObject> list = null;
-        try {
-            list = DB.findListBySql(sql);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        if(list != null){
-            for(JSObject j : list){
-                if(j != null && j.hasObjectData()){
-                    String countryCode = j.get("country_code");
-                    String countryName = j.get("country_name");
-                    if(countryCode != null && countryName != null){
-                        countryCodeMap.put(countryCode,countryName);
-                    }
-                }
-            }
-        }
-    }
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         super.doPost(request, response);
         if (!Utils.isAdmin(request, response)) return;
-
+        Jedis jedis = JedisPoolUtil.getJedis();
         String path = request.getPathInfo();
         JsonObject jsonObject = new JsonObject();
         String tagName = request.getParameter("tagName");
@@ -104,21 +82,20 @@ public class ActiveUserReport extends BaseHttpServlet {
                     }
                 }
                 list = DB.findListBySql(sql);
+                JSObject one = null;
                 for (JSObject j : list) {
                     if(j.hasObjectData()){
                         JsonObject jo = new JsonObject();
                         String countryCode = j.get("country_code");
-                        String countryName = countryCodeMap.get(countryCode);
-                        JSObject one = null;
-                        if(countryName == null){
-                            sql = "select country_name from app_country_code_dict where country_code = '" + countryCode + "'";
-                            one = DB.findOneBySql(sql);
-                            if(one.hasObjectData()){
+                        String countryName = jedis.hget("countryCodeNameMap",countryCode);
+                        if (countryName == null) {
+                            one = DB.findOneBySql("SELECT country_name FROM app_country_code_dict WHERE country_code = '" + countryCode + "'");
+                            if (one.hasObjectData()) {
                                 countryName = one.get("country_name");
-                            }else{
+                                jedis.hset("countryCodeNameMap",countryCode,countryName);
+                            } else {
                                 countryName = "--";
                             }
-                            countryCodeMap.put(countryCode,countryName);
                         }
                         double sevenDaysAvgARPU = 0;
                         sql = "SELECT avg(arpu) AS seven_days_avg_arpu FROM web_ad_country_analysis_report_history h,web_facebook_app_ids_rel r " +

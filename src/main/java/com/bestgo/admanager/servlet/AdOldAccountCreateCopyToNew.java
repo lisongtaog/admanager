@@ -23,8 +23,8 @@ import java.util.List;
  * @date 2018/8/13
  * @desc Ad_old_account_create_copy_to_new
  */
-@WebServlet(name = "Ad_old_account_create_copy_to_new", urlPatterns = "/Ad_old_account_create_copy_to_new/*")
-public class Ad_old_account_create_copy_to_new extends BaseHttpServlet {
+@WebServlet(name = "AdOldAccountCreateCopyToNew", urlPatterns = "/Ad_old_account_create_copy_to_new/*")
+public class AdOldAccountCreateCopyToNew extends BaseHttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         doPost(request, response);
     }
