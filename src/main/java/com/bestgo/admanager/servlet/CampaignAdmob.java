@@ -2,6 +2,7 @@ package com.bestgo.admanager.servlet;
 
 import com.bestgo.admanager.Config;
 import com.bestgo.admanager.OperationResult;
+import com.bestgo.admanager.constant.JedisConstant;
 import com.bestgo.admanager.utils.DateUtil;
 import com.bestgo.admanager.utils.JedisPoolUtil;
 import com.bestgo.admanager.utils.NumberUtil;
@@ -220,12 +221,12 @@ public class CampaignAdmob extends BaseHttpServlet {
                 } else {
                     double dBidding = NumberUtil.parseDouble(bidding, 0);
                     double maxBidding = 0.1;
-                    String maxBiddingStr = jedis.hget("tagNameBiddingMap", appName);
+                    String maxBiddingStr = jedis.hget(JedisConstant.TAG_NAME_BIDDING_MAP, appName);
                     if (maxBiddingStr == null) {
                         JSObject one = DB.findOneBySql("select max_bidding from web_tag where tag_name = '" + appName + "'");
                         if (one.hasObjectData()) {
                             maxBidding = NumberUtil.convertDouble(one.get("max_bidding"), 0);
-                            jedis.hset("tagNameBiddingMap", appName, maxBidding + "");
+                            jedis.hset(JedisConstant.TAG_NAME_BIDDING_MAP, appName, maxBidding + "");
                         }
                     } else {
                         maxBidding = NumberUtil.parseDouble(maxBiddingStr, 0);
@@ -520,7 +521,7 @@ public class CampaignAdmob extends BaseHttpServlet {
             }
         } else if (path.startsWith("/selectMaxBiddingByAppName")) {
             String appName = request.getParameter("appName");
-            String maxBiddingStr = jedis.hget("tagNameBiddingMap", appName);
+            String maxBiddingStr = jedis.hget(JedisConstant.TAG_NAME_BIDDING_MAP, appName);
             if (maxBiddingStr == null) {
                 JSObject one = null;
                 try {
@@ -530,7 +531,7 @@ public class CampaignAdmob extends BaseHttpServlet {
                 }
                 if (one.hasObjectData()) {
                     maxBiddingStr = NumberUtil.convertDouble(one.get("max_bidding"), 0) + "";
-                    jedis.hset("tagNameBiddingMap", appName, maxBiddingStr);
+                    jedis.hset(JedisConstant.TAG_NAME_BIDDING_MAP, appName, maxBiddingStr);
                 }
             }
             if (maxBiddingStr != null) {

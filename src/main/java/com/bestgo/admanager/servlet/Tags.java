@@ -1,5 +1,6 @@
 package com.bestgo.admanager.servlet;
 
+import com.bestgo.admanager.constant.JedisConstant;
 import com.bestgo.admanager.utils.*;
 import com.bestgo.admanager.OperationResult;
 import com.bestgo.common.database.services.DB;
@@ -75,7 +76,7 @@ public class Tags extends BaseHttpServlet {
                     }
                     result = updateTag(idStr, tagName,maxBiddingStr,tagCategoryIdStr,anticipated_revenue,anticipated_incoming,user_id,is_statistics,is_display);
                     if (result.result) {
-                        jedis.hset("tagNameBiddingMap",tagName,maxBiddingStr);
+                        jedis.hset(JedisConstant.TAG_NAME_BIDDING_MAP,tagName,maxBiddingStr);
                     }
                     json.addProperty("ret", result.result ? 1 : 0);
                     json.addProperty("message", result.message);
