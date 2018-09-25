@@ -183,316 +183,8 @@ public class QueryByMulConditions extends BaseHttpServlet {
                     if (sorter > 0) {
                         List<Campaigns> campaignsList = gson.fromJson(array, new TypeToken<List<Campaigns>>() {
                         }.getType());
-                        switch (sorter) {
-                            case 1:
-                                Collections.sort(campaignsList, new Comparator<Campaigns>() {
-                                    @Override
-                                    public int compare(Campaigns a, Campaigns b) {
-                                        if (a.create_time.compareTo(b.create_time) > 0) {
-                                            return 1;
-                                        } else if (a.create_time.compareTo(b.create_time) < 0) {
-                                            return -1;
-                                        } else {
-                                            return 0;
-                                        }
-                                    }
-                                });
-                                break;
-                            case 1001:
-                                Collections.sort(campaignsList, new Comparator<Campaigns>() {
-                                    @Override
-                                    public int compare(Campaigns a, Campaigns b) {
-                                        if (a.create_time.compareTo(b.create_time) > 0) {
-                                            return -1;
-                                        } else if (a.create_time.compareTo(b.create_time) < 0) {
-                                            return 1;
-                                        } else {
-                                            return 0;
-                                        }
-                                    }
-                                });
-                                break;
-                            case 2:
-                                Collections.sort(campaignsList, new Comparator<Campaigns>() {
-                                    @Override
-                                    public int compare(Campaigns a, Campaigns b) {
-                                        if (a.status.compareTo(b.status) > 0) {
-                                            return 1;
-                                        } else if (a.status.compareTo(b.status) < 0) {
-                                            return -1;
-                                        } else {
-                                            return 0;
-                                        }
-                                    }
-                                });
-                                break;
-                            case 1002:
-                                Collections.sort(campaignsList, new Comparator<Campaigns>() {
-                                    @Override
-                                    public int compare(Campaigns a, Campaigns b) {
-                                        if (a.status.compareTo(b.status) > 0) {
-                                            return -1;
-                                        } else if (a.status.compareTo(b.status) < 0) {
-                                            return 1;
-                                        } else {
-                                            return 0;
-                                        }
-                                    }
-                                });
-                                break;
-                            case 3:
-                                Collections.sort(campaignsList, new Comparator<Campaigns>() {
-                                    @Override
-                                    public int compare(Campaigns a, Campaigns b) {
-                                        if (a.budget > b.budget) {
-                                            return 1;
-                                        } else if (a.budget < b.budget) {
-                                            return -1;
-                                        } else {
-                                            return 0;
-                                        }
-                                    }
-                                });
-                                break;
-                            case 1003:
-                                Collections.sort(campaignsList, new Comparator<Campaigns>() {
-                                    @Override
-                                    public int compare(Campaigns a, Campaigns b) {
-                                        if (a.budget > b.budget) {
-                                            return -1;
-                                        } else if (a.budget < b.budget) {
-                                            return 1;
-                                        } else {
-                                            return 0;
-                                        }
-                                    }
-                                });
-                                break;
-                            case 4:
-                                Collections.sort(campaignsList, new Comparator<Campaigns>() {
-                                    @Override
-                                    public int compare(Campaigns a, Campaigns b) {
-                                        if (a.bidding > b.bidding) {
-                                            return 1;
-                                        } else if (a.bidding < b.bidding) {
-                                            return -1;
-                                        } else {
-                                            return 0;
-                                        }
-                                    }
-                                });
-                                break;
-                            case 1004:
-                                Collections.sort(campaignsList, new Comparator<Campaigns>() {
-                                    @Override
-                                    public int compare(Campaigns a, Campaigns b) {
-                                        if (a.bidding > b.bidding) {
-                                            return -1;
-                                        } else if (a.bidding < b.bidding) {
-                                            return 1;
-                                        } else {
-                                            return 0;
-                                        }
-                                    }
-                                });
-                                break;
-                            case 5:
-                                Collections.sort(campaignsList, new Comparator<Campaigns>() {
-                                    @Override
-                                    public int compare(Campaigns a, Campaigns b) {
-                                        if (a.spend > b.spend) {
-                                            return 1;
-                                        } else if (a.spend < b.spend) {
-                                            return -1;
-                                        } else {
-                                            return 0;
-                                        }
-                                    }
-                                });
-                                break;
-                            case 1005:
-                                Collections.sort(campaignsList, new Comparator<Campaigns>() {
-                                    @Override
-                                    public int compare(Campaigns a, Campaigns b) {
-                                        if (a.spend > b.spend) {
-                                            return -1;
-                                        } else if (a.spend < b.spend) {
-                                            return 1;
-                                        } else {
-                                            return 0;
-                                        }
-                                    }
-                                });
-                                break;
-                            case 6:
-                                Collections.sort(campaignsList, new Comparator<Campaigns>() {
-                                    @Override
-                                    public int compare(Campaigns a, Campaigns b) {
-                                        if (a.installed > b.installed) {
-                                            return 1;
-                                        } else if (a.installed < b.installed) {
-                                            return -1;
-                                        } else {
-                                            return 0;
-                                        }
-                                    }
-                                });
-                                break;
-                            case 1006:
-                                Collections.sort(campaignsList, new Comparator<Campaigns>() {
-                                    @Override
-                                    public int compare(Campaigns a, Campaigns b) {
-                                        if (a.installed > b.installed) {
-                                            return -1;
-                                        } else if (a.installed < b.installed) {
-                                            return 1;
-                                        } else {
-                                            return 0;
-                                        }
-                                    }
-                                });
-                                break;
-                            case 7:
-                                Collections.sort(campaignsList, new Comparator<Campaigns>() {
-                                    @Override
-                                    public int compare(Campaigns a, Campaigns b) {
-                                        if (a.click > b.click) {
-                                            return 1;
-                                        } else if (a.click < b.click) {
-                                            return -1;
-                                        } else {
-                                            return 0;
-                                        }
-                                    }
-                                });
-                                break;
-                            case 1007:
-                                Collections.sort(campaignsList, new Comparator<Campaigns>() {
-                                    @Override
-                                    public int compare(Campaigns a, Campaigns b) {
-                                        if (a.click > b.click) {
-                                            return -1;
-                                        } else if (a.click < b.click) {
-                                            return 1;
-                                        } else {
-                                            return 0;
-                                        }
-                                    }
-                                });
-                                break;
-                            case 8:
-                                Collections.sort(campaignsList, new Comparator<Campaigns>() {
-                                    @Override
-                                    public int compare(Campaigns a, Campaigns b) {
-                                        if (a.cpa > b.cpa) {
-                                            return 1;
-                                        } else if (a.cpa < b.cpa) {
-                                            return -1;
-                                        } else {
-                                            return 0;
-                                        }
-                                    }
-                                });
-                                break;
-                            case 1008:
-                                Collections.sort(campaignsList, new Comparator<Campaigns>() {
-                                    @Override
-                                    public int compare(Campaigns a, Campaigns b) {
-                                        if (a.cpa > b.cpa) {
-                                            return -1;
-                                        } else if (a.cpa < b.cpa) {
-                                            return 1;
-                                        } else {
-                                            return 0;
-                                        }
-                                    }
-                                });
-                                break;
-                            case 9:
-                                Collections.sort(campaignsList, new Comparator<Campaigns>() {
-                                    @Override
-                                    public int compare(Campaigns a, Campaigns b) {
-                                        if (a.ctr > b.ctr) {
-                                            return 1;
-                                        } else if (a.ctr < b.ctr) {
-                                            return -1;
-                                        } else {
-                                            return 0;
-                                        }
-                                    }
-                                });
-                                break;
-                            case 1009:
-                                Collections.sort(campaignsList, new Comparator<Campaigns>() {
-                                    @Override
-                                    public int compare(Campaigns a, Campaigns b) {
-                                        if (a.ctr > b.ctr) {
-                                            return -1;
-                                        } else if (a.ctr < b.ctr) {
-                                            return 1;
-                                        } else {
-                                            return 0;
-                                        }
-                                    }
-                                });
-                                break;
-                            case 10:
-                                Collections.sort(campaignsList, new Comparator<Campaigns>() {
-                                    @Override
-                                    public int compare(Campaigns a, Campaigns b) {
-                                        if (a.cvr > b.cvr) {
-                                            return 1;
-                                        } else if (a.cvr < b.cvr) {
-                                            return -1;
-                                        } else {
-                                            return 0;
-                                        }
-                                    }
-                                });
-                                break;
-                            case 1010:
-                                Collections.sort(campaignsList, new Comparator<Campaigns>() {
-                                    @Override
-                                    public int compare(Campaigns a, Campaigns b) {
-                                        if (a.cvr > b.cvr) {
-                                            return -1;
-                                        } else if (a.cvr < b.cvr) {
-                                            return 1;
-                                        } else {
-                                            return 0;
-                                        }
-                                    }
-                                });
-                                break;
-                            case 11:
-                                Collections.sort(campaignsList, new Comparator<Campaigns>() {
-                                    @Override
-                                    public int compare(Campaigns a, Campaigns b) {
-                                        if (a.un_rate > b.un_rate) {
-                                            return 1;
-                                        } else if (a.un_rate < b.un_rate) {
-                                            return -1;
-                                        } else {
-                                            return 0;
-                                        }
-                                    }
-                                });
-                                break;
-                            case 1011:
-                                Collections.sort(campaignsList, new Comparator<Campaigns>() {
-                                    @Override
-                                    public int compare(Campaigns a, Campaigns b) {
-                                        if (a.un_rate > b.un_rate) {
-                                            return -1;
-                                        } else if (a.un_rate < b.un_rate) {
-                                            return 1;
-                                        } else {
-                                            return 0;
-                                        }
-                                    }
-                                });
-                                break;
-                        }
+                        //系列排序
+                        sort(sorter,campaignsList);
 
                         for (Campaigns c : campaignsList) {
                             JsonObject j = new JsonObject();
@@ -555,232 +247,8 @@ public class QueryByMulConditions extends BaseHttpServlet {
                             record.cvr = record.click > 0 ? record.installed / record.click : 0;
                             countryRecordList.add(record);
                         }
-                        switch (sorter) {
-                            case 21:
-                                Collections.sort(countryRecordList, new Comparator<CountryRecord>() {
-                                    @Override
-                                    public int compare(CountryRecord a, CountryRecord b) {
-                                        if (a.impressions > b.impressions) {
-                                            return 1;
-                                        } else if (a.impressions < b.impressions) {
-                                            return -1;
-                                        } else {
-                                            return 0;
-                                        }
-                                    }
-                                });
-                                break;
-                            case 1021:
-                                Collections.sort(countryRecordList, new Comparator<CountryRecord>() {
-                                    @Override
-                                    public int compare(CountryRecord a, CountryRecord b) {
-                                        if (a.impressions > b.impressions) {
-                                            return -1;
-                                        } else if (a.impressions < b.impressions) {
-                                            return 1;
-                                        } else {
-                                            return 0;
-                                        }
-                                    }
-                                });
-                                break;
-                            case 22:
-                                Collections.sort(countryRecordList, new Comparator<CountryRecord>() {
-                                    @Override
-                                    public int compare(CountryRecord a, CountryRecord b) {
-                                        if (a.spend > b.spend) {
-                                            return 1;
-                                        } else if (a.spend < b.spend) {
-                                            return -1;
-                                        } else {
-                                            return 0;
-                                        }
-                                    }
-                                });
-                                break;
-                            case 1022:
-                                Collections.sort(countryRecordList, new Comparator<CountryRecord>() {
-                                    @Override
-                                    public int compare(CountryRecord a, CountryRecord b) {
-                                        if (a.spend > b.spend) {
-                                            return -1;
-                                        } else if (a.spend < b.spend) {
-                                            return 1;
-                                        } else {
-                                            return 0;
-                                        }
-                                    }
-                                });
-                                break;
-                            case 23:
-                                Collections.sort(countryRecordList, new Comparator<CountryRecord>() {
-                                    @Override
-                                    public int compare(CountryRecord a, CountryRecord b) {
-                                        if (a.installed > b.installed) {
-                                            return 1;
-                                        } else if (a.installed < b.installed) {
-                                            return -1;
-                                        } else {
-                                            return 0;
-                                        }
-                                    }
-                                });
-                                break;
-                            case 1023:
-                                Collections.sort(countryRecordList, new Comparator<CountryRecord>() {
-                                    @Override
-                                    public int compare(CountryRecord a, CountryRecord b) {
-                                        if (a.installed > b.installed) {
-                                            return -1;
-                                        } else if (a.installed < b.installed) {
-                                            return 1;
-                                        } else {
-                                            return 0;
-                                        }
-                                    }
-                                });
-                                break;
-                            case 24:
-                                Collections.sort(countryRecordList, new Comparator<CountryRecord>() {
-                                    @Override
-                                    public int compare(CountryRecord a, CountryRecord b) {
-                                        if (a.click > b.click) {
-                                            return 1;
-                                        } else if (a.click < b.click) {
-                                            return -1;
-                                        } else {
-                                            return 0;
-                                        }
-                                    }
-                                });
-                                break;
-                            case 1024:
-                                Collections.sort(countryRecordList, new Comparator<CountryRecord>() {
-                                    @Override
-                                    public int compare(CountryRecord a, CountryRecord b) {
-                                        if (a.click > b.click) {
-                                            return -1;
-                                        } else if (a.click < b.click) {
-                                            return 1;
-                                        } else {
-                                            return 0;
-                                        }
-                                    }
-                                });
-                                break;
-                            case 25:
-                                Collections.sort(countryRecordList, new Comparator<CountryRecord>() {
-                                    @Override
-                                    public int compare(CountryRecord a, CountryRecord b) {
-                                        if (a.cpa > b.cpa) {
-                                            return 1;
-                                        } else if (a.cpa < b.cpa) {
-                                            return -1;
-                                        } else {
-                                            return 0;
-                                        }
-                                    }
-                                });
-                                break;
-                            case 1025:
-                                Collections.sort(countryRecordList, new Comparator<CountryRecord>() {
-                                    @Override
-                                    public int compare(CountryRecord a, CountryRecord b) {
-                                        if (a.cpa > b.cpa) {
-                                            return -1;
-                                        } else if (a.cpa < b.cpa) {
-                                            return 1;
-                                        } else {
-                                            return 0;
-                                        }
-                                    }
-                                });
-                                break;
-                            case 26:
-                                Collections.sort(countryRecordList, new Comparator<CountryRecord>() {
-                                    @Override
-                                    public int compare(CountryRecord a, CountryRecord b) {
-                                        if (a.ctr > b.ctr) {
-                                            return 1;
-                                        } else if (a.ctr < b.ctr) {
-                                            return -1;
-                                        } else {
-                                            return 0;
-                                        }
-                                    }
-                                });
-                                break;
-                            case 1026:
-                                Collections.sort(countryRecordList, new Comparator<CountryRecord>() {
-                                    @Override
-                                    public int compare(CountryRecord a, CountryRecord b) {
-                                        if (a.ctr > b.ctr) {
-                                            return -1;
-                                        } else if (a.ctr < b.ctr) {
-                                            return 1;
-                                        } else {
-                                            return 0;
-                                        }
-                                    }
-                                });
-                                break;
-                            case 27:
-                                Collections.sort(countryRecordList, new Comparator<CountryRecord>() {
-                                    @Override
-                                    public int compare(CountryRecord a, CountryRecord b) {
-                                        if (a.cvr > b.cvr) {
-                                            return 1;
-                                        } else if (a.cvr < b.cvr) {
-                                            return -1;
-                                        } else {
-                                            return 0;
-                                        }
-                                    }
-                                });
-                                break;
-                            case 1027:
-                                Collections.sort(countryRecordList, new Comparator<CountryRecord>() {
-                                    @Override
-                                    public int compare(CountryRecord a, CountryRecord b) {
-                                        if (a.cvr > b.cvr) {
-                                            return -1;
-                                        } else if (a.cvr < b.cvr) {
-                                            return 1;
-                                        } else {
-                                            return 0;
-                                        }
-                                    }
-                                });
-                                break;
-                            case 28:
-                                Collections.sort(countryRecordList, new Comparator<CountryRecord>() {
-                                    @Override
-                                    public int compare(CountryRecord a, CountryRecord b) {
-                                        if (a.un_rate > b.un_rate) {
-                                            return 1;
-                                        } else if (a.un_rate < b.un_rate) {
-                                            return -1;
-                                        } else {
-                                            return 0;
-                                        }
-                                    }
-                                });
-                                break;
-                            case 1028:
-                                Collections.sort(countryRecordList, new Comparator<CountryRecord>() {
-                                    @Override
-                                    public int compare(CountryRecord a, CountryRecord b) {
-                                        if (a.un_rate > b.un_rate) {
-                                            return -1;
-                                        } else if (a.un_rate < b.un_rate) {
-                                            return 1;
-                                        } else {
-                                            return 0;
-                                        }
-                                    }
-                                });
-                                break;
-                        }
+                        //国家维度系列排序
+                        sortCountry(sorter,countryRecordList);
                         for (CountryRecord record : countryRecordList) {
                             JsonObject one = new JsonObject();
                             one.addProperty("country_name", record.country_name);
@@ -1232,6 +700,553 @@ public class QueryByMulConditions extends BaseHttpServlet {
         jsonObject.addProperty("total_cpa", NumberUtil.trimDouble(total_cpa, 3));
         jsonObject.addProperty("total_cvr", NumberUtil.trimDouble(total_cvr, 3));
         return jsonObject;
+    }
+
+    /**
+     * 对系列list的排序
+     * @param sorter
+     * @param campaignsList
+     */
+    private void sort(int sorter,List<Campaigns> campaignsList){
+        switch (sorter) {
+            case 1:
+                Collections.sort(campaignsList, new Comparator<Campaigns>() {
+                    @Override
+                    public int compare(Campaigns a, Campaigns b) {
+                        if (a.create_time.compareTo(b.create_time) > 0) {
+                            return 1;
+                        } else if (a.create_time.compareTo(b.create_time) < 0) {
+                            return -1;
+                        } else {
+                            return 0;
+                        }
+                    }
+                });
+                break;
+            case 1001:
+                Collections.sort(campaignsList, new Comparator<Campaigns>() {
+                    @Override
+                    public int compare(Campaigns a, Campaigns b) {
+                        if (a.create_time.compareTo(b.create_time) > 0) {
+                            return -1;
+                        } else if (a.create_time.compareTo(b.create_time) < 0) {
+                            return 1;
+                        } else {
+                            return 0;
+                        }
+                    }
+                });
+                break;
+            case 2:
+                Collections.sort(campaignsList, new Comparator<Campaigns>() {
+                    @Override
+                    public int compare(Campaigns a, Campaigns b) {
+                        if (a.status.compareTo(b.status) > 0) {
+                            return 1;
+                        } else if (a.status.compareTo(b.status) < 0) {
+                            return -1;
+                        } else {
+                            return 0;
+                        }
+                    }
+                });
+                break;
+            case 1002:
+                Collections.sort(campaignsList, new Comparator<Campaigns>() {
+                    @Override
+                    public int compare(Campaigns a, Campaigns b) {
+                        if (a.status.compareTo(b.status) > 0) {
+                            return -1;
+                        } else if (a.status.compareTo(b.status) < 0) {
+                            return 1;
+                        } else {
+                            return 0;
+                        }
+                    }
+                });
+                break;
+            case 3:
+                Collections.sort(campaignsList, new Comparator<Campaigns>() {
+                    @Override
+                    public int compare(Campaigns a, Campaigns b) {
+                        if (a.budget > b.budget) {
+                            return 1;
+                        } else if (a.budget < b.budget) {
+                            return -1;
+                        } else {
+                            return 0;
+                        }
+                    }
+                });
+                break;
+            case 1003:
+                Collections.sort(campaignsList, new Comparator<Campaigns>() {
+                    @Override
+                    public int compare(Campaigns a, Campaigns b) {
+                        if (a.budget > b.budget) {
+                            return -1;
+                        } else if (a.budget < b.budget) {
+                            return 1;
+                        } else {
+                            return 0;
+                        }
+                    }
+                });
+                break;
+            case 4:
+                Collections.sort(campaignsList, new Comparator<Campaigns>() {
+                    @Override
+                    public int compare(Campaigns a, Campaigns b) {
+                        if (a.bidding > b.bidding) {
+                            return 1;
+                        } else if (a.bidding < b.bidding) {
+                            return -1;
+                        } else {
+                            return 0;
+                        }
+                    }
+                });
+                break;
+            case 1004:
+                Collections.sort(campaignsList, new Comparator<Campaigns>() {
+                    @Override
+                    public int compare(Campaigns a, Campaigns b) {
+                        if (a.bidding > b.bidding) {
+                            return -1;
+                        } else if (a.bidding < b.bidding) {
+                            return 1;
+                        } else {
+                            return 0;
+                        }
+                    }
+                });
+                break;
+            case 5:
+                Collections.sort(campaignsList, new Comparator<Campaigns>() {
+                    @Override
+                    public int compare(Campaigns a, Campaigns b) {
+                        if (a.spend > b.spend) {
+                            return 1;
+                        } else if (a.spend < b.spend) {
+                            return -1;
+                        } else {
+                            return 0;
+                        }
+                    }
+                });
+                break;
+            case 1005:
+                Collections.sort(campaignsList, new Comparator<Campaigns>() {
+                    @Override
+                    public int compare(Campaigns a, Campaigns b) {
+                        if (a.spend > b.spend) {
+                            return -1;
+                        } else if (a.spend < b.spend) {
+                            return 1;
+                        } else {
+                            return 0;
+                        }
+                    }
+                });
+                break;
+            case 6:
+                Collections.sort(campaignsList, new Comparator<Campaigns>() {
+                    @Override
+                    public int compare(Campaigns a, Campaigns b) {
+                        if (a.installed > b.installed) {
+                            return 1;
+                        } else if (a.installed < b.installed) {
+                            return -1;
+                        } else {
+                            return 0;
+                        }
+                    }
+                });
+                break;
+            case 1006:
+                Collections.sort(campaignsList, new Comparator<Campaigns>() {
+                    @Override
+                    public int compare(Campaigns a, Campaigns b) {
+                        if (a.installed > b.installed) {
+                            return -1;
+                        } else if (a.installed < b.installed) {
+                            return 1;
+                        } else {
+                            return 0;
+                        }
+                    }
+                });
+                break;
+            case 7:
+                Collections.sort(campaignsList, new Comparator<Campaigns>() {
+                    @Override
+                    public int compare(Campaigns a, Campaigns b) {
+                        if (a.click > b.click) {
+                            return 1;
+                        } else if (a.click < b.click) {
+                            return -1;
+                        } else {
+                            return 0;
+                        }
+                    }
+                });
+                break;
+            case 1007:
+                Collections.sort(campaignsList, new Comparator<Campaigns>() {
+                    @Override
+                    public int compare(Campaigns a, Campaigns b) {
+                        if (a.click > b.click) {
+                            return -1;
+                        } else if (a.click < b.click) {
+                            return 1;
+                        } else {
+                            return 0;
+                        }
+                    }
+                });
+                break;
+            case 8:
+                Collections.sort(campaignsList, new Comparator<Campaigns>() {
+                    @Override
+                    public int compare(Campaigns a, Campaigns b) {
+                        if (a.cpa > b.cpa) {
+                            return 1;
+                        } else if (a.cpa < b.cpa) {
+                            return -1;
+                        } else {
+                            return 0;
+                        }
+                    }
+                });
+                break;
+            case 1008:
+                Collections.sort(campaignsList, new Comparator<Campaigns>() {
+                    @Override
+                    public int compare(Campaigns a, Campaigns b) {
+                        if (a.cpa > b.cpa) {
+                            return -1;
+                        } else if (a.cpa < b.cpa) {
+                            return 1;
+                        } else {
+                            return 0;
+                        }
+                    }
+                });
+                break;
+            case 9:
+                Collections.sort(campaignsList, new Comparator<Campaigns>() {
+                    @Override
+                    public int compare(Campaigns a, Campaigns b) {
+                        if (a.ctr > b.ctr) {
+                            return 1;
+                        } else if (a.ctr < b.ctr) {
+                            return -1;
+                        } else {
+                            return 0;
+                        }
+                    }
+                });
+                break;
+            case 1009:
+                Collections.sort(campaignsList, new Comparator<Campaigns>() {
+                    @Override
+                    public int compare(Campaigns a, Campaigns b) {
+                        if (a.ctr > b.ctr) {
+                            return -1;
+                        } else if (a.ctr < b.ctr) {
+                            return 1;
+                        } else {
+                            return 0;
+                        }
+                    }
+                });
+                break;
+            case 10:
+                Collections.sort(campaignsList, new Comparator<Campaigns>() {
+                    @Override
+                    public int compare(Campaigns a, Campaigns b) {
+                        if (a.cvr > b.cvr) {
+                            return 1;
+                        } else if (a.cvr < b.cvr) {
+                            return -1;
+                        } else {
+                            return 0;
+                        }
+                    }
+                });
+                break;
+            case 1010:
+                Collections.sort(campaignsList, new Comparator<Campaigns>() {
+                    @Override
+                    public int compare(Campaigns a, Campaigns b) {
+                        if (a.cvr > b.cvr) {
+                            return -1;
+                        } else if (a.cvr < b.cvr) {
+                            return 1;
+                        } else {
+                            return 0;
+                        }
+                    }
+                });
+                break;
+            case 11:
+                Collections.sort(campaignsList, new Comparator<Campaigns>() {
+                    @Override
+                    public int compare(Campaigns a, Campaigns b) {
+                        if (a.un_rate > b.un_rate) {
+                            return 1;
+                        } else if (a.un_rate < b.un_rate) {
+                            return -1;
+                        } else {
+                            return 0;
+                        }
+                    }
+                });
+                break;
+            case 1011:
+                Collections.sort(campaignsList, new Comparator<Campaigns>() {
+                    @Override
+                    public int compare(Campaigns a, Campaigns b) {
+                        if (a.un_rate > b.un_rate) {
+                            return -1;
+                        } else if (a.un_rate < b.un_rate) {
+                            return 1;
+                        } else {
+                            return 0;
+                        }
+                    }
+                });
+                break;
+        }
+    }
+
+    private void sortCountry(int sorter,List<CountryRecord> countryRecordList){
+        switch (sorter) {
+            case 21:
+                Collections.sort(countryRecordList, new Comparator<CountryRecord>() {
+                    @Override
+                    public int compare(CountryRecord a, CountryRecord b) {
+                        if (a.impressions > b.impressions) {
+                            return 1;
+                        } else if (a.impressions < b.impressions) {
+                            return -1;
+                        } else {
+                            return 0;
+                        }
+                    }
+                });
+                break;
+            case 1021:
+                Collections.sort(countryRecordList, new Comparator<CountryRecord>() {
+                    @Override
+                    public int compare(CountryRecord a, CountryRecord b) {
+                        if (a.impressions > b.impressions) {
+                            return -1;
+                        } else if (a.impressions < b.impressions) {
+                            return 1;
+                        } else {
+                            return 0;
+                        }
+                    }
+                });
+                break;
+            case 22:
+                Collections.sort(countryRecordList, new Comparator<CountryRecord>() {
+                    @Override
+                    public int compare(CountryRecord a, CountryRecord b) {
+                        if (a.spend > b.spend) {
+                            return 1;
+                        } else if (a.spend < b.spend) {
+                            return -1;
+                        } else {
+                            return 0;
+                        }
+                    }
+                });
+                break;
+            case 1022:
+                Collections.sort(countryRecordList, new Comparator<CountryRecord>() {
+                    @Override
+                    public int compare(CountryRecord a, CountryRecord b) {
+                        if (a.spend > b.spend) {
+                            return -1;
+                        } else if (a.spend < b.spend) {
+                            return 1;
+                        } else {
+                            return 0;
+                        }
+                    }
+                });
+                break;
+            case 23:
+                Collections.sort(countryRecordList, new Comparator<CountryRecord>() {
+                    @Override
+                    public int compare(CountryRecord a, CountryRecord b) {
+                        if (a.installed > b.installed) {
+                            return 1;
+                        } else if (a.installed < b.installed) {
+                            return -1;
+                        } else {
+                            return 0;
+                        }
+                    }
+                });
+                break;
+            case 1023:
+                Collections.sort(countryRecordList, new Comparator<CountryRecord>() {
+                    @Override
+                    public int compare(CountryRecord a, CountryRecord b) {
+                        if (a.installed > b.installed) {
+                            return -1;
+                        } else if (a.installed < b.installed) {
+                            return 1;
+                        } else {
+                            return 0;
+                        }
+                    }
+                });
+                break;
+            case 24:
+                Collections.sort(countryRecordList, new Comparator<CountryRecord>() {
+                    @Override
+                    public int compare(CountryRecord a, CountryRecord b) {
+                        if (a.click > b.click) {
+                            return 1;
+                        } else if (a.click < b.click) {
+                            return -1;
+                        } else {
+                            return 0;
+                        }
+                    }
+                });
+                break;
+            case 1024:
+                Collections.sort(countryRecordList, new Comparator<CountryRecord>() {
+                    @Override
+                    public int compare(CountryRecord a, CountryRecord b) {
+                        if (a.click > b.click) {
+                            return -1;
+                        } else if (a.click < b.click) {
+                            return 1;
+                        } else {
+                            return 0;
+                        }
+                    }
+                });
+                break;
+            case 25:
+                Collections.sort(countryRecordList, new Comparator<CountryRecord>() {
+                    @Override
+                    public int compare(CountryRecord a, CountryRecord b) {
+                        if (a.cpa > b.cpa) {
+                            return 1;
+                        } else if (a.cpa < b.cpa) {
+                            return -1;
+                        } else {
+                            return 0;
+                        }
+                    }
+                });
+                break;
+            case 1025:
+                Collections.sort(countryRecordList, new Comparator<CountryRecord>() {
+                    @Override
+                    public int compare(CountryRecord a, CountryRecord b) {
+                        if (a.cpa > b.cpa) {
+                            return -1;
+                        } else if (a.cpa < b.cpa) {
+                            return 1;
+                        } else {
+                            return 0;
+                        }
+                    }
+                });
+                break;
+            case 26:
+                Collections.sort(countryRecordList, new Comparator<CountryRecord>() {
+                    @Override
+                    public int compare(CountryRecord a, CountryRecord b) {
+                        if (a.ctr > b.ctr) {
+                            return 1;
+                        } else if (a.ctr < b.ctr) {
+                            return -1;
+                        } else {
+                            return 0;
+                        }
+                    }
+                });
+                break;
+            case 1026:
+                Collections.sort(countryRecordList, new Comparator<CountryRecord>() {
+                    @Override
+                    public int compare(CountryRecord a, CountryRecord b) {
+                        if (a.ctr > b.ctr) {
+                            return -1;
+                        } else if (a.ctr < b.ctr) {
+                            return 1;
+                        } else {
+                            return 0;
+                        }
+                    }
+                });
+                break;
+            case 27:
+                Collections.sort(countryRecordList, new Comparator<CountryRecord>() {
+                    @Override
+                    public int compare(CountryRecord a, CountryRecord b) {
+                        if (a.cvr > b.cvr) {
+                            return 1;
+                        } else if (a.cvr < b.cvr) {
+                            return -1;
+                        } else {
+                            return 0;
+                        }
+                    }
+                });
+                break;
+            case 1027:
+                Collections.sort(countryRecordList, new Comparator<CountryRecord>() {
+                    @Override
+                    public int compare(CountryRecord a, CountryRecord b) {
+                        if (a.cvr > b.cvr) {
+                            return -1;
+                        } else if (a.cvr < b.cvr) {
+                            return 1;
+                        } else {
+                            return 0;
+                        }
+                    }
+                });
+                break;
+            case 28:
+                Collections.sort(countryRecordList, new Comparator<CountryRecord>() {
+                    @Override
+                    public int compare(CountryRecord a, CountryRecord b) {
+                        if (a.un_rate > b.un_rate) {
+                            return 1;
+                        } else if (a.un_rate < b.un_rate) {
+                            return -1;
+                        } else {
+                            return 0;
+                        }
+                    }
+                });
+                break;
+            case 1028:
+                Collections.sort(countryRecordList, new Comparator<CountryRecord>() {
+                    @Override
+                    public int compare(CountryRecord a, CountryRecord b) {
+                        if (a.un_rate > b.un_rate) {
+                            return -1;
+                        } else if (a.un_rate < b.un_rate) {
+                            return 1;
+                        } else {
+                            return 0;
+                        }
+                    }
+                });
+                break;
+        }
     }
 
 }
