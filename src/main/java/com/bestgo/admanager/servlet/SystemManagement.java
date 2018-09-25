@@ -26,8 +26,8 @@ import java.util.List;
 /**
  * Created by jikai on 8/16/17.
  */
-@WebServlet(name = "System", urlPatterns = "/system/*")
-public class System extends BaseHttpServlet {
+@WebServlet(name = "SystemManagement", urlPatterns = "/system/*")
+public class SystemManagement extends BaseHttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         super.doPost(request, response);
         if (!Utils.isAdmin(request, response)) return;

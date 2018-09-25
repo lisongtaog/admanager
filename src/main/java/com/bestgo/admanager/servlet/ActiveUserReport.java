@@ -1,5 +1,6 @@
 package com.bestgo.admanager.servlet;
 
+import com.bestgo.admanager.constant.JedisConstant;
 import com.bestgo.admanager.utils.DateUtil;
 import com.bestgo.admanager.utils.JedisPoolUtil;
 import com.bestgo.admanager.utils.NumberUtil;
@@ -87,12 +88,12 @@ public class ActiveUserReport extends BaseHttpServlet {
                     if(j.hasObjectData()){
                         JsonObject jo = new JsonObject();
                         String countryCode = j.get("country_code");
-                        String countryName = jedis.hget("countryCodeNameMap",countryCode);
+                        String countryName = jedis.hget(JedisConstant.COUNTRY_CODE_NAME_MAP,countryCode);
                         if (countryName == null) {
                             one = DB.findOneBySql("SELECT country_name FROM app_country_code_dict WHERE country_code = '" + countryCode + "'");
                             if (one.hasObjectData()) {
                                 countryName = one.get("country_name");
-                                jedis.hset("countryCodeNameMap",countryCode,countryName);
+                                jedis.hset(JedisConstant.COUNTRY_CODE_NAME_MAP,countryCode,countryName);
                             } else {
                                 countryName = "--";
                             }
@@ -146,7 +147,9 @@ public class ActiveUserReport extends BaseHttpServlet {
                 jsonObject.addProperty("message", e.getMessage());
             }
         }
-
+        if (jedis != null) {
+            jedis.close();
+        }
         response.getWriter().write(jsonObject.toString());
     }
 
