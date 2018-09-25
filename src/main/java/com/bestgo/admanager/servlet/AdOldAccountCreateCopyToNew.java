@@ -21,7 +21,7 @@ import java.util.List;
 /**
  * @author lisongtao
  * @date 2018/8/13
- * @desc Ad_old_account_create_copy_to_new
+ * @desc 将已有广告语信息的账号的信息复制给新的账号
  */
 @WebServlet(name = "AdOldAccountCreateCopyToNew", urlPatterns = "/Ad_old_account_create_copy_to_new/*")
 public class AdOldAccountCreateCopyToNew extends BaseHttpServlet {
