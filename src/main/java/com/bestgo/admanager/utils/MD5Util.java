@@ -60,7 +60,8 @@ public class MD5Util {
 	}
 
 	public static void main(String args[]) {
-		String s = new String("cmwl2002nmm");
+		//zhoushanshan admin123
+		String s = new String("admin123");
 		System.out.println(digest(s));
 	}
 }

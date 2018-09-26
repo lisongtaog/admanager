@@ -587,6 +587,7 @@ function setData(data) {
             btn.click(function () {
                 var campaign_id = $(this).data("campaign_id");  //选中当前元素中键campaign_id的值
                 var budget = $(this).data("budget");
+                //web_ad_campaigns表里面存的预算和出价是美分，所以要除以100得到美元
                 budget = budget / 100;
                 var bidding = $(this).data("bidding");
                 bidding = bidding / 100;
