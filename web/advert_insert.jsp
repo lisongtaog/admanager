@@ -197,7 +197,7 @@
     function init() {
         $("li[role='presentation']:eq(6)").addClass("active");
         $('.select2').select2();
-        for(var i = 1; i<=50;i++){
+        for(var i = 1; i<=100;i++){
             $("#selectAdvertGroupId").append("<option value='"+i+"'>"+i+"</option>");
             $("#selectAdvertGroupIdAdmob").append("<option value='"+i+"'>"+i+"</option>");
         }
