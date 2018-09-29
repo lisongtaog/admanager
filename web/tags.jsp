@@ -394,7 +394,7 @@
             $("#inputRevenue").val(revenue);
             $("#inputIncoming").val(incoming);
             $("#user option").each(function (idx) {
-                var name = $(this).text();
+                var name = $(this).text().trim();
                 if (name == user) {
                     $("#user").val($(this).val());
                     return;
