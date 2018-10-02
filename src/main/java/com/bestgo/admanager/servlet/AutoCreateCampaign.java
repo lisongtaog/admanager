@@ -108,8 +108,12 @@ public class AutoCreateCampaign extends BaseHttpServlet {
                         result = new OperationResult();
                         result.result = true;
                         result.message = "执行成功";
-                        break;
+                    }else {
+                        result = new OperationResult();
+                        result.result = false;
+                        result.message = "无符合条件的数据！";
                     }
+                    break;
                 case "/query_by_id":
                     String id = request.getParameter("id");
                     JSObject one = facebookFetchById(id);
