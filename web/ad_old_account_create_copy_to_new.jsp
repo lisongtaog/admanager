@@ -2,11 +2,8 @@
 <%@ page import="com.bestgo.common.database.utils.JSObject" %>
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.ArrayList" %>
-<%@ page import="com.bestgo.admanager.servlet.Tags" %>
-<%@ page import="com.bestgo.common.database.services.DB" %>
-<%@ page import="com.bestgo.admanager.servlet.TagsBidAdmanager" %>
 <%@ page import="com.google.gson.JsonArray" %>
-<%@ page import="com.bestgo.admanager.servlet.Ad_old_account_create_copy_to_new" %>
+<%@ page import="com.bestgo.admanager.servlet.AdOldAccountCreateCopyToNew" %>
 
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@include file="common/rootBase.jsp" %>
@@ -31,13 +28,13 @@
     }
 
     //添加按钮数据的加载fetchAllAccount
-    List<JSObject> allTags = Ad_old_account_create_copy_to_new.fetchAllTags();
+    List<JSObject> allTags = AdOldAccountCreateCopyToNew.fetchAllTags();
     JsonArray array1 = new JsonArray();
     for (int i = 0; i < allTags.size(); i++) {
         array1.add((String) allTags.get(i).get("tag_name"));
     }
 
-    List<JSObject> allAccounts = Ad_old_account_create_copy_to_new.fetchAllAccount();
+    List<JSObject> allAccounts = AdOldAccountCreateCopyToNew.fetchAllAccount();
     JsonArray array2 = new JsonArray();
     for (int i = 0; i < allAccounts.size(); i++) {
         array2.add((String) allAccounts.get(i).get("account_id"));
@@ -74,7 +71,7 @@
                 //页面刷新，加载全部的数据。
                 List<JSObject> data = new ArrayList<>();
                 long totalPage = 0;
-                long count = Ad_old_account_create_copy_to_new.count();
+                long count = AdOldAccountCreateCopyToNew.count();
                 int index = NumberUtil.parseInt(request.getParameter("page_index"), 0);
                 int size = NumberUtil.parseInt(request.getParameter("page_size"), 20);
                 totalPage = count / size + (count % size == 0 ? 0 : 1);
@@ -82,7 +79,7 @@
                 int preIndex = index > 0 ? index - 1 : 0;
                 int nextPage = index < totalPage - 1 ? index + 1 : index;
 
-                data = Ad_old_account_create_copy_to_new.fetchAllData(index, size);
+                data = AdOldAccountCreateCopyToNew.fetchAllData(index, size);
             %>
 
             <%
