@@ -111,7 +111,7 @@ public class AutoCreateCampaign extends BaseHttpServlet {
                     }else {
                         result = new OperationResult();
                         result.result = false;
-                        result.message = "无符合条件的数据！";
+                        result.message = "无符合条件的数据！！";
                     }
                     break;
                 case "/query_by_id":
