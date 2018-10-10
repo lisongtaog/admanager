@@ -456,7 +456,7 @@ public class CampaignAdmob extends BaseHttpServlet {
             String tenDaysAgo = DateUtil.addDay(today, -10, "yyyy-MM-dd");//十天前
             JsonArray array = new JsonArray();
             try {
-                String sqlFilterAll = "SELECT id,campaign_id,campaign_name,account_id,create_time,STATUS,budget,bidding,total_spend,total_click,total_installed,total_impressions,cpa,ctr,tag_id,country_code\n" +
+                String sqlFilterAll = "SELECT id,campaign_id,campaign_name,account_id,create_time,status,budget,bidding,total_spend,total_click,total_installed,total_impressions,cpa,ctr,tag_id,country_code\n" +
                         "\tFROM web_ad_campaigns_admob \n" +
                         "\t\tWHERE create_time > '" + tenDaysAgo + "' AND  (tag_id = 0 OR country_code = '')";
                 List<JSObject> data = DB.findListBySql(sqlFilterAll);
