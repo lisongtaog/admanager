@@ -242,7 +242,6 @@ public class Tags extends BaseHttpServlet {
                     "web_tag t LEFT JOIN web_ad_login_user td ON t.user_id = td.id " +
                     "LEFT JOIN web_ad_tag_category tc ON t.tag_category_id = tc.id LIMIT "+(index * size)+","+size;
             return DB.findListBySql(sql);
-//            return DB.scan("web_tag").select("id", "tag_name","max_bidding","tag_category_id").limit(size).start(index * size).orderByAsc("id").execute();
         } catch (Exception ex) {
             Logger logger = Logger.getRootLogger();
             logger.error(ex.getMessage(), ex);
@@ -322,7 +321,7 @@ public class Tags extends BaseHttpServlet {
                 }
 
                 //根据标签名称创建分表
-                try {
+                /*try {
                     DB.updateBySql("CREATE TABLE `web_ad_campaigns_history_" + tagName + "`(" +
                             " `id` int(10) unsigned NOT NULL AUTO_INCREMENT," +
                             "  `campaign_id` varchar(50) NOT NULL," +
@@ -394,7 +393,7 @@ public class Tags extends BaseHttpServlet {
                             ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
                 } catch (Exception e) {
                     e.printStackTrace();
-                }
+                }*/
             }
         } catch (Exception e) {
             ret.result = false;
