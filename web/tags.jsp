@@ -385,7 +385,7 @@
             $("#inputTagName").val(tagName).prop("disabled", true);
             $("#inputMaxBidding").val(maxBidding);
             $("#category option").each(function (idx) {
-                var name = $(this).text();
+                var name = $(this).text().trim();
                 if (name == tagCategoryId) {
                     $("#category").val($(this).val());
                     return;
