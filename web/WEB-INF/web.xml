@@ -3,8 +3,24 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
          version="3.1">
+
+    <session-config>
         <!-- 会话失效分钟数 -->
-    　　<session-config>
-    　　　　<session-timeout>1400</session-timeout>
-    　　</session-config>
+        <session-timeout>1400</session-timeout>
+        <!--<cookie-config>-->
+            <!--<name>JSESSIONID</name>-->
+            <!--<domain>com.bestgo</domain>-->
+            <!--<path>/</path>-->
+            <!--<comment>-->
+                <!--admanager-->
+                <!--&lt;!&ndash; some information &ndash;&gt;-->
+            <!--</comment>-->
+            <!--<http-only>false</http-only>-->
+            <!--<secure>false</secure>-->
+            <!--<max-age>1800</max-age>-->
+        <!--</cookie-config>-->
+        <!--<tracking-mode>COOKIE</tracking-mode>-->
+        <!--<tracking-mode>URL</tracking-mode>-->
+        <!--<tracking-mode>SSL</tracking-mode>-->
+    </session-config>
 </web-app>
