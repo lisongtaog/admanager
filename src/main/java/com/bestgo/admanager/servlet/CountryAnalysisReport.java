@@ -763,7 +763,10 @@ public class CountryAnalysisReport extends BaseHttpServlet {
                         flag = true;
                     } else {
                         String rule_content = one.get("rule_content");
-                        rule_content = rule_content.replaceAll("cost>\\d*", "cost>" + cost);
+                        /**
+                         * 这里的  正则进行了修改。满足了小数的需求。
+                         */
+                        rule_content = rule_content.replaceAll("cost>\\d*(\\.\\d+)?", "cost>" + cost);
                         flag = DB.update("web_ad_rules")
                                 .put("rule_content", rule_content)
                                 .where(DB.filter().whereEqualTo("id", id))
