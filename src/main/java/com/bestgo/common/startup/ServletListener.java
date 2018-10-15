@@ -19,14 +19,13 @@ public class ServletListener implements ServletContextListener {
 	}
 
 	public void contextInitialized(ServletContextEvent arg0) {
-		ServletContext context = arg0.getServletContext();
-		initLog4J(context);
+//		ServletContext context = arg0.getServletContext();
+		initLog4J();
 		MySqlHelper.init();
 	}
 
-	private void initLog4J(ServletContext context){
-		String webappPath = context.getRealPath("/");
-		String log4jProp = webappPath + "/WEB-INF/log4j.properties";
-        PropertyConfigurator.configure(log4jProp);//装入log4j配置信息 
+	private void initLog4J(){
+		String log4jProp = this.getClass().getClassLoader().getResource("log4j.properties").getPath();
+		PropertyConfigurator.configure(log4jProp);//装入log4j配置信息
 	}
 }
