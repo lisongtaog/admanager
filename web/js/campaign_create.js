@@ -2181,6 +2181,8 @@ function init() {
             $("#inputImagePathAdmob").val(appList[0].tag_name + "/");
             pendingList.shift();
             if (pendingList.length == 0) {
+                $("#selectApp").trigger("change");
+                $("#selectAppAdmob").trigger("change");
                 if (isAutoCreate && modifyNetwork != null && modifyRecordId != null) {
                     initFormData();
                 }
@@ -2201,6 +2203,8 @@ function init() {
             });
             pendingList.shift();
             if (pendingList.length == 0) {
+                $("#selectApp").trigger("change");
+                $("#selectAppAdmob").trigger("change");
                 if (isAutoCreate && modifyNetwork != null && modifyRecordId != null) {
                     initFormData();
                 }
@@ -2221,6 +2225,8 @@ function init() {
             });
             pendingList.shift();
             if (pendingList.length == 0) {
+                $("#selectApp").trigger("change");
+                $("#selectAppAdmob").trigger("change");
                 if (isAutoCreate && modifyNetwork != null && modifyRecordId != null) {
                     initFormData();
                 }
@@ -4791,7 +4797,7 @@ function AdwordFormReading() {
 }
 
 function AdwordFormReadingByRegionExplode() {
-    var appName = $('#selectAppAdmob').val();
+    var appName = $('#arrayAdmob').val();
     var selectOptionsAdmob = $('#selectAccountAdmob option:selected');
     var accountNameAdmob = [];
     var accountIdAdmob = [];

@@ -213,6 +213,8 @@
         }, function(data) {
             if (data && data.ret == 1) {
                 appList = data.data;
+                $('#selectApp').append($("<option>请选择应用</option>"));
+                $('#selectAppAdmob').append($("<option>请选择应用</option>"));
                 appList.forEach(function(one) {
                     $('#selectApp').append($("<option>" + one.tag_name + "</option>"));
                     $('#selectAppAdmob').append($("<option>" + one.tag_name + "</option>"));
