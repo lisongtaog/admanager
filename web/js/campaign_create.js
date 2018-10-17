@@ -2173,6 +2173,8 @@ function init() {
     }, function (data) {
         if (data && data.ret == 1) {
             appList = data.data;
+            $('#selectApp').append($("<option>请选择应用</option>"));
+            $('#selectAppAdmob').append($("<option>请选择应用</option>"));
             appList.forEach(function (one) {
                 $('#selectApp').append($("<option>" + one.tag_name + "</option>"));
                 $('#selectAppAdmob').append($("<option>" + one.tag_name + "</option>"));
@@ -2181,8 +2183,6 @@ function init() {
             $("#inputImagePathAdmob").val(appList[0].tag_name + "/");
             pendingList.shift();
             if (pendingList.length == 0) {
-                $("#selectApp").trigger("change");
-                $("#selectAppAdmob").trigger("change");
                 if (isAutoCreate && modifyNetwork != null && modifyRecordId != null) {
                     initFormData();
                 }
@@ -2203,8 +2203,6 @@ function init() {
             });
             pendingList.shift();
             if (pendingList.length == 0) {
-                $("#selectApp").trigger("change");
-                $("#selectAppAdmob").trigger("change");
                 if (isAutoCreate && modifyNetwork != null && modifyRecordId != null) {
                     initFormData();
                 }
@@ -2225,8 +2223,6 @@ function init() {
             });
             pendingList.shift();
             if (pendingList.length == 0) {
-                $("#selectApp").trigger("change");
-                $("#selectAppAdmob").trigger("change");
                 if (isAutoCreate && modifyNetwork != null && modifyRecordId != null) {
                     initFormData();
                 }
