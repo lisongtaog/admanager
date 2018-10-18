@@ -47,12 +47,8 @@ public class UpdateAppImageVideoPathRel extends BaseHttpServlet {
                             DB.delete("ad_app_image_path_rel").where(DB.filter().whereEqualTo("app_name", appName)).execute();
                             for (String imagePath : PathList) {
                                 String imageRelativePath = imagePath.replace(rootPath + File.separatorChar, "");
-
                                 try {
-
-//                                  int index = imageRelativePath.lastIndexOf("\\");
-
-                                    int index = imageRelativePath.lastIndexOf("/");
+                                    int index = imageRelativePath.lastIndexOf(File.separatorChar);
                                     imageRelativePath = imageRelativePath.substring(0, index);
 
                                     int oldSize = set.size();
@@ -79,8 +75,7 @@ public class UpdateAppImageVideoPathRel extends BaseHttpServlet {
                             for (String videoPath : PathList) {
                                 String videoRelativePath = videoPath.replace(rootPath + File.separatorChar, "");
                                 try {
-//                                    int index = videoRelativePath.lastIndexOf("\\");
-                                    int index = videoRelativePath.lastIndexOf("/");
+                                    int index = videoRelativePath.lastIndexOf(File.separatorChar);
 
                                     videoRelativePath = videoRelativePath.substring(0, index);
 
