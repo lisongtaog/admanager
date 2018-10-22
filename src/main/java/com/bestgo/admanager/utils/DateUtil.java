@@ -1,5 +1,7 @@
 package com.bestgo.admanager.utils;
 
+import com.bestgo.admanager.constant.DateConstant;
+
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -12,6 +14,7 @@ import java.util.TimeZone;
  * @desc 处理有关日期的操作
  */
 public class DateUtil {
+
     /**
      * 将一个时间字符串通过某种格式转换成另一种时间字符串
      * @param dateStr
@@ -85,7 +88,11 @@ public class DateUtil {
      */
     public static String getUSANowDate() {
         Calendar calendar = Calendar.getInstance();
-        calendar.setTimeZone(TimeZone.getTimeZone("GMT-7:00"));
+        if (DateConstant.IS_DST) {
+            calendar.setTimeZone(TimeZone.getTimeZone("GMT-7:00"));
+        } else {
+            calendar.setTimeZone(TimeZone.getTimeZone("GMT-8:00"));
+        }
         String date = String.format("%d-%d-%d", calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH));
         return date;
     }
@@ -223,18 +230,47 @@ public class DateUtil {
     }
 
     /**
-     * 获取当前时间几小时后的时间字符串
+     *
      * @param hour
      * @return
      */
-    public static String getTimeByHour(int hour) {
 
+    /**
+     * 获取某个时间字符串几小时后的时间字符串
+     * @param hour 几个小时后
+     * @param dateTimeStr 输入时间字符串
+     * @param inFormat 将输入时间字符串转化成的时间格式
+     * @param outFormat 将输出时间字符串转化成的时间格式
+     * @return
+     */
+    public static String getTimeByHour(int hour,String dateTimeStr,String inFormat,String outFormat) {
         Calendar calendar = Calendar.getInstance();
+        SimpleDateFormat dateFormat = new SimpleDateFormat(inFormat);
+        try {
+            calendar.setTime(dateFormat.parse(dateTimeStr));
+            calendar.set(Calendar.HOUR_OF_DAY, calendar.get(Calendar.HOUR_OF_DAY) + hour);
+            if (!inFormat.equals(outFormat)) {
+                dateFormat = new SimpleDateFormat(outFormat);
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return dateFormat.format(calendar.getTime());
+    }
 
-        calendar.set(Calendar.HOUR_OF_DAY, calendar.get(Calendar.HOUR_OF_DAY) + hour);
-
-        return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(calendar.getTime());
-
+    /**
+     * 美国西太平洋时间转中国时间
+     * @param dateTimeStr
+     * @param inFormat
+     * @param outFormat
+     * @return
+     */
+    public static String usaDateTimeConverChinaDateTime(String dateTimeStr,String inFormat,String outFormat){
+        if (DateConstant.IS_DST) {
+            return getTimeByHour(15,dateTimeStr,inFormat,outFormat);
+        } else {
+            return getTimeByHour(16,dateTimeStr,inFormat,outFormat);
+        }
     }
 
 }
