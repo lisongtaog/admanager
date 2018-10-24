@@ -4793,7 +4793,7 @@ function AdwordFormReading() {
 }
 
 function AdwordFormReadingByRegionExplode() {
-    var appName = $('#arrayAdmob').val();
+    var appName = $('#selectAppAdmob').val();
     var selectOptionsAdmob = $('#selectAccountAdmob option:selected');
     var accountNameAdmob = [];
     var accountIdAdmob = [];

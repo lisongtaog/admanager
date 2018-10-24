@@ -329,7 +329,7 @@
 
     <form class="form-horizontal" action="#" id="formAdmob">
         <div class="form-group">
-            <label for="selectApp" class="col-sm-2 control-label">应用</label>
+            <label for="selectAppAdmob" class="col-sm-2 control-label">应用</label>
             <div class="col-sm-10">
                 <select class="form-control" id="selectAppAdmob">
 
