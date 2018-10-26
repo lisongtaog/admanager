@@ -44,11 +44,13 @@
             <label for="ruleType">规则类型</label>
             <select class="selectpicker" id="ruleType">
                 <option value="">所有类型</option>
-                <option value="1">类型1（监控广告系列）</option>
-                <option value="2">类型2（监控应用）</option>
-                <option value="3">类型3（监控国家花费）</option>
-                <option value="4">类型4（监控国家回本率）</option>
-                <option value="5">类型5（监控所有国家回本率）</option>
+                <option value="1">类型1（监控广告系列花费更新预算）</option>
+                <option value="2">类型2（监控应用花费暂停系列）</option>
+                <option value="3">类型3（监控国家花费暂停系列）</option>
+                <option value="4">类型4（监控国家回本率暂停系列）</option>
+                <option value="5">类型5（监控所有国家回本率暂停系列）</option>
+                <option value="6">类型6（监控系列CPA与Install暂停系列）</option>
+                <option value="7">类型7（监控系列CPA与Install开启系列）</option>
             </select>
             <label for="inputTag">标签</label>
             <input id="inputTag" type="text"/>
@@ -93,11 +95,13 @@
                         <label for="inputRuleType" class="col-sm-2 control-label">规则类型</label>
                         <div class="col-sm-10">
                             <select class="form-control" id="inputRuleType">
-                                <option value="1">类型1（监控广告系列）</option>
-                                <option value="2">类型2（监控应用）</option>
-                                <option value="3">类型3（监控国家花费）</option>
-                                <option value="4">类型4（监控国家回本率）</option>
-                                <option value="5">类型5（监控所有国家回本率）</option>
+                                <option value="1">类型1（监控广告系列花费更新预算）</option>
+                                <option value="2">类型2（监控应用花费暂停系列）</option>
+                                <option value="3">类型3（监控国家花费暂停系列）</option>
+                                <option value="4">类型4（监控国家回本率暂停系列）</option>
+                                <option value="5">类型5（监控所有国家回本率暂停系列）</option>
+                                <option value="6">类型6（监控系列CPA与Install暂停系列）</option>
+                                <option value="7">类型7（监控系列CPA与Install开启系列）</option>
                             </select>
                         </div>
                     </div>
@@ -158,15 +162,19 @@
     $('#inputRuleType').change(function () {
         var ruleType = $('#inputRuleType').val();
         if (ruleType == 1) {
-            $('#inputRuleContent').val("appName=VpnV10,countryCode=US,CPA<0.3,costDivBudget>0.9,budget+=CPA*40")
+            $('#inputRuleContent').val("appName=VpnV10,countryCode=US,CPA<0.3,costDivBudget>0.9,budget+=CPA*40");
         } else if (ruleType == 2) {//是应用维度    app_name=应用名称,cost>花费数字,cpa>cpa值
-            $('#inputRuleContent').val("app_name=xxx,cost>xxx,cpa>xxx")
+            $('#inputRuleContent').val("app_name=VpnV10,cost>12,cpa>0.1");
         } else if (ruleType == 3) {//是应用+国家维度 app_name=应用名称,country_code=国家代号,cpa_div_ecpm>cpa除以ecpm,cost>花费
-            $('#inputRuleContent').val("app_name=xxx,country_code=xxx,cpa_div_ecpm>xxx,cost>xxx")
+            $('#inputRuleContent').val("app_name=VpnV10,country_code=US,cpa_div_ecpm>0.3,cost>12");
         } else if (ruleType == 4) {
-            $('#inputRuleContent').val("app_name=xxx,country_code=xxx,purchased_user>10,roi<0.5")
+            $('#inputRuleContent').val("app_name=VpnV10,country_code=US,purchased_user>10,roi<0.5");
         } else if (ruleType == 5) {
-            $('#inputRuleContent').val("app_name=xxx,purchased_user>10,roi<0.5")
+            $('#inputRuleContent').val("app_name=VpnV10,purchased_user>10,roi<0.5");
+        } else if (ruleType == 6) {
+            $('#inputRuleContent').val("appName=VpnV10,countryCode=US,CPA>0.3,install>10");
+        } else if (ruleType == 7) {
+            $('#inputRuleContent').val("appName=VpnV10,countryCode=US,CPA<0.3,install>10");
         }
     });
 
