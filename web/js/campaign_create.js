@@ -2447,6 +2447,17 @@ function generateFacebookCampaignName(params) {
     var dims = [];
     var appName = $('#selectApp').val();
     dims.push(appName);
+    var region = $('#selectRegion').val();
+    var countryAlisa = $('#customCountryPart').val();
+    if (countryAlisa) {
+        dims.push(countryAlisa);
+    } else {
+        if (params.region) {
+            dims.push(params.region);
+        } else {
+            dims.push(region.join(","));
+        }
+    }
     if (params.fbPageName) {
         dims.push(params.fbPageName);
     }
@@ -2477,17 +2488,6 @@ function generateFacebookCampaignName(params) {
     }
     if (params.groupId) {
         dims.push("Group" + params.groupId)
-    }
-    var region = $('#selectRegion').val();
-    var countryAlisa = $('#customCountryPart').val();
-    if (countryAlisa) {
-        dims.push(countryAlisa);
-    } else {
-        if (params.region) {
-            dims.push(params.region);
-        } else {
-            dims.push(region.join(","));
-        }
     }
     var gender = $('#selectGender').val();
     if (typeof params.gender !== 'undefined') {
@@ -2544,9 +2544,6 @@ function generateAdmobCampaignName(params) {
     var dims = [];
     var now = new Date();
     dims.push($('#selectAppAdmob').val());
-    if (params.groupId) {
-        dims.push("Group" + params.groupId)
-    }
     var region = $('#selectRegionAdmob option:selected').text();
     var countryAlisa = $('#customCountryPartAdmob').val();
     if (countryAlisa) {
@@ -2577,6 +2574,9 @@ function generateAdmobCampaignName(params) {
         } else {
             dims.push(region);
         }
+    }
+    if (params.groupId) {
+        dims.push("Group" + params.groupId)
     }
 
     dims.push($('#selectLanguageAdmob option:selected').text());
