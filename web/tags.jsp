@@ -37,11 +37,14 @@
         <table class="table">
             <thead>
             <tr>
-                <td colspan="10">是否计入统计---针对投放数据统计中的应用是否纳入到统计中。&nbsp;&nbsp;是否显示---显示的是正在投放的产品；不显示的是被暂停投放的产品，只是为了便于查看数据
+                <td colspan="10">是否计入统计---针对【投放数据统计】中的应用是否纳入到统计中；
                 </td>
             </tr>
             <tr>
                 <td colspan="10">标签名称---与标签ID唯一并存，命名必须是前后两端中间位置都不能有空格，并且是驼峰命名AaaBbbCcc</td>
+            </tr>
+            <tr>
+                <td colspan="10">除了最大出价可以在投放机器上修改以外，其他增加和修改信息都要在汇总机器IP为10.23.3.192上进行，操作完毕后需要通知管理员。管理员将数据导入到投放机器上后，你会在看到自己负责的应用</td>
             </tr>
             <tr>
                 <th>标签ID</th>
@@ -52,7 +55,7 @@
                 <th>期望盈利</th>
                 <th>投放人员</th>
                 <th>是否计入统计</th>
-                <th>是否显示</th>
+                <th>是否投放</th>
                 <th>操作</th>
             </tr>
             </thead>
@@ -86,7 +89,9 @@
                 <td><%=one.get("nickname")%></td>
                 <td><%=Integer.parseInt(one.get("is_statistics").toString()) == 1 ? "是" : "否"%></td>
                 <td><%=Integer.parseInt(one.get("is_display").toString()) == 1 ? "是" : "否"%></td>
-                <td><a class="link_modify glyphicon glyphicon-pencil" href="#"></a><a class="link_delete glyphicon glyphicon-remove" href="#"></a></td>
+                <td><a class="link_modify glyphicon glyphicon-pencil" href="#"></a>
+                    <%--<a class="link_delete glyphicon glyphicon-remove" href="#"></a>--%>
+                </td>
             </tr>
             <% } %>
 
@@ -190,7 +195,7 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="isDisplay" class="col-sm-2 control-label">是否显示</label>
+                        <label for="isDisplay" class="col-sm-2 control-label">是否投放</label>
                         <div class="col-sm-8">
                             <select id="isDisplay" class="form-control">
                                 <option value="1">是</option>
@@ -260,7 +265,7 @@
             }, 'json');
         } else if (modifyType == 'update') {
 
-            //《是否显示》为否，清空该标签的规则。
+            //《是否投放》为否，清空该标签的规则。
             if (is_display == 0) {
                 $.post('rules/delByTagName', {
                     tagName: tagName,
@@ -358,7 +363,9 @@
             td.text(one.is_display == "1" ? "是" : "否");
             tr.append(td);
 
-            td = $('<td><a class="link_modify glyphicon glyphicon-pencil" href="#"></a><a class="link_delete glyphicon glyphicon-remove" href="#"></a></td>');
+            td = $('<td><a class="link_modify glyphicon glyphicon-pencil" href="#"></a>' +
+//                '<a class="link_delete glyphicon glyphicon-remove" href="#"></a>' +
+                '</td>');
             tr.append(td);
             $('.table tbody').append(tr);
         }
