@@ -338,7 +338,7 @@
         </div>
 
         <div class="form-group">
-            <label for="selectAccountAdmob" class="col-sm-2 control-label">广告账号</label>
+            <label for="selectAccountAdmob" class="col-sm-2 control-label">广告账号(暂未启用)</label>
             <div class="col-sm-8">
                 <select class="form-control select2" id="selectAccountAdmob" multiple="multiple">
 
