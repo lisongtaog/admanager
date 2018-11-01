@@ -416,7 +416,7 @@ public class Campaign extends BaseHttpServlet {
 
                         JSObject js = null;
                         for (int i = 0; i < createCountInt; i++) {
-                            js = accountList.get(NumberUtil.getRandomIntNum(0, accountList.size()));
+                            js = accountList.get(NumberUtil.getRandomIntNum(0, accountList.size() - 1));
                             String now = String.format("%d-%02d-%02d %02d:%02d:%02d", calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH),
                                     calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), calendar.get(Calendar.SECOND));
                             String s = String.valueOf(System.currentTimeMillis());

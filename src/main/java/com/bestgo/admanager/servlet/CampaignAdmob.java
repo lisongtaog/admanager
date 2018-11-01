@@ -3,10 +3,7 @@ package com.bestgo.admanager.servlet;
 import com.bestgo.admanager.Config;
 import com.bestgo.admanager.OperationResult;
 import com.bestgo.admanager.constant.JedisConstant;
-import com.bestgo.admanager.utils.DateUtil;
-import com.bestgo.admanager.utils.JedisPoolUtil;
-import com.bestgo.admanager.utils.NumberUtil;
-import com.bestgo.admanager.utils.Utils;
+import com.bestgo.admanager.utils.*;
 import com.bestgo.admanager_tools.AdWordsFetcher;
 import com.bestgo.admanager_tools.DefaultConfig;
 import com.bestgo.common.database.services.DB;
@@ -180,8 +177,8 @@ public class CampaignAdmob extends BaseHttpServlet {
             List<JSObject> accountIdList = fetchAccountIdList();
             String appName = request.getParameter("appName");
             String gpPackageId = request.getParameter("gpPackageId");
-//            String accountId = request.getParameter("accountId");
-//            String accountName = request.getParameter("accountName");
+            String accountId = request.getParameter("accountId");
+            String accountName = request.getParameter("accountName");
             String createCount = request.getParameter("createCount");
             String region = request.getParameter("region");
             String excludedRegion = request.getParameter("excludedRegion");
@@ -208,8 +205,6 @@ public class CampaignAdmob extends BaseHttpServlet {
                 int groupId = NumberUtil.parseInt(groupIdStr, 0);
                 if (groupId == 0) {
                     result.message = "广告组ID不存在！请联系管理员";
-                } else if (createCount.isEmpty()) {
-                    result.message = "创建数量不能为空";
                 } else if (message1.isEmpty()) {
                     result.message = "广告语1不能为空";
                 } else if (message2.isEmpty()) {
@@ -286,53 +281,102 @@ public class CampaignAdmob extends BaseHttpServlet {
                                 campaignNameOld = campaignName + "_";
                             }
                             campaignNameOld = campaignNameOld.replace("Group_", "Group" + groupId);
-//                            String[] accountNameArr = accountName.split(",");
-//                            String[] accountIdArr = accountId.split(",");
-                            int createCountInt = Integer.parseInt(createCount);
-//                            Random random = new Random();
-
-                            int Min = 0;
-                            int Max = accountIdList.size();
-                            for (int i = 0; i < createCountInt; i++) {
-                                int accountIndex = Min + (int)(Math.random() * ((Max - Min) + 1));
-                                JSObject js = accountIdList.get(accountIndex);
-                                String now = String.format("%d-%02d-%02d %02d:%02d:%02d", calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH),
-                                        calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), calendar.get(Calendar.SECOND));
-                                long s = System.currentTimeMillis();
-                                String part = i + new StringBuffer(s + "").reverse().toString();
-                                campaignName = campaignNameOld + js.get("short_name") + "_" + i + part;
-
-                                if (campaignName.length() > 150) {
-                                    campaignName = campaignName.substring(0, 150);
+                            int createCountInt = 1;
+                            if (createCount != null) {
+                                createCountInt = Integer.parseInt(createCount);
+                                if (createCountInt == 0) {
+                                    createCountInt = 1;
                                 }
-                                long genId = DB.insert("ad_campaigns_admob")
-                                        .put("account_id", js.get("account_id"))
-                                        .put("campaign_name", campaignName)
-                                        .put("app_id", gpPackageId)
-                                        .put("country_region", region)
-                                        .put("language", language)
-                                        .put("conversion_id", conversionId)
-                                        .put("excluded_region", excludedRegion)
-                                        .put("create_time", now)
-                                        .put("bugdet", bugdet)
-                                        .put("bidding", bidding)
-                                        .put("max_cpa", maxCPA)
-                                        .put("group_id", groupId)
-                                        .put("message1", message1)
-                                        .put("message2", message2)
-                                        .put("message3", message3)
-                                        .put("message4", message4)
-                                        .put("app_name", appName)
-                                        .put("tag_name", appName)
-                                        .put("image_path", imageAbsolutePath)
-                                        .executeReturnId();
-                                if (genId <= 0) {
-                                    Logger logger = Logger.getRootLogger();
-                                    logger.debug("app_id=" + gpPackageId + ", account_id=" + js.get("account_id") + ", country_region=" + region +
-                                            ", excluded_region=" + excludedRegion + ", create_time=" + now + ", language=" + language +
-                                            ", campaign_name=" + campaignName + ", conversion_id=" + conversionId + ", bugdet=" + bugdet +
-                                            ", bidding=" + bidding + ", bugdet=" + bugdet + ", bidding=" + bidding + ", message1=" + message1 + ", message2=" + message2
-                                            + ", message3=" + message3 + ", message4=" + message4 + ", app_name=" + appName + ", image_path=" + imageAbsolutePath);
+                            }
+                            if (StringUtil.isEmpty(accountId)) { //如果账号字段为空，则随机创建拿到createCountInt个遍历
+                                ArrayList<JSObject> jsAccountList = new ArrayList<>();
+                                for (int i = 0;i < createCountInt;i++) {
+                                    jsAccountList.add(accountIdList.get(NumberUtil.getRandomIntNum(0, accountIdList.size() - 1)));
+                                }
+                                JSObject js = null;
+                                for (int j = 0,len = jsAccountList.size();j < len;j++) {
+                                    js = jsAccountList.get(j);
+                                    String now = String.format("%d-%02d-%02d %02d:%02d:%02d", calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH),
+                                            calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), calendar.get(Calendar.SECOND));
+                                    long s = System.currentTimeMillis();
+                                    String part = j + new StringBuffer(s + "").reverse().toString();
+                                    campaignName = campaignNameOld + js.get("short_name") + "_" + j + part;
+
+                                    if (campaignName.length() > 150) {
+                                        campaignName = campaignName.substring(0, 150);
+                                    }
+                                    long genId = DB.insert("ad_campaigns_admob")
+                                            .put("account_id", js.get("account_id"))
+                                            .put("campaign_name", campaignName)
+                                            .put("app_id", gpPackageId)
+                                            .put("country_region", region)
+                                            .put("language", language)
+                                            .put("conversion_id", conversionId)
+                                            .put("excluded_region", excludedRegion)
+                                            .put("create_time", now)
+                                            .put("bugdet", bugdet)
+                                            .put("bidding", bidding)
+                                            .put("max_cpa", maxCPA)
+                                            .put("group_id", groupId)
+                                            .put("message1", message1)
+                                            .put("message2", message2)
+                                            .put("message3", message3)
+                                            .put("message4", message4)
+                                            .put("app_name", appName)
+                                            .put("tag_name", appName)
+                                            .put("image_path", imageAbsolutePath)
+                                            .executeReturnId();
+                                    if (genId <= 0) {
+                                        Logger logger = Logger.getRootLogger();
+                                        logger.debug("app_id=" + gpPackageId + ", account_id=" + js.get("account_id") + ", country_region=" + region +
+                                                ", excluded_region=" + excludedRegion + ", create_time=" + now + ", language=" + language +
+                                                ", campaign_name=" + campaignName + ", conversion_id=" + conversionId + ", bugdet=" + bugdet +
+                                                ", bidding=" + bidding + ", bugdet=" + bugdet + ", bidding=" + bidding + ", message1=" + message1 + ", message2=" + message2
+                                                + ", message3=" + message3 + ", message4=" + message4 + ", app_name=" + appName + ", image_path=" + imageAbsolutePath);
+                                    }
+                                }
+                            } else { //如果账号不为空，则按照账号数组分拆创建
+                                String[] accountNameArr = accountName.split(",");
+                                String[] accountIdArr = accountId.split(",");
+                                for (int j = 0,len = accountIdArr.length;j < len;j++) {
+                                    String now = String.format("%d-%02d-%02d %02d:%02d:%02d", calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH),
+                                            calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), calendar.get(Calendar.SECOND));
+                                    long s = System.currentTimeMillis();
+                                    String part = j + new StringBuffer(s + "").reverse().toString();
+                                    campaignName = campaignNameOld + accountNameArr[j] + "_" + j + part;
+
+                                    if (campaignName.length() > 150) {
+                                        campaignName = campaignName.substring(0, 150);
+                                    }
+                                    long genId = DB.insert("ad_campaigns_admob")
+                                            .put("account_id", accountIdArr[j])
+                                            .put("campaign_name", campaignName)
+                                            .put("app_id", gpPackageId)
+                                            .put("country_region", region)
+                                            .put("language", language)
+                                            .put("conversion_id", conversionId)
+                                            .put("excluded_region", excludedRegion)
+                                            .put("create_time", now)
+                                            .put("bugdet", bugdet)
+                                            .put("bidding", bidding)
+                                            .put("max_cpa", maxCPA)
+                                            .put("group_id", groupId)
+                                            .put("message1", message1)
+                                            .put("message2", message2)
+                                            .put("message3", message3)
+                                            .put("message4", message4)
+                                            .put("app_name", appName)
+                                            .put("tag_name", appName)
+                                            .put("image_path", imageAbsolutePath)
+                                            .executeReturnId();
+                                    if (genId <= 0) {
+                                        Logger logger = Logger.getRootLogger();
+                                        logger.debug("app_id=" + gpPackageId + ", account_id=" + accountIdArr[j] + ", country_region=" + region +
+                                                ", excluded_region=" + excludedRegion + ", create_time=" + now + ", language=" + language +
+                                                ", campaign_name=" + campaignName + ", conversion_id=" + conversionId + ", bugdet=" + bugdet +
+                                                ", bidding=" + bidding + ", bugdet=" + bugdet + ", bidding=" + bidding + ", message1=" + message1 + ", message2=" + message2
+                                                + ", message3=" + message3 + ", message4=" + message4 + ", app_name=" + appName + ", image_path=" + imageAbsolutePath);
+                                    }
                                 }
                             }
 

@@ -338,7 +338,7 @@
         </div>
 
         <div class="form-group">
-            <label for="selectAccountAdmob" class="col-sm-2 control-label">广告账号(暂未启用)</label>
+            <label for="selectAccountAdmob" class="col-sm-2 control-label">广告账号（不录入为随机）</label>
             <div class="col-sm-8">
                 <select class="form-control select2" id="selectAccountAdmob" multiple="multiple">
 
@@ -349,7 +349,7 @@
             </div>
         </div>
         <div class="form-group">
-            <label for="inputCreateCountAdmob" class="col-sm-2 control-label">创建数量</label>
+            <label for="inputCreateCountAdmob" class="col-sm-2 control-label">随机账号数量</label>
             <div class="col-sm-10">
                 <input class="form-control" id="inputCreateCountAdmob" value="1"/>
             </div>
