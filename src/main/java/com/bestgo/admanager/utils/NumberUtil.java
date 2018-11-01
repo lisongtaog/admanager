@@ -65,4 +65,14 @@ public class NumberUtil {
     public static double trimDouble(double value,int n) {
         return Double.parseDouble(String.format("%." + n + "f", value));
     }
+
+    /**
+     * 获取 Between最大值And最小值 之间的随机整数
+     * @param min
+     * @param max
+     * @return
+     */
+    public static int getRandomIntNum(int min,int max) {
+        return min + (int)(Math.random() * ((max - min) + 1));
+    }
 }

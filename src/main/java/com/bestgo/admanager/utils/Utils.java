@@ -340,4 +340,32 @@ public class Utils {
         }
         return map;
     }
+
+    public  static List<JSObject> fetchFBAccountList(boolean isAcitve){
+        List<JSObject> list = new ArrayList<>();
+        try {
+            if (isAcitve) {
+                list = DB.findListBySql("SELECT account_id,short_name FROM web_account_id WHERE `status` = 1");
+            } else {
+                list = DB.findListBySql("SELECT account_id,short_name FROM web_account_id");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    public  static List<JSObject> fetchAdwordsAccountList(boolean isAcitve){
+        List<JSObject> list = new ArrayList<>();
+        try {
+            if (isAcitve) {
+                list = DB.findListBySql("SELECT account_id,short_name FROM web_account_id_admob WHERE `status` = 1");
+            } else {
+                list = DB.findListBySql("SELECT account_id,short_name FROM web_account_id_admob");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
 }
