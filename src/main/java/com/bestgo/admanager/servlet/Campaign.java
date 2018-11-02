@@ -42,9 +42,15 @@ public class Campaign extends BaseHttpServlet {
         Jedis jedis = JedisPoolUtil.getJedis();
         String path = request.getPathInfo();
         JsonObject json = new JsonObject();
-        //检查帐户状态
-        Map<String, Integer> facebookAccountDetailsMap = getFacebookAccountDetails();
-
+        List<JSObject> facebookAccountIdList = Utils.getFacebookAccountIdList(true, true, false); //在投放的活跃的账号集合
+        HashMap<String, String> accountMap = new HashMap<>();
+        JSObject js = null;
+        for (int i= 0,len = facebookAccountIdList.size();i < len;i++) {
+            js = facebookAccountIdList.get(i);
+            if (js.hasObjectData()) {
+                accountMap.put(js.get("account_id"),js.get("short_name"));
+            }
+        }
         long delCount = 0;
 
         if (path.startsWith("/upCampaign")) {
@@ -183,16 +189,15 @@ public class Campaign extends BaseHttpServlet {
             String[] accountIdArr = null;
             //判断帐户是否有效
             boolean activeAccout = true;
-            if (StringUtil.isEmpty(accountId) || "ABC".equals(accountId)) {
+            if (StringUtil.isEmpty(accountId)) {
                 existAccoutField = false;
             } else {
                 accountNameArr = accountName.split(",");
                 accountIdArr = accountId.split(",");
                 for (int j = 0, len = accountNameArr.length; j < len; j++) {
                     //账户状态，如果为1则为开启；为2则为禁用
-                    Integer accountStatus = facebookAccountDetailsMap.get(accountIdArr[j]);
                     //帐户不存在或status是关闭,直接返回
-                    if (accountStatus == null || accountStatus != 1) {
+                    if (!accountMap.containsKey(accountIdArr[j])) {
                         activeAccout = false;
                         break;
                     }
@@ -411,10 +416,9 @@ public class Campaign extends BaseHttpServlet {
                             }
                         }
                     } else {//如果不存在账号字段，则取随机一个账号
-                        List<JSObject> accountList = Utils.fetchFBAccountList(true);
+                        List<JSObject> accountList = Utils.getFacebookAccountIdList(true, true, true);
                         Calendar calendar = Calendar.getInstance();
 
-                        JSObject js = null;
                         for (int i = 0; i < createCountInt; i++) {
                             js = accountList.get(NumberUtil.getRandomIntNum(0, accountList.size() - 1));
                             String now = String.format("%d-%02d-%02d %02d:%02d:%02d", calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH),
@@ -804,7 +808,7 @@ public class Campaign extends BaseHttpServlet {
                     }
                     if (enabled == 1) item.excludedCountry = null;
                     //账户状态，为1则为开启；为2则为禁用
-                    Integer accountStatus = facebookAccountDetailsMap.get(item.accountId);
+                    Integer accountStatus = accountMap.containsKey(item.accountId) ? 1 : 2;
 
                     if (record.hasObjectData() && (item.excludedCountry == null || item.excludedCountry.isEmpty())) {
                         long id = record.get("id");

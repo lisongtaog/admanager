@@ -341,17 +341,31 @@ public class Utils {
         return map;
     }
 
-    public  static List<JSObject> fetchFBAccountList(boolean isAcitve){
+    /**
+     * 获取FB账号集合
+     * @param isInservice 是否参与投放
+     * @param isRandomCreate 是否参与随机创建
+     * @return
+     */
+    public static List<JSObject> getFacebookAccountIdList(boolean queryAcitve,boolean isInservice,boolean isRandomCreate) {
         List<JSObject> list = new ArrayList<>();
         try {
-            if (isAcitve) {
-                list = DB.findListBySql("SELECT account_id,short_name FROM web_account_id WHERE `status` = 1");
-            } else {
-                list = DB.findListBySql("SELECT account_id,short_name FROM web_account_id");
+            String sql = "SELECT account_id,short_name FROM web_account_id ";
+            if (queryAcitve) {
+                sql += " WHERE `status` = 1";
+                if (isInservice) {
+                    sql += " AND is_inservice = 1";
+                }
+                if (isRandomCreate) {
+                    sql += " AND is_random_create = 1";
+                }
             }
+
+            list = DB.findListBySql(sql);
         } catch (Exception e) {
             e.printStackTrace();
         }
+
         return list;
     }
 
