@@ -5024,7 +5024,7 @@ $("#btnCreateAdmob").click(function () {
     if (!checkAutoCreate && !onlyAutoCreateCheck && !flag) {
         var requestPool = [];
         explodeParams.forEach(function (p) {
-            var cloned = {}
+            var cloned = {};
             $.extend(cloned, p);
             cloned.groupId = p.adsGroup.groupId;
             cloned.message1 = p.adsGroup.message1;
@@ -5515,3 +5515,10 @@ $("#inputVideoPath,#inputImagePath,#inputImagePathAdmob").change(function () {
         }
     }
 });
+
+
+
+
+
+
+
