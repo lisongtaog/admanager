@@ -39,8 +39,8 @@
         NOTE: jdbc url里的server ip写死了10.23.3.192
     -->
     <Resource name="jdbc/mysql" auth="Container" type="javax.sql.DataSource"
-			  driverClassName="com.mysql.jdbc.Driver" url="jdbc:mysql://localhost/admanager?characterEncoding=UTF-8&amp;noAccessToProcedureBodies=true&amp;autoReconnect=true&amp;useOldAliasMetadataBehavior=true"
-			  username="root" password="root" maxIdle="10" minIdle="1" maxWaitMillis="10000" maxTotal="100"
+			  driverClassName="com.mysql.cj.jdbc.Driver" url="jdbc:mysql://localhost/admanager?characterEncoding=UTF-8&amp;noAccessToProcedureBodies=true&amp;autoReconnect=true&amp;useOldAliasMetadataBehavior=true&amp;useSSL=false&amp;serverTimezone=Asia/Shanghai&amp;zeroDateTimeBehavior=CONVERT_TO_NULL"
+			  username="root" password="131409040112" maxIdle="10" minIdle="1" maxWaitMillis="10000" maxTotal="100"
 			  validationQuery="select 1" initialSize="1" testOnBorrow="true" testWhileIdle="true"/>
 			  <!--driverClassName="com.mysql.jdbc.Driver" url="jdbc:mysql://10.23.3.192/admanager?characterEncoding=UTF-8&amp;noAccessToProcedureBodies=true&amp;autoReconnect=true&amp;useOldAliasMetadataBehavior=true"-->
 			  <!--username="aduser" password="aduser1234" maxIdle="10" minIdle="1" maxWaitMillis="10000" maxTotal="100"-->
@@ -53,10 +53,11 @@
 
 
 
+
     <!--<Valve className="com.request.tomcat.session.management.RequestSessionHandlerValve"/>-->
     <!--<Manager className="com.request.tomcat.session.management.RequestSessionManager"/>-->
 
 	<!-- Redis保存着用户名和密码的Session -->
-	<Valve className="tomcat.request.session.redis.SessionHandlerValve" />
-	<Manager className="tomcat.request.session.redis.SessionManager" />
+	<!--<Valve className="tomcat.request.session.redis.SessionHandlerValve" />-->
+	<!--<Manager className="tomcat.request.session.redis.SessionManager" />-->
 </Context>
